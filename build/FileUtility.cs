@@ -105,6 +105,15 @@ namespace Build
             });
         }
 
+        public static void DeleteDirectory(string path, bool recursive)
+        {
+            if (Instance.Directory.Exists(path))
+            {
+                Instance.Directory.Delete(path, recursive);
+            }
+
+        }
+
         public static Task<bool> DeleteIfExistsAsync(string path)
         {
             return Task.Run(() =>
@@ -118,7 +127,7 @@ namespace Build
             });
         }
 
-        public static async Task WriteAsync(string path, string contents, Encoding encoding = null)
+        public static void Write(string path, string contents, Encoding encoding = null)
         {
             if (path == null)
             {
@@ -132,24 +141,12 @@ namespace Build
 
             encoding = encoding ?? Encoding.UTF8;
 
-            try
-            {
-                await TryWrite();
-            }
-            catch (DirectoryNotFoundException)
-            {
-                EnsureDirectoryExists(Path.GetDirectoryName(path));
-                await TryWrite();
-            }
-
-            async Task TryWrite()
-            {
-                using (Stream fileStream = OpenFile(path, FileMode.Create, FileAccess.Write, FileShare.Read))
-                using (var writer = new StreamWriter(fileStream, encoding, 4096))
-                {
-                    await writer.WriteAsync(contents);
-                }
-            }
+            EnsureDirectoryExists(Path.GetDirectoryName(path));
+            Stream fileStream = OpenFile(path, FileMode.Create, FileAccess.Write, FileShare.Read);
+            var writer = new StreamWriter(fileStream, encoding, 4096);
+            writer.Write(contents);
+            writer.Close();
+            fileStream.Close();
         }
 
         public static async Task<string> ReadAsync(string path, Encoding encoding = null)

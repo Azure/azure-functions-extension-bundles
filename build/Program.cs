@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using static Build.BuildSteps;
 
@@ -10,15 +11,15 @@ namespace Build
         {
             Orchestrator
                 .CreateForTarget(args)
-                .Then(CleanOutputDirectory)
+                .Then(Clean)
                 .Then(CreateOutputDirectory)
                 .Then(CopyProjectToOutputDirectory)
                 .Then(AddPackages)
                 .Then(BuildExtensionsProject)
                 .Then(DownloadTemplates)
-                //.Then(ExtractTemplatesToOutPutDirectory)
-                //.Then(RemoveObjFolderFromOutPutDirectory)
-                //.Then(ZipOutputDirectory)
+                .Then(RemoveObjFolderFromOutPutDirectory)
+                .Then(CreateBundleJsonFile)
+                .Then(ZipOutputDirectory)
                 .Run();
         }
     }

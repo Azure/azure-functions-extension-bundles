@@ -28,16 +28,28 @@ namespace Build
 
         public static readonly string ProjectFile = Path.Combine(SrcProjectPath, "extensions.csproj");
 
-        public static readonly string OutputDir = Path.Combine(Path.GetFullPath(".."), "artifacts");
+        public static readonly string OutputDirectory = Path.Combine(Path.GetFullPath(".."), "buildOutput");
 
-        public static readonly string OutputTemplatesDirectory = Path.Combine(OutputDir, TemplatesDirectoryName);
+        public static readonly string ArtifactsDirectory = Path.Combine(Path.GetFullPath(".."), "artifacts");
+
+        public static readonly string BundleZipPath = Path.Combine(ArtifactsDirectory, $"{ExtensionBundleId}.");
+
+        public static readonly string OutputTemplatesDirectory = Path.Combine(OutputDirectory, TemplatesDirectoryName);
 
         public static readonly string OutputTemplatesJsonFile = Path.Combine(OutputTemplatesDirectory, "Templates", "Templates.json");
 
-        public static readonly string OutputProjectFile = Path.Combine(OutputDir, "extensions.csproj");
+        public static readonly string OutputProjectFile = Path.Combine(OutputDirectory, "extensions.csproj");
 
-        public static readonly string OutputBinDir = Path.Combine(OutputDir, "bin");
+        public static readonly string OutputBinDirectory = Path.Combine(OutputDirectory, "bin");
 
         public static readonly string ExtensionsJsonFile = Path.Combine(SrcProjectPath, "extensions.json");
+
+        public static string ExtensionBundleId = "Microsoft.Azure.Functions.ExtensionBundle";
+
+        public static string ExtensionBundleVersionRange = "[1.*, 2.0.0)";
+
+        public static string ExtensionBundleBuildVersion = "1.0.0";
+
+        public static readonly string OutputBundleJsonFile= Path.Combine(OutputDirectory, "bundle.json");
     }
 }

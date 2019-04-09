@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Build
 {
-    class Extensions
+    class ExtensionBundleInfo
     {
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
