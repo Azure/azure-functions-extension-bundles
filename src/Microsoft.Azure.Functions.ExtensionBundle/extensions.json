@@ -1,0 +1,34 @@
+[
+    {
+        "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
+        "version": "3.0.4"
+    },
+    {
+        "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
+        "version": "3.0.3"
+    },
+    {
+        "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
+        "version": "3.0.3"
+    },
+    {
+        "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
+        "version": "3.0.0"
+    },
+    {
+        "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
+        "version": "1.8.0"
+    },
+    {
+        "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
+        "version": "2.0.0"
+    },
+    {
+        "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
+        "version": "3.0.3"
+    },
+    {
+        "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
+        "version": "3.0.0"
+    }
+]
