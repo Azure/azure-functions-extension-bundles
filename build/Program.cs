@@ -12,7 +12,9 @@ namespace Build
                 .CreateForTarget(args)
                 .Then(CleanOutputDir)
                 .Then(CreateOutputDir)
+                .Then(CopyProjectToOutputDir)
                 .Then(AddPackages)
+                .Then(RestorePackages)
                 .Run();
         }
     }

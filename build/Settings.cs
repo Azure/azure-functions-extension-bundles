@@ -20,12 +20,15 @@ namespace Build
 
         public static string[] nugetFeed = new[] { "https://www.nuget.org/api/v2/" };
 
-        public static readonly string OutputDir = Path.Combine(Path.GetFullPath(".."), "artifacts");
-
         public static readonly string SrcProjectPath = Path.GetFullPath("../src/Microsoft.Azure.Functions.ExtensionBundle/");
 
-        public static readonly string OutputProjectFile = Path.Combine(OutputDir, "extensions.csproj");
         public static readonly string ProjectFile = Path.Combine(SrcProjectPath, "extensions.csproj");
+
+        public static readonly string OutputProjectFile = Path.Combine(OutputDir, "extensions.csproj");
+
+        public static readonly string OutputDir = Path.Combine(Path.GetFullPath(".."), "artifacts");
+
+        public static readonly string OutputBinDir = Path.Combine(OutputDir, "bin");
 
         public static readonly string ExtensionsJsonFile = Path.Combine(SrcProjectPath, "extensions.json");
 

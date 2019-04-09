@@ -29,7 +29,7 @@ namespace Build
         public static void RestorePackages()
         {
             var feeds = Settings.nugetFeed.Aggregate(string.Empty, (a, b) => $"{a} --source {b}");
-            Shell.Run("dotnet", $"restore {Settings.ProjectFile} {feeds}");
+            Shell.Run("dotnet", $"restore {Settings.ProjectFile} {feeds} -o {Settings.OutputBinDir}");
         }
 
         public static void AddPackages()
