@@ -24,20 +24,12 @@ namespace Build
 
         public static readonly string ProjectFile = Path.Combine(SrcProjectPath, "extensions.csproj");
 
-        public static readonly string OutputProjectFile = Path.Combine(OutputDir, "extensions.csproj");
-
         public static readonly string OutputDir = Path.Combine(Path.GetFullPath(".."), "artifacts");
+
+        public static readonly string OutputProjectFile = Path.Combine(OutputDir, "extensions.csproj");
 
         public static readonly string OutputBinDir = Path.Combine(OutputDir, "bin");
 
         public static readonly string ExtensionsJsonFile = Path.Combine(SrcProjectPath, "extensions.json");
-
-        private static string config(string @default = null, string key = null)
-        {
-            var value = System.Environment.GetEnvironmentVariable(key);
-            return string.IsNullOrEmpty(value)
-                ? @default
-                : value;
-        }
     }
 }

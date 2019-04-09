@@ -65,8 +65,9 @@ namespace Build
             {
                 if (!start.Skip)
                 {
-                    ColoredConsole.WriteLine($"Running Target {start.Name}".Cyan());
+                    ColoredConsole.WriteLine($"Executing target:{start.Name}".Cyan());
                     start.Target();
+                    ColoredConsole.WriteLine($"Finished executing target:{start.Name}".DarkCyan());
                 }
 
                 if (start == end)
@@ -84,7 +85,7 @@ namespace Build
             {
                 if (!start.Skip)
                 {
-                    ColoredConsole.Write($"{start.Name} ==> ".Yellow());
+                    ColoredConsole.Write($"{start.Name} ==> ".DarkCyan());
                 }
                 if (start == end)
                 {
@@ -93,7 +94,7 @@ namespace Build
 
                 start = start.Next;
             }
-            ColoredConsole.WriteLine("DONE".Yellow());
+            ColoredConsole.WriteLine("DONE".DarkCyan());
         }
 
         class Node

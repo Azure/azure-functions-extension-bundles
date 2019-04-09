@@ -8,7 +8,7 @@ namespace Build
 {
     public static class BuildSteps
     {
-        public static void CleanOutputDir()
+        public static void CleanOutputDirectory()
         {
             if (FileUtility.DirectoryExists(Settings.OutputDir))
             {
@@ -16,20 +16,20 @@ namespace Build
             }
         }
 
-        public static void CreateOutputDir()
+        public static void CreateOutputDirectory()
         {
             FileUtility.EnsureDirectoryExists(Settings.OutputDir);
         }
 
-        public static void CopyProjectToOutputDir()
+        public static void CopyProjectToOutputDirectory()
         {
             FileUtility.CopyFile(Settings.ProjectFile, Settings.OutputProjectFile);
         }
 
-        public static void RestorePackages()
+        public static void BuildExtensionsProject()
         {
             var feeds = Settings.nugetFeed.Aggregate(string.Empty, (a, b) => $"{a} --source {b}");
-            Shell.Run("dotnet", $"restore {Settings.ProjectFile} {feeds} -o {Settings.OutputBinDir}");
+            Shell.Run("dotnet", $"build {Settings.OutputProjectFile} -o {Settings.OutputBinDir}");
         }
 
         public static void AddPackages()
@@ -38,7 +38,7 @@ namespace Build
             foreach (var extension in extensions)
             {
                 //                ColoredConsole.Out.WriteLine($"installing extension {extension.Id}:{extension.Version}");
-                Shell.Run("dotnet", $"add {Settings.OutputProjectFile} package {extension.Id} -v {extension.Version} -n");
+                Shell.Run("dotnet", $"add {Settings.OutputProjectFile} package {extension.Id} -v {extension.Version}");
             }
         }
 

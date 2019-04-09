@@ -10,11 +10,11 @@ namespace Build
         {
             Orchestrator
                 .CreateForTarget(args)
-                .Then(CleanOutputDir)
-                .Then(CreateOutputDir)
-                .Then(CopyProjectToOutputDir)
+                .Then(CleanOutputDirectory)
+                .Then(CreateOutputDirectory)
+                .Then(CopyProjectToOutputDirectory)
                 .Then(AddPackages)
-                .Then(RestorePackages)
+                .Then(BuildExtensionsProject)
                 .Run();
         }
     }
