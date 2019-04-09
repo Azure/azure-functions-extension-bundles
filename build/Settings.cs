@@ -7,6 +7,10 @@ namespace Build
 {
     public static class Settings
     {
+        public static readonly string TemplatesZipUri = "https://functionscdn.azureedge.net/public/TemplatesApi/2.0.10344.zip";
+
+        public static readonly string TemplatesDirectoryName = "StaticContent";
+
         public static string[] internalNugetFeed = new[]
         {
             "https://www.nuget.org/api/v2/",
@@ -25,6 +29,10 @@ namespace Build
         public static readonly string ProjectFile = Path.Combine(SrcProjectPath, "extensions.csproj");
 
         public static readonly string OutputDir = Path.Combine(Path.GetFullPath(".."), "artifacts");
+
+        public static readonly string OutputTemplatesDirectory = Path.Combine(OutputDir, TemplatesDirectoryName);
+
+        public static readonly string OutputTemplatesJsonFile = Path.Combine(OutputTemplatesDirectory, "Templates", "Templates.json");
 
         public static readonly string OutputProjectFile = Path.Combine(OutputDir, "extensions.csproj");
 

@@ -1,8 +1,11 @@
 using Colors.Net;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net.Http;
 
 namespace Build
 {
@@ -38,7 +41,7 @@ namespace Build
             foreach (var extension in extensions)
             {
                 //                ColoredConsole.Out.WriteLine($"installing extension {extension.Id}:{extension.Version}");
-                Shell.Run("dotnet", $"add {Settings.OutputProjectFile} package {extension.Id} -v {extension.Version}");
+                Shell.Run("dotnet", $"add {Settings.OutputProjectFile} package {extension.Id} -v {extension.Version} -n");
             }
         }
 
@@ -48,6 +51,42 @@ namespace Build
             return JsonConvert.DeserializeObject<List<Extensions>>(extensionsJsonFileContent);
         }
 
+        public static void DownloadTemplates()
+        {
+            string zipDirectoryPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            FileUtility.EnsureDirectoryExists(zipDirectoryPath);
+
+            string zipFilePath = Path.Combine(zipDirectoryPath, $"templates.zip");
+            var zipUri = new Uri(Settings.TemplatesZipUri);
+
+            if (DownloadZipFile(zipUri, zipFilePath))
+            {
+                FileUtility.EnsureDirectoryExists(Settings.OutputTemplatesDirectory);
+                ZipFile.ExtractToDirectory(zipFilePath, Settings.OutputTemplatesDirectory);
+            }
+            if (!FileUtility.DirectoryExists(Settings.OutputTemplatesDirectory) || !FileUtility.FileExists(Settings.OutputTemplatesJsonFile))
+            {
+                throw new Exception("Template download failed");
+            }
+        }
+
+        public static bool DownloadZipFile(Uri zipUri, string filePath)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                var response = httpClient.GetAsync(zipUri).GetAwaiter().GetResult();
+                if (!response.IsSuccessStatusCode)
+                {
+                    return false;
+                }
+
+                var content = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true);
+                stream.Write(content);
+                stream.Close();
+            }
+            return true;
+        }
 
         //public static async Task UploadZip()
         //{

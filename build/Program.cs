@@ -15,6 +15,10 @@ namespace Build
                 .Then(CopyProjectToOutputDirectory)
                 .Then(AddPackages)
                 .Then(BuildExtensionsProject)
+                .Then(DownloadTemplates)
+                //.Then(ExtractTemplatesToOutPutDirectory)
+                //.Then(RemoveObjFolderFromOutPutDirectory)
+                //.Then(ZipOutputDirectory)
                 .Run();
         }
     }
