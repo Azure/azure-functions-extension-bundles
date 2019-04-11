@@ -7,7 +7,7 @@ namespace Build
 {
     public static class Settings
     {
-        public static readonly string TemplatesZipUri = "https://functionscdn.azureedge.net/public/TemplatesApi/2.0.10344.zip";
+        public static readonly string TemplatesZipUri = "https://extensionbundlebuilds.blob.core.windows.net/extensionbundletemplates/2.0.10351.zip";
 
         public static readonly string TemplatesDirectoryName = "StaticContent";
 
