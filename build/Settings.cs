@@ -34,7 +34,7 @@ namespace Build
 
         public static readonly string BundleZipPath = Path.Combine(ArtifactsDirectory, $"{ExtensionBundleId}.");
 
-        public static readonly string OutputTemplatesDirectory = Path.Combine(OutputDirectory, TemplatesDirectoryName);
+        public static readonly string OutputTemplatesDirectory = Path.Combine(OutputDirectory, TemplatesDirectoryName, "v1");
 
         public static readonly string OutputTemplatesJsonFile = Path.Combine(OutputTemplatesDirectory, "Templates", "Templates.json");
 
@@ -50,6 +50,6 @@ namespace Build
 
         public static string ExtensionBundleBuildVersion = "1.0.0";
 
-        public static readonly string OutputBundleJsonFile= Path.Combine(OutputDirectory, "bundle.json");
+        public static readonly string OutputBundleJsonFile = Path.Combine(OutputDirectory, "bundle.json");
     }
 }
