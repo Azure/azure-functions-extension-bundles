@@ -1,5 +1,6 @@
 using Colors.Net;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -49,10 +50,10 @@ namespace Build
             }
         }
 
-        private static List<ExtensionBundleInfo> GetExtensionList()
+        private static List<Extension> GetExtensionList()
         {
             var extensionsJsonFileContent = FileUtility.ReadAllText(Settings.ExtensionsJsonFile);
-            return JsonConvert.DeserializeObject<List<ExtensionBundleInfo>>(extensionsJsonFileContent);
+            return JsonConvert.DeserializeObject<List<Extension>>(extensionsJsonFileContent);
         }
 
         public static void DownloadTemplates()
@@ -60,8 +61,9 @@ namespace Build
             string zipDirectoryPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             FileUtility.EnsureDirectoryExists(zipDirectoryPath);
 
+            string templatesZipUri = $"https://extensionbundlebuilds.blob.core.windows.net/extensionbundletemplates/{Settings.TemplatesVersion}.zip";
             string zipFilePath = Path.Combine(zipDirectoryPath, $"templates.zip");
-            var zipUri = new Uri(Settings.TemplatesZipUri);
+            var zipUri = new Uri(templatesZipUri);
 
             if (DownloadZipFile(zipUri, zipFilePath))
             {
@@ -72,6 +74,25 @@ namespace Build
             {
                 throw new Exception("Template download failed");
             }
+        }
+
+        public static void AddBindingInfoToExtensionsJson()
+        {
+            var extensionsJsonFileContent = FileUtility.ReadAllText(Settings.OutputExtensionJsonFile);
+            var outputExtensions = JsonConvert.DeserializeObject<BundleExtensions>(extensionsJsonFileContent);
+
+            var inputExtensions = GetExtensionList();
+
+            foreach (var extensionJsonEntry in outputExtensions.Extensions)
+            {
+                extensionJsonEntry.Bindings = inputExtensions.Where(
+                    e =>
+                    {
+                        return extensionJsonEntry.Name.Equals(e.Name, StringComparison.OrdinalIgnoreCase);
+                    }).First().Bindings;
+            }
+
+            FileUtility.Write(Settings.OutputExtensionJsonFile, JsonConvert.SerializeObject(outputExtensions));
         }
 
         public static bool DownloadZipFile(Uri zipUri, string filePath)
@@ -100,7 +121,7 @@ namespace Build
 
         public static void CreateBundleJsonFile()
         {
-            ExtensionBundleInfo bundleInfo = new ExtensionBundleInfo()
+            Extension bundleInfo = new Extension()
             {
                 Id = Settings.ExtensionBundleId,
                 Version = Settings.ExtensionBundleBuildVersion

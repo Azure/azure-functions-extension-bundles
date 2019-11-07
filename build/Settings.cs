@@ -7,8 +7,6 @@ namespace Build
 {
     public static class Settings
     {
-        public static readonly string TemplatesZipUri = "https://extensionbundlebuilds.blob.core.windows.net/extensionbundletemplates/2.0.10351.zip";
-
         public static readonly string TemplatesDirectoryName = "StaticContent";
 
         public static string[] internalNugetFeed = new[]
@@ -48,8 +46,12 @@ namespace Build
 
         public static string ExtensionBundleVersionRange = "[1.*, 2.0.0)";
 
-        public static string ExtensionBundleBuildVersion = "1.0.0";
+        public static string ExtensionBundleBuildVersion = "1.1.0";
+
+        public static string TemplatesVersion = "2.0.10351";
 
         public static readonly string OutputBundleJsonFile = Path.Combine(OutputDirectory, "bundle.json");
+
+        public static readonly string OutputExtensionJsonFile = Path.Combine(OutputBinDirectory, "extensions.json");
     }
 }

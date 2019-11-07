@@ -1,38 +1,83 @@
 [
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-        "version": "3.0.10"
+        "version": "3.0.10",
+        "name": "AzureStorage",
+        "bindings": [
+            "blobtrigger",
+            "queue",
+            "queuetrigger",
+            "table"
+        ]
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-        "version": "3.2.0"
+        "version": "3.2.0",
+        "name": "ServiceBus",
+        "bindings": [
+            "servicebustrigger",
+            "servicebus"
+        ]
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-        "version": "3.0.6"
+        "version": "3.0.6",
+        "name": "EventHubs",
+        "bindings": [
+            "eventhubtrigger",
+            "eventhub"
+        ]
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
-        "version": "3.0.0"
+        "version": "3.0.0",
+        "name": "SendGrid",
+        "bindings": [
+            "sendgrid"
+        ]
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-        "version": "1.8.3"
+        "version": "1.8.3",
+        "name": "DurableTask",
+        "bindings": [
+            "activitytrigger",
+            "orchestrationtrigger",
+            "orchestrationclient"
+        ]
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
-        "version": "2.1.0"
+        "version": "2.1.0",
+        "name": "EventGrid",
+        "bindings": [
+            "eventgridtrigger"
+        ]
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-        "version": "3.0.5"
+        "version": "3.0.5",
+        "name": "CosmosDB",
+        "bindings": [
+            "cosmosdbtrigger",
+            "cosmosdb"
+        ]
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
-        "version": "3.0.0"
+        "version": "3.0.0",
+        "name": "Twilio",
+        "bindings": [
+            "twiliosms"
+        ]
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "name": "SignalR",
+        "bindings": [
+            "signalr",
+            "signalrconnectioninfo"
+        ]
     }
 ]

@@ -19,6 +19,7 @@ namespace Build
                 .Then(DownloadTemplates)
                 .Then(RemoveObjFolderFromOutPutDirectory)
                 .Then(CreateBundleJsonFile)
+                .Then(AddBindingInfoToExtensionsJson)
                 .Then(ZipOutputDirectory)
                 .Run();
         }
