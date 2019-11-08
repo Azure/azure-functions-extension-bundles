@@ -121,12 +121,14 @@ namespace Build
 
         public static void CreateBundleJsonFile()
         {
+            var serializer = new JsonSerializerSettings();
+            serializer.NullValueHandling = NullValueHandling.Ignore;
             Extension bundleInfo = new Extension()
             {
                 Id = Settings.ExtensionBundleId,
                 Version = Settings.ExtensionBundleBuildVersion
             };
-            var fileContents = JsonConvert.SerializeObject(bundleInfo);
+            var fileContents = JsonConvert.SerializeObject(bundleInfo, serializer);
 
             FileUtility.Write(Settings.OutputBundleJsonFile, fileContents);
         }
