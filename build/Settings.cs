@@ -48,7 +48,7 @@ namespace Build
 
         public static string ExtensionBundleBuildVersion = "1.1.0";
 
-        public static string TemplatesVersion = "2.0.10351";
+        public static string TemplatesVersion = "2.0.10392";
 
         public static readonly string OutputBundleJsonFile = Path.Combine(OutputDirectory, "bundle.json");
 
