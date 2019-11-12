@@ -76,6 +76,21 @@ namespace Build
             }
         }
 
+        public static void CopyResourcesFile()
+        {
+            if (FileUtility.DirectoryExists(Settings.OutputTemplatesDirectory) || FileUtility.FileExists(Settings.ResourcesFile))
+            {
+                FileUtility.CopyFile(Settings.ResourcesFile, Settings.ResourcesEnUSFile);
+            }
+
+
+            if (!FileUtility.DirectoryExists(Settings.OutputTemplatesDirectory) || !FileUtility.FileExists(Settings.ResourcesEnUSFile))
+            {
+                throw new Exception("Resource Copy failed");
+            }
+
+        }
+
         public static void AddBindingInfoToExtensionsJson()
         {
             var extensionsJsonFileContent = FileUtility.ReadAllText(Settings.OutputExtensionJsonFile);

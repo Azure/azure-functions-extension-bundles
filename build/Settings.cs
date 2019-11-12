@@ -36,6 +36,10 @@ namespace Build
 
         public static readonly string OutputTemplatesJsonFile = Path.Combine(OutputTemplatesDirectory, "Templates", "Templates.json");
 
+        public static readonly string ResourcesFile = Path.Combine(OutputTemplatesDirectory, "Resources", "Resources.json");
+
+        public static readonly string ResourcesEnUSFile = Path.Combine(OutputTemplatesDirectory, "Resources", "Resources.en-US.json");
+
         public static readonly string OutputProjectFile = Path.Combine(OutputDirectory, "extensions.csproj");
 
         public static readonly string OutputBinDirectory = Path.Combine(OutputDirectory, "bin");

@@ -17,6 +17,7 @@ namespace Build
                 .Then(AddPackages)
                 .Then(BuildExtensionsProject)
                 .Then(DownloadTemplates)
+                .Then(CopyResourcesFile)
                 .Then(RemoveObjFolderFromOutPutDirectory)
                 .Then(CreateBundleJsonFile)
                 .Then(AddBindingInfoToExtensionsJson)
