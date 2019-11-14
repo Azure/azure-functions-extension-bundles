@@ -136,7 +136,7 @@ namespace Build
 
         public static void CreateDeploymentPackage()
         {
-            string packagePath = Path.Combine(Settings.PackageRootPath, "content");
+            string packagePath = Path.Combine(Settings.PackageRootPath, Settings.ExtensionBundleBuildVersion);
             FileUtility.EnsureDirectoryExists(packagePath);
 
             // Copy the bundle zip
