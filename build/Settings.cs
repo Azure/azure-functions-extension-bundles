@@ -68,6 +68,7 @@ namespace Build
 
         public static List<IndexFileV2Metadata> IndexFiles = new List<IndexFileV2Metadata>()
         {
+            new IndexFileV2Metadata("https://functionscdnstaging.azureedge.net", ExtensionBundleId),
             new IndexFileV2Metadata("https://functionscdn.azureedge.net", ExtensionBundleId),
             new IndexFileV2Metadata("https://ogfinfrastructure.blob.core.windows.net", ExtensionBundleId),
             new IndexFileV2Metadata("https://ogfinfrastructure.blob.core.windows.net", "Microsoft.Azure.Functions.ExtensionBundleNew")

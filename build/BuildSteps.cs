@@ -1,6 +1,7 @@
 using Colors.Net;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -169,6 +170,11 @@ namespace Build
                     FileUtility.EnsureDirectoryExists(directoryPath);
 
                     var indexV2FilePath = Path.Combine(directoryPath, Settings.IndexV2FileName);
+                    JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+                    {
+                        ContractResolver = new CamelCasePropertyNamesContractResolver()
+                    };
+
                     FileUtility.Write(indexV2FilePath, JsonConvert.SerializeObject(indexV2File));
 
                     // Generating v1 index file
