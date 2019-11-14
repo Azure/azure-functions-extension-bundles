@@ -10,7 +10,7 @@ using System.Net.Http;
 
 namespace Build
 {
-    public static class BuildSteps
+    public static partial class BuildSteps
     {
         public static void Clean()
         {
@@ -74,10 +74,7 @@ namespace Build
             {
                 throw new Exception("Template download failed");
             }
-        }
 
-        public static void CopyResourcesFile()
-        {
             if (FileUtility.DirectoryExists(Settings.OutputTemplatesDirectory) || FileUtility.FileExists(Settings.ResourcesFile))
             {
                 FileUtility.CopyFile(Settings.ResourcesFile, Settings.ResourcesEnUSFile);
@@ -88,14 +85,12 @@ namespace Build
             {
                 throw new Exception("Resource Copy failed");
             }
-
         }
 
         public static void AddBindingInfoToExtensionsJson()
         {
             var extensionsJsonFileContent = FileUtility.ReadAllText(Settings.OutputExtensionJsonFile);
             var outputExtensions = JsonConvert.DeserializeObject<BundleExtensions>(extensionsJsonFileContent);
-
             var inputExtensions = GetExtensionList();
 
             foreach (var extensionJsonEntry in outputExtensions.Extensions)
@@ -132,6 +127,80 @@ namespace Build
         {
             FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
             ZipFile.CreateFromDirectory(Settings.OutputDirectory, Path.Combine(Settings.ArtifactsDirectory, $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}.zip"), CompressionLevel.NoCompression, false);
+        }
+
+        public static void ZipPackageDirectory()
+        {
+            ZipFile.CreateFromDirectory(Settings.PackageRootPath, Path.Combine(Settings.ArtifactsDirectory, $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}_package.zip"), CompressionLevel.NoCompression, false);
+        }
+
+        public static void CreateDeploymentPackage()
+        {
+            string packagePath = Path.Combine(Settings.PackageRootPath, "content");
+            FileUtility.EnsureDirectoryExists(packagePath);
+
+            // Copy the bundle zip
+            string bundleZipFileName = $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}.zip";
+            string bundlePath = Path.Combine(Settings.ArtifactsDirectory, bundleZipFileName);
+            File.Copy(bundlePath, Path.Combine(packagePath, bundleZipFileName));
+
+            // copy non binary files
+            ZipFile.ExtractToDirectory(bundlePath, packagePath);
+            FileUtility.DeleteDirectory(Path.Combine(packagePath, "bin"), true);
+        }
+
+        public static void GenerateIndexJsonFiles()
+        {
+            foreach (var indexFileMetadata in Settings.IndexFiles)
+            {
+                // Generating v2 index file
+                var indexV2File = GetIndexV2File($"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/index-v2.json");
+                indexV2File.Add(Settings.ExtensionBundleBuildVersion, new IndexV2.BundleResource()
+                {
+                    Bindings = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{Settings.ExtensionBundleBuildVersion}/StaticContent/v1/bindings/bindings.json",
+                    Functions = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{Settings.ExtensionBundleBuildVersion}/StaticContent/v1/templates/templates.json",
+                    Resources = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{Settings.ExtensionBundleBuildVersion}/StaticContent/v1/resources/" + "Resources.{locale}.json"
+                });
+
+                var indexFilePath = Path.Combine(Settings.PackageRootPath, indexFileMetadata.IndexV2FileName);
+                FileUtility.Write(indexFilePath, JsonConvert.SerializeObject(indexV2File));
+
+                // Generating v1 index file
+                var indexFile = GetIndexFile($"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/index.json");
+                indexFile.Add(Settings.ExtensionBundleBuildVersion);
+                indexFilePath = Path.Combine(Settings.PackageRootPath, indexFileMetadata.IndexFileName);
+                FileUtility.Write(indexFilePath, JsonConvert.SerializeObject(indexFile));
+            }
+        }
+
+        public static IndexV2 GetIndexV2File(string path)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                var response = httpClient.GetAsync(path).Result;
+
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return new IndexV2();
+                }
+
+                return JsonConvert.DeserializeObject<IndexV2>(response.Content.ReadAsStringAsync().Result);
+            }
+        }
+
+        public static HashSet<string> GetIndexFile(string path)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                var response = httpClient.GetAsync(path).Result;
+
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    return new HashSet<string>();
+                }
+
+                return JsonConvert.DeserializeObject<HashSet<string>>(response.Content.ReadAsStringAsync().Result);
+            }
         }
 
         public static void CreateBundleJsonFile()

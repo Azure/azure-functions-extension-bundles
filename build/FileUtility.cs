@@ -226,7 +226,7 @@ namespace Build
 
         public static void CopyFile(string sourcePath, string targetPath)
         {
-            File.Copy(sourcePath, targetPath);
+            File.Copy(sourcePath, targetPath, true);
         }
 
         public static void CopyDirectory(string sourcePath, string targetPath)

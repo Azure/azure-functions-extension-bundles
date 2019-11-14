@@ -34,6 +34,8 @@ namespace Build
 
         public static readonly string OutputTemplatesDirectory = Path.Combine(OutputDirectory, TemplatesDirectoryName, "v1");
 
+        public static readonly string StaticContentDirectoryPath = Path.Combine(OutputDirectory, TemplatesDirectoryName);
+
         public static readonly string OutputTemplatesJsonFile = Path.Combine(OutputTemplatesDirectory, "Templates", "Templates.json");
 
         public static readonly string ResourcesFile = Path.Combine(OutputTemplatesDirectory, "Resources", "Resources.json");
@@ -57,5 +59,14 @@ namespace Build
         public static readonly string OutputBundleJsonFile = Path.Combine(OutputDirectory, "bundle.json");
 
         public static readonly string OutputExtensionJsonFile = Path.Combine(OutputBinDirectory, "extensions.json");
+
+        public static readonly string PackageRootPath = Path.Combine(OutputDirectory, $"{ExtensionBundleId}.{ExtensionBundleBuildVersion}_package");
+
+        public static List<IndexFileV2Metadata> IndexFiles = new List<IndexFileV2Metadata>()
+        {
+            new IndexFileV2Metadata("https://functionscdn.azureedge.net", ExtensionBundleId),
+            new IndexFileV2Metadata("https://ogfinfrastructure.blob.core.windows.net", ExtensionBundleId),
+            new IndexFileV2Metadata("https://ogfinfrastructure.blob.core.windows.net", "Microsoft.Azure.Functions.ExtensionBundleNew")
+        };
     }
 }
