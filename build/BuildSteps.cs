@@ -155,21 +155,29 @@ namespace Build
             {
                 // Generating v2 index file
                 var indexV2File = GetIndexV2File($"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/index-v2.json");
-                indexV2File.Add(Settings.ExtensionBundleBuildVersion, new IndexV2.BundleResource()
+                var bundleResource = new IndexV2.BundleResource()
                 {
                     Bindings = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{Settings.ExtensionBundleBuildVersion}/StaticContent/v1/bindings/bindings.json",
                     Functions = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{Settings.ExtensionBundleBuildVersion}/StaticContent/v1/templates/templates.json",
                     Resources = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{Settings.ExtensionBundleBuildVersion}/StaticContent/v1/resources/" + "Resources.{locale}.json"
-                });
+                };
 
-                var indexFilePath = Path.Combine(Settings.PackageRootPath, indexFileMetadata.IndexV2FileName);
-                FileUtility.Write(indexFilePath, JsonConvert.SerializeObject(indexV2File));
+                if (indexV2File.TryAdd(Settings.ExtensionBundleBuildVersion, bundleResource))
+                {
+                    // write index-v2 file
+                    string directoryPath = Path.Combine(Settings.PackageRootPath, indexFileMetadata.IndexFileDirectory);
+                    FileUtility.EnsureDirectoryExists(directoryPath);
 
-                // Generating v1 index file
-                var indexFile = GetIndexFile($"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/index.json");
-                indexFile.Add(Settings.ExtensionBundleBuildVersion);
-                indexFilePath = Path.Combine(Settings.PackageRootPath, indexFileMetadata.IndexFileName);
-                FileUtility.Write(indexFilePath, JsonConvert.SerializeObject(indexFile));
+                    var indexV2FilePath = Path.Combine(directoryPath, Settings.IndexV2FileName);
+                    FileUtility.Write(indexV2FilePath, JsonConvert.SerializeObject(indexV2File));
+
+                    // Generating v1 index file
+                    var indexFile = GetIndexFile($"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/index.json");
+                    indexFile.Add(Settings.ExtensionBundleBuildVersion);
+
+                    var indexFilePath = Path.Combine(Settings.PackageRootPath, indexFileMetadata.IndexFileDirectory, Settings.IndexFileName);
+                    FileUtility.Write(indexFilePath, JsonConvert.SerializeObject(indexFile));
+                }
             }
         }
 

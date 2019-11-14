@@ -62,6 +62,10 @@ namespace Build
 
         public static readonly string PackageRootPath = Path.Combine(OutputDirectory, $"{ExtensionBundleId}.{ExtensionBundleBuildVersion}_package");
 
+        public static readonly string IndexV2FileName = "index-v2.json";
+
+        public static readonly string IndexFileName = "index.json";
+
         public static List<IndexFileV2Metadata> IndexFiles = new List<IndexFileV2Metadata>()
         {
             new IndexFileV2Metadata("https://functionscdn.azureedge.net", ExtensionBundleId),

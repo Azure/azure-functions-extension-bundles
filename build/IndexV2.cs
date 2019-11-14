@@ -28,15 +28,16 @@ namespace Build
             public string Resources { get; set; }
         }
 
-        public void Add(string version, BundleResource resource)
+        public bool TryAdd(string version, BundleResource resource)
         {
-            BundleVersions.Add(version,
+            var addSuccessful = BundleVersions.TryAdd(version,
                 new Dictionary<string, string>()
                 {
                     { "templates", version }
                 });
 
-            Templates.v1.Add(version, resource);
+            addSuccessful = addSuccessful && Templates.v1.TryAdd(version, resource);
+            return addSuccessful;
         }
     }
 }

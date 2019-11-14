@@ -6,12 +6,10 @@
         {
             EndPointUrl = endpointUrl;
             BundleId = bundleId;
-            IndexV2FileName = $"{endpointUrl.Substring(8)}_{bundleId}_indexV2.json";
-            IndexFileName = $"{endpointUrl.Substring(8)}_{bundleId}_index.json";
+            IndexFileDirectory = $"{endpointUrl.Substring(8)}_{bundleId}";
         }
-        public string IndexV2FileName { get; private set; }
 
-        public string IndexFileName { get; private set; }
+        public string IndexFileDirectory { get; private set; }
 
         public string EndPointUrl { get; private set; }
 
