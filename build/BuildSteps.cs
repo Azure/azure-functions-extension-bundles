@@ -103,6 +103,10 @@ namespace Build
                     }).First().Bindings;
             }
 
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
             FileUtility.Write(Settings.OutputExtensionJsonFile, JsonConvert.SerializeObject(outputExtensions));
         }
 
