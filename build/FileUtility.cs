@@ -139,7 +139,8 @@ namespace Build
                 throw new ArgumentNullException(nameof(contents));
             }
 
-            encoding = encoding ?? Encoding.UTF8;
+            Encoding utf8WithoutBom = new UTF8Encoding(false);
+            encoding = encoding ?? utf8WithoutBom;
 
             EnsureDirectoryExists(Path.GetDirectoryName(path));
             Stream fileStream = OpenFile(path, FileMode.Create, FileAccess.Write, FileShare.Read);
