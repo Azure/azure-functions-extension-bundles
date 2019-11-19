@@ -60,7 +60,9 @@ namespace Build
 
         public static readonly string OutputExtensionJsonFile = Path.Combine(OutputBinDirectory, "extensions.json");
 
-        public static readonly string PackageRootPath = Path.Combine(OutputDirectory, $"{ExtensionBundleId}.{ExtensionBundleBuildVersion}_package");
+        public static readonly string PackageRootPath = Path.Combine(OutputDirectory, $"{ExtensionBundleId}.{ExtensionBundleBuildVersion}_storage_package");
+
+        public static readonly string RUPackagePath = Path.Combine(OutputDirectory, $"{ExtensionBundleId}.{ExtensionBundleBuildVersion}_RU_package", ExtensionBundleBuildVersion);
 
         public static readonly string IndexV2FileName = "index-v2.json";
 

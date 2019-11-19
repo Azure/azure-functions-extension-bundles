@@ -154,6 +154,17 @@ namespace Build
             FileUtility.DeleteDirectory(Path.Combine(packagePath, "bin"), true);
         }
 
+        public static void CreateRUPackage()
+        {
+            FileUtility.EnsureDirectoryExists(Settings.RUPackagePath);
+            // Copy the bundle zip
+            string bundleZipFileName = $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}.zip";
+            string bundlePath = Path.Combine(Settings.ArtifactsDirectory, bundleZipFileName);
+            File.Copy(bundlePath, Path.Combine(Settings.RUPackagePath, bundleZipFileName));
+            ZipFile.ExtractToDirectory(bundlePath, Settings.RUPackagePath);
+            ZipFile.CreateFromDirectory(Settings.RUPackagePath, Path.Combine(Settings.ArtifactsDirectory, $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}_RU_package.zip"), CompressionLevel.NoCompression, false);
+        }
+
         public static void GenerateIndexJsonFiles()
         {
             foreach (var indexFileMetadata in Settings.IndexFiles)

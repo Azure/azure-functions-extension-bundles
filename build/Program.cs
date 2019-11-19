@@ -23,6 +23,7 @@ namespace Build
                 .Then(ZipOutputDirectory)
                 .Then(GenerateIndexJsonFiles)
                 .Then(CreateDeploymentPackage)
+                .Then(CreateRUPackage)
                 .Then(ZipPackageDirectory)
                 .Run();
         }
