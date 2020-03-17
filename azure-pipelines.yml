@@ -1,7 +1,7 @@
 trigger:
-- master
+- dev
 - v1.x
-- azure-pipelines
+- v2.x
 
 pool:
   vmImage: 'vs2017-win2016'
