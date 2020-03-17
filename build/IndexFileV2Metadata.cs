@@ -2,11 +2,11 @@
 {
     public class IndexFileV2Metadata
     {
-        public IndexFileV2Metadata(string endpointUrl, string bundleId)
+        public IndexFileV2Metadata(string endpointUrl, string bundleId, string indexFileDirectory)
         {
             EndPointUrl = endpointUrl;
             BundleId = bundleId;
-            IndexFileDirectory = $"{endpointUrl.Substring(8)}_{bundleId}";
+            IndexFileDirectory = indexFileDirectory;
         }
 
         public string IndexFileDirectory { get; private set; }

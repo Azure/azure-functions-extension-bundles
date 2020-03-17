@@ -8,6 +8,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Xml;
 
 namespace Build
 {
@@ -39,7 +40,11 @@ namespace Build
         public static void BuildExtensionsProject()
         {
             var feeds = Settings.nugetFeed.Aggregate(string.Empty, (a, b) => $"{a} --source {b}");
-            Shell.Run("dotnet", $"build {Settings.OutputProjectFile} -o {Settings.OutputBinDirectory}");
+            Shell.Run("dotnet", $"publish {Settings.OutputProjectFile} -c Release -o {Settings.OutputBinTempDirectory}");
+            var binariesPath = Path.Combine(Settings.OutputBinTempDirectory, "bin");
+            FileUtility.DeleteDirectory(Settings.OutputBinDirectory, true);
+            FileUtility.CopyDirectory(binariesPath, Settings.OutputBinDirectory);
+            FileUtility.DeleteDirectory(Settings.OutputBinTempDirectory, true);
         }
 
         public static void AddPackages()
@@ -61,8 +66,7 @@ namespace Build
         {
             string zipDirectoryPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             FileUtility.EnsureDirectoryExists(zipDirectoryPath);
-
-            string templatesZipUri = $"https://extensionbundlebuilds.blob.core.windows.net/extensionbundletemplates/{Settings.TemplatesVersion}.zip";
+            string templatesZipUri = $"https://functionscdn.azureedge.net/public/ExtensionBundleTemplates/ExtensionBundle.v1.Templates.{Settings.TemplatesVersion}.zip";
             string zipFilePath = Path.Combine(zipDirectoryPath, $"templates.zip");
             var zipUri = new Uri(templatesZipUri);
 
@@ -128,20 +132,15 @@ namespace Build
             return true;
         }
 
-        public static void ZipOutputDirectory()
+        public static void CreateBundleZipFile()
         {
             FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
             ZipFile.CreateFromDirectory(Settings.OutputDirectory, Path.Combine(Settings.ArtifactsDirectory, $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}.zip"), CompressionLevel.NoCompression, false);
         }
 
-        public static void ZipPackageDirectory()
+       public static void AddBundleContent(string rootPath)
         {
-            ZipFile.CreateFromDirectory(Settings.PackageRootPath, Path.Combine(Settings.ArtifactsDirectory, $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}_package.zip"), CompressionLevel.NoCompression, false);
-        }
-
-        public static void CreateDeploymentPackage()
-        {
-            string packagePath = Path.Combine(Settings.PackageRootPath, Settings.ExtensionBundleBuildVersion);
+            string packagePath = Path.Combine(rootPath, Settings.ExtensionBundleBuildVersion);
             FileUtility.EnsureDirectoryExists(packagePath);
 
             // Copy the bundle zip
@@ -160,12 +159,12 @@ namespace Build
             // Copy the bundle zip
             string bundleZipFileName = $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}.zip";
             string bundlePath = Path.Combine(Settings.ArtifactsDirectory, bundleZipFileName);
-            File.Copy(bundlePath, Path.Combine(Settings.RUPackagePath, bundleZipFileName));
             ZipFile.ExtractToDirectory(bundlePath, Settings.RUPackagePath);
-            ZipFile.CreateFromDirectory(Settings.RUPackagePath, Path.Combine(Settings.ArtifactsDirectory, $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}_RU_package.zip"), CompressionLevel.NoCompression, false);
+            var RURootPackagePath = Directory.GetParent(Settings.RUPackagePath);
+            ZipFile.CreateFromDirectory(RURootPackagePath.FullName, Path.Combine(Settings.ArtifactsDirectory, $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}_RU_package.zip"), CompressionLevel.NoCompression, false);
         }
 
-        public static void GenerateIndexJsonFiles()
+        public static void CreateCDNStoragePackage()
         {
             foreach (var indexFileMetadata in Settings.IndexFiles)
             {
@@ -181,8 +180,9 @@ namespace Build
                 indexV2File.TryAdd(Settings.ExtensionBundleBuildVersion, bundleResource);
 
                 // write index-v2 file
-                string directoryPath = Path.Combine(Settings.PackageRootPath, indexFileMetadata.IndexFileDirectory);
+                string directoryPath = Path.Combine(Settings.OutputDirectory, indexFileMetadata.IndexFileDirectory);
                 FileUtility.EnsureDirectoryExists(directoryPath);
+                AddBundleContent(directoryPath);
 
                 var indexV2FilePath = Path.Combine(directoryPath, Settings.IndexV2FileName);
                 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
@@ -196,9 +196,11 @@ namespace Build
                 var indexFile = GetIndexFile($"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/index.json");
                 indexFile.Add(Settings.ExtensionBundleBuildVersion);
 
-                var indexFilePath = Path.Combine(Settings.PackageRootPath, indexFileMetadata.IndexFileDirectory, Settings.IndexFileName);
+                var indexFilePath = Path.Combine(Settings.OutputDirectory, indexFileMetadata.IndexFileDirectory, Settings.IndexFileName);
                 FileUtility.Write(indexFilePath, JsonConvert.SerializeObject(indexFile));
 
+
+                ZipFile.CreateFromDirectory(directoryPath, Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}.zip"), CompressionLevel.NoCompression, false);
             }
         }
 

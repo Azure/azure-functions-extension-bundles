@@ -110,6 +110,7 @@ namespace Build
             if (Instance.Directory.Exists(path))
             {
                 Instance.Directory.Delete(path, recursive);
+                System.Threading.Thread.Sleep(1000);
             }
 
         }

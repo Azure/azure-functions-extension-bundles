@@ -44,6 +44,8 @@ namespace Build
 
         public static readonly string OutputProjectFile = Path.Combine(OutputDirectory, "extensions.csproj");
 
+        public static readonly string OutputBinTempDirectory = Path.Combine(OutputDirectory, "binTemp");
+
         public static readonly string OutputBinDirectory = Path.Combine(OutputDirectory, "bin");
 
         public static readonly string ExtensionsJsonFile = Path.Combine(SrcProjectPath, "extensions.json");
@@ -52,15 +54,13 @@ namespace Build
 
         public static string ExtensionBundleVersionRange = "[1.*, 2.0.0)";
 
-        public static string ExtensionBundleBuildVersion = "1.1.1";
+        public static string ExtensionBundleBuildVersion = "1.2.0";
 
-        public static string TemplatesVersion = "2.0.10393";
+        public static string TemplatesVersion = "1.0.1543";
 
         public static readonly string OutputBundleJsonFile = Path.Combine(OutputDirectory, "bundle.json");
 
         public static readonly string OutputExtensionJsonFile = Path.Combine(OutputBinDirectory, "extensions.json");
-
-        public static readonly string PackageRootPath = Path.Combine(OutputDirectory, $"{ExtensionBundleId}.{ExtensionBundleBuildVersion}_storage_package");
 
         public static readonly string RUPackagePath = Path.Combine(OutputDirectory, $"{ExtensionBundleId}.{ExtensionBundleBuildVersion}_RU_package", ExtensionBundleBuildVersion);
 
@@ -70,10 +70,8 @@ namespace Build
 
         public static List<IndexFileV2Metadata> IndexFiles = new List<IndexFileV2Metadata>()
         {
-            new IndexFileV2Metadata("https://functionscdnstaging.azureedge.net", ExtensionBundleId),
-            new IndexFileV2Metadata("https://functionscdn.azureedge.net", ExtensionBundleId),
-            new IndexFileV2Metadata("https://ogfinfrastructure.blob.core.windows.net", ExtensionBundleId),
-            new IndexFileV2Metadata("https://ogfinfrastructure.blob.core.windows.net", "Microsoft.Azure.Functions.ExtensionBundleNew")
+            new IndexFileV2Metadata("https://functionscdnstaging.azureedge.net", ExtensionBundleId, "cdnStaging"),
+            new IndexFileV2Metadata("https://functionscdn.azureedge.net", ExtensionBundleId, "cdnProd")
         };
     }
 }

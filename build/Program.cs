@@ -20,11 +20,9 @@ namespace Build
                 .Then(RemoveObjFolderFromOutPutDirectory)
                 .Then(CreateBundleJsonFile)
                 .Then(AddBindingInfoToExtensionsJson)
-                .Then(ZipOutputDirectory)
-                .Then(GenerateIndexJsonFiles)
-                .Then(CreateDeploymentPackage)
+                .Then(CreateBundleZipFile)
                 .Then(CreateRUPackage)
-                .Then(ZipPackageDirectory)
+                .Then(CreateCDNStoragePackage)
                 .Run();
         }
     }
