@@ -180,7 +180,7 @@ namespace Build
                 indexV2File.TryAdd(Settings.ExtensionBundleBuildVersion, bundleResource);
 
                 // write index-v2 file
-                string directoryPath = Path.Combine(Settings.OutputDirectory, indexFileMetadata.IndexFileDirectory);
+                string directoryPath = Path.Combine(Settings.OutputDirectory, indexFileMetadata.IndexFileDirectory, Settings.ExtensionBundleId);
                 FileUtility.EnsureDirectoryExists(directoryPath);
                 AddBundleContent(directoryPath);
 
@@ -196,11 +196,9 @@ namespace Build
                 var indexFile = GetIndexFile($"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/index.json");
                 indexFile.Add(Settings.ExtensionBundleBuildVersion);
 
-                var indexFilePath = Path.Combine(Settings.OutputDirectory, indexFileMetadata.IndexFileDirectory, Settings.IndexFileName);
+                var indexFilePath = Path.Combine(Settings.OutputDirectory, indexFileMetadata.IndexFileDirectory, Settings.ExtensionBundleId, Settings.IndexFileName);
                 FileUtility.Write(indexFilePath, JsonConvert.SerializeObject(indexFile));
-
-
-                ZipFile.CreateFromDirectory(directoryPath, Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}.zip"), CompressionLevel.NoCompression, false);
+                ZipFile.CreateFromDirectory(Path.Combine(Settings.OutputDirectory, indexFileMetadata.IndexFileDirectory), Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}.zip"), CompressionLevel.NoCompression, false);
             }
         }
 
