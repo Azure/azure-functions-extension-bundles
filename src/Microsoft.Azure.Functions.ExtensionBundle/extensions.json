@@ -39,11 +39,12 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-        "version": "2.1.1",
+        "version": "2.2.0",
         "name": "DurableTask",
         "bindings": [
             "activitytrigger",
             "orchestrationtrigger",
+            "entitytrigger",
             "durableClient"
         ]
     },
