@@ -66,7 +66,7 @@ namespace Build
         {
             string zipDirectoryPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             FileUtility.EnsureDirectoryExists(zipDirectoryPath);
-            string templatesZipUri = $"https://functionscdn.azureedge.net/public/ExtensionBundleTemplates/ExtensionBundle.v1.Templates.{Settings.TemplatesVersion}.zip";
+            string templatesZipUri = $"https://functionscdn.azureedge.net/public/ExtensionBundleTemplates/ExtensionBundle.v2.Templates.{Settings.TemplatesVersion}.zip";
             string zipFilePath = Path.Combine(zipDirectoryPath, $"templates.zip");
             var zipUri = new Uri(templatesZipUri);
 
