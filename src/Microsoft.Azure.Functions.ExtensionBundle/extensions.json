@@ -45,7 +45,7 @@
             "activitytrigger",
             "orchestrationtrigger",
             "entitytrigger",
-            "durableClient"
+            "durableclient"
         ]
     },
     {
