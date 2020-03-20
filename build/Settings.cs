@@ -52,11 +52,11 @@ namespace Build
 
         public static string ExtensionBundleId = "Microsoft.Azure.Functions.ExtensionBundle";
 
-        public static string ExtensionBundleVersionRange = "[1.*, 2.0.0)";
+        public static string ExtensionBundleVersionRange = "[2.*, 3.0.0)";
 
         public static string ExtensionBundleBuildVersion = "1.2.0";
 
-        public static string TemplatesVersion = "1.0.1543";
+        public static string TemplatesVersion = "2.0.1547";
 
         public static readonly string OutputBundleJsonFile = Path.Combine(OutputDirectory, "bundle.json");
 
