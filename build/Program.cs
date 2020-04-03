@@ -12,15 +12,8 @@ namespace Build
             Orchestrator
                 .CreateForTarget(args)
                 .Then(Clean)
-                .Then(CreateOutputDirectory)
-                .Then(CopyProjectToOutputDirectory)
-                .Then(AddPackages)
-                .Then(BuildExtensionsProject)
                 .Then(DownloadTemplates)
-                .Then(RemoveObjFolderFromOutPutDirectory)
-                .Then(CreateBundleJsonFile)
-                .Then(AddBindingInfoToExtensionsJson)
-                .Then(CreateBundleZipFile)
+                .Then(GenerateNetCoreV2Bundle)
                 .Then(CreateRUPackage)
                 .Then(CreateCDNStoragePackage)
                 .Run();

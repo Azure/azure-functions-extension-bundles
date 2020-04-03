@@ -7,8 +7,6 @@ namespace Build
 {
     public static class Settings
     {
-        public static readonly string TemplatesDirectoryName = "StaticContent";
-
         public static string[] internalNugetFeed = new[]
         {
             "https://www.nuget.org/api/v2/",
@@ -20,35 +18,29 @@ namespace Build
             "https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json"
         };
 
+        public static readonly string SourcePath = Path.GetFullPath("../src/Microsoft.Azure.Functions.ExtensionBundle/");
+
+        public static string ExtensionsJsonFilePath => Path.Combine(SourcePath, ExtensionsJsonFileName);
+
         public static string[] nugetFeed = new[] { "https://www.nuget.org/api/v2/" };
 
-        public static readonly string SrcProjectPath = Path.GetFullPath("../src/Microsoft.Azure.Functions.ExtensionBundle/");
+        public static readonly string StaticContentDirectoryName = "StaticContent";
 
-        public static readonly string ProjectFile = Path.Combine(SrcProjectPath, "extensions.csproj");
-
-        public static readonly string OutputDirectory = Path.Combine(Path.GetFullPath(".."), "buildOutput");
+        public static readonly string RootBinDirectory = Path.Combine(Path.GetFullPath(".."), "bin");
 
         public static readonly string ArtifactsDirectory = Path.Combine(Path.GetFullPath(".."), "artifacts");
 
-        public static readonly string BundleZipPath = Path.Combine(ArtifactsDirectory, $"{ExtensionBundleId}.");
+        public static readonly string TemplatesRootDirectory = Path.Combine(RootBinDirectory, StaticContentDirectoryName, "v1");
 
-        public static readonly string OutputTemplatesDirectory = Path.Combine(OutputDirectory, TemplatesDirectoryName, "v1");
+        public static readonly string StaticContentDirectoryPath = Path.Combine(RootBinDirectory, StaticContentDirectoryName);
 
-        public static readonly string StaticContentDirectoryPath = Path.Combine(OutputDirectory, TemplatesDirectoryName);
+        public static readonly string TemplatesJsonFilePath = Path.Combine(TemplatesRootDirectory, "Templates", "Templates.json");
 
-        public static readonly string OutputTemplatesJsonFile = Path.Combine(OutputTemplatesDirectory, "Templates", "Templates.json");
+        public static readonly string ResourcesFilePath = Path.Combine(TemplatesRootDirectory, "Resources", "Resources.json");
 
-        public static readonly string ResourcesFile = Path.Combine(OutputTemplatesDirectory, "Resources", "Resources.json");
+        public static readonly string ResourcesEnUSFilePath = Path.Combine(TemplatesRootDirectory, "Resources", "Resources.en-US.json");
 
-        public static readonly string ResourcesEnUSFile = Path.Combine(OutputTemplatesDirectory, "Resources", "Resources.en-US.json");
-
-        public static readonly string OutputProjectFile = Path.Combine(OutputDirectory, "extensions.csproj");
-
-        public static readonly string OutputBinTempDirectory = Path.Combine(OutputDirectory, "binTemp");
-
-        public static readonly string OutputBinDirectory = Path.Combine(OutputDirectory, "bin");
-
-        public static readonly string ExtensionsJsonFile = Path.Combine(SrcProjectPath, "extensions.json");
+        public static readonly string ExtensionsJsonFileName = "extensions.json";
 
         public static string ExtensionBundleId = "Microsoft.Azure.Functions.ExtensionBundle";
 
@@ -58,11 +50,7 @@ namespace Build
 
         public static string TemplatesVersion = "2.0.1547";
 
-        public static readonly string OutputBundleJsonFile = Path.Combine(OutputDirectory, "bundle.json");
-
-        public static readonly string OutputExtensionJsonFile = Path.Combine(OutputBinDirectory, "extensions.json");
-
-        public static readonly string RUPackagePath = Path.Combine(OutputDirectory, $"{ExtensionBundleId}.{ExtensionBundleBuildVersion}_RU_package", ExtensionBundleBuildVersion);
+        public static readonly string RUPackagePath = Path.Combine(RootBinDirectory, $"{ExtensionBundleId}.{ExtensionBundleBuildVersion}_RU_package", ExtensionBundleBuildVersion);
 
         public static readonly string IndexV2FileName = "index-v2.json";
 
