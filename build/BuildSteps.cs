@@ -16,9 +16,9 @@ namespace Build
     {
         public static void Clean()
         {
-            if (FileUtility.DirectoryExists(Settings.OutputDirectory))
+            if (FileUtility.DirectoryExists(Settings.RootBinDirectory))
             {
-                Directory.Delete(Settings.OutputDirectory, recursive: true);
+                Directory.Delete(Settings.RootBinDirectory, recursive: true);
             }
 
             if (FileUtility.DirectoryExists(Settings.ArtifactsDirectory))
@@ -27,74 +27,92 @@ namespace Build
             }
         }
 
-        public static void CreateOutputDirectory()
-        {
-            FileUtility.EnsureDirectoryExists(Settings.OutputDirectory);
-        }
-
-        public static void CopyProjectToOutputDirectory()
-        {
-            FileUtility.CopyFile(Settings.ProjectFile, Settings.OutputProjectFile);
-        }
-
-        public static void BuildExtensionsProject()
-        {
-            var feeds = Settings.nugetFeed.Aggregate(string.Empty, (a, b) => $"{a} --source {b}");
-            Shell.Run("dotnet", $"publish {Settings.OutputProjectFile} -c Release -o {Settings.OutputBinTempDirectory}");
-            var binariesPath = Path.Combine(Settings.OutputBinTempDirectory, "bin");
-            FileUtility.DeleteDirectory(Settings.OutputBinDirectory, true);
-            FileUtility.CopyDirectory(binariesPath, Settings.OutputBinDirectory);
-            FileUtility.DeleteDirectory(Settings.OutputBinTempDirectory, true);
-        }
-
-        public static void AddPackages()
-        {
-            var extensions = GetExtensionList();
-            foreach (var extension in extensions)
-            {
-                Shell.Run("dotnet", $"add {Settings.OutputProjectFile} package {extension.Id} -v {extension.Version} -n");
-            }
-        }
-
-        private static List<Extension> GetExtensionList()
-        {
-            var extensionsJsonFileContent = FileUtility.ReadAllText(Settings.ExtensionsJsonFile);
-            return JsonConvert.DeserializeObject<List<Extension>>(extensionsJsonFileContent);
-        }
-
         public static void DownloadTemplates()
         {
-            string zipDirectoryPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            FileUtility.EnsureDirectoryExists(zipDirectoryPath);
+            string downloadPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            FileUtility.EnsureDirectoryExists(downloadPath);
             string templatesZipUri = $"https://functionscdn.azureedge.net/public/ExtensionBundleTemplates/ExtensionBundle.v1.Templates.{Settings.TemplatesVersion}.zip";
-            string zipFilePath = Path.Combine(zipDirectoryPath, $"templates.zip");
+            string zipFilePath = Path.Combine(downloadPath, $"templates.zip");
             var zipUri = new Uri(templatesZipUri);
 
             if (DownloadZipFile(zipUri, zipFilePath))
             {
-                FileUtility.EnsureDirectoryExists(Settings.OutputTemplatesDirectory);
-                ZipFile.ExtractToDirectory(zipFilePath, Settings.OutputTemplatesDirectory);
+                FileUtility.EnsureDirectoryExists(Settings.TemplatesRootDirectory);
+                ZipFile.ExtractToDirectory(zipFilePath, Settings.TemplatesRootDirectory);
             }
-            if (!FileUtility.DirectoryExists(Settings.OutputTemplatesDirectory) || !FileUtility.FileExists(Settings.OutputTemplatesJsonFile))
+
+            if (!FileUtility.DirectoryExists(Settings.TemplatesRootDirectory) || !FileUtility.FileExists(Settings.TemplatesJsonFilePath))
             {
                 throw new Exception("Template download failed");
             }
 
-            if (FileUtility.DirectoryExists(Settings.OutputTemplatesDirectory) || FileUtility.FileExists(Settings.ResourcesFile))
+            if (FileUtility.DirectoryExists(Settings.TemplatesRootDirectory) || FileUtility.FileExists(Settings.ResourcesFilePath))
             {
-                FileUtility.CopyFile(Settings.ResourcesFile, Settings.ResourcesEnUSFile);
+                FileUtility.CopyFile(Settings.ResourcesFilePath, Settings.ResourcesEnUSFilePath);
             }
 
 
-            if (!FileUtility.DirectoryExists(Settings.OutputTemplatesDirectory) || !FileUtility.FileExists(Settings.ResourcesEnUSFile))
+            if (!FileUtility.DirectoryExists(Settings.TemplatesRootDirectory) || !FileUtility.FileExists(Settings.ResourcesEnUSFilePath))
             {
                 throw new Exception("Resource Copy failed");
             }
         }
 
-        public static void AddBindingInfoToExtensionsJson()
+        public static void GenerateNetCoreV2Bundle()
         {
-            var extensionsJsonFileContent = FileUtility.ReadAllText(Settings.OutputExtensionJsonFile);
+            BuildConfiguration netCoreV2BuildConfiguration = new BuildConfiguration()
+            {
+                ConfigurationName = "netCoreV2",
+                ProjectFileName = "extensions.csproj",
+                RuntimeIdentifier = "any",
+                ReadyToRunEnabled = false
+            };
+
+            var sourceProjectFilePath = GetSourceProjectFilePath(netCoreV2BuildConfiguration);
+            var projectFilePath = GetProjectFilePath(netCoreV2BuildConfiguration);
+            GenerateBundleProjectFile(sourceProjectFilePath, projectFilePath);
+
+            var publishDirectory = GetProjectPublishPath(netCoreV2BuildConfiguration);
+            BuildExtensionsProject(projectFilePath, publishDirectory, netCoreV2BuildConfiguration.ReadyToRunEnabled, netCoreV2BuildConfiguration.RuntimeIdentifier);
+
+            var binariesPath = Path.Combine(publishDirectory, "bin");
+            string bundlePath = CreateExtensionBundle(netCoreV2BuildConfiguration.ConfigurationName, binariesPath, projectFilePath);
+            CreateBundleZipFile(bundlePath);
+        }
+
+        public static void GenerateBundleProjectFile(string sourceProjectFilePath, string targetProjectFilePath)
+        {
+            var projectDirectory = Path.GetDirectoryName(targetProjectFilePath);
+            FileUtility.EnsureDirectoryExists(projectDirectory);
+            FileUtility.CopyFile(sourceProjectFilePath, targetProjectFilePath);
+            AddExtensionPackages(targetProjectFilePath);
+        }
+
+        public static void AddExtensionPackages(string projectFilePath)
+        {
+            var extensions = GetExtensionList();
+            foreach (var extension in extensions)
+            {
+                Shell.Run("dotnet", $"add {projectFilePath} package {extension.Id} -v {extension.Version} -n");
+            }
+        }
+
+        public static void BuildExtensionsProject(string projectFilePath, string publishDirectory, bool readyToRunEnabled, string runtimeIdentifier)
+        {
+            var feeds = Settings.nugetFeed.Aggregate(string.Empty, (a, b) => $"{a} --source {b}");
+            var publishCommandArguments = $"publish {projectFilePath} -c Release -o {publishDirectory}";
+
+            if (readyToRunEnabled)
+            {
+                publishCommandArguments += $"-r {runtimeIdentifier}";
+            }
+
+            Shell.Run("dotnet", publishCommandArguments);
+        }
+
+        public static void AddBindingInfoToExtensionsJson(string extensionsJson)
+        {
+            var extensionsJsonFileContent = FileUtility.ReadAllText(extensionsJson);
             var outputExtensions = JsonConvert.DeserializeObject<BundleExtensions>(extensionsJsonFileContent);
             var inputExtensions = GetExtensionList();
 
@@ -111,7 +129,13 @@ namespace Build
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
-            FileUtility.Write(Settings.OutputExtensionJsonFile, JsonConvert.SerializeObject(outputExtensions));
+            FileUtility.Write(extensionsJson, JsonConvert.SerializeObject(outputExtensions));
+        }
+
+        private static List<Extension> GetExtensionList()
+        {
+            var extensionsJsonFileContent = FileUtility.ReadAllText(Settings.ExtensionsJsonFilePath);
+            return JsonConvert.DeserializeObject<List<Extension>>(extensionsJsonFileContent);
         }
 
         public static bool DownloadZipFile(Uri zipUri, string filePath)
@@ -132,13 +156,33 @@ namespace Build
             return true;
         }
 
-        public static void CreateBundleZipFile()
+        public static string CreateExtensionBundle(string configurationName, string bundleBinariesDirectoryPath, string bundleProjectFilePath)
         {
-            FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
-            ZipFile.CreateFromDirectory(Settings.OutputDirectory, Path.Combine(Settings.ArtifactsDirectory, $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}.zip"), CompressionLevel.NoCompression, false);
+            string bundleName = $"bundle_{configurationName}";
+            // Create a directory to hold the bundle content
+            string bundlePath = Path.Combine(Settings.RootBinDirectory, bundleName);
+            string targetBundleBinariesPath = Path.Combine(bundlePath, "bin");
+
+            // Copy binaries
+            FileUtility.CopyDirectory(bundleBinariesDirectoryPath, targetBundleBinariesPath);
+
+            // Copy templates
+            var staticContentDirectory = Path.Combine(bundlePath, Settings.StaticContentDirectoryName);
+            FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, staticContentDirectory);
+
+            // Add bundle.json
+            CreateBundleJsonFile(bundlePath);
+
+            // Add Csproj file
+            string projectPath = Path.Combine(bundlePath, "extensions.csproj");
+            string extensionJsonFilePath = Path.Join(targetBundleBinariesPath, Settings.ExtensionsJsonFileName);
+            AddBindingInfoToExtensionsJson(extensionJsonFilePath);
+            File.Copy(bundleProjectFilePath, projectPath);
+
+            return bundlePath;
         }
 
-       public static void AddBundleContent(string rootPath)
+        public static void AddBundleContent(string rootPath)
         {
             string packagePath = Path.Combine(rootPath, Settings.ExtensionBundleBuildVersion);
             FileUtility.EnsureDirectoryExists(packagePath);
@@ -151,6 +195,15 @@ namespace Build
             // copy non binary files
             ZipFile.ExtractToDirectory(bundlePath, packagePath);
             FileUtility.DeleteDirectory(Path.Combine(packagePath, "bin"), true);
+        }
+        public static void CreateBundleZipFile(string bundleSourceDirectoryPath, string bundleNamePostFix = null)
+        {
+            string bundleName = $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}";
+            bundleName += bundleNamePostFix == null ? ".zip" : $"_{bundleNamePostFix}.zip";
+
+            FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
+            string bundleZipFilePath = Path.Combine(Settings.ArtifactsDirectory, bundleName);
+            ZipFile.CreateFromDirectory(bundleSourceDirectoryPath, bundleZipFilePath, CompressionLevel.NoCompression, false);
         }
 
         public static void CreateRUPackage()
@@ -180,7 +233,7 @@ namespace Build
                 indexV2File.TryAdd(Settings.ExtensionBundleBuildVersion, bundleResource);
 
                 // write index-v2 file
-                string directoryPath = Path.Combine(Settings.OutputDirectory, indexFileMetadata.IndexFileDirectory, Settings.ExtensionBundleId);
+                string directoryPath = Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory, Settings.ExtensionBundleId);
                 FileUtility.EnsureDirectoryExists(directoryPath);
                 AddBundleContent(directoryPath);
 
@@ -196,9 +249,9 @@ namespace Build
                 var indexFile = GetIndexFile($"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/index.json");
                 indexFile.Add(Settings.ExtensionBundleBuildVersion);
 
-                var indexFilePath = Path.Combine(Settings.OutputDirectory, indexFileMetadata.IndexFileDirectory, Settings.ExtensionBundleId, Settings.IndexFileName);
+                var indexFilePath = Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory, Settings.ExtensionBundleId, Settings.IndexFileName);
                 FileUtility.Write(indexFilePath, JsonConvert.SerializeObject(indexFile));
-                ZipFile.CreateFromDirectory(Path.Combine(Settings.OutputDirectory, indexFileMetadata.IndexFileDirectory), Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}.zip"), CompressionLevel.NoCompression, false);
+                ZipFile.CreateFromDirectory(Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory), Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}.zip"), CompressionLevel.NoCompression, false);
             }
         }
 
@@ -232,7 +285,7 @@ namespace Build
             }
         }
 
-        public static void CreateBundleJsonFile()
+        public static void CreateBundleJsonFile(string path)
         {
             var serializer = new JsonSerializerSettings();
             serializer.NullValueHandling = NullValueHandling.Ignore;
@@ -243,12 +296,23 @@ namespace Build
             };
             var fileContents = JsonConvert.SerializeObject(bundleInfo, serializer);
 
-            FileUtility.Write(Settings.OutputBundleJsonFile, fileContents);
+            string bundleJsonPath = Path.Combine(path, "bundle.json");
+            FileUtility.Write(bundleJsonPath, fileContents);
         }
 
-        public static void RemoveObjFolderFromOutPutDirectory()
+        private static string GetProjectFilePath(BuildConfiguration buildConfiguration)
         {
-            FileUtility.DeleteDirectory(Path.Combine(Settings.OutputDirectory, "obj"), true);
+            string bundleProjectDirectoryName = $"BundleProject_{buildConfiguration.ConfigurationName}_{buildConfiguration.RuntimeIdentifier}";
+            var projectDirectory = Path.Combine(Settings.RootBinDirectory, bundleProjectDirectoryName);
+            return Path.Combine(Settings.RootBinDirectory, projectDirectory, buildConfiguration.ProjectFileName);
         }
+
+        private static string GetProjectPublishPath(BuildConfiguration buildConfiguration)
+        {
+            string bundleProjectDirectoryName = $"BundleProject_buildOutput_{buildConfiguration.ConfigurationName}_{buildConfiguration.RuntimeIdentifier}";
+            return Path.Combine(Settings.RootBinDirectory, bundleProjectDirectoryName);
+        }
+
+        public static string GetSourceProjectFilePath(BuildConfiguration buildConfiguration) => Path.Combine(Settings.SourcePath, buildConfiguration.ProjectFileName);
     }
 }
