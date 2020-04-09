@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Build
 {
@@ -16,6 +17,41 @@ namespace Build
             "https://www.myget.org/F/30de4ee06dd54956a82013fa17a3accb/",
             "https://www.myget.org/F/xunit/api/v3/index.json",
             "https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json"
+        };
+
+        public static BuildConfiguration netCoreV2BuildConfig = new BuildConfiguration()
+        {
+            ConfigurationName = "netCoreV2",
+            ProjectFileName = "extensions.csproj",
+            RuntimeIdentifiers = new List<string>() { "any" }
+        };
+
+        public static List<BuildConfiguration> netCoreV3RRBuildConfigurations = new List<BuildConfiguration>()
+            {
+                new BuildConfiguration()
+                {
+                    ConfigurationName = "netCoreV3_RR",
+                    ProjectFileName = "extensions_netcoreapp3.csproj",
+                    RuntimeIdentifiers = new List<string>() { "win-x86", "win-x64"},
+                    PublishReadyToRun = true,
+                    OSPlatform = OSPlatform.Windows
+                },
+                new BuildConfiguration()
+                {
+                    ConfigurationName = "netCoreV3",
+                    ProjectFileName = "extensions_netcoreapp3.csproj",
+                    RuntimeIdentifiers = new List<string>() { "linux-x64" },
+                    PublishReadyToRun = true,
+                    OSPlatform = OSPlatform.Linux
+                }
+            };
+
+        public static BuildConfiguration netCoreV3BuildConfiguration = new BuildConfiguration()
+        {
+            ConfigurationName = "netCoreV3",
+            ProjectFileName = "extensions_netcoreapp3.csproj",
+            RuntimeIdentifiers = new List<string>() { "any" },
+            OSPlatform = OSPlatform.Windows
         };
 
         public static readonly string SourcePath = Path.GetFullPath("../src/Microsoft.Azure.Functions.ExtensionBundle/");
