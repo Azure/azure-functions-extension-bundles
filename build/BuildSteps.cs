@@ -1,6 +1,4 @@
-using Colors.Net;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
@@ -8,7 +6,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
-using System.Xml;
+using System.Runtime.InteropServices;
 
 namespace Build
 {
@@ -60,25 +58,49 @@ namespace Build
 
         public static void GenerateNetCoreV2Bundle()
         {
-            BuildConfiguration netCoreV2BuildConfiguration = new BuildConfiguration()
-            {
-                ConfigurationName = "netCoreV2",
-                ProjectFileName = "extensions.csproj",
-                RuntimeIdentifier = "any",
-                ReadyToRunEnabled = false
-            };
-
-            var sourceProjectFilePath = GetSourceProjectFilePath(netCoreV2BuildConfiguration);
-            var projectFilePath = GetProjectFilePath(netCoreV2BuildConfiguration);
-            GenerateBundleProjectFile(sourceProjectFilePath, projectFilePath);
-
-            var publishDirectory = GetProjectPublishPath(netCoreV2BuildConfiguration);
-            BuildExtensionsProject(projectFilePath, publishDirectory, netCoreV2BuildConfiguration.ReadyToRunEnabled, netCoreV2BuildConfiguration.RuntimeIdentifier);
-
-            var binariesPath = Path.Combine(publishDirectory, "bin");
-            string bundlePath = CreateExtensionBundle(netCoreV2BuildConfiguration.ConfigurationName, binariesPath, projectFilePath);
-            CreateBundleZipFile(bundlePath);
+            GenerateBundle(Settings.netCoreV2BuildConfig);
         }
+
+        public static void GenerateNetCoreV3Bundles()
+        {
+            var v3BuildConfigurations = new List<BuildConfiguration>(Settings.netCoreV3RRBuildConfigurations);
+            v3BuildConfigurations.Add(Settings.netCoreV3BuildConfiguration);
+
+            foreach (var buildConfiguration in v3BuildConfigurations)
+            {
+                GenerateBundle(buildConfiguration);
+            }
+        }
+
+        public static void GenerateBundle(BuildConfiguration buildConfiguration)
+        {
+            foreach (string rid in buildConfiguration.RuntimeIdentifiers)
+            {
+                if (!buildConfiguration.PublishReadyToRun || RuntimeInformation.IsOSPlatform(buildConfiguration.OSPlatform))
+                {
+                    var sourceProjectFilePath = Path.Combine(Settings.SourcePath, buildConfiguration.ProjectFileName);
+
+                    string configId = GetConfigId(buildConfiguration.ConfigurationName, rid);
+
+                    string bundleProjectDirectoryName = $"BundleProject_{configId}";
+                    var projectDirectory = Path.Combine(Settings.RootBinDirectory, bundleProjectDirectoryName);
+                    string projectFilePath = Path.Combine(Settings.RootBinDirectory, projectDirectory, "extensions.csproj");
+
+
+
+                    GenerateBundleProjectFile(sourceProjectFilePath, projectFilePath);
+
+                    string publishDirectory = GetPublishDirectoryPath(configId);
+                    BuildExtensionsProject(projectFilePath, publishDirectory, rid, buildConfiguration.PublishReadyToRun);
+
+                    var publishedBinariesPath = Path.Combine(publishDirectory, "bin");
+                    string bundlePath = CreateExtensionBundle(configId, publishedBinariesPath, projectFilePath);
+                    CreateBundleZipFile(bundlePath, configId);
+                }
+            }
+        }
+
+        private static string GetPublishDirectoryPath(string configId) => Path.Combine(Settings.RootBinDirectory, $"BundleProject_buildOutput_{configId}");
 
         public static void GenerateBundleProjectFile(string sourceProjectFilePath, string targetProjectFilePath)
         {
@@ -97,14 +119,19 @@ namespace Build
             }
         }
 
-        public static void BuildExtensionsProject(string projectFilePath, string publishDirectory, bool readyToRunEnabled, string runtimeIdentifier)
+        public static void BuildExtensionsProject(string projectFilePath, string publishDirectory, string runtimeIdentifier, bool publishReadyToRun = false)
         {
             var feeds = Settings.nugetFeed.Aggregate(string.Empty, (a, b) => $"{a} --source {b}");
             var publishCommandArguments = $"publish {projectFilePath} -c Release -o {publishDirectory}";
 
-            if (readyToRunEnabled)
+            if (!runtimeIdentifier.Equals("any", StringComparison.OrdinalIgnoreCase))
             {
-                publishCommandArguments += $"-r {runtimeIdentifier}";
+                publishCommandArguments += $" -r {runtimeIdentifier}";
+            }
+
+            if (publishReadyToRun)
+            {
+                publishCommandArguments += $" /p:PublishReadyToRun=true";
             }
 
             Shell.Run("dotnet", publishCommandArguments);
@@ -156,9 +183,9 @@ namespace Build
             return true;
         }
 
-        public static string CreateExtensionBundle(string configurationName, string bundleBinariesDirectoryPath, string bundleProjectFilePath)
+        public static string CreateExtensionBundle(string configId, string bundleBinariesDirectoryPath, string bundleProjectFilePath)
         {
-            string bundleName = $"bundle_{configurationName}";
+            string bundleName = $"bundle_{configId}";
             // Create a directory to hold the bundle content
             string bundlePath = Path.Combine(Settings.RootBinDirectory, bundleName);
             string targetBundleBinariesPath = Path.Combine(bundlePath, "bin");
@@ -178,29 +205,38 @@ namespace Build
             string extensionJsonFilePath = Path.Join(targetBundleBinariesPath, Settings.ExtensionsJsonFileName);
             AddBindingInfoToExtensionsJson(extensionJsonFilePath);
             File.Copy(bundleProjectFilePath, projectPath);
-
             return bundlePath;
         }
 
         public static void AddBundleContent(string rootPath)
         {
-            string packagePath = Path.Combine(rootPath, Settings.ExtensionBundleBuildVersion);
-            FileUtility.EnsureDirectoryExists(packagePath);
+            var staticContentDirectory = Path.Combine(rootPath, Settings.StaticContentDirectoryName);
+            FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, staticContentDirectory);
 
-            // Copy the bundle zip
-            string bundleZipFileName = $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}.zip";
-            string bundlePath = Path.Combine(Settings.ArtifactsDirectory, bundleZipFileName);
-            File.Copy(bundlePath, Path.Combine(packagePath, bundleZipFileName));
+            // add v2 binaries
+            var v2SourceBundleZipPath = GetBundleZipFilePath(Settings.netCoreV2BuildConfig.ConfigurationName, Settings.netCoreV2BuildConfig.RuntimeIdentifiers[0]);
+            string v2BundlePath = Path.Combine(rootPath, $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}.zip");
+            FileUtility.CopyFile(v2SourceBundleZipPath, v2BundlePath);
 
-            // copy non binary files
-            ZipFile.ExtractToDirectory(bundlePath, packagePath);
-            FileUtility.DeleteDirectory(Path.Combine(packagePath, "bin"), true);
+            // add v3 binaires
+            foreach (var buildConfig in Settings.netCoreV3RRBuildConfigurations)
+            {
+                if (RuntimeInformation.IsOSPlatform(buildConfig.OSPlatform))
+                {
+                    foreach (var rid in buildConfig.RuntimeIdentifiers)
+                    {
+                        var bundleZipPath = GetBundleZipFilePath(buildConfig.ConfigurationName, rid);
+                        var bundleZipFileName = GetBundleZipFileName(buildConfig.ConfigurationName, rid);
+                        string bundleZipDestinationPath = Path.Combine(rootPath, bundleZipFileName);
+                        FileUtility.CopyFile(bundleZipPath, bundleZipDestinationPath);
+                    }
+                }
+            }
         }
-        public static void CreateBundleZipFile(string bundleSourceDirectoryPath, string bundleNamePostFix = null)
-        {
-            string bundleName = $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}";
-            bundleName += bundleNamePostFix == null ? ".zip" : $"_{bundleNamePostFix}.zip";
 
+        public static void CreateBundleZipFile(string bundleSourceDirectoryPath, string configId)
+        {
+            string bundleName = $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}_{configId}.zip";
             FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
             string bundleZipFilePath = Path.Combine(Settings.ArtifactsDirectory, bundleName);
             ZipFile.CreateFromDirectory(bundleSourceDirectoryPath, bundleZipFilePath, CompressionLevel.NoCompression, false);
@@ -209,10 +245,28 @@ namespace Build
         public static void CreateRUPackage()
         {
             FileUtility.EnsureDirectoryExists(Settings.RUPackagePath);
-            // Copy the bundle zip
-            string bundleZipFileName = $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}.zip";
-            string bundlePath = Path.Combine(Settings.ArtifactsDirectory, bundleZipFileName);
+            var v2BuildConfig = Settings.netCoreV2BuildConfig;
+
+            // add v2 binaries
+            string bundlePath = GetBundleZipFilePath(v2BuildConfig.ConfigurationName, v2BuildConfig.RuntimeIdentifiers[0]);
             ZipFile.ExtractToDirectory(bundlePath, Settings.RUPackagePath);
+
+            // add v3 binaires
+            foreach (var buildConfig in Settings.netCoreV3RRBuildConfigurations)
+            {
+                foreach (var rid in buildConfig.RuntimeIdentifiers)
+                {
+                    if (buildConfig.OSPlatform == OSPlatform.Windows)
+                    {
+                        string configId = GetConfigId(buildConfig.ConfigurationName, rid);
+                        string publishDirectory = GetPublishDirectoryPath(configId);
+                        string publishedBinariesPath = Path.Combine(publishDirectory, "bin");
+                        string RuPackageBinDirecotryPath = Path.Combine(Settings.RUPackagePath, $"v3/bin-{rid}");
+                        FileUtility.CopyDirectory(publishedBinariesPath, RuPackageBinDirecotryPath);
+                    }
+                }
+            }
+
             var RURootPackagePath = Directory.GetParent(Settings.RUPackagePath);
             ZipFile.CreateFromDirectory(RURootPackagePath.FullName, Path.Combine(Settings.ArtifactsDirectory, $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}_RU_package.zip"), CompressionLevel.NoCompression, false);
         }
@@ -300,19 +354,19 @@ namespace Build
             FileUtility.Write(bundleJsonPath, fileContents);
         }
 
-        private static string GetProjectFilePath(BuildConfiguration buildConfiguration)
+        private static string GetConfigId(string configurationName, string runtimeIdentifier) => $"{configurationName}_{runtimeIdentifier}";
+
+        private static string GetBundleZipFileName(string configurationName, string runtimeIdentifier)
         {
-            string bundleProjectDirectoryName = $"BundleProject_{buildConfiguration.ConfigurationName}_{buildConfiguration.RuntimeIdentifier}";
-            var projectDirectory = Path.Combine(Settings.RootBinDirectory, bundleProjectDirectoryName);
-            return Path.Combine(Settings.RootBinDirectory, projectDirectory, buildConfiguration.ProjectFileName);
+            string configId = GetConfigId(configurationName, runtimeIdentifier);
+            return $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}_{configId}.zip";
         }
 
-        private static string GetProjectPublishPath(BuildConfiguration buildConfiguration)
+        private static string GetBundleZipFilePath(string configurationName, string runtimeIdentifier)
         {
-            string bundleProjectDirectoryName = $"BundleProject_buildOutput_{buildConfiguration.ConfigurationName}_{buildConfiguration.RuntimeIdentifier}";
-            return Path.Combine(Settings.RootBinDirectory, bundleProjectDirectoryName);
+            var zipFileName = GetBundleZipFileName(configurationName, runtimeIdentifier);
+            return Path.Combine(Settings.ArtifactsDirectory, zipFileName);
         }
 
-        public static string GetSourceProjectFilePath(BuildConfiguration buildConfiguration) => Path.Combine(Settings.SourcePath, buildConfiguration.ProjectFileName);
     }
 }

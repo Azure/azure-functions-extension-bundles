@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Build
@@ -11,8 +12,10 @@ namespace Build
 
         public string ProjectFileName { get; set; }
 
-        public string RuntimeIdentifier { get; set; }
+        public List<string> RuntimeIdentifiers { get; set; }
 
-        public bool ReadyToRunEnabled { get; set; }
+        public bool PublishReadyToRun { get; set; }
+
+        public OSPlatform OSPlatform { get; internal set; }
     }
 }
