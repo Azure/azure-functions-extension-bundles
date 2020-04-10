@@ -79,11 +79,11 @@ namespace Build
 
         public static readonly string StaticContentDirectoryPath = Path.Combine(RootBinDirectory, StaticContentDirectoryName);
 
-        public static readonly string TemplatesJsonFilePath = Path.Combine(TemplatesRootDirectory, "Templates", "Templates.json");
+        public static readonly string TemplatesJsonFilePath = Path.Combine(TemplatesRootDirectory, "templates", "templates.json");
 
-        public static readonly string ResourcesFilePath = Path.Combine(TemplatesRootDirectory, "Resources", "Resources.json");
+        public static readonly string ResourcesFilePath = Path.Combine(TemplatesRootDirectory, "resources", "Resources.json");
 
-        public static readonly string ResourcesEnUSFilePath = Path.Combine(TemplatesRootDirectory, "Resources", "Resources.en-US.json");
+        public static readonly string ResourcesEnUSFilePath = Path.Combine(TemplatesRootDirectory, "resources", "Resources.en-US.json");
 
         public static readonly string ExtensionsJsonFileName = "extensions.json";
 

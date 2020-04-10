@@ -311,7 +311,7 @@ namespace Build
                 AddBundleZipFile(packageBundleDirectory, Settings.netCoreV3RRLinuxBuildConfiguration);
 
                 string packageZipFilePath = Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}_linux.zip");
-                ZipFile.CreateFromDirectory(packageZipFilePath, packageZipFilePath, CompressionLevel.NoCompression, false);
+                ZipFile.CreateFromDirectory(packageRootDirectoryPath, packageZipFilePath, CompressionLevel.NoCompression, false);
             }
         }
 
