@@ -3,22 +3,47 @@ trigger:
 - v1.x
 - v2.x
 
-pool:
-  vmImage: 'vs2017-win2016'
+jobs:
+- job: InitializePipeline
+  pool:
+    vmImage: 'vs2017-win2016'
 
-steps:
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'run'
-    workingDirectory: '.\build'
-- task: CopyFiles@2
-  inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
-    Contents: '*.zip'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-    CleanTargetFolder: true
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+  steps:
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'run'
+      workingDirectory: '.\build'
+      arguments: 'skip:GenerateNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux'
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
+      Contents: '*.zip'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      CleanTargetFolder: true
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'
+
+- job: BuildArtifacts_Ubuntu
+  pool:
+    vmImage: 'ubuntu-18.04'
+
+  steps:
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'run'
+      workingDirectory: '.\build'
+      arguments: 'skip:GenerateNetCoreV2Bundle,GenerateNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows'
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
+      Contents: '*.zip'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      CleanTargetFolder: true
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop2'
+      publishLocation: 'Container'
