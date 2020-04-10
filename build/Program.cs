@@ -14,9 +14,12 @@ namespace Build
                 .Then(Clean)
                 .Then(DownloadTemplates)
                 .Then(GenerateNetCoreV2Bundle)
-                .Then(GenerateNetCoreV3Bundles)
+                .Then(GenerateNetCoreV3BundlesWindows)
+                .Then(GenerateNetCoreV3BundlesLinux)
                 .Then(CreateRUPackage)
                 .Then(CreateCDNStoragePackage)
+                .Then(CreateCDNStoragePackageWindows)
+                .Then(CreateCDNStoragePackageLinux)
                 .Run();
         }
     }
