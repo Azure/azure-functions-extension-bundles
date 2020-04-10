@@ -4,11 +4,16 @@ trigger:
 - v2.x
 
 jobs:
-- job: InitializePipeline
+- job: BuildArtifacts_Windows
   pool:
     vmImage: 'vs2017-win2016'
 
   steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '3.1.x'
+      performMultiLevelLookup: true
   - task: DotNetCoreCLI@2
     inputs:
       command: 'run'
@@ -31,11 +36,16 @@ jobs:
     vmImage: 'ubuntu-18.04'
 
   steps:
-  - task: DotNetCoreCLI@2
+  - task: Bash@3
     inputs:
-      command: 'run'
-      workingDirectory: '.\build'
-      arguments: 'skip:GenerateNetCoreV2Bundle,GenerateNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows'
+      targetType: 'inline'
+      script: |
+        mkdir .dotnet &&
+        chmod +x dotnet-install.sh &&
+        ./dotnet-install.sh --version 3.1.201 --install-dir .dotnet &&
+        PATH=".dotnet:"$PATH && dotnet --info
+        cd build
+        dotnet run skip:GenerateNetCoreV2Bundle,GenerateNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
