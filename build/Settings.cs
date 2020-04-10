@@ -23,34 +23,43 @@ namespace Build
         {
             ConfigurationName = "netCoreV2",
             ProjectFileName = "extensions.csproj",
-            RuntimeIdentifiers = new List<string>() { "any" }
+            RuntimeIdentifier = "any"
         };
 
-        public static List<BuildConfiguration> netCoreV3RRBuildConfigurations = new List<BuildConfiguration>()
-            {
-                new BuildConfiguration()
-                {
-                    ConfigurationName = "netCoreV3_RR",
-                    ProjectFileName = "extensions_netcoreapp3.csproj",
-                    RuntimeIdentifiers = new List<string>() { "win-x86", "win-x64"},
-                    PublishReadyToRun = true,
-                    OSPlatform = OSPlatform.Windows
-                },
-                new BuildConfiguration()
-                {
-                    ConfigurationName = "netCoreV3",
-                    ProjectFileName = "extensions_netcoreapp3.csproj",
-                    RuntimeIdentifiers = new List<string>() { "linux-x64" },
-                    PublishReadyToRun = true,
-                    OSPlatform = OSPlatform.Linux
-                }
-            };
+        public static BuildConfiguration netCoreV3RRWindowsX86BuildConfiguration = new BuildConfiguration()
+        {
+            ConfigurationName = "netCoreV3_RR",
+            ProjectFileName = "extensions_netcoreapp3.csproj",
+            RuntimeIdentifier = "win-x86",
+            PublishReadyToRun = true,
+            OSPlatform = OSPlatform.Windows
+        };
+
+        public static BuildConfiguration netCoreV3RRWindowsX64BuildConfiguration = new BuildConfiguration()
+        {
+            ConfigurationName = "netCoreV3_RR",
+            ProjectFileName = "extensions_netcoreapp3.csproj",
+            RuntimeIdentifier = "win-x64",
+            PublishReadyToRun = true,
+            OSPlatform = OSPlatform.Windows
+        };
+
+
+        public static BuildConfiguration netCoreV3RRLinuxBuildConfiguration = new BuildConfiguration()
+        {
+            ConfigurationName = "netCoreV3",
+            ProjectFileName = "extensions_netcoreapp3.csproj",
+            RuntimeIdentifier = "linux-x64",
+            PublishReadyToRun = true,
+            OSPlatform = OSPlatform.Linux
+        };
+
 
         public static BuildConfiguration netCoreV3BuildConfiguration = new BuildConfiguration()
         {
             ConfigurationName = "netCoreV3",
             ProjectFileName = "extensions_netcoreapp3.csproj",
-            RuntimeIdentifiers = new List<string>() { "any" },
+            RuntimeIdentifier = "any",
             OSPlatform = OSPlatform.Windows
         };
 

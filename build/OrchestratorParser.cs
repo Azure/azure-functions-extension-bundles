@@ -24,7 +24,10 @@ namespace Build
                 this.TargetToRun = targetToRun;
             }
 
-            skipList = args.Where(a => a.StartsWith("skip:")).Select(a => a.Split(":").Last());
+            skipList = args.Where(a => a.StartsWith("skip:")).SelectMany(a =>
+            {
+                return a.Replace("skip:",string.Empty).Split(",");
+            });
         }
 
         public bool ShouldSkip(string target) => skipList.Any(i => i.Equals(target, StringComparison.OrdinalIgnoreCase));
