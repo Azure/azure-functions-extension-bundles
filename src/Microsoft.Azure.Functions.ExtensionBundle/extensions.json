@@ -53,7 +53,8 @@
         "version": "2.1.0",
         "name": "EventGrid",
         "bindings": [
-            "eventgridtrigger"
+            "eventgridtrigger",
+            "eventgrid"
         ]
     },
     {
