@@ -19,49 +19,8 @@ namespace Build
             "https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json"
         };
 
-        public static BuildConfiguration netCoreV2BuildConfig = new BuildConfiguration()
-        {
-            ConfigurationName = "netCoreV2",
-            ProjectFileName = "extensions.csproj",
-            RuntimeIdentifier = "any"
-        };
+       
 
-        public static BuildConfiguration netCoreV3RRWindowsX86BuildConfiguration = new BuildConfiguration()
-        {
-            ConfigurationName = "netCoreV3_RR",
-            ProjectFileName = "extensions_netcoreapp3.csproj",
-            RuntimeIdentifier = "win-x86",
-            PublishReadyToRun = true,
-            OSPlatform = OSPlatform.Windows
-        };
-
-        public static BuildConfiguration netCoreV3RRWindowsX64BuildConfiguration = new BuildConfiguration()
-        {
-            ConfigurationName = "netCoreV3_RR",
-            ProjectFileName = "extensions_netcoreapp3.csproj",
-            RuntimeIdentifier = "win-x64",
-            PublishReadyToRun = true,
-            OSPlatform = OSPlatform.Windows
-        };
-
-
-        public static BuildConfiguration netCoreV3RRLinuxBuildConfiguration = new BuildConfiguration()
-        {
-            ConfigurationName = "netCoreV3",
-            ProjectFileName = "extensions_netcoreapp3.csproj",
-            RuntimeIdentifier = "linux-x64",
-            PublishReadyToRun = true,
-            OSPlatform = OSPlatform.Linux
-        };
-
-
-        public static BuildConfiguration netCoreV3BuildConfiguration = new BuildConfiguration()
-        {
-            ConfigurationName = "netCoreV3",
-            ProjectFileName = "extensions_netcoreapp3.csproj",
-            RuntimeIdentifier = "any",
-            OSPlatform = OSPlatform.Windows
-        };
 
         public static readonly string SourcePath = Path.GetFullPath("../src/Microsoft.Azure.Functions.ExtensionBundle/");
 
@@ -72,6 +31,8 @@ namespace Build
         public static readonly string StaticContentDirectoryName = "StaticContent";
 
         public static readonly string RootBinDirectory = Path.Combine(Path.GetFullPath(".."), "bin");
+
+        public static readonly string RootBuildDirectory = Path.Combine(Path.GetFullPath(".."), "build_temp");
 
         public static readonly string ArtifactsDirectory = Path.Combine(Path.GetFullPath(".."), "artifacts");
 
@@ -105,6 +66,111 @@ namespace Build
         {
             new IndexFileV2Metadata("https://functionscdnstaging.azureedge.net", ExtensionBundleId, "cdnStaging"),
             new IndexFileV2Metadata("https://functionscdn.azureedge.net", ExtensionBundleId, "cdnProd")
+        };
+
+        public static List<BuildConfiguration> WindowsBuildConfigurations = new List<BuildConfiguration>()
+        {
+            new BuildConfiguration()
+            {
+                ConfigId = ConfigId.NetCoreApp2_any_any,
+                SourceProjectFileName = "extensions.csproj",
+                RuntimeIdentifier = "any",
+                PublishReadyToRun = false,
+                PublishBinDirectorySubPath = "bin"
+
+            },
+            new BuildConfiguration()
+            {
+                ConfigId = ConfigId.NetCoreApp3_win_x86,
+                SourceProjectFileName = "extensions_netcoreapp3.csproj",
+                RuntimeIdentifier = "win-x86",
+                PublishReadyToRun = true,
+                PublishBinDirectorySubPath = Path.Combine("bin_v3", "win-x86")
+            },
+            new BuildConfiguration()
+            {
+                ConfigId = ConfigId.NetCoreApp3_win_x64,
+                SourceProjectFileName = "extensions_netcoreapp3.csproj",
+                RuntimeIdentifier = "win-x64",
+                PublishReadyToRun = true,
+                PublishBinDirectorySubPath = Path.Combine("bin_v3", "win-x64")
+            },
+            new BuildConfiguration()
+            {
+                ConfigId = ConfigId.NetCoreApp3_any_any,
+                SourceProjectFileName = "extensions_netcoreapp3.csproj",
+                RuntimeIdentifier = "any",
+                PublishReadyToRun = false,
+                PublishBinDirectorySubPath = "bin"
+            }
+        };
+
+        public static List<BuildConfiguration> LinuxBuildConfigurations = new List<BuildConfiguration>()
+        {
+            new BuildConfiguration()
+            {
+                ConfigId = ConfigId.NetCoreApp3_linux_x64,
+                SourceProjectFileName = "extensions_netcoreapp3.csproj",
+                RuntimeIdentifier = "linux-x64",
+                PublishReadyToRun = true,
+                PublishBinDirectorySubPath = Path.Combine("bin_v3", "linux-x64")
+            },
+            new BuildConfiguration()
+            {
+                ConfigId = ConfigId.NetCoreApp3_any_any,
+                SourceProjectFileName = "extensions_netcoreapp3.csproj",
+                RuntimeIdentifier = "any",
+                PublishReadyToRun = false,
+                PublishBinDirectorySubPath = "bin"
+            }
+        };
+
+        public enum ConfigId
+        {
+            NetCoreApp3_win_x86,
+            NetCoreApp3_win_x64,
+            NetCoreApp2_any_any,
+            NetCoreApp3_any_any,
+            NetCoreApp3_linux_x64
+        }
+
+        public static BundlePackageConfiguration BundlePackageNetCoreV2Any = new BundlePackageConfiguration()
+        {
+            PackageIdentifier = string.Empty,
+            ConfigBinariesToInclude = new List<ConfigId>() {
+                ConfigId.NetCoreApp2_any_any
+            },
+            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.NetCoreApp2_any_any.ToString(), "extensions.csproj")
+        };
+
+        public static BundlePackageConfiguration BundlePackageNetCoreV3Any = new BundlePackageConfiguration()
+        {
+            PackageIdentifier = "any-any",
+            ConfigBinariesToInclude = new List<ConfigId>() {
+                ConfigId.NetCoreApp3_any_any
+            },
+            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.NetCoreApp3_any_any.ToString(), "extensions.csproj")
+        };
+
+        public static BundlePackageConfiguration BundlePackageNetCoreWindows = new BundlePackageConfiguration()
+        {
+            PackageIdentifier = "win-any",
+            ConfigBinariesToInclude = new List<ConfigId>() {
+                ConfigId.NetCoreApp2_any_any,
+                ConfigId.NetCoreApp3_win_x86,
+                ConfigId.NetCoreApp3_win_x64
+            },
+            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.NetCoreApp3_any_any.ToString(), "extensions.csproj")
+        };
+
+        public static BundlePackageConfiguration BundlePackageNetCoreV3Linux = new BundlePackageConfiguration()
+        {
+            PackageIdentifier = "linux-x64",
+            ConfigBinariesToInclude = new List<ConfigId>() {
+                ConfigId.NetCoreApp3_any_any,
+                ConfigId.NetCoreApp3_linux_x64
+            },
+            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.NetCoreApp3_any_any.ToString(), "extensions.csproj")
         };
     }
 }
