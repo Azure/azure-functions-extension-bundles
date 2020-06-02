@@ -63,6 +63,11 @@ namespace Build
         public static void BuildBundleBinariesForWindows()
         {
             Settings.WindowsBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config));
+
+            // temporary fix for missing extensions.json
+            string sourceExtensionsJsonPath = Path.Combine(Settings.RootBinDirectory, @"NetCoreApp3_win_x64\bin_v3\win-x64\extensions.json");
+            string extensionsJsonPath = Path.Combine(Settings.RootBinDirectory, @"NetCoreApp3_win_x86\bin_v3\win-x86\extensions.json");
+            File.Copy(sourceExtensionsJsonPath, extensionsJsonPath, true);
         }
 
         public static void BuildBundleBinariesForLinux()
