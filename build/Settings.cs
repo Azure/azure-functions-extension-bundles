@@ -54,7 +54,7 @@ namespace Build
 
         public static string ExtensionBundleBuildVersion = "2.0.0";
 
-        public static string TemplatesVersion = "2.0.1547";
+        public static string TemplatesVersion = "2.0.1563";
 
         public static readonly string RUPackagePath = Path.Combine(RootBinDirectory, $"{ExtensionBundleId}.{ExtensionBundleBuildVersion}_RU_package", ExtensionBundleBuildVersion);
 
