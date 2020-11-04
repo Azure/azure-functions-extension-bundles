@@ -83,7 +83,6 @@ namespace Build
 
             FileUtility.EnsureDirectoryExists(projectDirectory);
             FileUtility.CopyFile(sourceProjectFilePath, targetProjectFilePath);
-            AddPackagesSources();
             AddExtensionPackages(targetProjectFilePath);
             return targetProjectFilePath;
         }

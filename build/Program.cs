@@ -13,6 +13,7 @@ namespace Build
                 .CreateForTarget(args)
                 .Then(Clean)
                 .Then(DownloadTemplates)
+                .Then(AddPackagesSources)
                 .Then(BuildBundleBinariesForWindows)
                 .Then(BuildBundleBinariesForLinux)
                 .Then(GenerateNetCoreV2Bundle)
