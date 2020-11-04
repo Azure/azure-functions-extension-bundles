@@ -4,12 +4,23 @@
     "version": "5.0.0-alpha.20201102.1",
     "name": "AzureStorageQueues",
     "bindings": [
+      "blobtrigger",
+      "blob",
       "queue",
       "queuetrigger"
     ]
   },
   {
-    "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
+    "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
+    "version": "5.0.0-alpha.20201102.1",
+    "name": "AzureStorageQueues",
+    "bindings": [
+      "queue",
+      "queuetrigger"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
     "version": "5.0.0-alpha.20201102.1",
     "name": "AzureStorageBlobs",
     "bindings": [
@@ -57,7 +68,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
-    "version": "3.0.0-alpha.20201103.1",
+    "version": "2.1.0",
     "name": "EventGrid",
     "bindings": [
       "eventgridtrigger",
