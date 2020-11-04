@@ -29,6 +29,12 @@ namespace Build
             "https://www.nuget.org/api/v2/"
         };
 
+        public static Dictionary<string, string> nugetSources = new Dictionary<string, string>()
+        {
+            { "azureSdk", "https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-net/nuget/v3/index.json"},
+            { "nuget", "https://www.nuget.org/api/v2/"}
+        };
+
         public static readonly string StaticContentDirectoryName = "StaticContent";
 
         public static readonly string RootBinDirectory = Path.Combine(Path.GetFullPath(".."), "bin");

@@ -83,6 +83,7 @@ namespace Build
 
             FileUtility.EnsureDirectoryExists(projectDirectory);
             FileUtility.CopyFile(sourceProjectFilePath, targetProjectFilePath);
+            AddPackagesSources();
             AddExtensionPackages(targetProjectFilePath);
             return targetProjectFilePath;
         }
@@ -93,6 +94,23 @@ namespace Build
             foreach (var extension in extensions)
             {
                 Shell.Run("dotnet", $"add {projectFilePath} package {extension.Id} -v {extension.Version} -n");
+            }
+        }
+
+        public static void AddPackagesSources()
+        {
+            var extensions = GetExtensionList();
+            foreach (var extension in Settings.nugetSources)
+            {
+                try
+                {
+                    Shell.Run("dotnet", $"nuget add source {extension.Value} -n {extension.Key}");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
             }
         }
 
