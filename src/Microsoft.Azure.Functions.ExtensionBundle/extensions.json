@@ -1,88 +1,94 @@
 [
-    {
-        "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-        "version": "4.0.3",
-        "name": "AzureStorage",
-        "bindings": [
-            "blobtrigger",
-            "queue",
-            "queuetrigger",
-            "table",
-            "blob"
-        ]
-    },
-    {
-        "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-        "version": "4.2.0",
-        "name": "ServiceBus",
-        "bindings": [
-            "servicebustrigger",
-            "servicebus"
-        ]
-    },
-    {
-        "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-        "version": "4.1.1",
-        "name": "EventHubs",
-        "bindings": [
-            "eventhubtrigger",
-            "eventhub"
-        ]
-    },
-    {
-        "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
-        "version": "3.0.0",
-        "name": "SendGrid",
-        "bindings": [
-            "sendgrid"
-        ]
-    },
-    {
-        "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-        "version": "2.3.1",
-        "name": "DurableTask",
-        "bindings": [
-            "activitytrigger",
-            "orchestrationtrigger",
-            "entitytrigger",
-            "durableclient",
-            "orchestrationclient"
-        ]
-    },
-    {
-        "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
-        "version": "2.1.0",
-        "name": "EventGrid",
-        "bindings": [
-            "eventgridtrigger",
-            "eventgrid"
-        ]
-    },
-    {
-        "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-        "version": "3.0.7",
-        "name": "CosmosDB",
-        "bindings": [
-            "cosmosdbtrigger",
-            "cosmosdb"
-        ]
-    },
-    {
-        "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
-        "version": "3.0.0",
-        "name": "Twilio",
-        "bindings": [
-            "twiliosms"
-        ]
-    },
-    {
-        "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
-        "version": "1.2.2",
-        "name": "SignalR",
-        "bindings": [
-            "signalr",
-            "signalrconnectioninfo",
-            "signalrtrigger"
-        ]
-    }
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
+    "version": "5.0.0-alpha.20201102.1",
+    "name": "AzureStorageQueues",
+    "bindings": [
+      "queue",
+      "queuetrigger"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
+    "version": "5.0.0-alpha.20201102.1",
+    "name": "AzureStorageBlobs",
+    "bindings": [
+      "blobtrigger",
+      "blob"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
+    "version": "4.2.0",
+    "name": "ServiceBus",
+    "bindings": [
+      "servicebustrigger",
+      "servicebus"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
+    "version": "4.1.1",
+    "name": "EventHubs",
+    "bindings": [
+      "eventhubtrigger",
+      "eventhub"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
+    "version": "3.0.0",
+    "name": "SendGrid",
+    "bindings": [
+      "sendgrid"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
+    "version": "2.3.1",
+    "name": "DurableTask",
+    "bindings": [
+      "activitytrigger",
+      "orchestrationtrigger",
+      "entitytrigger",
+      "durableclient",
+      "orchestrationclient"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
+    "version": "3.0.0-alpha.20201103.1",
+    "name": "EventGrid",
+    "bindings": [
+      "eventgridtrigger",
+      "eventgrid"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
+    "version": "3.0.7",
+    "name": "CosmosDB",
+    "bindings": [
+      "cosmosdbtrigger",
+      "cosmosdb"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
+    "version": "3.0.0",
+    "name": "Twilio",
+    "bindings": [
+      "twiliosms"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
+    "version": "1.2.2",
+    "name": "SignalR",
+    "bindings": [
+      "signalr",
+      "signalrconnectioninfo",
+      "signalrtrigger"
+    ]
+  }
 ]

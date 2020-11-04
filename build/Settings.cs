@@ -19,14 +19,15 @@ namespace Build
             "https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json"
         };
 
-       
-
-
         public static readonly string SourcePath = Path.GetFullPath("../src/Microsoft.Azure.Functions.ExtensionBundle/");
 
         public static string ExtensionsJsonFilePath => Path.Combine(SourcePath, ExtensionsJsonFileName);
 
-        public static string[] nugetFeed = new[] { "https://www.nuget.org/api/v2/" };
+        public static string[] nugetFeed = new[]
+        {
+            "https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-net/nuget/v3/index.json",
+            "https://www.nuget.org/api/v2/"
+        };
 
         public static readonly string StaticContentDirectoryName = "StaticContent";
 
@@ -50,9 +51,9 @@ namespace Build
 
         public static string ExtensionBundleId = "Microsoft.Azure.Functions.ExtensionBundle";
 
-        public static string ExtensionBundleVersionRange = "[2.*, 3.0.0)";
+        public static string ExtensionBundleVersionRange = "[3.*, 4.0.0)";
 
-        public static string ExtensionBundleBuildVersion = "2.3.0";
+        public static string ExtensionBundleBuildVersion = "3.0.0";
 
         public static string TemplatesVersion = "2.0.1619";
 
