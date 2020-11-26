@@ -84,5 +84,14 @@
             "signalrconnectioninfo",
             "signalrtrigger"
         ]
+    },
+    {
+        "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
+        "version": "1.0.0-beta",
+        "name": "RabbitMQ",
+        "bindings": [
+            "rabbitmqtrigger",
+            "rabbitmq"
+        ]
     }
 ]
