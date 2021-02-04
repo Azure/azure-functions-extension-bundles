@@ -91,5 +91,14 @@
             "rabbitmqtrigger",
             "rabbitmq"
         ]
+    },
+    {
+        "id": "Microsoft.Azure.WebJobs.Extensions.Kafka",
+        "version": "3.2.1",
+        "name": "Kafka",
+        "bindings": [
+            "kafkatrigger",
+            "kafka"
+        ]
     }
 ]
