@@ -1,7 +1,7 @@
 [
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-        "version": "4.0.3",
+        "version": "4.0.4",
         "name": "AzureStorage",
         "bindings": [
             "blobtrigger",
@@ -87,7 +87,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
-        "version": "1.0.0-beta",
+        "version": "1.0.0",
         "name": "RabbitMQ",
         "bindings": [
             "rabbitmqtrigger",
