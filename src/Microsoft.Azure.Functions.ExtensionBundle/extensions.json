@@ -13,7 +13,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-        "version": "4.2.0",
+        "version": "4.2.1",
         "name": "ServiceBus",
         "bindings": [
             "servicebustrigger",
@@ -31,7 +31,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
-        "version": "3.0.0",
+        "version": "3.0.2",
         "name": "SendGrid",
         "bindings": [
             "sendgrid"
@@ -60,7 +60,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-        "version": "3.0.7",
+        "version": "3.0.9",
         "name": "CosmosDB",
         "bindings": [
             "cosmosdbtrigger",
@@ -69,7 +69,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
-        "version": "3.0.0",
+        "version": "3.0.2",
         "name": "Twilio",
         "bindings": [
             "twiliosms"
