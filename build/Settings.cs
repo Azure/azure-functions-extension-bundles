@@ -58,8 +58,8 @@ namespace Build
         public static string ExtensionBundleId = "Microsoft.Azure.Functions.ExtensionBundle";
 
         public static string ExtensionBundleVersionRange = "[3.*, 4.0.0)";
-
-        public static string ExtensionBundleBuildVersion = "3.1.0";
+re
+        public static string ExtensionBundleBuildVersion = "3.2.0";
 
         public static string TemplatesVersion = "2.0.1701";
 
