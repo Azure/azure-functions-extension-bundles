@@ -1,7 +1,7 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "version": "5.0.0-beta.2",
+    "version": "5.0.0-beta.4",
     "name": "AzureStorageQueues",
     "bindings": [
       "blobtrigger",
@@ -12,7 +12,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
-    "version": "5.0.0-beta.2",
+    "version": "5.0.0-beta.4",
     "name": "AzureStorageQueues",
     "bindings": [
       "queue",
@@ -21,7 +21,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
-    "version": "5.0.0-beta.2",
+    "version": "5.0.0-beta.4",
     "name": "AzureStorageBlobs",
     "bindings": [
       "blobtrigger",
@@ -30,7 +30,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-    "version": "4.2.1",
+    "version": "5.0.0-beta.3",
     "name": "ServiceBus",
     "bindings": [
       "servicebustrigger",
@@ -39,7 +39,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-    "version": "5.0.0-beta.1",
+    "version": "5.0.0-beta.6",
     "name": "EventHubs",
     "bindings": [
       "eventhubtrigger",
@@ -68,7 +68,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
-    "version": "2.1.0",
+    "version": "3.0.0-beta.3",
     "name": "EventGrid",
     "bindings": [
       "eventgridtrigger",
