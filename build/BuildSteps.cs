@@ -33,7 +33,7 @@ namespace Build
         {
             string downloadPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             FileUtility.EnsureDirectoryExists(downloadPath);
-            string templatesZipUri = $"https://functionscdn.azureedge.net/public/ExtensionBundleTemplates/ExtensionBundle.v2.Templates.{Settings.TemplatesVersion}.zip";
+            string templatesZipUri = $"https://functionscdn.azureedge.net/public/ExtensionBundleTemplates/ExtensionBundle.Preview.v3.Templates.{Settings.TemplatesVersion}.zip";
             string zipFilePath = Path.Combine(downloadPath, $"templates.zip");
             var zipUri = new Uri(templatesZipUri);
 
