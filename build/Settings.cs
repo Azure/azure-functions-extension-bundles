@@ -59,7 +59,7 @@ namespace Build
 
         public static string ExtensionBundleVersionRange = "[3.*, 4.0.0)";
 
-        public static string ExtensionBundleBuildVersion = "3.2.1";
+        public static string ExtensionBundleBuildVersion = "3.0.0";
 
         public static string TemplatesVersion = "2.0.1716";
 
