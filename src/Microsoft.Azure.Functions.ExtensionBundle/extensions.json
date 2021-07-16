@@ -121,5 +121,16 @@
         "kafkatrigger",
         "kafka"
     ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSub",
+    "version": "1.0.0-beta.2",
+    "name": "WebPubSub",
+    "bindings": [
+      "webpubsub",
+      "webpubsubconnection",
+      "webpubsubtrigger",
+      "webpubsubrequest"
+    ]
   }
 ]
