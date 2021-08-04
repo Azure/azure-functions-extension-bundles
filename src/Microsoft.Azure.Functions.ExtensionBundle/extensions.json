@@ -1,7 +1,7 @@
 [
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-        "version": "3.0.11",
+        "majorVersion": "3",
         "name": "AzureStorage",
         "bindings": [
             "blobtrigger",
@@ -13,7 +13,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-        "version": "3.2.0",
+        "majorVersion": "3",
         "name": "ServiceBus",
         "bindings": [
             "servicebustrigger",
@@ -22,7 +22,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-        "version": "3.0.6",
+        "majorVersion": "3",
         "name": "EventHubs",
         "bindings": [
             "eventhubtrigger",
@@ -31,7 +31,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
-        "version": "3.0.2",
+        "majorVersion": "3",
         "name": "SendGrid",
         "bindings": [
             "sendgrid"
@@ -39,7 +39,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-        "version": "1.8.7",
+        "majorVersion": "1",
         "name": "DurableTask",
         "bindings": [
             "activitytrigger",
@@ -49,7 +49,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
-        "version": "2.1.0",
+        "majorVersion": "2",
         "name": "EventGrid",
         "bindings": [
             "eventgridtrigger",
@@ -58,7 +58,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-        "version": "3.0.9",
+        "majorVersion": "3",
         "name": "CosmosDB",
         "bindings": [
             "cosmosdbtrigger",
@@ -67,7 +67,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
-        "version": "3.0.2",
+        "majorVersion": "3",
         "name": "Twilio",
         "bindings": [
             "twiliosms"
@@ -75,7 +75,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
-        "version": "1.2.2",
+        "majorVersion": "1",
         "name": "SignalR",
         "bindings": [
             "signalr",
@@ -85,7 +85,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
-        "version": "1.0.0",
+        "majorVersion": "1",
         "name": "RabbitMQ",
         "bindings": [
             "rabbitmqtrigger",
@@ -94,7 +94,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.Kafka",
-        "version": "3.2.1",
+        "majorVersion": "3",
         "name": "Kafka",
         "bindings": [
             "kafkatrigger",
