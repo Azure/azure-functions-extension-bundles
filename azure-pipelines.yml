@@ -18,7 +18,7 @@ jobs:
     inputs:
       command: 'run'
       workingDirectory: '.\build'
-      arguments: 'skip:GenerateNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
+      arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
@@ -45,7 +45,7 @@ jobs:
         ./dotnet-install.sh --version 3.1.201 --install-dir .dotnet &&
         PATH=".dotnet:"$PATH && dotnet --info
         cd build
-        dotnet run skip:GenerateNetCoreV2Bundle,GenerateNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows
+        dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(Build.Repository.LocalPath)/artifacts'
