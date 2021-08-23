@@ -1,7 +1,7 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "version": "5.0.0-beta.4",
+    "majorVersion": "5",
     "name": "AzureStorage",
     "bindings": [
       "blobtrigger",
@@ -12,7 +12,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
-    "version": "5.0.0-beta.4",
+    "majorVersion": "5",
     "name": "AzureStorageQueues",
     "bindings": [
       "queue",
@@ -21,7 +21,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
-    "version": "5.0.0-beta.4",
+    "majorVersion": "5",
     "name": "AzureStorageBlobs",
     "bindings": [
       "blobtrigger",
@@ -30,7 +30,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-    "version": "5.0.0-beta.4",
+    "majorVersion": "5",
     "name": "ServiceBus",
     "bindings": [
       "servicebustrigger",
@@ -39,7 +39,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-    "version": "5.0.0-beta.6",
+    "majorVersion": "5",
     "name": "EventHubs",
     "bindings": [
       "eventhubtrigger",
@@ -48,7 +48,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
-    "version": "3.0.2",
+    "majorVersion": "3",
     "name": "SendGrid",
     "bindings": [
       "sendgrid"
@@ -56,7 +56,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "version": "2.5.0",
+    "majorVersion": "2",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -68,7 +68,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
-    "version": "3.0.0-beta.3",
+    "majorVersion": "3",
     "name": "EventGrid",
     "bindings": [
       "eventgridtrigger",
@@ -77,7 +77,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "version": "3.0.10",
+    "majorVersion": "3",
     "name": "CosmosDB",
     "bindings": [
       "cosmosdbtrigger",
@@ -86,7 +86,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
-    "version": "3.0.2",
+    "majorVersion": "3",
     "name": "Twilio",
     "bindings": [
       "twiliosms"
@@ -94,7 +94,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
-    "version": "1.4.2",
+    "majorVersion": "1",
     "name": "SignalR",
     "bindings": [
       "signalr",
@@ -106,7 +106,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
-    "version": "1.0.0",
+    "majorVersion": "1",
     "name": "RabbitMQ",
     "bindings": [
         "rabbitmqtrigger",
@@ -115,7 +115,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Kafka",
-    "version": "3.3.2",
+    "majorVersion": "3",
     "name": "Kafka",
     "bindings": [
         "kafkatrigger",

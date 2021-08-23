@@ -9,7 +9,7 @@ using System.Net.Http;
 
 namespace Build
 {
-    public static partial class BuildSteps
+    public static class BuildSteps
     {
         public static void Clean()
         {
@@ -33,7 +33,7 @@ namespace Build
         {
             string downloadPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             FileUtility.EnsureDirectoryExists(downloadPath);
-            string templatesZipUri = $"https://functionscdn.azureedge.net/public/ExtensionBundleTemplates/ExtensionBundle.Preview.v3.Templates.{Settings.TemplatesVersion}.zip";
+            string templatesZipUri = $"https://functionscdn.azureedge.net/public/ExtensionBundleTemplates/ExtensionBundle.Preview.v3.Templates.{BundleConfiguration.Instance.TemplateVersion}.zip";
             string zipFilePath = Path.Combine(downloadPath, $"templates.zip");
             var zipUri = new Uri(templatesZipUri);
 
@@ -77,22 +77,27 @@ namespace Build
 
         public static string GenerateBundleProjectFile(BuildConfiguration buildConfig)
         {
+            var sourceNugetConfig = Path.Combine(Settings.SourcePath, Settings.NugetConfigFileName);
             var sourceProjectFilePath = Path.Combine(Settings.SourcePath, buildConfig.SourceProjectFileName);
             string projectDirectory = Path.Combine(Settings.RootBuildDirectory, buildConfig.ConfigId.ToString());
             string targetProjectFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, "extensions.csproj");
+            string targetNugetConfigFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, Settings.NugetConfigFileName);
 
             FileUtility.EnsureDirectoryExists(projectDirectory);
             FileUtility.CopyFile(sourceProjectFilePath, targetProjectFilePath);
-            AddExtensionPackages(targetProjectFilePath);
+            FileUtility.CopyFile(sourceNugetConfig, targetNugetConfigFilePath);
+
+            AddExtensionPackages(targetProjectFilePath, BundleConfiguration.Instance.IsPreviewBundle);
             return targetProjectFilePath;
         }
 
-        public static void AddExtensionPackages(string projectFilePath)
+        public static void AddExtensionPackages(string projectFilePath, bool addPrereleasePackages)
         {
             var extensions = GetExtensionList();
             foreach (var extension in extensions)
             {
-                Shell.Run("dotnet", $"add {projectFilePath} package {extension.Id} -v {extension.Version} -n");
+                string version = string.IsNullOrEmpty(extension.Version) ? Helper.GetLatestPackageVersion(extension.Id, extension.MajorVersion, addPrereleasePackages) : extension.Version;
+                Shell.Run("dotnet", $"add {projectFilePath} package {extension.Id} -v {version} -n");
             }
         }
 
@@ -117,7 +122,6 @@ namespace Build
         {
             var projectFilePath = GenerateBundleProjectFile(buildConfig);
 
-            var feeds = Settings.nugetFeed.Aggregate(string.Empty, (a, b) => $"{a} --source {b}");
             var publishCommandArguments = $"publish {projectFilePath} -c Release -o {buildConfig.PublishDirectoryPath}";
 
             if (!buildConfig.RuntimeIdentifier.Equals("any", StringComparison.OrdinalIgnoreCase))
@@ -221,19 +225,19 @@ namespace Build
         }
 
 
-        public static void GenerateNetCoreV2Bundle()
+        public static void PackageNetCoreV2Bundle()
         {
             CreateExtensionBundle(Settings.BundlePackageNetCoreV2Any);
         }
 
 
-        public static void GenerateNetCoreV3BundlesLinux()
+        public static void PackageNetCoreV3BundlesLinux()
         {
             CreateExtensionBundle(Settings.BundlePackageNetCoreV3Any);
             CreateExtensionBundle(Settings.BundlePackageNetCoreV3Linux);
         }
 
-        public static void GenerateNetCoreV3BundlesWindows()
+        public static void PackageNetCoreV3BundlesWindows()
         {
             CreateExtensionBundle(Settings.BundlePackageNetCoreV3Any);
             CreateExtensionBundle(Settings.BundlePackageNetCoreWindows);
@@ -252,7 +256,7 @@ namespace Build
             ZipFile.ExtractToDirectory(Settings.BundlePackageNetCoreWindows.GeneratedBundleZipFilePath, Settings.RUPackagePath);
 
             var RURootPackagePath = Directory.GetParent(Settings.RUPackagePath);
-            ZipFile.CreateFromDirectory(RURootPackagePath.FullName, Path.Combine(Settings.ArtifactsDirectory, $"{Settings.ExtensionBundleId}.{Settings.ExtensionBundleBuildVersion}_RU_package.zip"), CompressionLevel.NoCompression, false);
+            ZipFile.CreateFromDirectory(RURootPackagePath.FullName, Path.Combine(Settings.ArtifactsDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package.zip"), CompressionLevel.NoCompression, false);
         }
 
         public static void CreateCDNStoragePackage()
@@ -263,18 +267,18 @@ namespace Build
                 var indexV2File = GetIndexV2File($"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/index-v2.json");
                 var bundleResource = new IndexV2.BundleResource()
                 {
-                    Bindings = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{Settings.ExtensionBundleBuildVersion}/StaticContent/v1/bindings/bindings.json",
-                    Functions = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{Settings.ExtensionBundleBuildVersion}/StaticContent/v1/templates/templates.json",
-                    Resources = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{Settings.ExtensionBundleBuildVersion}/StaticContent/v1/resources/" + "Resources.{locale}.json"
+                    Bindings = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{BundleConfiguration.Instance.ExtensionBundleVersion}/StaticContent/v1/bindings/bindings.json",
+                    Functions = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{BundleConfiguration.Instance.ExtensionBundleVersion}/StaticContent/v1/templates/templates.json",
+                    Resources = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{BundleConfiguration.Instance.ExtensionBundleVersion}/StaticContent/v1/resources/" + "Resources.{locale}.json"
                 };
 
-                indexV2File.TryAdd(Settings.ExtensionBundleBuildVersion, bundleResource);
+                indexV2File.TryAdd(BundleConfiguration.Instance.ExtensionBundleVersion, bundleResource);
 
                 // write index-v2 file
-                string directoryPath = Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory, Settings.ExtensionBundleId);
+                string directoryPath = Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory, BundleConfiguration.Instance.ExtensionBundleId);
                 FileUtility.EnsureDirectoryExists(directoryPath);
 
-                var bundleVersionDirectory = Path.Combine(directoryPath, Settings.ExtensionBundleBuildVersion);
+                var bundleVersionDirectory = Path.Combine(directoryPath, BundleConfiguration.Instance.ExtensionBundleVersion);
                 var contentDirectory = Path.Combine(bundleVersionDirectory, Settings.StaticContentDirectoryName);
                 FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, contentDirectory);
 
@@ -288,9 +292,9 @@ namespace Build
 
                 // Generating v1 index file
                 var indexFile = GetIndexFile($"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/index.json");
-                indexFile.Add(Settings.ExtensionBundleBuildVersion);
+                indexFile.Add(BundleConfiguration.Instance.ExtensionBundleVersion);
 
-                var indexFilePath = Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory, Settings.ExtensionBundleId, Settings.IndexFileName);
+                var indexFilePath = Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory, BundleConfiguration.Instance.ExtensionBundleId, Settings.IndexFileName);
                 FileUtility.Write(indexFilePath, JsonConvert.SerializeObject(indexFile));
 
                 AddBundleZipFile(bundleVersionDirectory, Settings.BundlePackageNetCoreV2Any);
@@ -311,7 +315,7 @@ namespace Build
             foreach (var indexFileMetadata in Settings.IndexFiles)
             {
                 string packageRootDirectoryPath = Path.Combine(Settings.RootBinDirectory, $"{indexFileMetadata.IndexFileDirectory}_windows");
-                string packageBundleDirectory = Path.Combine(packageRootDirectoryPath, Settings.ExtensionBundleId, Settings.ExtensionBundleBuildVersion);
+                string packageBundleDirectory = Path.Combine(packageRootDirectoryPath, BundleConfiguration.Instance.ExtensionBundleId, BundleConfiguration.Instance.ExtensionBundleVersion);
                 FileUtility.EnsureDirectoryExists(packageBundleDirectory);
 
                 AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageNetCoreV3Any);
@@ -327,7 +331,7 @@ namespace Build
             foreach (var indexFileMetadata in Settings.IndexFiles)
             {
                 string packageRootDirectoryPath = Path.Combine(Settings.RootBinDirectory, $"{indexFileMetadata.IndexFileDirectory}_linux");
-                string packageBundleDirectory = Path.Combine(packageRootDirectoryPath, Settings.ExtensionBundleId, Settings.ExtensionBundleBuildVersion);
+                string packageBundleDirectory = Path.Combine(packageRootDirectoryPath, BundleConfiguration.Instance.ExtensionBundleId, BundleConfiguration.Instance.ExtensionBundleVersion);
                 FileUtility.EnsureDirectoryExists(packageBundleDirectory);
 
                 AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageNetCoreV3Linux);
@@ -373,8 +377,8 @@ namespace Build
             serializer.NullValueHandling = NullValueHandling.Ignore;
             Extension bundleInfo = new Extension()
             {
-                Id = Settings.ExtensionBundleId,
-                Version = Settings.ExtensionBundleBuildVersion
+                Id = BundleConfiguration.Instance.ExtensionBundleId,
+                Version = BundleConfiguration.Instance.ExtensionBundleVersion
             };
             var fileContents = JsonConvert.SerializeObject(bundleInfo, serializer);
 

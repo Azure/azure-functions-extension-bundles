@@ -8,21 +8,11 @@ namespace Build
 {
     public static class Settings
     {
-        public static string[] internalNugetFeed = new[]
-        {
-            "https://www.nuget.org/api/v2/",
-            "https://www.myget.org/F/azure-appservice/api/v2",
-            "https://www.myget.org/F/azure-appservice-staging/api/v2",
-            "https://www.myget.org/F/fusemandistfeed/api/v2",
-            "https://www.myget.org/F/30de4ee06dd54956a82013fa17a3accb/",
-            "https://www.myget.org/F/xunit/api/v3/index.json",
-            "https://dotnet.myget.org/F/aspnetcore-dev/api/v3/index.json"
-        };
-
         public static readonly string SourcePath = Path.GetFullPath("../src/Microsoft.Azure.Functions.ExtensionBundle/");
 
         public static string ExtensionsJsonFilePath => Path.Combine(SourcePath, ExtensionsJsonFileName);
 
+        public static string BundleConfigJsonFilePath => Path.Combine(SourcePath, BundleConfigJsonFileName);
         public static string[] nugetFeed = new[]
         {
             "https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-net/nuget/v3/index.json",
@@ -55,15 +45,12 @@ namespace Build
 
         public static readonly string ExtensionsJsonFileName = "extensions.json";
 
-        public static string ExtensionBundleId = "Microsoft.Azure.Functions.ExtensionBundle.Preview";
+        public static readonly string BundleConfigJsonFileName = "bundleConfig.json";
 
         public static string ExtensionBundleVersionRange = "[3.*, 4.0.0)";
+        public static readonly string NugetConfigFileName = "NuGet.Config";
 
-        public static string ExtensionBundleBuildVersion = "3.0.0";
-
-        public static string TemplatesVersion = "3.0.1851";
-
-        public static readonly string RUPackagePath = Path.Combine(RootBinDirectory, $"{ExtensionBundleId}.{ExtensionBundleBuildVersion}_RU_package", ExtensionBundleBuildVersion);
+        public static readonly string RUPackagePath = Path.Combine(RootBinDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package", BundleConfiguration.Instance.ExtensionBundleVersion);
 
         public static readonly string IndexV2FileName = "index-v2.json";
 
@@ -71,8 +58,8 @@ namespace Build
 
         public static List<IndexFileV2Metadata> IndexFiles = new List<IndexFileV2Metadata>()
         {
-            new IndexFileV2Metadata("https://functionscdnstaging.azureedge.net", ExtensionBundleId, "cdnStaging"),
-            new IndexFileV2Metadata("https://functionscdn.azureedge.net", ExtensionBundleId, "cdnProd")
+            new IndexFileV2Metadata("https://functionscdnstaging.azureedge.net", BundleConfiguration.Instance.ExtensionBundleId, "cdnStaging"),
+            new IndexFileV2Metadata("https://functionscdn.azureedge.net", BundleConfiguration.Instance.ExtensionBundleId, "cdnProd")
         };
 
         public static List<BuildConfiguration> WindowsBuildConfigurations = new List<BuildConfiguration>()

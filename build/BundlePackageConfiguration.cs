@@ -10,7 +10,7 @@ namespace Build
 
         public List<ConfigId> ConfigBinariesToInclude { get; set; } = new List<ConfigId>();
 
-        public string BundleName => $"{ExtensionBundleId}.{ExtensionBundleBuildVersion}_{PackageIdentifier}".Trim('_');
+        public string BundleName => $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_{PackageIdentifier}".Trim('_');
 
         public string GeneratedBundleZipFileName => $"{BundleName}.zip";
 
