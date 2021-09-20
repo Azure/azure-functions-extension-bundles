@@ -74,6 +74,17 @@
         ]
     },
     {
+        "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSub",
+        "majorVersion": "1",
+        "name": "WebPubSub",
+        "bindings": [
+            "webPubSub",
+            "webPubSubRequest",
+            "webPubSubConnection",
+            "webPubSubTrigger"
+        ]
+    },
+    {
         "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
         "majorVersion": "1",
         "name": "SignalR",
