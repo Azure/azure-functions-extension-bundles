@@ -107,7 +107,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.ApplicationInsights",
-        "version": "1.0.0-preview1",
+        "version": "1.0.0-preview2",
         "name": "ApplicationInsights",
         "bindings": [
             "_"
