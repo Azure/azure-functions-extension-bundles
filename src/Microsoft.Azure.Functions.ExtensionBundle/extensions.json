@@ -104,5 +104,13 @@
             "kafkatrigger",
             "kafka"
         ]
+    },
+    {
+        "id": "Microsoft.Azure.WebJobs.Extensions.ApplicationInsights",
+        "version": "1.0.0-preview1",
+        "name": "ApplicationInsights",
+        "bindings": [
+            "_"
+        ]
     }
 ]
