@@ -6,4 +6,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.13" />
   </ItemGroup>
+  <ItemGroup>
+    <FunctionsPreservedDependencies Include="Microsoft.ApplicationInsights.dll" />
+    <FunctionsPreservedDependencies Include="Microsoft.Azure.WebJobs.Logging.ApplicationInsights.dll" />
+  </ItemGroup>
 </Project>
