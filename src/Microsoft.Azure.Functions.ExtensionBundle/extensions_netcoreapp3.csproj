@@ -9,5 +9,6 @@
   <ItemGroup>
     <FunctionsPreservedDependencies Include="Microsoft.ApplicationInsights.dll" />
     <FunctionsPreservedDependencies Include="Microsoft.Azure.WebJobs.Logging.ApplicationInsights.dll" />
+    <FunctionsPreservedDependencies Include="System.Diagnostics.PerformanceCounter.dll" />
   </ItemGroup>
 </Project>
