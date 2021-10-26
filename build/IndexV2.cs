@@ -8,7 +8,7 @@ namespace Build
 {
     public class IndexV2
     {
-        public string DefaultVersionRange { get; set; } = "[1.*, 2.0.0)";
+        public string DefaultVersionRange { get; set; } = "[3.*, 4.0.0)";
 
         public Dictionary<string, Dictionary<string, string>> BundleVersions { get; set; } = new Dictionary<string, Dictionary<string, string>>();
 
