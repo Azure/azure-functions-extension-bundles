@@ -66,6 +66,15 @@ namespace Build
         {
             new BuildConfiguration()
             {
+                ConfigId = ConfigId.NetCoreApp2_any_any,
+                SourceProjectFileName = "extensions.csproj",
+                RuntimeIdentifier = "any",
+                PublishReadyToRun = false,
+                PublishBinDirectorySubPath = "bin"
+
+            },
+            new BuildConfiguration()
+            {
                 ConfigId = ConfigId.NetCoreApp3_win_x86,
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "win-x86",
