@@ -83,8 +83,8 @@ namespace Build
                 SourceProjectFileName = "extensions.csproj",
                 RuntimeIdentifier = "any",
                 PublishReadyToRun = false,
-                PublishBinDirectorySubPath = "bin"
-
+                PublishBinDirectorySubPath = "bin",
+                DotNetVersion = 2.2,
             },
             new BuildConfiguration()
             {
@@ -92,7 +92,8 @@ namespace Build
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "win-x86",
                 PublishReadyToRun = true,
-                PublishBinDirectorySubPath = Path.Combine("bin_v3", "win-x86")
+                PublishBinDirectorySubPath = Path.Combine("bin_v3", "win-x86"),
+                DotNetVersion = 3.1,
             },
             new BuildConfiguration()
             {
@@ -100,7 +101,8 @@ namespace Build
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "win-x64",
                 PublishReadyToRun = true,
-                PublishBinDirectorySubPath = Path.Combine("bin_v3", "win-x64")
+                PublishBinDirectorySubPath = Path.Combine("bin_v3", "win-x64"),
+                DotNetVersion = 3.1,
             },
             new BuildConfiguration()
             {
@@ -108,7 +110,8 @@ namespace Build
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "any",
                 PublishReadyToRun = false,
-                PublishBinDirectorySubPath = "bin"
+                PublishBinDirectorySubPath = Path.Combine("bin_v3", "any"),
+                DotNetVersion = 3.1,
             }
         };
 
@@ -120,7 +123,8 @@ namespace Build
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "linux-x64",
                 PublishReadyToRun = true,
-                PublishBinDirectorySubPath = Path.Combine("bin_v3", "linux-x64")
+                PublishBinDirectorySubPath = Path.Combine("bin_v3", "linux-x64"),
+                DotNetVersion = 3,
             },
             new BuildConfiguration()
             {
@@ -128,7 +132,8 @@ namespace Build
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "any",
                 PublishReadyToRun = false,
-                PublishBinDirectorySubPath = "bin"
+                PublishBinDirectorySubPath = "bin",
+                DotNetVersion = 3,
             }
         };
 
@@ -143,7 +148,7 @@ namespace Build
 
         public static BundlePackageConfiguration BundlePackageNetCoreV2Any = new BundlePackageConfiguration()
         {
-            PackageIdentifier = string.Empty,
+            PackageIdentifier = "v2-any",
             ConfigBinariesToInclude = new List<ConfigId>() {
                 ConfigId.NetCoreApp2_any_any
             },
@@ -152,7 +157,7 @@ namespace Build
 
         public static BundlePackageConfiguration BundlePackageNetCoreV3Any = new BundlePackageConfiguration()
         {
-            PackageIdentifier = "any-any",
+            PackageIdentifier = "v3-any",
             ConfigBinariesToInclude = new List<ConfigId>() {
                 ConfigId.NetCoreApp3_any_any
             },
@@ -164,6 +169,7 @@ namespace Build
             PackageIdentifier = "win-any",
             ConfigBinariesToInclude = new List<ConfigId>() {
                 ConfigId.NetCoreApp2_any_any,
+                ConfigId.NetCoreApp3_any_any,
                 ConfigId.NetCoreApp3_win_x86,
                 ConfigId.NetCoreApp3_win_x64
             },

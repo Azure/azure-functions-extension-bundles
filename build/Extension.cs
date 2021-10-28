@@ -18,5 +18,8 @@ namespace Build
 
         [JsonProperty(PropertyName = "bindings")]
         public List<string> Bindings { get; set; }
+
+        [JsonProperty(PropertyName = "minDotNetVersion")]
+        public double? MinDotNetVersion { get; set; }
     }
 }

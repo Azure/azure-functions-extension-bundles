@@ -18,6 +18,8 @@ namespace Build
         public string PublishBinDirectoryPath => Path.Combine(PublishDirectoryPath, PublishBinDirectorySubPath);
 
         public string PublishBinDirectorySubPath { get; set; }
+
+        public double DotNetVersion { get; set; }
     }
 
 }
