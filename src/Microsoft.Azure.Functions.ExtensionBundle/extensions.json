@@ -67,6 +67,30 @@
     ]
   },
   {
+    "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
+    "majorVersion": "0",
+    "name": "SqlDurabilityProviderStartup",
+    "bindings": [
+      "activitytrigger",
+      "orchestrationtrigger",
+      "entitytrigger",
+      "durableclient",
+      "orchestrationclient"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
+    "majorVersion": "0",
+    "name": "NetheriteProviderStartup",
+    "bindings": [
+      "activitytrigger",
+      "orchestrationtrigger",
+      "entitytrigger",
+      "durableclient",
+      "orchestrationclient"
+    ]
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
     "majorVersion": "3",
     "name": "EventGrid",
