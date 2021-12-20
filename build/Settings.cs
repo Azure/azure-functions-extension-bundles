@@ -33,6 +33,11 @@ namespace Build
 
         public static readonly string ArtifactsDirectory = Path.Combine(Path.GetFullPath(".."), "artifacts");
 
+        public static readonly string ToolsDirectory = Path.Combine(Path.GetFullPath(".."), "tools");
+
+        public static readonly string ManifestToolDirectory = Path.Combine(ToolsDirectory, $"ManifestTool");
+
+
         public static readonly string TemplatesRootDirectory = Path.Combine(RootBinDirectory, StaticContentDirectoryName, "v1");
 
         public static readonly string StaticContentDirectoryPath = Path.Combine(RootBinDirectory, StaticContentDirectoryName);
