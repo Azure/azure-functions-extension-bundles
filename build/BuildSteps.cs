@@ -27,6 +27,11 @@ namespace Build
             {
                 Directory.Delete(Settings.ArtifactsDirectory, recursive: true);
             }
+
+            if (FileUtility.DirectoryExists(Settings.ToolsDirectory))
+            {
+                Directory.Delete(Settings.ToolsDirectory, recursive: true);
+            }
         }
 
         public static void DownloadTemplates()
@@ -57,6 +62,21 @@ namespace Build
             if (!FileUtility.DirectoryExists(Settings.TemplatesRootDirectory) || !FileUtility.FileExists(Settings.ResourcesEnUSFilePath))
             {
                 throw new Exception("Resource Copy failed");
+            }
+        }
+
+        public static void DownloadManifestUtility()
+        {
+            string downloadPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            FileUtility.EnsureDirectoryExists(downloadPath);
+            string manifestToolZipUri = Environment.GetEnvironmentVariable("SBOMUtilSASUrl");
+            string zipFilePath = Path.Combine(downloadPath, $"ManifestTool.zip");
+            var zipUri = new Uri(manifestToolZipUri);
+
+            if (DownloadZipFile(zipUri, zipFilePath))
+            {
+                FileUtility.EnsureDirectoryExists(Settings.ManifestToolDirectory);
+                ZipFile.ExtractToDirectory(zipFilePath, Settings.ManifestToolDirectory);
             }
         }
 
