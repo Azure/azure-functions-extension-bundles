@@ -27,6 +27,11 @@ namespace Build
             {
                 Directory.Delete(Settings.ArtifactsDirectory, recursive: true);
             }
+
+            if (FileUtility.DirectoryExists(Settings.ToolsDirectory))
+            {
+                Directory.Delete(Settings.ToolsDirectory, recursive: true);
+            }
         }
 
         public static void DownloadTemplates()
@@ -58,6 +63,21 @@ namespace Build
             if (!FileUtility.DirectoryExists(Settings.TemplatesRootDirectory) || !FileUtility.FileExists(Settings.ResourcesEnUSFilePath))
             {
                 throw new Exception("Resource Copy failed");
+            }
+        }
+
+        public static void DownloadManifestUtility()
+        {
+            string downloadPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            FileUtility.EnsureDirectoryExists(downloadPath);
+            string manifestToolZipUri = Environment.GetEnvironmentVariable("SBOMUtilSASUrl");
+            string zipFilePath = Path.Combine(downloadPath, $"ManifestTool.zip");
+            var zipUri = new Uri(manifestToolZipUri);
+
+            if (DownloadZipFile(zipUri, zipFilePath))
+            {
+                FileUtility.EnsureDirectoryExists(Settings.ManifestToolDirectory);
+                ZipFile.ExtractToDirectory(zipFilePath, Settings.ManifestToolDirectory);
             }
         }
 
@@ -142,6 +162,15 @@ namespace Build
                 FileUtility.EnsureDirectoryExists(Directory.GetParent(buildConfig.PublishBinDirectoryPath).FullName);
                 Directory.Move(Path.Combine(buildConfig.PublishDirectoryPath, "bin"), buildConfig.PublishBinDirectoryPath);
             }
+            
+            string manifestDll = Path.Combine(Settings.ManifestToolDirectory, "Microsoft.ManifestTool.dll");
+            string manifestToolArguments = $"{manifestDll} generate -PackageName {BundleConfiguration.Instance.ExtensionBundleId} " +
+                $"-BuildDropPath {buildConfig.PublishDirectoryPath} " +
+                $"-BuildComponentPath {buildConfig.PublishDirectoryPath} " +
+                $" -Verbosity Information" +
+                $" -t {Path.Combine(buildConfig.PublishBinDirectoryPath, "manifest.json")} " +
+                $" -PackageVersion {BundleConfiguration.Instance.ExtensionBundleVersion}";
+            Shell.Run("dotnet", manifestToolArguments);
         }
 
         public static void AddBindingInfoToExtensionsJson(string extensionsJson)
