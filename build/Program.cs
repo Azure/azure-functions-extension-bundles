@@ -13,15 +13,16 @@ namespace Build
                 .CreateForTarget(args)
                 .Then(Clean)
                 .Then(DownloadTemplates)
+                .Then(DownloadManifestUtility)
                 .Then(BuildBundleBinariesForWindows)
                 .Then(BuildBundleBinariesForLinux)
                 .Then(PackageNetCoreV2Bundle)
                 .Then(PackageNetCoreV3BundlesWindows)
                 .Then(PackageNetCoreV3BundlesLinux)
-                 .Then(CreateRUPackage)
-                 .Then(CreateCDNStoragePackage)
-                 .Then(CreateCDNStoragePackageWindows)
-                 .Then(CreateCDNStoragePackageLinux)
+                .Then(CreateRUPackage)
+                .Then(CreateCDNStoragePackage)
+                .Then(CreateCDNStoragePackageWindows)
+                .Then(CreateCDNStoragePackageLinux)
                 .Run();
         }
     }

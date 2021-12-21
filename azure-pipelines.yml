@@ -6,7 +6,9 @@ trigger:
 jobs:
 - job: BuildArtifacts_Windows
   pool:
-    vmImage: 'vs2017-win2016'
+    name: '1ES-Hosted-Azfunc'
+    demands:
+    - ImageOverride -equals MMS2019TLS
 
   steps:
   - task: UseDotNet@2
@@ -19,6 +21,8 @@ jobs:
       command: 'run'
       workingDirectory: '.\build'
       arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
+    env:
+      SBOMUtilSASUrl: $(SBOMUtilSASUrl)
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
@@ -33,7 +37,9 @@ jobs:
 
 - job: BuildArtifacts_Ubuntu
   pool:
-    vmImage: 'ubuntu-18.04'
+    name: '1ES-Hosted-Azfunc'
+    demands:
+    - ImageOverride -equals MMSUbuntu20.04TLS
 
   steps:
   - task: Bash@3
@@ -46,6 +52,8 @@ jobs:
         PATH=".dotnet:"$PATH && dotnet --info
         cd build
         dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows
+    env:
+      SBOMUtilSASUrl: $(SBOMUtilSASUrl)
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(Build.Repository.LocalPath)/artifacts'
