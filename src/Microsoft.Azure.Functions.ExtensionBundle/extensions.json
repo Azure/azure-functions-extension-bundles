@@ -29,6 +29,14 @@
     ]
   },
   {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Tables",
+    "majorVersion": "1",
+    "name": "AzureTables",
+    "bindings": [
+      "table"
+    ]
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
     "majorVersion": "5",
     "name": "ServiceBus",
