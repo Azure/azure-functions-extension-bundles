@@ -154,6 +154,11 @@ namespace Build
                 publishCommandArguments += $" /p:PublishReadyToRun=true";
             }
 
+            if (buildConfig.SuppressTfmSupportBuildWarnings)
+            {
+                publishCommandArguments += " /p:SuppressTfmSupportBuildWarnings=true";
+            }
+
             Shell.Run("dotnet", publishCommandArguments);
 
             if (Path.Combine(buildConfig.PublishDirectoryPath, "bin") != buildConfig.PublishBinDirectoryPath)
