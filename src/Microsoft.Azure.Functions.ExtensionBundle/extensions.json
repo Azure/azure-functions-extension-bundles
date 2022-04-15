@@ -11,6 +11,14 @@
     ]
   },
   {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Tables",
+    "majorVersion": "1",
+    "name": "AzureTables",
+    "bindings": [
+      "table"
+    ]
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
     "majorVersion": "5",
     "name": "AzureStorageQueues",
