@@ -63,6 +63,7 @@ namespace Build
                 ConfigId = ConfigId.NetCoreApp2_any_any,
                 SourceProjectFileName = "extensions.csproj",
                 RuntimeIdentifier = "any",
+                SuppressTfmSupportBuildWarnings = true,
                 PublishReadyToRun = false,
                 PublishBinDirectorySubPath = "bin"
 
@@ -72,6 +73,7 @@ namespace Build
                 ConfigId = ConfigId.NetCoreApp3_win_x86,
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "win-x86",
+                SuppressTfmSupportBuildWarnings = false,
                 PublishReadyToRun = true,
                 PublishBinDirectorySubPath = Path.Combine("bin_v3", "win-x86")
             },
@@ -80,6 +82,7 @@ namespace Build
                 ConfigId = ConfigId.NetCoreApp3_win_x64,
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "win-x64",
+                SuppressTfmSupportBuildWarnings = false,
                 PublishReadyToRun = true,
                 PublishBinDirectorySubPath = Path.Combine("bin_v3", "win-x64")
             },
@@ -88,6 +91,7 @@ namespace Build
                 ConfigId = ConfigId.NetCoreApp3_any_any,
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "any",
+                SuppressTfmSupportBuildWarnings = false,
                 PublishReadyToRun = false,
                 PublishBinDirectorySubPath = "bin"
             }
@@ -100,6 +104,7 @@ namespace Build
                 ConfigId = ConfigId.NetCoreApp3_linux_x64,
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "linux-x64",
+                SuppressTfmSupportBuildWarnings = false,
                 PublishReadyToRun = true,
                 PublishBinDirectorySubPath = Path.Combine("bin_v3", "linux-x64")
             },
@@ -108,6 +113,7 @@ namespace Build
                 ConfigId = ConfigId.NetCoreApp3_any_any,
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "any",
+                SuppressTfmSupportBuildWarnings = false,
                 PublishReadyToRun = false,
                 PublishBinDirectorySubPath = "bin"
             }
