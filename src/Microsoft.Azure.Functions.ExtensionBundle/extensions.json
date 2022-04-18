@@ -75,6 +75,18 @@
     ]
   },
   {
+    "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
+    "majorVersion": "1",
+    "name": "NetheriteProviderStartup",
+    "bindings": [
+      "activitytrigger",
+      "orchestrationtrigger",
+      "entitytrigger",
+      "durableclient",
+      "orchestrationclient"
+    ]
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
     "majorVersion": "3",
     "name": "EventGrid",

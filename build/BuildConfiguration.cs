@@ -13,6 +13,8 @@ namespace Build
 
         public bool PublishReadyToRun { get; set; }
 
+        public bool SuppressTfmSupportBuildWarnings { get; set; }
+
         public string PublishDirectoryPath => Path.Combine(Settings.RootBinDirectory, $"{ConfigId}");
 
         public string PublishBinDirectoryPath => Path.Combine(PublishDirectoryPath, PublishBinDirectorySubPath);
