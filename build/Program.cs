@@ -15,6 +15,7 @@ namespace Build
                 .Then(DownloadTemplates)
                 .Then(BuildBundleBinariesForWindows)
                 .Then(BuildBundleBinariesForLinux)
+                .Then(RunManifestUtility)
                 .Then(PackageNetCoreV2Bundle)
                 .Then(PackageNetCoreV3BundlesWindows)
                 .Then(PackageNetCoreV3BundlesLinux)
