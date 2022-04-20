@@ -129,12 +129,6 @@ namespace Build
 
         public static void RunManifestUtility(BuildConfiguration buildConfig)
         {
-            if (Path.Combine(buildConfig.PublishDirectoryPath, "bin") != buildConfig.PublishBinDirectoryPath)
-            {
-                FileUtility.EnsureDirectoryExists(Directory.GetParent(buildConfig.PublishBinDirectoryPath).FullName);
-                Directory.Move(Path.Combine(buildConfig.PublishDirectoryPath, "bin"), buildConfig.PublishBinDirectoryPath);
-            }
-
             string manifestDll = Path.Combine(Settings.ManifestToolDirectory, "Microsoft.ManifestTool.dll");
             string manifestToolArguments = $"{manifestDll} generate -PackageName {BundleConfiguration.Instance.ExtensionBundleId} " +
                 $"-BuildDropPath {buildConfig.PublishDirectoryPath} " +
