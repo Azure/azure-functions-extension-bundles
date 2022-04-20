@@ -6,7 +6,7 @@ Extension bundle provides a way for non-dotnet function apps to reference and us
     "version": "2.0",
     "extensionBundle": {
         "id": "Microsoft.Azure.Functions.ExtensionBundle",
-        "version": "[2.*, 3.0.0)"
+        "version": "[3.3.*, 4.0.0)"
     }
 }
 ```
