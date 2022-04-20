@@ -121,12 +121,16 @@ namespace Build
             }
         }
 
-        public static void RunManifestUtility()
+        public static void RunManifestUtilityWindows()
         {
             Settings.WindowsBuildConfigurations.ForEach((config) => RunManifestUtility(config));
-            Settings.LinuxBuildConfigurations.ForEach((config) => RunManifestUtility(config));
         }
 
+        public static void RunManifestUtilityLinux()
+        {
+            Settings.LinuxBuildConfigurations.ForEach((config) => RunManifestUtility(config));
+        }
+        
         public static void RunManifestUtility(BuildConfiguration buildConfig)
         {
             string manifestDll = Path.Combine(Settings.ManifestToolDirectory, "Microsoft.ManifestTool.dll");
