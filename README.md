@@ -52,7 +52,7 @@ dotnet run skip:dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWi
     | v3.x-preview | https://github.com/Azure/azure-functions-extension-bundles/tree/v3.x-preview |
     | v4.x-preview | https://github.com/Azure/azure-functions-extension-bundles/tree/v4.x-preview |
 
-2. Add the following details to [extensions.json](src\Microsoft.Azure.Functions.ExtensionBundle\extensions.json) file
+2. Add the following details to [extensions.json](src/Microsoft.Azure.Functions.ExtensionBundle/extensions.json) file
 
     ```Javascript
     {
