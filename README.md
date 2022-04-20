@@ -18,7 +18,7 @@ Extension bundle provides a way for non-dotnet function apps to reference and us
 |v2.x|[![Build Status](https://azfunc.visualstudio.com/Azure%20Functions/_apis/build/status/Azure.azure-functions-extension-bundles?branchName=v2.x)](https://azfunc.visualstudio.com/Azure%20Functions/_build?definitionId=41&_a=summary&repositoryFilter=26&branchFilter=509%2C509%2C509%2C509%2C509%2C509%2C509%2C509%2C509)|
 |v3.x|[![Build Status](https://azfunc.visualstudio.com/Azure%20Functions/_apis/build/status/Azure.azure-functions-extension-bundles?branchName=v3.x)](https://azfunc.visualstudio.com/Azure%20Functions/_build?definitionId=41&_a=summary&repositoryFilter=26&branchFilter=509%2C509%2C509%2C509%2C509%2C509%2C509%2C509%2C509)|
 |v3.x-preview|[![Build Status](https://azfunc.visualstudio.com/Azure%20Functions/_apis/build/status/Azure.azure-functions-extension-bundles?branchName=v3.x-preview)](https://azfunc.visualstudio.com/Azure%20Functions/_build?definitionId=41&_a=summary&repositoryFilter=26&branchFilter=509%2C509%2C509%2C509%2C509%2C509%2C509%2C509%2C509)|
-|v4.x-preview|[![Build Status](https://azfunc.visualstudio.com/Azure%20Functions/_apis/build/status/Azure.azure-functions-extension-bundles?branchName=v4.x-preview)](https://azfunc.visualstudio.com/Azure%20Functions/_build?definitionId=41&_a=summary&repositoryFilter=26&branchFilter=509%2C509%2C509%2C509%2C509%2C509%2C509%2C509%2C509)|
+|v4.x-preview|[![Build Status](https://azfunc.visualstudio.com/Azure%20Functions/_apis/build/status/Azure.azure-functions-extension-bundles?branchName=v4.x-preview)](https://azfunc.visualstudio.com/Azure%20Functions/_build?definitionId=41&_a=summary&repositoryFilter=26&branchFilter=4220)|
 
 
 ## Build Requirements
