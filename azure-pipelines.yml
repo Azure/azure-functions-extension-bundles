@@ -22,7 +22,7 @@ jobs:
     inputs:
       command: 'run'
       workingDirectory: '.\build'
-      arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
+      arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux,RunManifestUtilityLinux'
     env:
       SBOMUtilSASUrl: $(SBOMUtilSASUrl)
   - task: CopyFiles@2
@@ -53,7 +53,7 @@ jobs:
         ./dotnet-install.sh --version 3.1.201 --install-dir .dotnet &&
         PATH=".dotnet:"$PATH && dotnet --info
         cd build
-        dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows
+        dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,RunManifestUtilityWindows
     env:
       SBOMUtilSASUrl: $(SBOMUtilSASUrl)
   - task: CopyFiles@2
