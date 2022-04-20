@@ -101,20 +101,18 @@ namespace Build
             }
         }
 
-        public static void RunManifestUtility()
+        public static void RunManifestUtilityWindows()
         {
             Settings.WindowsBuildConfigurations.ForEach((config) => RunManifestUtility(config));
-            Settings.LinuxBuildConfigurations.ForEach((config) => RunManifestUtility(config));
         }
 
+        public static void RunManifestUtilityLinux()
+        {
+            Settings.LinuxBuildConfigurations.ForEach((config) => RunManifestUtility(config));
+        }
+        
         public static void RunManifestUtility(BuildConfiguration buildConfig)
         {
-            if (Path.Combine(buildConfig.PublishDirectoryPath, "bin") != buildConfig.PublishBinDirectoryPath)
-            {
-                FileUtility.EnsureDirectoryExists(Directory.GetParent(buildConfig.PublishBinDirectoryPath).FullName);
-                Directory.Move(Path.Combine(buildConfig.PublishDirectoryPath, "bin"), buildConfig.PublishBinDirectoryPath);
-            }
-
             string manifestDll = Path.Combine(Settings.ManifestToolDirectory, "Microsoft.ManifestTool.dll");
             string manifestToolArguments = $"{manifestDll} generate -PackageName {BundleConfiguration.Instance.ExtensionBundleId} " +
                 $"-BuildDropPath {buildConfig.PublishDirectoryPath} " +
