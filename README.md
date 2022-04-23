@@ -31,14 +31,14 @@ Extension bundle provides a way for non-dotnet function apps to reference and us
 ```
 cd build
 
-dotnet run skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux,DownloadManifestUtility,RunManifestUtilityLinux
+dotnet run skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux,DownloadManifestUtility,RunManifestUtilityLinux,RunManifestUtilityWindows
 ```
 
 ### Linux
 ```
 cd build
 
-dotnet run skip:dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,DownloadManifestUtility,RunManifestUtilityWindows
+dotnet run skip:dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,DownloadManifestUtility,RunManifestUtilityWindows,RunManifestUtilityLinux
 ```
 
 ## Add extension to a extension bundle
