@@ -132,5 +132,15 @@
       "webpubsubrequest",
       "webpubsubtrigger"
     ]
+  },
+  {
+	"id": "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents",
+	"version": "0.1.12",
+	"name": "Events",
+	
+	"bindings": [
+		"AuthenticationEventTrigger",
+		"AuthenticationEvent"
+	]
   }
 ]
