@@ -145,5 +145,13 @@
         "kafkatrigger",
         "kafka"
     ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Sql",
+    "majorVersion": "0",
+    "name": "SqlBinding",
+    "bindings": [
+      "Sql"
+    ]
   }
 ]
