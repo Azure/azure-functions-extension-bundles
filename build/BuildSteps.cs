@@ -268,12 +268,6 @@ namespace Build
         }
 
 
-        public static void PackageNetCoreV2Bundle()
-        {
-            CreateExtensionBundle(Settings.BundlePackageNetCoreV2Any);
-        }
-
-
         public static void PackageNetCoreV3BundlesLinux()
         {
             CreateExtensionBundle(Settings.BundlePackageNetCoreV3Any);
@@ -340,14 +334,14 @@ namespace Build
                 var indexFilePath = Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory, BundleConfiguration.Instance.ExtensionBundleId, Settings.IndexFileName);
                 FileUtility.Write(indexFilePath, JsonConvert.SerializeObject(indexFile));
 
-                AddBundleZipFile(bundleVersionDirectory, Settings.BundlePackageNetCoreV2Any);
+                AddBundleZipFile(bundleVersionDirectory, Settings.BundlePackageNetCoreV3Any);
 
                 // Add bundle.json
                 CreateBundleJsonFile(bundleVersionDirectory);
 
                 // Add Csproj file
                 string projectPath = Path.Combine(bundleVersionDirectory, "extensions.csproj");
-                File.Copy(Settings.BundlePackageNetCoreV2Any.CsProjFilePath, projectPath);
+                File.Copy(Settings.BundlePackageNetCoreV3Any.CsProjFilePath, projectPath);
 
                 ZipFile.CreateFromDirectory(Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory), Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}.zip"), CompressionLevel.NoCompression, false);
             }
