@@ -38,7 +38,7 @@ dotnet run skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildB
 ```
 cd build
 
-dotnet run skip:dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,DownloadManifestUtility,RunManifestUtilityWindows,RunManifestUtilityLinux
+dotnet run skip:dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,DownloadManifestUtility,RunManifestUtilityWindows,RunManifestUtilityLinux
 ```
 
 ## Add extension to a extension bundle
@@ -81,6 +81,13 @@ dotnet run skip:dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWi
 - Also follow the steps mentioned at the link below to test templates added to extension bundle
     - https://github.com/Azure/azure-functions-templates#testing-script-type-template-via-core-tools
 
+
+## Debugging the build process in Visual Studio
+1. Open the `build/Build.sln` file in Visual Studio
+1. Create a debug profile for the project (right-click on the project, "Properties", "Debug", "Open debug launch profiles UI")
+1. Set the Command Line arguments using the instructions above (everything after `dotnet run`, i.e. `"skip:XXX,YYY,..."`)
+1. Set the working directory to be the `build` directory
+1. F5
 
 ## Test an Extension Bundle
 1. Build extension bundles locally and locate the `artifacts\Microsoft.Azure.Functions.ExtensionBundle.{version}_any-any.zip` file.
