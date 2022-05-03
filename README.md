@@ -82,7 +82,7 @@ dotnet run skip:dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,C
     - https://github.com/Azure/azure-functions-templates#testing-script-type-template-via-core-tools
 
 
-## Debugging in Visual Studio
+## Debugging the build process in Visual Studio
 1. Open the `build/Build.sln` file in Visual Studio
 1. Create a debug profile for the project (right-click on the project, "Properties", "Debug", "Open debug launch profiles UI")
 1. Set the Command Line arguments using the instructions above (everything after `dotnet run`, i.e. `"skip:XXX,YYY,..."`)
