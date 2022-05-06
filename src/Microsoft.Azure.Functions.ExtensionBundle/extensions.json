@@ -134,13 +134,20 @@
     ]
   },
   {
-	"id": "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents",
-	"version": "0.1.13",
-	"name": "Events",
-	
-	"bindings": [
-		"AuthenticationEventTrigger",
-		"AuthenticationEvent"
-	]
+    "id": "Microsoft.Azure.WebJobs.Extensions.Sql",
+    "majorVersion": "0",
+    "name": "SqlBinding",
+    "bindings": [
+      "Sql"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents",
+    "version": "0.1.13",
+    "name": "AuthenticationEvents", 
+    "bindings": [
+      "AuthenticationEventTrigger",
+      "AuthenticationEvent"
+    ]
   }
 ]
