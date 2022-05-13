@@ -18,6 +18,7 @@ namespace Build
                 .Then(BuildBundleBinariesForLinux)
                 .Then(RunManifestUtilityWindows)
                 .Then(RunManifestUtilityLinux)
+                .Then(PackageNetCoreV3Bundle)
                 .Then(PackageNetCoreV3BundlesWindows)
                 .Then(PackageNetCoreV3BundlesLinux)
                 .Then(CreateRUPackage)

@@ -136,6 +136,7 @@ namespace Build
         {
             PackageIdentifier = "win-any",
             ConfigBinariesToInclude = new List<ConfigId>() {
+                ConfigId.NetCoreApp3_any_any,
                 ConfigId.NetCoreApp3_win_x86,
                 ConfigId.NetCoreApp3_win_x64
             },
@@ -148,6 +149,15 @@ namespace Build
             ConfigBinariesToInclude = new List<ConfigId>() {
                 ConfigId.NetCoreApp3_any_any,
                 ConfigId.NetCoreApp3_linux_x64
+            },
+            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.NetCoreApp3_any_any.ToString(), "extensions.csproj")
+        };
+
+        public static BundlePackageConfiguration BundlePackageNetCoreV3 = new BundlePackageConfiguration()
+        {
+            PackageIdentifier = string.Empty,
+            ConfigBinariesToInclude = new List<ConfigId>() {
+                ConfigId.NetCoreApp3_any_any
             },
             CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.NetCoreApp3_any_any.ToString(), "extensions.csproj")
         };
