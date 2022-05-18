@@ -56,7 +56,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "majorVersion": "2",
+    "Version": "2.7.0",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
