@@ -1,7 +1,5 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Build
 {
@@ -21,5 +19,10 @@ namespace Build
 
         [JsonProperty(PropertyName = "bindings")]
         public List<string> Bindings { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Id}, v{Version ?? MajorVersion.ToString()}";
+        }
     }
 }
