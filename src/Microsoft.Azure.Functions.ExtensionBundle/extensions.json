@@ -62,6 +62,18 @@
         ]
     },
     {
+        "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
+        "majorVersion": "1",
+        "name": "SqlDurabilityProviderStartup",
+        "bindings": [
+          "activitytrigger",
+          "orchestrationtrigger",
+          "entitytrigger",
+          "durableclient",
+          "orchestrationclient"
+        ]
+    },
+    {
         "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
         "majorVersion": "2",
         "name": "EventGrid",

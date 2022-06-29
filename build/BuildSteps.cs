@@ -181,11 +181,21 @@ namespace Build
 
             foreach (var extensionJsonEntry in outputExtensions.Extensions)
             {
-                extensionJsonEntry.Bindings = inputExtensions.Where(
-                    e =>
-                    {
-                        return extensionJsonEntry.Name.Equals(e.Name, StringComparison.OrdinalIgnoreCase);
-                    }).First().Bindings;
+                Extension matchedExtension = inputExtensions
+                    .Where(e => extensionJsonEntry.Name.Equals(e.Name, StringComparison.OrdinalIgnoreCase))
+                    .FirstOrDefault();
+                if (matchedExtension == null)
+                {
+                    string fileName = Path.GetFileName(extensionsJson);
+                    string configuredNames = string.Join(", ", inputExtensions.Select(e => e.Name));
+
+                    throw new InvalidOperationException(
+                        $"No extension that matched '{extensionJsonEntry.Name}' was found. This might indicate an " +
+                        $"incorrectly configured name in {fileName}. The extension names listed in {fileName} include " +
+                        $"the following: {configuredNames}.");
+                }
+
+                extensionJsonEntry.Bindings = matchedExtension.Bindings;
             }
 
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings
