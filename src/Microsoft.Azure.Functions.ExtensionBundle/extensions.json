@@ -77,7 +77,7 @@
   {
     "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
     "majorVersion": "1",
-    "name": "NetheriteProviderStartup",
+    "name": "NetheriteProvider",
     "bindings": [
       "activitytrigger",
       "orchestrationtrigger",
