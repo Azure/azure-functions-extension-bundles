@@ -69,7 +69,7 @@
   {
     "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
     "majorVersion": "1",
-    "name": "SqlDurabilityProviderStartup",
+    "name": "SqlDurabilityProvider",
     "bindings": [
       "activitytrigger",
       "orchestrationtrigger",
@@ -81,7 +81,7 @@
   {
     "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
     "majorVersion": "1",
-    "name": "NetheriteProviderStartup",
+    "name": "NetheriteProvider",
     "bindings": [
       "activitytrigger",
       "orchestrationtrigger",
