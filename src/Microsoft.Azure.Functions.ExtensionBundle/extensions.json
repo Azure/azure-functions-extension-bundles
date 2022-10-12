@@ -153,5 +153,13 @@
     "bindings": [
       "Sql"
     ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents",
+    "majorVersion": "1",
+    "name": "AuthenticationEvents", 
+    "bindings": [
+      "AuthenticationEventsTrigger"
+    ]
   }
 ]
