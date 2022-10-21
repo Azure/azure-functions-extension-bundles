@@ -5,7 +5,7 @@ Extension bundle provides a way for non-dotnet function apps to reference and us
 {
     "version": "2.0",
     "extensionBundle": {
-        "id": "Microsoft.Azure.Functions.ExtensionBundle.Preview",
+        "id": "Microsoft.Azure.Functions.ExtensionBundle",
         "version": "[4.*, 5.0.0)"
     }
 }
