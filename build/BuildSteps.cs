@@ -180,7 +180,7 @@ namespace Build
             Shell.Run("dotnet", publishCommandArguments);
 
             // Temporary fix to copy assembly needed for cosmosDb extension
-            var additionalAssembliesPath = Path.Combine(Directory.GetParent(projectFilePath).FullName, "bin\\Release\\netcoreapp3.1", buildConfig.RuntimeIdentifier == "any" ? String.Empty : buildConfig.RuntimeIdentifier, "System.Configuration.ConfigurationManager.dll");
+            var additionalAssembliesPath = Path.Combine(Directory.GetParent(projectFilePath).FullName, "bin" , "Release", "netcoreapp3.1", buildConfig.RuntimeIdentifier == "any" ? String.Empty : buildConfig.RuntimeIdentifier, "System.Configuration.ConfigurationManager.dll");
             if (Path.Combine(buildConfig.PublishDirectoryPath, "bin") != buildConfig.PublishBinDirectoryPath)
             {
                 FileUtility.EnsureDirectoryExists(Directory.GetParent(buildConfig.PublishBinDirectoryPath).FullName);
