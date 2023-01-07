@@ -79,6 +79,10 @@ namespace Build
                 FileUtility.EnsureDirectoryExists(Settings.ManifestToolDirectory);
                 ZipFile.ExtractToDirectory(zipFilePath, Settings.ManifestToolDirectory);
             }
+            else
+            {
+                throw new Exception("Download failed for ManifestUtility");
+            }
         }
 
         public static void BuildBundleBinariesForWindows()
@@ -179,6 +183,7 @@ namespace Build
 
             Shell.Run("dotnet", publishCommandArguments);
 
+            var additionalAssembliesPath = Path.Combine(Directory.GetParent(projectFilePath).FullName, "bin", "Release", "netcoreapp3.1", buildConfig.RuntimeIdentifier == "any" ? String.Empty : buildConfig.RuntimeIdentifier, "System.Configuration.ConfigurationManager.dll");
             if (Path.Combine(buildConfig.PublishDirectoryPath, "bin") != buildConfig.PublishBinDirectoryPath)
             {
                 FileUtility.EnsureDirectoryExists(Directory.GetParent(buildConfig.PublishBinDirectoryPath).FullName);
@@ -221,6 +226,7 @@ namespace Build
                 var response = httpClient.GetAsync(zipUri).GetAwaiter().GetResult();
                 if (!response.IsSuccessStatusCode)
                 {
+                    Console.WriteLine($"Download failed with response code:{response.StatusCode}");
                     return false;
                 }
 
