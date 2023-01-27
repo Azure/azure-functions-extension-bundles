@@ -162,5 +162,13 @@
     "bindings": [
       "AuthenticationEventsTrigger"
     ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Kusto",
+    "majorVersion": "1",
+    "name": "KustoBinding", 
+    "bindings": [
+      "Kusto"
+    ]
   }
 ]
