@@ -148,17 +148,16 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Sql",
-    "majorVersion": "1",
+    "majorVersion": "0",
     "name": "SqlBinding",
     "bindings": [
-      "Sql",
-      "SqlTrigger"
+      "Sql"
     ]
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents",
     "majorVersion": "1",
-    "name": "AuthenticationEvent", 
+    "name": "AuthenticationEvent",
     "bindings": [
       "AuthenticationEventsTrigger"
     ]
