@@ -189,6 +189,11 @@ namespace Build
                 FileUtility.EnsureDirectoryExists(Directory.GetParent(buildConfig.PublishBinDirectoryPath).FullName);
                 Directory.Move(Path.Combine(buildConfig.PublishDirectoryPath, "bin"), buildConfig.PublishBinDirectoryPath);
             }
+
+            // Temporary fix to copy assembly needed for cosmosDb extension
+            File.Copy(additionalAssembliesPath, Path.Combine(buildConfig.PublishBinDirectoryPath, "System.Configuration.ConfigurationManager.dll"));
+            File.Copy(additionalAssembliesPath, Path.Combine(buildConfig.PublishBinDirectoryPath, "System.Security.Permissions.dll"));
+            
         }
 
         public static void AddBindingInfoToExtensionsJson(string extensionsJson)
