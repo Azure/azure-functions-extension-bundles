@@ -152,7 +152,7 @@ namespace Build
         {
             Settings.LinuxBuildConfigurations.ForEach((config) => RunManifestUtility(config));
         }
-        
+
         public static void RunManifestUtility(BuildConfiguration buildConfig)
         {
             string manifestDll = Path.Combine(Settings.ManifestToolDirectory, "Microsoft.ManifestTool.dll");
@@ -183,12 +183,21 @@ namespace Build
 
             Shell.Run("dotnet", publishCommandArguments);
 
-            var additionalAssembliesPath = Path.Combine(Directory.GetParent(projectFilePath).FullName, "bin", "Release", "netcoreapp3.1", buildConfig.RuntimeIdentifier == "any" ? String.Empty : buildConfig.RuntimeIdentifier, "System.Configuration.ConfigurationManager.dll");
             if (Path.Combine(buildConfig.PublishDirectoryPath, "bin") != buildConfig.PublishBinDirectoryPath)
             {
                 FileUtility.EnsureDirectoryExists(Directory.GetParent(buildConfig.PublishBinDirectoryPath).FullName);
                 Directory.Move(Path.Combine(buildConfig.PublishDirectoryPath, "bin"), buildConfig.PublishBinDirectoryPath);
             }
+
+            // Temporary fix to copy assembly needed for cosmosDb extension
+            var additionalAssembliesPath = Path.Combine(Directory.GetParent(projectFilePath).FullName, "bin", "Release", "netcoreapp3.1", buildConfig.RuntimeIdentifier == "any" ? String.Empty : buildConfig.RuntimeIdentifier);
+
+            var configAssembly = "System.Configuration.ConfigurationManager.dll";
+            File.Copy(Path.Combine(additionalAssembliesPath, configAssembly), Path.Combine(buildConfig.PublishBinDirectoryPath, configAssembly));
+
+            var permissionsAssembly = "System.Security.Permissions.dll";
+            File.Copy(Path.Combine(additionalAssembliesPath, permissionsAssembly), Path.Combine(buildConfig.PublishBinDirectoryPath, permissionsAssembly));
+
         }
 
         public static void AddBindingInfoToExtensionsJson(string extensionsJson)
