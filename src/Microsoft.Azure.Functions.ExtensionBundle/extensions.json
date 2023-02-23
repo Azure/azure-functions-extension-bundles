@@ -133,8 +133,8 @@
     "majorVersion": "2",
     "name": "RabbitMQ",
     "bindings": [
-        "rabbitmqtrigger",
-        "rabbitmq"
+      "rabbitmqtrigger",
+      "rabbitmq"
     ]
   },
   {
@@ -142,8 +142,8 @@
     "majorVersion": "3",
     "name": "Kafka",
     "bindings": [
-        "kafkatrigger",
-        "kafka"
+      "kafkatrigger",
+      "kafka"
     ]
   },
   {
@@ -156,5 +156,11 @@
       "webpubsubrequest",
       "webpubsubtrigger"
     ]
+  },
+  {
+    "id": "Azure.Storage.Queues",
+    "Version": "12.13.0",
+    "name": "AzureStorageQueues",
+    "bindings": []
   }
 ]
