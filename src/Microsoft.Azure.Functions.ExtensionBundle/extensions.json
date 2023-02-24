@@ -101,7 +101,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "majorVersion": "4",
+    "version": "4.0.0-rc",
     "name": "CosmosDB",
     "bindings": [
       "cosmosdbtrigger",
@@ -130,11 +130,11 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
-    "majorVersion": "1",
+    "majorVersion": "2",
     "name": "RabbitMQ",
     "bindings": [
-        "rabbitmqtrigger",
-        "rabbitmq"
+      "rabbitmqtrigger",
+      "rabbitmq"
     ]
   },
   {
@@ -142,16 +142,19 @@
     "majorVersion": "3",
     "name": "Kafka",
     "bindings": [
-        "kafkatrigger",
-        "kafka"
+      "kafkatrigger",
+      "kafka"
     ]
   },
   {
-    "id": "Microsoft.Azure.WebJobs.Extensions.Sql",
-    "majorVersion": "0",
-    "name": "SqlBinding",
+    "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSub",
+    "majorVersion": "1",
+    "name": "WebPubSub",
     "bindings": [
-      "Sql"
+      "webpubsub",
+      "webpubsubconnection",
+      "webpubsubrequest",
+      "webpubsubtrigger"
     ]
   },
   {
@@ -161,5 +164,11 @@
     "bindings": [
       "AuthenticationEventsTrigger"
     ]
+  },
+  {
+    "id": "Azure.Storage.Queues",
+    "Version": "12.13.0",
+    "name": "AzureStorageQueues",
+    "bindings": []
   }
 ]

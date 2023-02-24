@@ -148,7 +148,7 @@ namespace Build
         {
             Settings.LinuxBuildConfigurations.ForEach((config) => RunManifestUtility(config));
         }
-        
+
         public static void RunManifestUtility(BuildConfiguration buildConfig)
         {
             string manifestDll = Path.Combine(Settings.ManifestToolDirectory, "Microsoft.ManifestTool.dll");
@@ -179,11 +179,16 @@ namespace Build
 
             Shell.Run("dotnet", publishCommandArguments);
 
+            // Temporary fix to copy assembly needed for cosmosDb extension
+            var additionalAssembliesPath = Path.Combine(Directory.GetParent(projectFilePath).FullName, "bin" , "Release", "netcoreapp3.1", buildConfig.RuntimeIdentifier == "any" ? String.Empty : buildConfig.RuntimeIdentifier, "System.Configuration.ConfigurationManager.dll");
             if (Path.Combine(buildConfig.PublishDirectoryPath, "bin") != buildConfig.PublishBinDirectoryPath)
             {
                 FileUtility.EnsureDirectoryExists(Directory.GetParent(buildConfig.PublishBinDirectoryPath).FullName);
                 Directory.Move(Path.Combine(buildConfig.PublishDirectoryPath, "bin"), buildConfig.PublishBinDirectoryPath);
             }
+
+            // Temporary fix to copy assembly needed for cosmosDb extension
+            File.Copy(additionalAssembliesPath, Path.Combine(buildConfig.PublishBinDirectoryPath, "System.Configuration.ConfigurationManager.dll"));
         }
 
         public static void AddBindingInfoToExtensionsJson(string extensionsJson)
@@ -297,7 +302,7 @@ namespace Build
             ZipFile.ExtractToDirectory(Settings.BundlePackageNetCoreWindows.GeneratedBundleZipFilePath, Settings.RUPackagePath);
 
             var RURootPackagePath = Directory.GetParent(Settings.RUPackagePath);
-            ZipFile.CreateFromDirectory(RURootPackagePath.FullName, Path.Combine(Settings.ArtifactsDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package.zip"), CompressionLevel.NoCompression, false);
+            ZipFile.CreateFromDirectory(RURootPackagePath.FullName, Path.Combine(Settings.ArtifactsDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package.zip"), CompressionLevel.Optimal, false);
         }
 
         public static void CreateCDNStoragePackage()
