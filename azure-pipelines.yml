@@ -11,19 +11,10 @@ jobs:
     - ImageOverride -equals MMS2019TLS
 
   steps:
-  - task: PowerShell@2
-    displayName: 'Install .NET 6'
-    inputs:
-      targetType: 'inline'
-      script: |
-        Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1' -OutFile 'dotnet-install.ps1'
-        # Official release versions can be found at: https://dotnet.microsoft.com/download/dotnet/6.0
-        # Newer versions can be found at: https://github.com/dotnet/installer#installers-and-binaries
-        ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Verbose -Channel 6.0
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
-      version: '2.1.x'
+      version: '6.0.x'
       performMultiLevelLookup: true
   - task: DotNetCoreCLI@2
     inputs:
@@ -51,15 +42,11 @@ jobs:
     - ImageOverride -equals MMSUbuntu20.04TLS
 
   steps:
-  - task: PowerShell@2
-    displayName: 'Install .NET 6'
+  - task: UseDotNet@2
     inputs:
-      targetType: 'inline'
-      script: |
-        Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1' -OutFile 'dotnet-install.ps1'
-        # Official release versions can be found at: https://dotnet.microsoft.com/download/dotnet/6.0
-        # Newer versions can be found at: https://github.com/dotnet/installer#installers-and-binaries
-        ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Verbose -Channel 6.0
+      packageType: 'sdk'
+      version: '6.0.x'
+      performMultiLevelLookup: true
   - task: Bash@3
     inputs:
       targetType: 'inline'
