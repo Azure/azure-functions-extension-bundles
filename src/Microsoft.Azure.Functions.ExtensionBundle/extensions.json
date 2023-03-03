@@ -176,5 +176,11 @@
     "Version": "4.7.2",
     "name": "SystemDrawingCommon",
     "bindings": []
+  },
+  {
+    "id": "System.Private.Uri",
+    "Version": "4.3.2",
+    "name": "SystemPrivateUri",
+    "bindings": []
   }
 ]
