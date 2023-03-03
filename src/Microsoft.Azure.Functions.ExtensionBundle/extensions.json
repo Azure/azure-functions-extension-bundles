@@ -162,5 +162,11 @@
     "Version": "12.13.0",
     "name": "AzureStorageQueues",
     "bindings": []
+  },
+  {
+    "id": "System.Private.Uri",
+    "Version": "4.3.2",
+    "name": "SystemPrivateUri",
+    "bindings": []
   }
 ]
