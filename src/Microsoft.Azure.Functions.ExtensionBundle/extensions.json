@@ -147,6 +147,14 @@
     ]
   },
   {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Sql",
+    "majorVersion": "2",
+    "name": "SqlBinding",
+    "bindings": [
+      "Sql"
+    ]
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSub",
     "majorVersion": "1",
     "name": "WebPubSub",
