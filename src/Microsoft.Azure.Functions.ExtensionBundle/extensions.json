@@ -148,7 +148,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Sql",
-    "majorVersion": "1",
+    "majorVersion": "3",
     "name": "SqlBinding",
     "bindings": [
       "Sql",
