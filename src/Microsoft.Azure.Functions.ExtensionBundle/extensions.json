@@ -148,7 +148,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Sql",
-    "majorVersion": "1",
+    "majorVersion": "3",
     "name": "SqlBinding",
     "bindings": [
       "Sql",
@@ -158,7 +158,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents",
     "majorVersion": "1",
-    "name": "AuthenticationEvent", 
+    "name": "AuthenticationEvent",
     "bindings": [
       "AuthenticationEventsTrigger"
     ]
@@ -166,7 +166,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Kusto",
     "majorVersion": "1",
-    "name": "KustoBinding", 
+    "name": "KustoBinding",
     "bindings": [
       "Kusto"
     ]
