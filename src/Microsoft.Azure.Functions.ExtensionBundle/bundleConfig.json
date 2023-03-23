@@ -1,6 +1,6 @@
 ﻿{
     "bundleId":  "Microsoft.Azure.Functions.ExtensionBundle",
-    "bundleVersion":  "3.20.2",
-    "templateVersion":  "3.0.2408",
+    "bundleVersion":  "3.21.0",
+    "templateVersion":  "3.0.2479",
     "isPreviewBundle":  false
 }
