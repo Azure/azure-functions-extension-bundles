@@ -27,40 +27,6 @@
       "blobtrigger",
       "blob"
     ]
-  },
-  {
-    "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-    "majorVersion": "5",
-    "name": "ServiceBus",
-    "bindings": [
-      "servicebustrigger",
-      "servicebus"
-    ]
-  },
-  {
-    "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-    "majorVersion": "5",
-    "name": "EventHubs",
-    "bindings": [
-      "eventhubtrigger",
-      "eventhub"
-    ]
-  },
-  {
-    "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
-    "majorVersion": "3",
-    "name": "SendGrid",
-    "bindings": [
-      "sendgrid"
-    ]
-  },
-  {
-    "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "majorVersion": "2",
-    "name": "DurableTask",
-    "bindings": [
-      "activitytrigger",
-      "orchestrationtrigger",
       "entitytrigger",
       "durableclient",
       "orchestrationclient"
@@ -87,46 +53,9 @@
       "orchestrationtrigger",
       "entitytrigger",
       "durableclient",
-      "orchestrationclient"
-    ]
-  },
-  {
-    "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
-    "majorVersion": "3",
-    "name": "EventGrid",
-    "bindings": [
-      "eventgridtrigger",
-      "eventgrid"
-    ]
-  },
-  {
-    "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "version": "4.0.0-rc",
-    "name": "CosmosDB",
-    "bindings": [
-      "cosmosdbtrigger",
-      "cosmosdb"
-    ]
-  },
-  {
-    "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
-    "majorVersion": "3",
-    "name": "Twilio",
-    "bindings": [
-      "twiliosms"
-    ]
-  },
-  {
-    "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
-    "majorVersion": "1",
-    "name": "SignalR",
-    "bindings": [
-      "signalr",
-      "signalrconnectioninfo",
       "signalrtrigger",
       "signalrendpoints",
       "signalrnegotiation"
-    ]
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",

@@ -59,10 +59,19 @@ namespace Build
                 FileUtility.CopyFile(Settings.ResourcesFilePath, Settings.ResourcesEnUSFilePath);
             }
 
-
             if (!FileUtility.DirectoryExists(Settings.TemplatesRootDirectory) || !FileUtility.FileExists(Settings.ResourcesEnUSFilePath))
             {
                 throw new Exception("Resource Copy failed");
+            }
+
+            if (!FileUtility.DirectoryExists(Settings.TemplatesV2RootDirectory))
+            {
+                FileUtility.EnsureDirectoryExists(Settings.TemplatesV2RootDirectory);
+            }
+
+            if (!FileUtility.DirectoryExists(Settings.TemplatesV2RootDirectory) && FileUtility.FileExists(Settings.TemplatesV2JsonFilePath))
+            {
+                Directory.Move(Settings.TemplatesV2Directory, Settings.TemplatesV2RootDirectory);
             }
         }
 
