@@ -59,6 +59,26 @@ namespace Build
                 FileUtility.CopyFile(Settings.ResourcesFilePath, Settings.ResourcesEnUSFilePath);
             }
 
+            if (FileUtility.DirectoryExists(Settings.TemplatesV2Directory))
+            {
+                Directory.Move(Settings.TemplatesV2Directory, Path.Join(Settings.TemplatesV2RootDirectory, "templates"));
+            }
+
+            if (FileUtility.DirectoryExists(Settings.ResourcesV2Directory))
+            {
+                Directory.Move(Settings.ResourcesV2Directory, Path.Join(Settings.TemplatesV2RootDirectory, "resources"));
+            }
+
+            if (FileUtility.DirectoryExists(Settings.BindingsV2Directory))
+            {
+                Directory.Move(Settings.BindingsV2Directory, Path.Join(Settings.TemplatesV2RootDirectory, "bindings"));
+            }
+
+            if (!FileUtility.DirectoryExists(Settings.TemplatesV2RootDirectory))
+            {
+                FileUtility.EnsureDirectoryExists(Settings.TemplatesV2RootDirectory);
+            }
+
 
             if (!FileUtility.DirectoryExists(Settings.TemplatesRootDirectory) || !FileUtility.FileExists(Settings.ResourcesEnUSFilePath))
             {

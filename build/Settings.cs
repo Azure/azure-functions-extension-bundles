@@ -48,6 +48,14 @@ namespace Build
 
         public static readonly string ResourcesEnUSFilePath = Path.Combine(TemplatesRootDirectory, "resources", "Resources.en-US.json");
 
+        public static readonly string TemplatesV2RootDirectory = Path.Combine(RootBinDirectory, StaticContentDirectoryName, "v2");
+
+        public static readonly string TemplatesV2Directory = Path.Combine(TemplatesV1RootDirectory, "templates-v2");
+
+        public static readonly string ResourcesV2Directory = Path.Combine(TemplatesV1RootDirectory, "resources-v2");
+
+        public static readonly string BindingsV2Directory = Path.Combine(TemplatesV1RootDirectory, "bindings-v2");
+
         public static readonly string ExtensionsJsonFileName = "extensions.json";
 
         public static readonly string BundleConfigJsonFileName = "bundleConfig.json";
