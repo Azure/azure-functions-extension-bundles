@@ -45,21 +45,21 @@ namespace Build
 
             if (DownloadZipFile(zipUri, zipFilePath))
             {
-                FileUtility.EnsureDirectoryExists(Settings.TemplatesRootDirectory);
-                ZipFile.ExtractToDirectory(zipFilePath, Settings.TemplatesRootDirectory);
+                FileUtility.EnsureDirectoryExists(Settings.TemplatesV1RootDirectory);
+                ZipFile.ExtractToDirectory(zipFilePath, Settings.TemplatesV1RootDirectory);
             }
 
-            if (!FileUtility.DirectoryExists(Settings.TemplatesRootDirectory) || !FileUtility.FileExists(Settings.TemplatesJsonFilePath))
+            if (!FileUtility.DirectoryExists(Settings.TemplatesV1RootDirectory) || !FileUtility.FileExists(Settings.TemplatesJsonFilePath))
             {
                 throw new Exception("Template download failed");
             }
 
-            if (FileUtility.DirectoryExists(Settings.TemplatesRootDirectory) || FileUtility.FileExists(Settings.ResourcesFilePath))
+            if (FileUtility.DirectoryExists(Settings.TemplatesV1RootDirectory) || FileUtility.FileExists(Settings.ResourcesFilePath))
             {
                 FileUtility.CopyFile(Settings.ResourcesFilePath, Settings.ResourcesEnUSFilePath);
             }
 
-            if (!FileUtility.DirectoryExists(Settings.TemplatesRootDirectory) || !FileUtility.FileExists(Settings.ResourcesEnUSFilePath))
+            if (!FileUtility.DirectoryExists(Settings.TemplatesV1RootDirectory) || !FileUtility.FileExists(Settings.ResourcesEnUSFilePath))
             {
                 throw new Exception("Resource Copy failed");
             }
@@ -69,9 +69,19 @@ namespace Build
                 FileUtility.EnsureDirectoryExists(Settings.TemplatesV2RootDirectory);
             }
 
-            if (!FileUtility.DirectoryExists(Settings.TemplatesV2RootDirectory) && FileUtility.FileExists(Settings.TemplatesV2JsonFilePath))
+            if (FileUtility.DirectoryExists(Settings.TemplatesV2Directory))
             {
-                Directory.Move(Settings.TemplatesV2Directory, Settings.TemplatesV2RootDirectory);
+                Directory.Move(Settings.TemplatesV2Directory, Path.Join(Settings.TemplatesV2RootDirectory, "templates"));
+            }
+
+            if (FileUtility.DirectoryExists(Settings.ResourcesV2Directory))
+            {
+                Directory.Move(Settings.ResourcesV2Directory, Path.Join(Settings.TemplatesV2RootDirectory, "resources"));
+            }
+
+            if (FileUtility.DirectoryExists(Settings.BindingsV2Directory))
+            {
+                Directory.Move(Settings.BindingsV2Directory, Path.Join(Settings.TemplatesV2RootDirectory, "bindings"));
             }
         }
 
@@ -104,7 +114,6 @@ namespace Build
         {
             Settings.LinuxBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config));
         }
-
         public static string GenerateBundleProjectFile(BuildConfiguration buildConfig)
         {
             var sourceNugetConfig = Path.Combine(Settings.SourcePath, Settings.NugetConfigFileName);
@@ -198,10 +207,16 @@ namespace Build
             var additionalAssembliesPath = Path.Combine(Directory.GetParent(projectFilePath).FullName, "bin", "Release", "netcoreapp3.1", buildConfig.RuntimeIdentifier == "any" ? String.Empty : buildConfig.RuntimeIdentifier);
 
             var configAssembly = "System.Configuration.ConfigurationManager.dll";
-            File.Copy(Path.Combine(additionalAssembliesPath, configAssembly), Path.Combine(buildConfig.PublishBinDirectoryPath, configAssembly));
+            if (FileUtility.FileExists(Path.Combine(additionalAssembliesPath, configAssembly)))
+            {
+                File.Copy(Path.Combine(additionalAssembliesPath, configAssembly), Path.Combine(buildConfig.PublishBinDirectoryPath, configAssembly));
+            }
 
             var permissionsAssembly = "System.Security.Permissions.dll";
-            File.Copy(Path.Combine(additionalAssembliesPath, permissionsAssembly), Path.Combine(buildConfig.PublishBinDirectoryPath, permissionsAssembly));
+            if (FileUtility.FileExists(Path.Combine(additionalAssembliesPath, permissionsAssembly)))
+            {
+                File.Copy(Path.Combine(additionalAssembliesPath, permissionsAssembly), Path.Combine(buildConfig.PublishBinDirectoryPath, permissionsAssembly));
+            }
         }
 
         public static void AddBindingInfoToExtensionsJson(string extensionsJson)
