@@ -13,6 +13,7 @@ jobs:
     - ImageOverride -equals MMS2019TLS
 
   steps:
+  - template: build/install-dotnet.yml
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
