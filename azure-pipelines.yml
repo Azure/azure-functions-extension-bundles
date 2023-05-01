@@ -56,7 +56,7 @@ jobs:
       targetType: 'inline'
       script: |
         Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1' -OutFile 'dotnet-install.ps1'
-        ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Verbose -Channel 3.1
+        ./dotnet-install.ps1 -Architecture x86 -InstallDir 'C:\Program Files\dotnet' -Verbose -Channel 3.1
   - task: Bash@3
     inputs:
       targetType: 'inline'
