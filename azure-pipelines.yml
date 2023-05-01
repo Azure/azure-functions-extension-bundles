@@ -4,6 +4,7 @@ trigger:
 - v2.x
 - v3.x
 - v3.x-preview
+- v4.x-preview
 
 jobs:
 - job: BuildArtifacts_Windows
@@ -49,6 +50,16 @@ jobs:
     - ImageOverride -equals MMSUbuntu20.04TLS
 
   steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '3.1.x'
+      performMultiLevelLookup: true
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '2.1.x'
+      performMultiLevelLookup: true
   - task: Bash@3
     inputs:
       targetType: 'inline'
