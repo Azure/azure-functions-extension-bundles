@@ -170,5 +170,20 @@
     "bindings": [
       "Kusto"
     ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
+    "majorVersion": "0",
+    "name": "Dapr",
+    "bindings": [
+      "daprBinding",
+      "daprBindingTrigger",
+      "daprInvoke",
+      "daprPublish",
+      "daprSecret",
+      "daprServiceInvocationTrigger",
+      "daprState",
+      "daprTopicTrigger"
+    ]
   }
 ]
