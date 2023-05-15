@@ -170,5 +170,15 @@
     "bindings": [
       "Kusto"
     ]
-  }
+  },
+  {
+  "id": "Microsoft.Azure.WebJobs.Extensions.Redis",
+  "majorVersion": "0",
+  "name": "Redis",
+  "bindings": [
+    "RedisPubSubTrigger",
+    "RedisStreamTrigger",
+    "RedisListTrigger"
+  ]
+}
 ]
