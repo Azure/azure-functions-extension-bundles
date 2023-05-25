@@ -49,6 +49,11 @@ jobs:
     - ImageOverride -equals MMSUbuntu20.04TLS
 
   steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '3.1.201'
+      performMultiLevelLookup: true
   - task: Bash@3
     inputs:
       targetType: 'inline'
