@@ -11,13 +11,6 @@ jobs:
     - ImageOverride -equals MMS2019TLS
 
   steps:
-  - task: PowerShell@2
-    displayName: 'Install .NET 3.1'
-    inputs:
-      targetType: 'inline'
-      script: |
-        Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1' -OutFile 'dotnet-install.ps1'
-        ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Verbose -Channel 3.1
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
@@ -54,6 +47,13 @@ jobs:
     - ImageOverride -equals MMSUbuntu20.04TLS
 
   steps:
+  - task: PowerShell@2
+    displayName: 'Install .NET 3.1'
+    inputs:
+      targetType: 'inline'
+      script: |
+        Invoke-WebRequest 'https://dot.net/v1/dotnet-install.ps1' -OutFile 'dotnet-install.ps1'
+        ./dotnet-install.ps1 -InstallDir 'C:\Program Files\dotnet' -Verbose -Channel 3.1
   - task: Bash@3
     inputs:
       targetType: 'inline'
