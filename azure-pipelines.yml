@@ -11,7 +11,7 @@ jobs:
     - ImageOverride -equals MMS2019TLS
 
   steps:
-  - task: SetupDotNet@v1
+  - task: SetupDotNet@1
     inputs:
       packageType: 'sdk'
       version: '3.1.100'
