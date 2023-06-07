@@ -20,6 +20,14 @@
     ]
   },
   {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Tables",
+    "majorVersion": "1",
+    "name": "AzureTables",
+    "bindings": [
+      "table"
+    ]
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
     "majorVersion": "5",
     "name": "AzureStorageBlobs",
