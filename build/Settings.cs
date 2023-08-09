@@ -37,17 +37,21 @@ namespace Build
 
         public static readonly string ManifestToolDirectory = Path.Combine(ToolsDirectory, $"ManifestTool");
 
-
-        public static readonly string TemplatesRootDirectory = Path.Combine(RootBinDirectory, StaticContentDirectoryName, "v1");
+        public static readonly string TemplatesV1RootDirectory = Path.Combine(RootBinDirectory, StaticContentDirectoryName, "v1");
 
         public static readonly string StaticContentDirectoryPath = Path.Combine(RootBinDirectory, StaticContentDirectoryName);
 
-        public static readonly string TemplatesJsonFilePath = Path.Combine(TemplatesRootDirectory, "templates", "templates.json");
+        public static readonly string TemplatesJsonFilePath = Path.Combine(TemplatesV1RootDirectory, "templates", "templates.json");
 
-        public static readonly string ResourcesFilePath = Path.Combine(TemplatesRootDirectory, "resources", "Resources.json");
+        public static readonly string ResourcesFilePath = Path.Combine(TemplatesV1RootDirectory, "resources", "Resources.json");
 
-        public static readonly string ResourcesEnUSFilePath = Path.Combine(TemplatesRootDirectory, "resources", "Resources.en-US.json");
+        public static readonly string ResourcesEnUSFilePath = Path.Combine(TemplatesV1RootDirectory, "resources", "Resources.en-US.json");
 
+        public static readonly string TemplatesV2RootDirectory = Path.Combine(RootBinDirectory, StaticContentDirectoryName, "v2");
+
+        public static readonly string TemplatesV2Directory = Path.Combine(TemplatesV1RootDirectory, "templates-v2");
+        public static readonly string ResourcesV2Directory = Path.Combine(TemplatesV1RootDirectory, "resources-v2");
+        public static readonly string BindingsV2Directory = Path.Combine(TemplatesV1RootDirectory, "bindings-v2");
         public static readonly string ExtensionsJsonFileName = "extensions.json";
 
         public static readonly string BundleConfigJsonFileName = "bundleConfig.json";
