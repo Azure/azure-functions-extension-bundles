@@ -36,6 +36,13 @@ jobs:
       Contents: '*.zip'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       CleanTargetFolder: true
+  - task: DotNetCoreCLI@2
+    displayName: 'Run tests'
+    inputs:
+      command: 'test'
+      arguments: '--no-build -c Release'
+      projects: |
+        **/*Tests.csproj
   - task: PublishBuildArtifacts@1
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
