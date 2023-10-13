@@ -1,0 +1,188 @@
+﻿[
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
+    "majorVersion": "5",
+    "name": "AzureStorage",
+    "bindings": [
+      "blobtrigger",
+      "blob",
+      "queue",
+      "queuetrigger"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
+    "majorVersion": "5",
+    "name": "AzureStorageQueues",
+    "bindings": [
+      "queue",
+      "queuetrigger"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Tables",
+    "majorVersion": "1",
+    "name": "AzureTables",
+    "bindings": [
+      "table"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
+    "majorVersion": "5",
+    "name": "AzureStorageBlobs",
+    "bindings": [
+      "blobtrigger",
+      "blob"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
+    "majorVersion": "5",
+    "name": "ServiceBus",
+    "bindings": [
+      "servicebustrigger",
+      "servicebus"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
+    "majorVersion": "5",
+    "name": "EventHubs",
+    "bindings": [
+      "eventhubtrigger",
+      "eventhub"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
+    "majorVersion": "3",
+    "name": "SendGrid",
+    "bindings": [
+      "sendgrid"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
+    "majorVersion": "2",
+    "name": "DurableTask",
+    "bindings": [
+      "activitytrigger",
+      "orchestrationtrigger",
+      "entitytrigger",
+      "durableclient",
+      "orchestrationclient"
+    ]
+  },
+  {
+    "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
+    "majorVersion": "1",
+    "name": "SqlDurabilityProvider",
+    "bindings": [
+      "activitytrigger",
+      "orchestrationtrigger",
+      "entitytrigger",
+      "durableclient",
+      "orchestrationclient"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
+    "majorVersion": "1",
+    "name": "NetheriteProvider",
+    "bindings": [
+      "activitytrigger",
+      "orchestrationtrigger",
+      "entitytrigger",
+      "durableclient",
+      "orchestrationclient"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
+    "majorVersion": "3",
+    "name": "EventGrid",
+    "bindings": [
+      "eventgridtrigger",
+      "eventgrid"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
+    "majorVersion": "4",
+    "name": "CosmosDB",
+    "bindings": [
+      "cosmosdbtrigger",
+      "cosmosdb"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
+    "majorVersion": "3",
+    "name": "Twilio",
+    "bindings": [
+      "twiliosms"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
+    "majorVersion": "1",
+    "name": "SignalR",
+    "bindings": [
+      "signalr",
+      "signalrconnectioninfo",
+      "signalrtrigger",
+      "signalrendpoints",
+      "signalrnegotiation"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
+    "majorVersion": "2",
+    "name": "RabbitMQ",
+    "bindings": [
+      "rabbitmqtrigger",
+      "rabbitmq"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Kafka",
+    "majorVersion": "3",
+    "name": "Kafka",
+    "bindings": [
+      "kafkatrigger",
+      "kafka"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Sql",
+    "majorVersion": "3",
+    "name": "SqlBinding",
+    "bindings": [
+      "Sql"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSub",
+    "majorVersion": "1",
+    "name": "WebPubSub",
+    "bindings": [
+      "webpubsub",
+      "webpubsubconnection",
+      "webpubsubrequest",
+      "webpubsubtrigger"
+    ]
+  },
+  {
+    "id": "Azure.Storage.Queues",
+    "majorVersion": "12",
+    "name": "AzureStorageQueues",
+    "bindings": []
+  },
+  {
+    "id": "System.Private.Uri",
+    "Version": "4.3.2",
+    "name": "SystemPrivateUri",
+    "bindings": []
+  }
+]

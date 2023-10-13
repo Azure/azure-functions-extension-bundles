@@ -27,7 +27,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-<!--		<ProjectReference Include="..\DotNetWorkerTests\DotNetWorkerTests.csproj" />-->
+		<ProjectReference Include="..\build\Build.csproj" />
 	</ItemGroup>
 
 </Project>
