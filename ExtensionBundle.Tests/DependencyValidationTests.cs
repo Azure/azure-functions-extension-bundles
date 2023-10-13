@@ -18,11 +18,11 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 
         public DependencyValidationTests()
         {
-            var extensionsJsonFileContent = FileUtility.ReadAllText("..\\..\\..\\..\\src\\Microsoft.Azure.Functions.ExtensionBundle\\extensions.json");
+            var extensionsJsonFileContent = FileUtility.ReadAllText("../../../../src/Microsoft.Azure.Functions.ExtensionBundle/extensions.json");
             extensionsList = JsonConvert.DeserializeObject<List<Extension>>(extensionsJsonFileContent);
             extensionsDict = extensionsList.ToDictionary(ext => ext.Id, ext => ext.MajorVersion);
 
-            var testExtensionsJsonFileContent = FileUtility.ReadAllText("..\\..\\..\\TestData\\TestExtensions.json");
+            var testExtensionsJsonFileContent = FileUtility.ReadAllText("../../../TestData/TestExtensions.json");
             var testExtensionsList = JsonConvert.DeserializeObject<List<Extension>>(testExtensionsJsonFileContent);
             testExtensionsDict = testExtensionsList.ToDictionary(ext => ext.Id, ext => ext.MajorVersion);
         }
