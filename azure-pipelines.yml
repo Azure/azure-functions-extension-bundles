@@ -30,19 +30,19 @@ jobs:
       arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux,RunManifestUtilityLinux'
     env:
       SBOMUtilSASUrl: $(SBOMUtilSASUrl)
+  - task: DotNetCoreCLI@2
+    displayName: 'Run tests'
+    inputs:
+      command: 'test'
+      arguments: '-c Release'
+      projects: |
+        **/*Tests.csproj
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
       Contents: '*.zip'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       CleanTargetFolder: true
-  - task: DotNetCoreCLI@2
-    displayName: 'Run tests'
-    inputs:
-      command: 'test'
-      arguments: '--no-build -c Release'
-      projects: |
-        **/*Tests.csproj
   - task: PublishBuildArtifacts@1
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
@@ -73,6 +73,13 @@ jobs:
         dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,RunManifestUtilityWindows
     env:
       SBOMUtilSASUrl: $(SBOMUtilSASUrl)
+  - task: DotNetCoreCLI@2
+    displayName: 'Run tests'
+    inputs:
+      command: 'test'
+      arguments: '-c Release'
+      projects: |
+        **/*Tests.csproj
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(Build.Repository.LocalPath)/artifacts'
