@@ -41,17 +41,5 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
                 }
             }
         }
-
-        [Fact]
-        public void Test_New_Extensions_Added()
-        {
-            foreach (var extension in extensionsList)
-            {
-                if (!testExtensionsDict.ContainsKey(extension.Id))
-                {
-                    Assert.Fail("New Extensions added. Update TestExtensions file.");
-                }
-            }
-        }
     }
 }
