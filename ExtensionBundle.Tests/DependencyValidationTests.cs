@@ -12,15 +12,12 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
     public class DependencyValidationTests
     {
         internal List<Extension> extensionsList;
-        internal List<Extension> testExtensionsList;
-        internal Dictionary<string, int> extensionsDict;
         internal Dictionary<string, int> testExtensionsDict;
 
         public DependencyValidationTests()
         {
             var extensionsJsonFileContent = FileUtility.ReadAllText("../../../../src/Microsoft.Azure.Functions.ExtensionBundle/extensions.json");
             extensionsList = JsonConvert.DeserializeObject<List<Extension>>(extensionsJsonFileContent);
-            extensionsDict = extensionsList.ToDictionary(ext => ext.Id, ext => ext.MajorVersion);
 
             var testExtensionsJsonFileContent = FileUtility.ReadAllText("../../../TestData/TestExtensions.json");
             var testExtensionsList = JsonConvert.DeserializeObject<List<Extension>>(testExtensionsJsonFileContent);
