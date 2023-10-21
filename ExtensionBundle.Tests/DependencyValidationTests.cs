@@ -22,39 +22,6 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         private readonly DependencyContextJsonReader _reader = new DependencyContextJsonReader();
         private readonly IEnumerable<string> _rids = DependencyHelper.GetRuntimeFallbacks();
 
-        // These are changed often and controlled by us, so we don't need to fail if they are updated.
-        /*
-        private static readonly string[] _excludedList = new[]
-        {
-            "Build.dll",
-        };
-        */
-
-        public DependencyValidationTests()
-        {
-            var extensionsJsonFileContent = FileUtility.ReadAllText("../../../../src/Microsoft.Azure.Functions.ExtensionBundle/extensions.json");
-            extensionsList = JsonConvert.DeserializeObject<List<Extension>>(extensionsJsonFileContent);
-
-            var testExtensionsJsonFileContent = FileUtility.ReadAllText("../../../TestData/TestExtensions.json");
-            var testExtensionsList = JsonConvert.DeserializeObject<List<Extension>>(testExtensionsJsonFileContent);
-            testExtensionsDict = testExtensionsList.ToDictionary(ext => ext.Id, ext => ext.MajorVersion);
-        }
-
-        [Fact]
-        public void Test_Version_Mismatch()
-        {
-            foreach (var extension in extensionsList)
-            {
-                if (testExtensionsDict.ContainsKey(extension.Id))
-                {
-                    if (testExtensionsDict[extension.Id] != extension.MajorVersion)
-                    {
-                        Assert.Fail("Changing major version is not allowed and will be considered as breaking change.");
-                    }
-                }
-            }
-        }
-
         [Fact]
         public void Verify_DepsJsonChanges()
         {

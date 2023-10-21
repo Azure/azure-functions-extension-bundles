@@ -12,20 +12,9 @@
 	<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="7.0.0" />
   </ItemGroup>
 	<ItemGroup>
-		<None Remove="runtimeassemblies-relaxed.json" />
-		<None Remove="runtimeassemblies.json" />
 		<None Remove="runtimes.json" />
 	</ItemGroup>
 	<ItemGroup>
-		<EmbeddedResource Include="extensionrequirements.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<EmbeddedResource Include="runtimeassemblies-relaxed.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</EmbeddedResource>
-		<EmbeddedResource Include="runtimeassemblies.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</EmbeddedResource>
 		<EmbeddedResource Include="runtimes.json" />
 	</ItemGroup>
 </Project>

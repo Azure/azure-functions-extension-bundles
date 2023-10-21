@@ -16,80 +16,88 @@ namespace Build
         private const string AssemblyNamePrefix = "assembly:";
         private static readonly Lazy<Dictionary<string, string[]>> _ridGraph = new Lazy<Dictionary<string, string[]>>(BuildRuntimesGraph);
         private static string _runtimeIdentifier;
+        public const string DefaultWindowsRID = "win10";
+        public const string DefaultOSXRID = "osx.10.12";
+        public const string DefaultLinuxRID = "linux";
 
-        private static Dictionary<string, string[]> BuildRuntimesGraph()
-        {
-            var ridGraph = new Dictionary<string, string[]>();
-            string runtimesJson = GetRuntimesGraphJson();
-            var runtimes = (JObject)JObject.Parse(runtimesJson)["runtimes"];
 
-            foreach (var runtime in runtimes)
-            {
-                string[] imports = ((JObject)runtime.Value)["#import"]
-                    ?.Values<string>()
-                    .ToArray();
+private static Dictionary<string, string[]> BuildRuntimesGraph()
+{
+    var ridGraph = new Dictionary<string, string[]>();
+    string runtimesJson = GetRuntimesGraphJson();
+    var runtimes = (JObject)JObject.Parse(runtimesJson)["runtimes"];
 
-                ridGraph.Add(runtime.Key, imports);
-            }
+    foreach (var runtime in runtimes)
+    {
+        string[] imports = ((JObject)runtime.Value)["#import"]
+            ?.Values<string>()
+            .ToArray();
 
-            return ridGraph;
-        }
+        ridGraph.Add(runtime.Key, imports);
+    }
 
-        private static string GetDefaultPlatformRid()
-        {
-            // This logic follows what the .NET Core host does in: https://github.com/dotnet/core-setup/blob/master/src/corehost/common/pal.h
+    return ridGraph;
+}
 
-            // When running on a platform that is not supported in RID fallback graph (because it was unknown
-            // at the time the SharedFX in question was built), we need to use a reasonable fallback RID to allow
-            // consuming the native assets.
-            //
-            // For Windows and OSX, we will maintain the last highest RID-Platform we are known to support for them as the
-            // degree of compat across their respective releases is usually high.
-            //
-            // We cannot maintain the same (compat) invariant for linux and thus, we will fallback to using lowest RID-Plaform.
+private static string GetDefaultPlatformRid()
+{
+    // This logic follows what the .NET Core host does in: https://github.com/dotnet/core-setup/blob/master/src/corehost/common/pal.h
 
-            string rid = null;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                rid = DotNetConstants.DefaultWindowsRID;
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                rid = DotNetConstants.DefaultOSXRID;
-            }
-            else
-            {
-                rid = DotNetConstants.DefaultLinuxRID;
-            }
+    // When running on a platform that is not supported in RID fallback graph (because it was unknown
+    // at the time the SharedFX in question was built), we need to use a reasonable fallback RID to allow
+    // consuming the native assets.
+    //
+    // For Windows and OSX, we will maintain the last highest RID-Platform we are known to support for them as the
+    // degree of compat across their respective releases is usually high.
+    //
+    // We cannot maintain the same (compat) invariant for linux and thus, we will fallback to using lowest RID-Plaform.
 
-            return rid;
-        }
+    string rid = null;
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    {
+        rid = DefaultWindowsRID;
+    }
+    else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+    {
+        rid = DefaultOSXRID;
+    }
+    else
+    {
+        rid = DefaultLinuxRID;
+    }
 
-        private static string GetRuntimesGraphJson()
-        {
-            return GetResourceFileContents("runtimes.json");
-        }
+    return rid;
+}
 
-        private static string GetResourceFileContents(string fileName)
-        {
-            var assembly = typeof(Helper).Assembly;
-            using (Stream resource = assembly.GetManifestResourceStream("Build.runtimes.json")) // ($"{assembly.GetName().Name}.{fileName}"))
-            using (var reader = new StreamReader(resource))
-            {
-                return reader.ReadToEnd();
-            }
-        }
 
-        internal static Dictionary<string, ScriptRuntimeAssembly> GetRuntimeAssemblies(string assemblyManifestName)
-        {
-            string assembliesJson = GetResourceFileContents(assemblyManifestName);
-            JObject assemblies = JObject.Parse(assembliesJson);
+private static string GetRuntimesGraphJson()
+{
+    return GetResourceFileContents("runtimes.json");
+}
 
-            return assemblies["runtimeAssemblies"]
-                .ToObject<ScriptRuntimeAssembly[]>()
-                .ToDictionary(a => a.Name, StringComparer.OrdinalIgnoreCase);
-        }
+private static string GetResourceFileContents(string fileName)
+{
+    var assembly = typeof(Helper).Assembly;
+    using (Stream resource = assembly.GetManifestResourceStream("Build.runtimes.json")) // ($"{assembly.GetName().Name}.{fileName}"))
+    using (var reader = new StreamReader(resource))
+    {
+        return reader.ReadToEnd();
+    }
+}
 
+        /*
+internal static Dictionary<string, ScriptRuntimeAssembly> GetRuntimeAssemblies(string assemblyManifestName)
+{
+    string assembliesJson = GetResourceFileContents(assemblyManifestName);
+    JObject assemblies = JObject.Parse(assembliesJson);
+
+    return assemblies["runtimeAssemblies"]
+        .ToObject<ScriptRuntimeAssembly[]>()
+        .ToDictionary(a => a.Name, StringComparer.OrdinalIgnoreCase);
+}
+*/
+
+        /*
         internal static ExtensionRequirementsInfo GetExtensionRequirements()
         {
             string requirementsJson = GetResourceFileContents("extensionrequirements.json");
@@ -103,6 +111,7 @@ namespace Build
 
             return new ExtensionRequirementsInfo(bundleRequirements, extensionRequirements);
         }
+        */
 
         /// <summary>
         /// Gets the default runtime fallback RIDs for a given RID.
@@ -176,6 +185,9 @@ namespace Build
             return rids;
         }
 
+
+        /*
+
         /// <summary>
         /// Checks if the string is in assembly representation format.
         /// </summary>
@@ -203,7 +215,8 @@ namespace Build
 
             return isSharedAssembly;
         }
+   */
 
         private static string GetRuntimeIdentifier() => _runtimeIdentifier ??= AppContext.GetData("RUNTIME_IDENTIFIER") as string ?? "unknown";
-    }
+        }
 }
