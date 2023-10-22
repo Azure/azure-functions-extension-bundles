@@ -17,23 +17,21 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 {
     public class DependencyValidationTests
     {
-        internal List<Extension> extensionsList;
-        internal Dictionary<string, int> testExtensionsDict;
         private readonly DependencyContextJsonReader _reader = new DependencyContextJsonReader();
         private readonly IEnumerable<string> _rids = DependencyHelper.GetRuntimeFallbacks();
 
         [Fact]
         public void Verify_DepsJsonChanges()
         {
+            BasePath.path = "../../../..";
+            
             BuildSteps.Clean();
             BuildSteps.DownloadTemplates();
             BuildSteps.BuildBundleBinariesForWindows();
 
-
-            //string depsJsonFileName = "Build.deps.json";
-            string oldDepsJson = "C:\\ExtensionBundles\\azure-functions-extension-bundles\\ExtensionBundle.Tests\\function.deps.json"; //Path.GetFullPath(depsJsonFileName);
-            //string webhostBinPath = "C:\\ExtensionBundles\\azure-functions-extension-bundles\\build\\bin"; //Path.Combine("..", "..", "..", "..", "build", "bin");
-            string newDepsJson = "C:\\ExtensionBundles\\azure-functions-extension-bundles\\build\\build_temp\\NetCoreApp3_any_any\\bin\\Release\\netcoreapp3.1\\extensions.deps.json"; //Directory.GetFiles(Path.GetFullPath(webhostBinPath), depsJsonFileName, SearchOption.AllDirectories).FirstOrDefault();
+            string oldDepsJson = Path.GetFullPath("../../../extensions.deps.json");
+            string webhostBinPath = Path.Combine("..", "..", "..", "..", "build", "build_temp");
+            string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories).FirstOrDefault();
 
             Assert.True(File.Exists(oldDepsJson), $"{oldDepsJson} not found.");
             Assert.True(File.Exists(newDepsJson), $"{newDepsJson} not found.");
@@ -64,12 +62,6 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             foreach (RuntimeFile oldFile in oldAssets)
             {
                 string fileName = Path.GetFileName(oldFile.Path);
-                /*
-                if (_excludedList.Contains(fileName))
-                {
-                    continue;
-                }
-                */
 
                 var newFile = newAssets.SingleOrDefault(p =>
                 {
@@ -99,6 +91,8 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
                 sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
             }
 
+            BuildSteps.Clean();
+
             Assert.True(succeed, sb.ToString());
         }
 
@@ -110,7 +104,6 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 
                 return deps.RuntimeLibraries
                     .SelectMany(l => SelectRuntimeAssemblyGroup(_rids, l.RuntimeAssemblyGroups))
-//                    .Where(l => !_excludedList.Contains(Path.GetFileName(l.Path)))
                     .OrderBy(p => Path.GetFileName(p.Path));
             }
         }

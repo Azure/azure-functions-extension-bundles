@@ -8,10 +8,10 @@ namespace Build
 {
     public static class Settings
     {
-        static string a = "C:/ExtensionBundles/azure-functions-extension-bundles/build";
-        static string b = "C:/ExtensionBundles/azure-functions-extension-bundles";
+        public static string basePath = BasePath.path;
 
-        public static readonly string SourcePath = b + "/src/Microsoft.Azure.Functions.ExtensionBundle/";
+        public static readonly string SourcePath = Path.GetFullPath(basePath + "/src/Microsoft.Azure.Functions.ExtensionBundle/");
+        public static readonly string BuildPath = Path.Combine(Path.GetFullPath(basePath), "build");
 
         public static string ExtensionsJsonFilePath => Path.Combine(SourcePath, ExtensionsJsonFileName);
 
@@ -30,13 +30,13 @@ namespace Build
 
         public static readonly string StaticContentDirectoryName = "StaticContent";
 
-        public static readonly string RootBinDirectory = Path.Combine(a, "bin");
+        public static readonly string RootBinDirectory = Path.Combine(BuildPath, "bin");
 
-        public static readonly string RootBuildDirectory = Path.Combine(a, "build_temp");
+        public static readonly string RootBuildDirectory = Path.Combine(BuildPath, "build_temp");
 
-        public static readonly string ArtifactsDirectory = Path.Combine(a, "artifacts");
+        public static readonly string ArtifactsDirectory = Path.Combine(BuildPath, "artifacts");
 
-        public static readonly string ToolsDirectory = Path.Combine(a, "tools");
+        public static readonly string ToolsDirectory = Path.Combine(BuildPath, "tools");
 
         public static readonly string ManifestToolDirectory = Path.Combine(ToolsDirectory, $"ManifestTool");
 
