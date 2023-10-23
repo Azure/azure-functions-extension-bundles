@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         [Fact]
         public void Verify_DepsJsonChanges()
         {
-            string oldDepsJson = Path.GetFullPath("../../../windows_extensions.deps.json");
+            string oldDepsJson = Path.GetFullPath("../../../TestData/windows_extensions.deps.json");
             BasePath.path = "../../../..";
             
             BuildSteps.Clean();
@@ -31,7 +31,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 BuildSteps.BuildBundleBinariesForLinux();
-                oldDepsJson = Path.GetFullPath("../../../linux_extensions.deps.json");
+                oldDepsJson = Path.GetFullPath("../../../TestData/linux_extensions.deps.json");
             }
             else
             {
