@@ -30,13 +30,13 @@ namespace Build
 
         public static readonly string StaticContentDirectoryName = "StaticContent";
 
-        public static readonly string RootBinDirectory = Path.Combine(BuildPath, "bin");
+        public static readonly string RootBinDirectory = Path.Combine(Path.GetFullPath(basePath), "bin");
 
-        public static readonly string RootBuildDirectory = Path.Combine(BuildPath, "build_temp");
+        public static readonly string RootBuildDirectory = Path.Combine(Path.GetFullPath(basePath), "build_temp");
 
-        public static readonly string ArtifactsDirectory = Path.Combine(BuildPath, "artifacts");
+        public static readonly string ArtifactsDirectory = Path.Combine(Path.GetFullPath(basePath), "artifacts");
 
-        public static readonly string ToolsDirectory = Path.Combine(BuildPath, "tools");
+        public static readonly string ToolsDirectory = Path.Combine(Path.GetFullPath(basePath), "tools");
 
         public static readonly string ManifestToolDirectory = Path.Combine(ToolsDirectory, $"ManifestTool");
 
