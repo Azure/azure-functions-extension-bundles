@@ -2,7 +2,6 @@
 // Licensed under the MIT License. See License.txt in the project root for license information.
 
 using Build;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,7 +10,7 @@ using System.Text;
 using Microsoft.Extensions.DependencyModel;
 using Xunit;
 using System.Diagnostics.CodeAnalysis;
-using System.Xml.Linq;
+using System.Runtime.InteropServices;
 
 namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 {
@@ -27,10 +26,18 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             
             BuildSteps.Clean();
             BuildSteps.DownloadTemplates();
-            BuildSteps.BuildBundleBinariesForWindows();
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                BuildSteps.BuildBundleBinariesForLinux();
+            }
+            else
+            {
+                BuildSteps.BuildBundleBinariesForWindows();
+            }
 
             string oldDepsJson = Path.GetFullPath("../../../extensions.deps.json");
-            string webhostBinPath = Path.Combine("..", "..", "..", "..", "build", "build_temp");
+            string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories).FirstOrDefault();
 
             Assert.True(File.Exists(oldDepsJson), $"{oldDepsJson} not found.");
