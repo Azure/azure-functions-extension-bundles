@@ -22,6 +22,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         [Fact]
         public void Verify_DepsJsonChanges()
         {
+            string oldDepsJson = Path.GetFullPath("../../../windows_extensions.deps.json");
             BasePath.path = "../../../..";
             
             BuildSteps.Clean();
@@ -30,13 +31,13 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 BuildSteps.BuildBundleBinariesForLinux();
+                oldDepsJson = Path.GetFullPath("../../../linux_extensions.deps.json");
             }
             else
             {
                 BuildSteps.BuildBundleBinariesForWindows();
             }
 
-            string oldDepsJson = Path.GetFullPath("../../../extensions.deps.json");
             string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories).FirstOrDefault();
 
@@ -98,7 +99,10 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
                 sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
             }
 
-            BuildSteps.Clean();
+            if (FileUtility.DirectoryExists(Settings.RootBuildDirectory))
+            {
+                Directory.Delete(Settings.RootBuildDirectory, recursive: true);
+            }
 
             Assert.True(succeed, sb.ToString());
         }
