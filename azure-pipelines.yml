@@ -24,19 +24,19 @@ jobs:
       version: '2.1.x'
       performMultiLevelLookup: true
   - task: DotNetCoreCLI@2
-    inputs:
-      command: 'run'
-      workingDirectory: '.\build'
-      arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux,RunManifestUtilityLinux'
-    env:
-      SBOMUtilSASUrl: $(SBOMUtilSASUrl)
-  - task: DotNetCoreCLI@2
     displayName: 'Run tests'
     inputs:
       command: 'test'
       arguments: '-c Release'
       projects: |
         **/*Tests.csproj
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'run'
+      workingDirectory: '.\build'
+      arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux,RunManifestUtilityLinux'
+    env:
+      SBOMUtilSASUrl: $(SBOMUtilSASUrl)
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
@@ -61,6 +61,13 @@ jobs:
       packageType: 'sdk'
       version: '3.1.201'
       performMultiLevelLookup: true
+  - task: DotNetCoreCLI@2
+    displayName: 'Run tests'
+    inputs:
+      command: 'test'
+      arguments: '-c Release'
+      projects: |
+        **/*Tests.csproj
   - task: Bash@3
     inputs:
       targetType: 'inline'
@@ -73,13 +80,6 @@ jobs:
         dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,RunManifestUtilityWindows
     env:
       SBOMUtilSASUrl: $(SBOMUtilSASUrl)
-  - task: DotNetCoreCLI@2
-    displayName: 'Run tests'
-    inputs:
-      command: 'test'
-      arguments: '-c Release'
-      projects: |
-        **/*Tests.csproj
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(Build.Repository.LocalPath)/artifacts'

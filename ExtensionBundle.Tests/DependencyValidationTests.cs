@@ -99,11 +99,6 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
                 sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
             }
 
-            if (FileUtility.DirectoryExists(Settings.RootBuildDirectory))
-            {
-                Directory.Delete(Settings.RootBuildDirectory, recursive: true);
-            }
-
             Assert.True(succeed, sb.ToString());
         }
 
