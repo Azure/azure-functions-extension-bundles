@@ -226,6 +226,16 @@ namespace Build
             });
         }
 
+        public static string[] GetFiles(string path)
+        {
+            if (path == null)
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
+            return Instance.Directory.GetFiles(path);
+        }
+
         public static void CopyFile(string sourcePath, string targetPath)
         {
             File.Copy(sourcePath, targetPath, true);

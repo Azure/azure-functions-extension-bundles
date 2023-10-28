@@ -197,6 +197,8 @@ namespace Build
 
             Shell.Run("dotnet", publishCommandArguments);
 
+            GenerateVulnerabilityReport(projectFilePath);
+
             if (Path.Combine(buildConfig.PublishDirectoryPath, "bin") != buildConfig.PublishBinDirectoryPath)
             {
                 FileUtility.EnsureDirectoryExists(Directory.GetParent(buildConfig.PublishBinDirectoryPath).FullName);
@@ -217,6 +219,20 @@ namespace Build
             {
                 File.Copy(Path.Combine(additionalAssembliesPath, permissionsAssembly), Path.Combine(buildConfig.PublishBinDirectoryPath, permissionsAssembly));
             }
+        }
+
+        public static void GenerateVulnerabilityReport(string projectFilePath)
+        {
+            var currectDirectory = Directory.GetCurrentDirectory();
+            Directory.SetCurrentDirectory(Settings.RootBuildDirectory);
+            string output = Shell.GetOutput("dotnet", $"list \"{projectFilePath}\" package --include-transitive --vulnerable");
+
+            if (!output.Contains("has no vulnerable packages given the current sources."))
+            {
+                Console.WriteLine(output);
+                throw new Exception($"Vulnerabilities found in {projectFilePath}");
+            }
+            Directory.SetCurrentDirectory(currectDirectory);
         }
 
         public static void AddBindingInfoToExtensionsJson(string extensionsJson)
