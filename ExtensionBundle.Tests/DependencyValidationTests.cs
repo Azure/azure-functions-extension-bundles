@@ -39,14 +39,13 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 
         [Fact]
         public void Verify_DepsJsonChanges_Windows_Any()
-        {
-            string oldDepsJson = Path.GetFullPath("../../../TestData/win_any_extensions.deps.json");
-            
+        {            
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return;
             }
 
+            string oldDepsJson = Path.GetFullPath("../../../TestData/win_any_extensions.deps.json");
             string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
                                             .Where(path => path.Contains("win_any"))
@@ -68,13 +67,12 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         [Fact]
         public void Verify_DepsJsonChanges_Any_Any()
         {
-            string oldDepsJson = Path.GetFullPath("../../../TestData/any_any_extensions.deps.json");
-
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return;
             }
 
+            string oldDepsJson = Path.GetFullPath("../../../TestData/any_any_extensions.deps.json");
             string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
                                             .Where(path => path.Contains("any_any"))
@@ -96,13 +94,12 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         [Fact]
         public void Verify_DepsJsonChanges_Linux_X64()
         {
-            string oldDepsJson = Path.GetFullPath("../../../TestData/linux_x64_extensions.deps.json");
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 return;
             }
 
+            string oldDepsJson = Path.GetFullPath("../../../TestData/linux_x64_extensions.deps.json");
             string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
                                             .Where(path => path.Contains("x64"))
