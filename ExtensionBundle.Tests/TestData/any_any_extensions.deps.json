@@ -9,7 +9,7 @@
       "extensions/1.0.0": {
         "dependencies": {
           "Azure.Storage.Queues": "12.16.0",
-          "Microsoft.Azure.DurableTask.Netherite.AzureFunctions": "1.4.0",
+          "Microsoft.Azure.DurableTask.Netherite.AzureFunctions": "1.4.1",
           "Microsoft.Azure.WebJobs.Extensions.CosmosDB": "4.4.0",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask": "2.12.0",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "3.3.0",
@@ -882,7 +882,7 @@
           }
         }
       },
-      "Microsoft.Azure.DurableTask.Netherite/1.4.0": {
+      "Microsoft.Azure.DurableTask.Netherite/1.4.1": {
         "dependencies": {
           "Azure.Core": "1.35.0",
           "Azure.Data.Tables": "12.8.0",
@@ -898,20 +898,20 @@
         "runtime": {
           "lib/netcoreapp3.1/DurableTask.Netherite.dll": {
             "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.4.0.4129"
+            "fileVersion": "1.4.1.4678"
           }
         }
       },
-      "Microsoft.Azure.DurableTask.Netherite.AzureFunctions/1.4.0": {
+      "Microsoft.Azure.DurableTask.Netherite.AzureFunctions/1.4.1": {
         "dependencies": {
           "Microsoft.Azure.DurableTask.Core": "2.15.1",
-          "Microsoft.Azure.DurableTask.Netherite": "1.4.0",
+          "Microsoft.Azure.DurableTask.Netherite": "1.4.1",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask": "2.12.0"
         },
         "runtime": {
           "lib/netcoreapp3.1/DurableTask.Netherite.AzureFunctions.dll": {
             "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.4.0.4129"
+            "fileVersion": "1.4.1.4678"
           }
         }
       },
@@ -3660,19 +3660,19 @@
       "path": "microsoft.azure.durabletask.core/2.15.1",
       "hashPath": "microsoft.azure.durabletask.core.2.15.1.nupkg.sha512"
     },
-    "Microsoft.Azure.DurableTask.Netherite/1.4.0": {
+    "Microsoft.Azure.DurableTask.Netherite/1.4.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Cqmb0KLVlE6fbAsnDt5kW80/nJ7IerwvpaaqxMleHu2xeb4W5tnu+M+oel0ToyqDUQuNXeT2WJDBkQ+vzFupBw==",
-      "path": "microsoft.azure.durabletask.netherite/1.4.0",
-      "hashPath": "microsoft.azure.durabletask.netherite.1.4.0.nupkg.sha512"
+      "sha512": "sha512-AvwxGKxhbeotHG8fbvjnfsvsLqefbN0iJShULlkMc0GBTP8H8m1pvnZo1JUW7nRE0JZD6NCvdhAXsUyjkrvjEQ==",
+      "path": "microsoft.azure.durabletask.netherite/1.4.1",
+      "hashPath": "microsoft.azure.durabletask.netherite.1.4.1.nupkg.sha512"
     },
-    "Microsoft.Azure.DurableTask.Netherite.AzureFunctions/1.4.0": {
+    "Microsoft.Azure.DurableTask.Netherite.AzureFunctions/1.4.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-oIhtA+5QEP1fIlCwZvF7rcfcllmVmn7IC9zpABwqd32Mv6ArdikT6aY3Bn5up/G0UbshJzCLIeYS7LCkcMuBcA==",
-      "path": "microsoft.azure.durabletask.netherite.azurefunctions/1.4.0",
-      "hashPath": "microsoft.azure.durabletask.netherite.azurefunctions.1.4.0.nupkg.sha512"
+      "sha512": "sha512-GilgW8icC7PV1pzcEu6r7JN1joUeiPMjX2jblWDN/MgbtVdCSvjy0pHU2Y0w+xdKhaUjwR14oUqhZaEfaXV1Iw==",
+      "path": "microsoft.azure.durabletask.netherite.azurefunctions/1.4.1",
+      "hashPath": "microsoft.azure.durabletask.netherite.azurefunctions.1.4.1.nupkg.sha512"
     },
     "Microsoft.Azure.EventHubs/4.3.2": {
       "type": "package",
