@@ -48,7 +48,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             string oldDepsJson = Path.GetFullPath("../../../TestData/win_any_extensions.deps.json");
             string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
-                                            .Where(path => path.Contains("win_any"))
+                                            .Where(path => path.Contains("win_x64"))
                                             .FirstOrDefault();
 
             Assert.True(File.Exists(oldDepsJson), $"{oldDepsJson} not found.");
