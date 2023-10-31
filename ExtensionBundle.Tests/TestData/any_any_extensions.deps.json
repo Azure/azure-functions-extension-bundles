@@ -3761,7 +3761,7 @@
     "Microsoft.Azure.WebJobs/3.0.37": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-SaCmVlum/FS6YDHAFdt38sCQNSCKlrqlHBDLUjKvqu3gEfefygaVcbeyMcvNAIcxlw9wHyoDFBofA6Z1ERdw+w==",
+      "sha512": "sha512-cB8ExO360UeFprY4GAuumLhg35krY56LriAAE8kNkckxFQlEIZwQ5lMsOFU0cRwUcvFajLMdALllKF2PgYJRkA==",
       "path": "microsoft.azure.webjobs/3.0.37",
       "hashPath": "microsoft.azure.webjobs.3.0.37.nupkg.sha512"
     },

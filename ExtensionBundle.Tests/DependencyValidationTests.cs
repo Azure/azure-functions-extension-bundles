@@ -19,30 +19,111 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         private readonly DependencyContextJsonReader _reader = new DependencyContextJsonReader();
         private readonly IEnumerable<string> _rids = DependencyHelper.GetRuntimeFallbacks();
 
-        [Fact]
-        public void Verify_DepsJsonChanges()
+        public DependencyValidationTests() 
         {
-            string oldDepsJson = Path.GetFullPath("../../../TestData/windows_extensions.deps.json");
             BasePath.path = "../../../..";
-            
+
             BuildSteps.Clean();
             BuildSteps.DownloadTemplates();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 BuildSteps.BuildBundleBinariesForLinux();
-                oldDepsJson = Path.GetFullPath("../../../TestData/linux_extensions.deps.json");
             }
             else
             {
                 BuildSteps.BuildBundleBinariesForWindows();
             }
 
+        }
+
+        [Fact]
+        public void Verify_DepsJsonChanges_Windows_Any()
+        {
+            string oldDepsJson = Path.GetFullPath("../../../TestData/win_any_extensions.deps.json");
+            
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return;
+            }
+
             string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
-            string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories).FirstOrDefault();
+            string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
+                                            .Where(path => path.Contains("win_any"))
+                                            .FirstOrDefault();
 
             Assert.True(File.Exists(oldDepsJson), $"{oldDepsJson} not found.");
             Assert.True(File.Exists(newDepsJson), $"{newDepsJson} not found.");
+
+            (bool succeed, string output) = CompareDepsJsonFiles(oldDepsJson, newDepsJson);
+
+            if (succeed == true)
+            {
+                return;
+            }
+
+            Assert.True(succeed, output);
+        }
+
+        [Fact]
+        public void Verify_DepsJsonChanges_Any_Any()
+        {
+            string oldDepsJson = Path.GetFullPath("../../../TestData/any_any_extensions.deps.json");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return;
+            }
+
+            string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
+            string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
+                                            .Where(path => path.Contains("any_any"))
+                                            .FirstOrDefault();
+
+            Assert.True(File.Exists(oldDepsJson), $"{oldDepsJson} not found.");
+            Assert.True(File.Exists(newDepsJson), $"{newDepsJson} not found.");
+
+            (bool succeed, string output) = CompareDepsJsonFiles(oldDepsJson, newDepsJson);
+
+            if (succeed == true)
+            {
+                return;
+            }
+
+            Assert.True(succeed, output);
+        }
+
+        [Fact]
+        public void Verify_DepsJsonChanges_Linux_X64()
+        {
+            string oldDepsJson = Path.GetFullPath("../../../TestData/linux_x64_extensions.deps.json");
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return;
+            }
+
+            string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
+            string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
+                                            .Where(path => path.Contains("x64"))
+                                            .FirstOrDefault();
+
+            Assert.True(File.Exists(oldDepsJson), $"{oldDepsJson} not found.");
+            Assert.True(File.Exists(newDepsJson), $"{newDepsJson} not found.");
+
+            (bool succeed, string output) = CompareDepsJsonFiles(oldDepsJson, newDepsJson);
+
+            if (succeed == true)
+            {
+                return;
+            }
+
+            Assert.True(succeed, output);
+        }
+
+
+        private (bool, string) CompareDepsJsonFiles(string oldDepsJson, string newDepsJson)
+        {
 
             IEnumerable<RuntimeFile> oldAssets = GetRuntimeFiles(oldDepsJson);
             IEnumerable<RuntimeFile> newAssets = GetRuntimeFiles(newDepsJson);
@@ -56,7 +137,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 
             if (succeed)
             {
-                return;
+                return (succeed, null);
             }
 
             IList<RuntimeFile> changed = new List<RuntimeFile>();
@@ -99,7 +180,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
                 sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
             }
 
-            Assert.True(succeed, sb.ToString());
+            return (succeed, sb.ToString());
         }
 
         private IEnumerable<RuntimeFile> GetRuntimeFiles(string depsJsonFileName)

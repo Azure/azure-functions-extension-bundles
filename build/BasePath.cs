@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Build
 {
-    public static class BasePath
+    internal static class BasePath
     {
-        public static string path { get; set; } = "..";
+        internal static string path { get; set; } = "..";
     }
 }
