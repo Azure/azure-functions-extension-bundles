@@ -187,7 +187,7 @@
   },
   {
     "id": "Azure.Identity",
-    "Version": "1.10.3",
+    "Version": "1.10.2",
     "name": "AzureIdentity",
     "bindings": []
   }
