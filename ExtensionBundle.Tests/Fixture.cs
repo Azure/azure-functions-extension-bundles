@@ -1,6 +1,7 @@
 ﻿using Build;
 using System.Runtime.InteropServices;
 using Xunit;
+using static Build.BasePath;
 
 namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 {
@@ -8,7 +9,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
     {
         public Fixture()
         {
-            BasePath.path = "../../../..";
+            path = "../../../..";
 
             BuildSteps.Clean();
             BuildSteps.DownloadTemplates();

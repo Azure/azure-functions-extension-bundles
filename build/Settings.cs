@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using static Build.BasePath;
 
 namespace Build
 {
     public static class Settings
     {
-        public static string basePath = BasePath.path;
+        public static string basePath = path;
 
         public static readonly string SourcePath = Path.GetFullPath(basePath + "/src/Microsoft.Azure.Functions.ExtensionBundle/");
         public static readonly string BuildPath = Path.Combine(Path.GetFullPath(basePath), "build");
