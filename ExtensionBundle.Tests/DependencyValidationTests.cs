@@ -14,27 +14,16 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 {
+    [Collection("Fixture")]
     public class DependencyValidationTests
     {
         private readonly DependencyContextJsonReader _reader = new DependencyContextJsonReader();
         private readonly IEnumerable<string> _rids = DependencyHelper.GetRuntimeFallbacks();
+        private readonly Fixture _fixture;
 
-        public DependencyValidationTests() 
+        public DependencyValidationTests(Fixture fixture)
         {
-            BasePath.path = "../../../..";
-
-            BuildSteps.Clean();
-            BuildSteps.DownloadTemplates();
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                BuildSteps.BuildBundleBinariesForLinux();
-            }
-            else
-            {
-                BuildSteps.BuildBundleBinariesForWindows();
-            }
-
+            _fixture = fixture;
         }
 
         [Fact]
