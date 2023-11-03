@@ -1,8 +1,5 @@
 ﻿using Build;
-using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 using Xunit;
 
 namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
