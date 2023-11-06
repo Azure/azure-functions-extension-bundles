@@ -88,7 +88,7 @@
   },
   {
     "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
-    "majorVersion": "1",
+    "Version": "1.4.0",
     "name": "NetheriteProvider",
     "bindings": [
       "activitytrigger",
