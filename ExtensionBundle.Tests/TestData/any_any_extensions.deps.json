@@ -10,7 +10,7 @@
         "dependencies": {
           "Azure.Storage.Queues": "12.16.0",
           "Microsoft.Azure.DurableTask.Netherite.AzureFunctions": "1.4.1",
-          "Microsoft.Azure.WebJobs.Extensions.CosmosDB": "4.4.0",
+          "Microsoft.Azure.WebJobs.Extensions.CosmosDB": "4.4.1",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask": "2.12.0",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "3.3.0",
           "Microsoft.Azure.WebJobs.Extensions.EventHubs": "5.5.0",
@@ -19,7 +19,7 @@
           "Microsoft.Azure.WebJobs.Extensions.SendGrid": "3.0.3",
           "Microsoft.Azure.WebJobs.Extensions.ServiceBus": "5.13.3",
           "Microsoft.Azure.WebJobs.Extensions.SignalRService": "1.11.2",
-          "Microsoft.Azure.WebJobs.Extensions.Sql": "3.0.443",
+          "Microsoft.Azure.WebJobs.Extensions.Sql": "3.0.461",
           "Microsoft.Azure.WebJobs.Extensions.Storage": "5.2.1",
           "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs": "5.2.1",
           "Microsoft.Azure.WebJobs.Extensions.Storage.Queues": "5.2.0",
@@ -93,11 +93,11 @@
           }
         }
       },
-      "Azure.Identity/1.7.0": {
+      "Azure.Identity/1.10.2": {
         "dependencies": {
           "Azure.Core": "1.35.0",
-          "Microsoft.Identity.Client": "4.45.0",
-          "Microsoft.Identity.Client.Extensions.Msal": "2.19.3",
+          "Microsoft.Identity.Client": "4.54.1",
+          "Microsoft.Identity.Client.Extensions.Msal": "2.31.0",
           "System.Memory": "4.5.4",
           "System.Security.Cryptography.ProtectedData": "6.0.0",
           "System.Text.Json": "4.7.2",
@@ -105,8 +105,8 @@
         },
         "runtime": {
           "lib/netstandard2.0/Azure.Identity.dll": {
-            "assemblyVersion": "1.7.0.0",
-            "fileVersion": "1.700.22.46903"
+            "assemblyVersion": "1.10.2.0",
+            "fileVersion": "1.1000.223.50903"
           }
         }
       },
@@ -985,7 +985,7 @@
       },
       "Microsoft.Azure.SignalR/1.21.6": {
         "dependencies": {
-          "Azure.Identity": "1.7.0",
+          "Azure.Identity": "1.10.2",
           "Microsoft.AspNetCore.Connections.Abstractions": "3.0.0",
           "Microsoft.AspNetCore.Http.Connections.Common": "3.0.0",
           "Microsoft.Azure.SignalR.Protocols": "1.21.6",
@@ -1011,7 +1011,7 @@
       "Microsoft.Azure.SignalR.Management/1.21.6": {
         "dependencies": {
           "Azure.Core": "1.35.0",
-          "Azure.Identity": "1.7.0",
+          "Azure.Identity": "1.10.2",
           "Microsoft.AspNetCore.Connections.Abstractions": "3.0.0",
           "Microsoft.AspNetCore.Http.Connections.Common": "3.0.0",
           "Microsoft.Azure.Core.NewtonsoftJson": "1.0.0",
@@ -1033,7 +1033,7 @@
       },
       "Microsoft.Azure.SignalR.Protocols/1.21.6": {
         "dependencies": {
-          "Azure.Identity": "1.7.0",
+          "Azure.Identity": "1.10.2",
           "Microsoft.AspNetCore.Connections.Abstractions": "3.0.0",
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.AspNetCore.Http.Connections": "1.0.15",
@@ -1061,7 +1061,7 @@
       },
       "Microsoft.Azure.SignalR.Serverless.Protocols/1.9.0": {
         "dependencies": {
-          "Azure.Identity": "1.7.0",
+          "Azure.Identity": "1.10.2",
           "Microsoft.AspNetCore.Connections.Abstractions": "3.0.0",
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.AspNetCore.Http.Connections": "1.0.15",
@@ -1157,7 +1157,7 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.CosmosDB/4.4.0": {
+      "Microsoft.Azure.WebJobs.Extensions.CosmosDB/4.4.1": {
         "dependencies": {
           "Microsoft.Azure.Cosmos": "3.35.4",
           "Microsoft.Azure.WebJobs": "3.0.37",
@@ -1166,14 +1166,14 @@
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.CosmosDB.dll": {
-            "assemblyVersion": "4.4.0.0",
-            "fileVersion": "4.4.0.0"
+            "assemblyVersion": "4.4.1.0",
+            "fileVersion": "4.4.1.0"
           }
         }
       },
       "Microsoft.Azure.WebJobs.Extensions.DurableTask/2.12.0": {
         "dependencies": {
-          "Azure.Identity": "1.7.0",
+          "Azure.Identity": "1.10.2",
           "Microsoft.AspNetCore.Mvc.WebApiCompatShim": "2.2.0",
           "Microsoft.AspNetCore.Routing": "2.2.2",
           "Microsoft.AspNetCore.Server.Kestrel": "2.2.0",
@@ -1314,8 +1314,9 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.Sql/3.0.443": {
+      "Microsoft.Azure.WebJobs.Extensions.Sql/3.0.461": {
         "dependencies": {
+          "Azure.Identity": "1.10.2",
           "Microsoft.ApplicationInsights": "2.21.0",
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.Azure.WebJobs": "3.0.37",
@@ -1327,8 +1328,8 @@
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.Sql.dll": {
-            "assemblyVersion": "3.0.443.0",
-            "fileVersion": "3.0.443.0"
+            "assemblyVersion": "3.0.461.0",
+            "fileVersion": "3.0.461.0"
           }
         }
       },
@@ -1453,9 +1454,9 @@
       "Microsoft.CSharp/4.5.0": {},
       "Microsoft.Data.SqlClient/5.0.1": {
         "dependencies": {
-          "Azure.Identity": "1.7.0",
+          "Azure.Identity": "1.10.2",
           "Microsoft.Data.SqlClient.SNI.runtime": "5.0.1",
-          "Microsoft.Identity.Client": "4.45.0",
+          "Microsoft.Identity.Client": "4.54.1",
           "Microsoft.IdentityModel.JsonWebTokens": "6.21.0",
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "6.21.0",
           "Microsoft.SqlServer.Server": "1.0.0",
@@ -1575,7 +1576,7 @@
       "Microsoft.Extensions.Azure/1.6.3": {
         "dependencies": {
           "Azure.Core": "1.35.0",
-          "Azure.Identity": "1.7.0",
+          "Azure.Identity": "1.10.2",
           "Microsoft.Extensions.Configuration.Abstractions": "3.1.26",
           "Microsoft.Extensions.Configuration.Binder": "3.1.26",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "3.1.26",
@@ -1780,34 +1781,35 @@
           }
         }
       },
-      "Microsoft.Identity.Client/4.45.0": {
+      "Microsoft.Identity.Client/4.54.1": {
         "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "6.21.0"
+          "Microsoft.IdentityModel.Abstractions": "6.22.0"
         },
         "runtime": {
           "lib/netcoreapp2.1/Microsoft.Identity.Client.dll": {
-            "assemblyVersion": "4.45.0.0",
-            "fileVersion": "4.45.0.0"
+            "assemblyVersion": "4.54.1.0",
+            "fileVersion": "4.54.1.0"
           }
         }
       },
-      "Microsoft.Identity.Client.Extensions.Msal/2.19.3": {
+      "Microsoft.Identity.Client.Extensions.Msal/2.31.0": {
         "dependencies": {
-          "Microsoft.Identity.Client": "4.45.0",
+          "Microsoft.Identity.Client": "4.54.1",
+          "System.IO.FileSystem.AccessControl": "5.0.0",
           "System.Security.Cryptography.ProtectedData": "6.0.0"
         },
         "runtime": {
-          "lib/netcoreapp2.1/Microsoft.Identity.Client.Extensions.Msal.dll": {
-            "assemblyVersion": "2.19.3.0",
-            "fileVersion": "2.19.3.0"
+          "lib/netcoreapp3.1/Microsoft.Identity.Client.Extensions.Msal.dll": {
+            "assemblyVersion": "2.31.0.0",
+            "fileVersion": "2.31.0.0"
           }
         }
       },
-      "Microsoft.IdentityModel.Abstractions/6.21.0": {
+      "Microsoft.IdentityModel.Abstractions/6.22.0": {
         "runtime": {
           "lib/netstandard2.0/Microsoft.IdentityModel.Abstractions.dll": {
-            "assemblyVersion": "6.21.0.0",
-            "fileVersion": "6.21.0.30701"
+            "assemblyVersion": "6.22.0.0",
+            "fileVersion": "6.22.0.30727"
           }
         }
       },
@@ -1841,7 +1843,7 @@
       },
       "Microsoft.IdentityModel.Logging/6.21.0": {
         "dependencies": {
-          "Microsoft.IdentityModel.Abstractions": "6.21.0"
+          "Microsoft.IdentityModel.Abstractions": "6.22.0"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.IdentityModel.Logging.dll": {
@@ -2399,6 +2401,26 @@
           "System.Runtime.Handles": "4.3.0",
           "System.Text.Encoding": "4.3.0",
           "System.Threading.Tasks": "4.3.0"
+        }
+      },
+      "System.IO.FileSystem.AccessControl/5.0.0": {
+        "dependencies": {
+          "System.Security.AccessControl": "6.0.0",
+          "System.Security.Principal.Windows": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/System.IO.FileSystem.AccessControl.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/netstandard2.0/System.IO.FileSystem.AccessControl.dll": {
+            "rid": "win",
+            "assetType": "runtime",
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.20.51904"
+          }
         }
       },
       "System.IO.FileSystem.Primitives/4.3.0": {
@@ -3261,12 +3283,12 @@
       "path": "azure.data.tables/12.8.0",
       "hashPath": "azure.data.tables.12.8.0.nupkg.sha512"
     },
-    "Azure.Identity/1.7.0": {
+    "Azure.Identity/1.10.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-eHEiCO/8+MfNc9nH5dVew/+FvxdaGrkRL4OMNwIz0W79+wtJyEoeRlXJ3SrXhoy9XR58geBYKmzMR83VO7bcAw==",
-      "path": "azure.identity/1.7.0",
-      "hashPath": "azure.identity.1.7.0.nupkg.sha512"
+      "sha512": "sha512-jfq07QnxB7Rx15DWHxIfZbdbgICL1IARncBPIYmnmF+1Xqn6KqiF6ijlKv2hj82WFr9kUi+jzU8zVqrBocJZ8A==",
+      "path": "azure.identity/1.10.2",
+      "hashPath": "azure.identity.1.10.2.nupkg.sha512"
     },
     "Azure.Messaging.EventGrid/4.14.1": {
       "type": "package",
@@ -3779,12 +3801,12 @@
       "path": "microsoft.azure.webjobs.extensions/3.0.6",
       "hashPath": "microsoft.azure.webjobs.extensions.3.0.6.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.CosmosDB/4.4.0": {
+    "Microsoft.Azure.WebJobs.Extensions.CosmosDB/4.4.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-9QRXTCyLv8GgV+vRwZY1X3Yy4nQ7H8YumAntyc648bZ8dgZSSbraRH3KevbDfHSyDovfgAu6Zbr8YHfZRZScQA==",
-      "path": "microsoft.azure.webjobs.extensions.cosmosdb/4.4.0",
-      "hashPath": "microsoft.azure.webjobs.extensions.cosmosdb.4.4.0.nupkg.sha512"
+      "sha512": "sha512-v4cUH65rDBcputusnGHHLrSJHKZ2eJLm3rUJ6My8h3RBscRvDmzEBfyJ4cQI280oqhw4VpuwtiqD5CUrfNWt1Q==",
+      "path": "microsoft.azure.webjobs.extensions.cosmosdb/4.4.1",
+      "hashPath": "microsoft.azure.webjobs.extensions.cosmosdb.4.4.1.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.DurableTask/2.12.0": {
       "type": "package",
@@ -3856,12 +3878,12 @@
       "path": "microsoft.azure.webjobs.extensions.signalrservice/1.11.2",
       "hashPath": "microsoft.azure.webjobs.extensions.signalrservice.1.11.2.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.Sql/3.0.443": {
+    "Microsoft.Azure.WebJobs.Extensions.Sql/3.0.461": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Pw1ftHz7nxvJQvOWprhlbLDEAo9leBg+MF58jQmOtKQxJswM/yZweDsI5JN60nJhmUxxN2wRrIuAZIiL2/wGjg==",
-      "path": "microsoft.azure.webjobs.extensions.sql/3.0.443",
-      "hashPath": "microsoft.azure.webjobs.extensions.sql.3.0.443.nupkg.sha512"
+      "sha512": "sha512-kkJXs0RODoVx7Hg58CwWo7hNYo5vI2Nkq77imM2DmYuixswKhjkm667ljzF6LrpmsABjSwoEfFDUextxTYP8vg==",
+      "path": "microsoft.azure.webjobs.extensions.sql/3.0.461",
+      "hashPath": "microsoft.azure.webjobs.extensions.sql.3.0.461.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.Storage/5.2.1": {
       "type": "package",
@@ -4157,26 +4179,26 @@
       "path": "microsoft.faster.core/2.0.16",
       "hashPath": "microsoft.faster.core.2.0.16.nupkg.sha512"
     },
-    "Microsoft.Identity.Client/4.45.0": {
+    "Microsoft.Identity.Client/4.54.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ircobISCLWbtE5eEoLKU+ldfZ8O41vg4lcy38KRj/znH17jvBiAl8oxcyNp89CsuqE3onxIpn21Ca7riyDDrRw==",
-      "path": "microsoft.identity.client/4.45.0",
-      "hashPath": "microsoft.identity.client.4.45.0.nupkg.sha512"
+      "sha512": "sha512-YkQkV3IRaA1W36HD4NRD1cq+QFr+4QPKK3SgTSpx+RiobXnLZ6E9anOjDi2TS7okOEofBbjR6GyTPp4IR0MnEQ==",
+      "path": "microsoft.identity.client/4.54.1",
+      "hashPath": "microsoft.identity.client.4.54.1.nupkg.sha512"
     },
-    "Microsoft.Identity.Client.Extensions.Msal/2.19.3": {
+    "Microsoft.Identity.Client.Extensions.Msal/2.31.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-zVVZjn8aW7W79rC1crioDgdOwaFTQorsSO6RgVlDDjc7MvbEGz071wSNrjVhzR0CdQn6Sefx7Abf1o7vasmrLg==",
-      "path": "microsoft.identity.client.extensions.msal/2.19.3",
-      "hashPath": "microsoft.identity.client.extensions.msal.2.19.3.nupkg.sha512"
+      "sha512": "sha512-IhGSqN0szneKC5Qk3/okJQJbDpQfLW/+mvslhzJPox4t2UuIkA2ZHe4w/z62ASye46G9sQWF9qqLXTgNacE2xQ==",
+      "path": "microsoft.identity.client.extensions.msal/2.31.0",
+      "hashPath": "microsoft.identity.client.extensions.msal.2.31.0.nupkg.sha512"
     },
-    "Microsoft.IdentityModel.Abstractions/6.21.0": {
+    "Microsoft.IdentityModel.Abstractions/6.22.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-XeE6LQtD719Qs2IG7HDi1TSw9LIkDbJ33xFiOBoHbApVw/8GpIBCbW+t7RwOjErUDyXZvjhZliwRkkLb8Z1uzg==",
-      "path": "microsoft.identitymodel.abstractions/6.21.0",
-      "hashPath": "microsoft.identitymodel.abstractions.6.21.0.nupkg.sha512"
+      "sha512": "sha512-iI+9V+2ciCrbheeLjpmjcqCnhy+r6yCoEcid3nkoFWerHgjVuT6CPM4HODUTtUPe1uwks4wcnAujJ8u+IKogHQ==",
+      "path": "microsoft.identitymodel.abstractions/6.22.0",
+      "hashPath": "microsoft.identitymodel.abstractions.6.22.0.nupkg.sha512"
     },
     "Microsoft.IdentityModel.Clients.ActiveDirectory/3.14.2": {
       "type": "package",
@@ -4632,6 +4654,13 @@
       "sha512": "sha512-3wEMARTnuio+ulnvi+hkRNROYwa1kylvYahhcLk4HSoVdl+xxTFVeVlYOfLwrDPImGls0mDqbMhrza8qnWPTdA==",
       "path": "system.io.filesystem/4.3.0",
       "hashPath": "system.io.filesystem.4.3.0.nupkg.sha512"
+    },
+    "System.IO.FileSystem.AccessControl/5.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-SxHB3nuNrpptVk+vZ/F+7OHEpoHUIKKMl02bUmYHQr1r+glbZQxs7pRtsf4ENO29TVm2TH3AEeep2fJcy92oYw==",
+      "path": "system.io.filesystem.accesscontrol/5.0.0",
+      "hashPath": "system.io.filesystem.accesscontrol.5.0.0.nupkg.sha512"
     },
     "System.IO.FileSystem.Primitives/4.3.0": {
       "type": "package",
