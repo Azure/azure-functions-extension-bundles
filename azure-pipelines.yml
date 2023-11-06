@@ -25,6 +25,13 @@ jobs:
       version: '2.1.x'
       performMultiLevelLookup: true
   - task: DotNetCoreCLI@2
+    displayName: 'Run tests'
+    inputs:
+      command: 'test'
+      arguments: '-c Release'
+      projects: |
+        **/*Tests.csproj
+  - task: DotNetCoreCLI@2
     inputs:
       command: 'run'
       workingDirectory: '.\build'
@@ -60,6 +67,13 @@ jobs:
       packageType: 'sdk'
       version: '2.1.x'
       performMultiLevelLookup: true
+  - task: DotNetCoreCLI@2
+    displayName: 'Run tests'
+    inputs:
+      command: 'test'
+      arguments: '-c Release'
+      projects: |
+        **/*Tests.csproj
   - task: Bash@3
     inputs:
       targetType: 'inline'
