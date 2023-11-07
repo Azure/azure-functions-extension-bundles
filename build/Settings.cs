@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using static Build.BasePath;
 
 namespace Build
 {
     public static class Settings
     {
-        public static readonly string SourcePath = Path.GetFullPath("../src/Microsoft.Azure.Functions.ExtensionBundle/");
+        public static string basePath = path;
+
+        public static readonly string SourcePath = Path.GetFullPath(basePath + "/src/Microsoft.Azure.Functions.ExtensionBundle/");
+        public static readonly string BuildPath = Path.Combine(Path.GetFullPath(basePath), "build");
 
         public static string ExtensionsJsonFilePath => Path.Combine(SourcePath, ExtensionsJsonFileName);
 
@@ -27,13 +31,13 @@ namespace Build
 
         public static readonly string StaticContentDirectoryName = "StaticContent";
 
-        public static readonly string RootBinDirectory = Path.Combine(Path.GetFullPath(".."), "bin");
+        public static readonly string RootBinDirectory = Path.Combine(Path.GetFullPath(basePath), "bin");
 
-        public static readonly string RootBuildDirectory = Path.Combine(Path.GetFullPath(".."), "build_temp");
+        public static readonly string RootBuildDirectory = Path.Combine(Path.GetFullPath(basePath), "build_temp");
 
-        public static readonly string ArtifactsDirectory = Path.Combine(Path.GetFullPath(".."), "artifacts");
+        public static readonly string ArtifactsDirectory = Path.Combine(Path.GetFullPath(basePath), "artifacts");
 
-        public static readonly string ToolsDirectory = Path.Combine(Path.GetFullPath(".."), "tools");
+        public static readonly string ToolsDirectory = Path.Combine(Path.GetFullPath(basePath), "tools");
 
         public static readonly string ManifestToolDirectory = Path.Combine(ToolsDirectory, $"ManifestTool");
 
