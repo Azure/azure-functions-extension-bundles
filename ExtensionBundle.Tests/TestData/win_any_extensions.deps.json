@@ -26,7 +26,7 @@
           "Microsoft.Azure.WebJobs.Extensions.Tables": "1.2.0",
           "Microsoft.Azure.WebJobs.Extensions.Twilio": "3.0.2",
           "Microsoft.Azure.WebJobs.Extensions.WebPubSub": "1.7.0",
-          "Microsoft.DurableTask.SqlServer.AzureFunctions": "1.2.0",
+          "Microsoft.DurableTask.SqlServer.AzureFunctions": "1.2.1",
           "Microsoft.NET.Sdk.Functions": "3.0.13",
           "Microsoft.Rest.ClientRuntime": "2.3.24",
           "System.Drawing.Common": "4.7.2",
@@ -1359,7 +1359,7 @@
           }
         }
       },
-      "Microsoft.DurableTask.SqlServer/1.2.0": {
+      "Microsoft.DurableTask.SqlServer/1.2.1": {
         "dependencies": {
           "Microsoft.Azure.DurableTask.Core": "2.15.1",
           "Microsoft.Data.SqlClient": "3.0.0",
@@ -1369,19 +1369,19 @@
         "runtime": {
           "lib/netstandard2.0/DurableTask.SqlServer.dll": {
             "assemblyVersion": "1.2.0.0",
-            "fileVersion": "1.2.0.4474"
+            "fileVersion": "1.2.1.4719"
           }
         }
       },
-      "Microsoft.DurableTask.SqlServer.AzureFunctions/1.2.0": {
+      "Microsoft.DurableTask.SqlServer.AzureFunctions/1.2.1": {
         "dependencies": {
           "Microsoft.Azure.WebJobs.Extensions.DurableTask": "2.12.0",
-          "Microsoft.DurableTask.SqlServer": "1.2.0"
+          "Microsoft.DurableTask.SqlServer": "1.2.1"
         },
         "runtime": {
           "lib/netstandard2.0/DurableTask.SqlServer.AzureFunctions.dll": {
             "assemblyVersion": "1.2.0.0",
-            "fileVersion": "1.2.0.4474"
+            "fileVersion": "1.2.1.4719"
           }
         }
       },
@@ -3806,19 +3806,19 @@
       "path": "microsoft.durabletask.sidecar.protobuf/1.0.0",
       "hashPath": "microsoft.durabletask.sidecar.protobuf.1.0.0.nupkg.sha512"
     },
-    "Microsoft.DurableTask.SqlServer/1.2.0": {
+    "Microsoft.DurableTask.SqlServer/1.2.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ij18lh+0+QGNNfvroAeEEvsYI61na8HBjrACfv8+FUiWAMPsFBmwk2TWGdDBed/Ddyh/buc9os5El9OV0JSWRA==",
-      "path": "microsoft.durabletask.sqlserver/1.2.0",
-      "hashPath": "microsoft.durabletask.sqlserver.1.2.0.nupkg.sha512"
+      "sha512": "sha512-bup5S/F3rzZYnSvoOvss2xIR3TOGMSZu+Ru4etmzJm63jxvYeH69aZGpr63SZU40JgJojMiCZu9wyazvlb+Bpw==",
+      "path": "microsoft.durabletask.sqlserver/1.2.1",
+      "hashPath": "microsoft.durabletask.sqlserver.1.2.1.nupkg.sha512"
     },
-    "Microsoft.DurableTask.SqlServer.AzureFunctions/1.2.0": {
+    "Microsoft.DurableTask.SqlServer.AzureFunctions/1.2.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-1XzFkM83CmjYt/gWm/rUu751CeLxulgcaOKM6Bsks2Q33lt8ME/ywtMx1dNnJRVhvj5kors1MWV6u0P5fQoakw==",
-      "path": "microsoft.durabletask.sqlserver.azurefunctions/1.2.0",
-      "hashPath": "microsoft.durabletask.sqlserver.azurefunctions.1.2.0.nupkg.sha512"
+      "sha512": "sha512-Ouu4oXU7CwK4uVmSv3HyhEB3AWNnEfhfsfT/dxKgd3BSNZG+l9oJ2TkT2xotLsQooFmWr4Qw8d59qh++5UqTBQ==",
+      "path": "microsoft.durabletask.sqlserver.azurefunctions/1.2.1",
+      "hashPath": "microsoft.durabletask.sqlserver.azurefunctions.1.2.1.nupkg.sha512"
     },
     "Microsoft.Extensions.Azure/1.6.3": {
       "type": "package",
