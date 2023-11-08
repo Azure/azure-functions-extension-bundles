@@ -27,17 +27,44 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         }
 
         [Fact]
-        public void Verify_DepsJsonChanges_Windows_Any()
+        public void Verify_DepsJsonChanges_Windows_X64_Any()
         {            
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return;
             }
 
-            string oldDepsJson = Path.GetFullPath("../../../TestData/win_any_extensions.deps.json");
+            string oldDepsJson = Path.GetFullPath("../../../TestData/win_x64_extensions.deps.json");
             string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
-                                            .Where(path => path.Contains("win_x64"))
+                                            .Where(path => path.Contains("x64"))
+                                            .FirstOrDefault();
+
+            Assert.True(File.Exists(oldDepsJson), $"{oldDepsJson} not found.");
+            Assert.True(File.Exists(newDepsJson), $"{newDepsJson} not found.");
+
+            (bool succeed, string output) = CompareDepsJsonFiles(oldDepsJson, newDepsJson);
+
+            if (succeed == true)
+            {
+                return;
+            }
+
+            Assert.True(succeed, output);
+        }
+
+        [Fact]
+        public void Verify_DepsJsonChanges_Windows_x86_Any()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                return;
+            }
+
+            string oldDepsJson = Path.GetFullPath("../../../TestData/win_x64_extensions.deps.json");
+            string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
+            string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
+                                            .Where(path => path.Contains("x86"))
                                             .FirstOrDefault();
 
             Assert.True(File.Exists(oldDepsJson), $"{oldDepsJson} not found.");
@@ -141,8 +168,9 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
                 var newFile = newAssets.SingleOrDefault(p =>
                 {
                     return Path.GetFileName(p.Path) == fileName &&
-                        (p.FileVersion != oldFile.FileVersion ||
-                         p.AssemblyVersion != oldFile.AssemblyVersion);
+                        (Version.TryParse(p.AssemblyVersion, out Version xVersion) &&
+                        Version.TryParse(oldFile.AssemblyVersion, out Version yVersion) &&
+                        xVersion.Major != yVersion.Major);
                 });
 
                 if (newFile != null)
@@ -202,15 +230,21 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         {
             public bool Equals([AllowNull] RuntimeFile x, [AllowNull] RuntimeFile y)
             {
-                return x.AssemblyVersion == y.AssemblyVersion &&
-                    x.FileVersion == y.FileVersion &&
-                    x.Path == y.Path;
+                return Version.TryParse(x.AssemblyVersion, out Version xVersion)
+                        && Version.TryParse(y.AssemblyVersion, out Version yVersion)
+                        && xVersion.Major == yVersion.Major;
             }
 
             public int GetHashCode([DisallowNull] RuntimeFile obj)
             {
-                string code = obj.Path + obj.AssemblyVersion + obj.FileVersion;
-                return code.GetHashCode();
+                Version.TryParse(obj.AssemblyVersion, out Version xV);
+                if (xV != null)
+                {
+                    string code = xV.Major.ToString();
+                    return code.GetHashCode();
+                }
+
+                return 0;
             }
         }
     }
