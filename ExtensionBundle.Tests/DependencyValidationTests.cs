@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             _fixture = fixture;
         }
 
-        [InlineData("any_any_extensions.deps.json", "any_any")]
+        [InlineData("any_any_extensions.deps.json", "NetCoreApp3_any_any")]
         [InlineData("win_x86_extensions.deps.json", "x86")]
         [InlineData("win_x64_extensions.deps.json", "x64")]
         [Theory]
