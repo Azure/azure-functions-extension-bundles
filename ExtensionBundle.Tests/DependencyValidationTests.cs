@@ -90,9 +90,13 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             IEnumerable<RuntimeFile> newAssets = GetRuntimeFiles(newDepsJson);
 
             var comparer = new RuntimeFileComparer();
+            var assemblyToIgnore = "extensions.dll";
 
             var removed = oldAssets.Except(newAssets, comparer).ToList();
+            removed = removed.Where(f => !(f.Path.Contains(assemblyToIgnore) && f.AssemblyVersion == null)).ToList();
+
             var added = newAssets.Except(oldAssets, comparer).ToList();
+            added = added.Where(f => !(f.Path.Contains(assemblyToIgnore) && f.AssemblyVersion == null)).ToList();
 
             bool succeed = removed.Count == 0 && added.Count == 0;
 
@@ -101,7 +105,6 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
                 return (succeed, null);
             }
 
-            string assemblyToIgnore = "extensions.dll";
             IList<RuntimeFile> changed = new List<RuntimeFile>();
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("IMPORTANT: The dependencies in extensions have changed and MUST be reviewed before proceeding. Please follow up with brettsam, fabiocav, nasoni or mathewc for approval.");
@@ -134,19 +137,13 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             sb.AppendLine("  Removed:");
             foreach (RuntimeFile f in removed.Except(changed))
             {
-                if (!(f.Path.Contains(assemblyToIgnore) && f.AssemblyVersion == null))
-                {
-                    sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
-                }
+                sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
             }
             sb.AppendLine();
             sb.AppendLine("  Added:");
             foreach (RuntimeFile f in added.Except(changed))
             {
-                if (!(f.Path.Contains(assemblyToIgnore) && f.AssemblyVersion == null))
-                {
-                    sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
-                }
+                sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
             }
 
             return (succeed, sb.ToString());
