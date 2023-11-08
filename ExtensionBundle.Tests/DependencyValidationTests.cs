@@ -101,6 +101,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
                 return (succeed, null);
             }
 
+            string assemblyToIgnore = "extensions.dll";
             IList<RuntimeFile> changed = new List<RuntimeFile>();
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("IMPORTANT: The dependencies in extensions have changed and MUST be reviewed before proceeding. Please follow up with brettsam, fabiocav, nasoni or mathewc for approval.");
@@ -133,13 +134,19 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             sb.AppendLine("  Removed:");
             foreach (RuntimeFile f in removed.Except(changed))
             {
-                sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
+                if (!(f.Path.Contains(assemblyToIgnore) && f.AssemblyVersion == null))
+                {
+                    sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
+                }
             }
             sb.AppendLine();
             sb.AppendLine("  Added:");
             foreach (RuntimeFile f in added.Except(changed))
             {
-                sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
+                if (!(f.Path.Contains(assemblyToIgnore) && f.AssemblyVersion == null))
+                {
+                    sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
+                }
             }
 
             return (succeed, sb.ToString());
@@ -178,11 +185,6 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         {
             public bool Equals([AllowNull] RuntimeFile x, [AllowNull] RuntimeFile y)
             {
-                if (x.AssemblyVersion is null && y.AssemblyVersion is null)
-                {
-                    return true;
-                }
-
                 return Version.TryParse(x.AssemblyVersion, out Version xVersion)
                     && Version.TryParse(y.AssemblyVersion, out Version yVersion)
                     && xVersion.Major == yVersion.Major;
