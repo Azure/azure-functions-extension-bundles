@@ -30,17 +30,17 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         [InlineData("win_x86_extensions.deps.json", "x86")]
         [InlineData("win_x64_extensions.deps.json", "x64")]
         [Theory]
-        public void Verify_DepsJsonChanges(string pathOldDepsJson, string pathNewDepsJson)
+        public void Verify_DepsJsonChanges(string oldDepsJsonName, string newDepsJsonName)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return;
             }
 
-            string oldDepsJson = Path.GetFullPath($"../../../TestData/{pathOldDepsJson}");
+            string oldDepsJson = Path.GetFullPath($"../../../TestData/{oldDepsJsonName}");
             string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
-                                            .Where(path => path.Contains(pathNewDepsJson))
+                                            .Where(path => path.Contains(newDepsJsonName))
                                             .FirstOrDefault();
 
             Assert.True(File.Exists(oldDepsJson), $"{oldDepsJson} not found.");
@@ -115,10 +115,10 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 
                 var newFile = newAssets.SingleOrDefault(p =>
                 {
-                    return Path.GetFileName(p.Path) == fileName &&
-                        (Version.TryParse(p.AssemblyVersion, out Version xVersion) &&
-                        Version.TryParse(oldFile.AssemblyVersion, out Version yVersion) &&
-                        xVersion.Major != yVersion.Major);
+                    return Path.GetFileName(p.Path) == fileName
+                        && Version.TryParse(p.AssemblyVersion, out Version newVersion)
+                        && Version.TryParse(oldFile.AssemblyVersion, out Version oldVersion)
+                        && newVersion.Major != oldVersion.Major;
                 });
 
                 if (newFile != null)
@@ -184,16 +184,16 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
                 }
 
                 return Version.TryParse(x.AssemblyVersion, out Version xVersion)
-                        && Version.TryParse(y.AssemblyVersion, out Version yVersion)
-                        && xVersion.Major == yVersion.Major;
+                    && Version.TryParse(y.AssemblyVersion, out Version yVersion)
+                    && xVersion.Major == yVersion.Major;
             }
 
             public int GetHashCode([DisallowNull] RuntimeFile obj)
             {
-                Version.TryParse(obj.AssemblyVersion, out Version xV);
-                if (xV != null)
+                Version.TryParse(obj.AssemblyVersion, out Version objVersion);
+                if (objVersion != null)
                 {
-                    string code = xV.Major.ToString();
+                    string code = objVersion.Major.ToString();
                     return code.GetHashCode();
                 }
 
