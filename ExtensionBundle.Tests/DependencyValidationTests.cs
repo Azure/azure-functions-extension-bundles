@@ -26,6 +26,8 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             _fixture = fixture;
         }
 
+        /*
+
         [Fact]
         public void Verify_DepsJsonChanges_Windows_X64_Any()
         {            
@@ -61,7 +63,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
                 return;
             }
 
-            string oldDepsJson = Path.GetFullPath("../../../TestData/win_x64_extensions.deps.json");
+            string oldDepsJson = Path.GetFullPath("../../../TestData/win_x86_extensions.deps.json");
             string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
                                             .Where(path => path.Contains("x86"))
@@ -79,19 +81,23 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 
             Assert.True(succeed, output);
         }
+        */
 
-        [Fact]
-        public void Verify_DepsJsonChanges_Any_Any()
+        [InlineData("any_any_extensions.deps.json", "any_any")]
+        [InlineData("win_x86_extensions.deps.json", "x86")]
+        [InlineData("win_x64_extensions.deps.json", "x64")]
+        [Theory]
+        public void Verify_DepsJsonChanges(string pathOldDepsJson, string pathNewDepsJson)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return;
             }
 
-            string oldDepsJson = Path.GetFullPath("../../../TestData/any_any_extensions.deps.json");
+            string oldDepsJson = Path.GetFullPath($"../../../TestData/{pathOldDepsJson}");
             string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
-                                            .Where(path => path.Contains("any_any"))
+                                            .Where(path => path.Contains(pathNewDepsJson))
                                             .FirstOrDefault();
 
             Assert.True(File.Exists(oldDepsJson), $"{oldDepsJson} not found.");
