@@ -137,7 +137,6 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 
         private (bool, string) CompareDepsJsonFiles(string oldDepsJson, string newDepsJson)
         {
-
             IEnumerable<RuntimeFile> oldAssets = GetRuntimeFiles(oldDepsJson);
             IEnumerable<RuntimeFile> newAssets = GetRuntimeFiles(newDepsJson);
 
@@ -230,6 +229,11 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         {
             public bool Equals([AllowNull] RuntimeFile x, [AllowNull] RuntimeFile y)
             {
+                if (x.AssemblyVersion is null && y.AssemblyVersion is null)
+                {
+                    return true;
+                }
+
                 return Version.TryParse(x.AssemblyVersion, out Version xVersion)
                         && Version.TryParse(y.AssemblyVersion, out Version yVersion)
                         && xVersion.Major == yVersion.Major;
