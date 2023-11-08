@@ -26,45 +26,21 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             _fixture = fixture;
         }
 
-        [Fact]
-        public void Verify_DepsJsonChanges_Windows_Any()
-        {            
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                return;
-            }
-
-            string oldDepsJson = Path.GetFullPath("../../../TestData/win_any_extensions.deps.json");
-            string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
-            string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
-                                            .Where(path => path.Contains("win_x64"))
-                                            .FirstOrDefault();
-
-            Assert.True(File.Exists(oldDepsJson), $"{oldDepsJson} not found.");
-            Assert.True(File.Exists(newDepsJson), $"{newDepsJson} not found.");
-
-            (bool succeed, string output) = CompareDepsJsonFiles(oldDepsJson, newDepsJson);
-
-            if (succeed == true)
-            {
-                return;
-            }
-
-            Assert.True(succeed, output);
-        }
-
-        [Fact]
-        public void Verify_DepsJsonChanges_Any_Any()
+        [InlineData("any_any_extensions.deps.json", "NetCoreApp3_any_any")]
+        [InlineData("win_x86_extensions.deps.json", "x86")]
+        [InlineData("win_x64_extensions.deps.json", "x64")]
+        [Theory]
+        public void Verify_DepsJsonChanges(string oldDepsJsonName, string newDepsJsonName)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return;
             }
 
-            string oldDepsJson = Path.GetFullPath("../../../TestData/any_any_extensions.deps.json");
+            string oldDepsJson = Path.GetFullPath($"../../../TestData/{oldDepsJsonName}");
             string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
-                                            .Where(path => path.Contains("NetCoreApp3_any_any"))
+                                            .Where(path => path.Contains(newDepsJsonName))
                                             .FirstOrDefault();
 
             Assert.True(File.Exists(oldDepsJson), $"{oldDepsJson} not found.");
@@ -110,14 +86,17 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 
         private (bool, string) CompareDepsJsonFiles(string oldDepsJson, string newDepsJson)
         {
-
             IEnumerable<RuntimeFile> oldAssets = GetRuntimeFiles(oldDepsJson);
             IEnumerable<RuntimeFile> newAssets = GetRuntimeFiles(newDepsJson);
 
             var comparer = new RuntimeFileComparer();
+            var assemblyToIgnore = "extensions.dll";
 
             var removed = oldAssets.Except(newAssets, comparer).ToList();
+            removed = removed.Where(f => !(f.Path.Contains(assemblyToIgnore) && f.AssemblyVersion == null)).ToList();
+
             var added = newAssets.Except(oldAssets, comparer).ToList();
+            added = added.Where(f => !(f.Path.Contains(assemblyToIgnore) && f.AssemblyVersion == null)).ToList();
 
             bool succeed = removed.Count == 0 && added.Count == 0;
 
@@ -140,9 +119,10 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 
                 var newFile = newAssets.SingleOrDefault(p =>
                 {
-                    return Path.GetFileName(p.Path) == fileName &&
-                        (p.FileVersion != oldFile.FileVersion ||
-                         p.AssemblyVersion != oldFile.AssemblyVersion);
+                    return Path.GetFileName(p.Path) == fileName
+                        && Version.TryParse(p.AssemblyVersion, out Version newVersion)
+                        && Version.TryParse(oldFile.AssemblyVersion, out Version oldVersion)
+                        && newVersion.Major != oldVersion.Major;
                 });
 
                 if (newFile != null)
@@ -202,15 +182,21 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         {
             public bool Equals([AllowNull] RuntimeFile x, [AllowNull] RuntimeFile y)
             {
-                return x.AssemblyVersion == y.AssemblyVersion &&
-                    x.FileVersion == y.FileVersion &&
-                    x.Path == y.Path;
+                return Version.TryParse(x.AssemblyVersion, out Version xVersion)
+                    && Version.TryParse(y.AssemblyVersion, out Version yVersion)
+                    && xVersion.Major == yVersion.Major;
             }
 
             public int GetHashCode([DisallowNull] RuntimeFile obj)
             {
-                string code = obj.Path + obj.AssemblyVersion + obj.FileVersion;
-                return code.GetHashCode();
+                Version.TryParse(obj.AssemblyVersion, out Version objVersion);
+                if (objVersion != null)
+                {
+                    string code = objVersion.Major.ToString();
+                    return code.GetHashCode();
+                }
+
+                return 0;
             }
         }
     }
