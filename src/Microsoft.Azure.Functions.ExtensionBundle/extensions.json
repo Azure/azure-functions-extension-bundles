@@ -39,7 +39,7 @@
     },
     {
         "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-        "majorVersion": "2",
+        "Version": "2.12.0",
         "name": "DurableTask",
         "bindings": [
             "activitytrigger",
@@ -51,8 +51,20 @@
     },
     {
         "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
-        "majorVersion": "1",
+        "Version": "1.4.0",
         "name": "NetheriteProviderStartup",
+        "bindings": [
+          "activitytrigger",
+          "orchestrationtrigger",
+          "entitytrigger",
+          "durableclient",
+          "orchestrationclient"
+        ]
+    },
+    {
+        "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
+        "Version": "1.1.1",
+        "name": "SqlDurabilityProviderStartup",
         "bindings": [
           "activitytrigger",
           "orchestrationtrigger",
