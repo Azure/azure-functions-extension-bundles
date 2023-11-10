@@ -1,7 +1,7 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "majorVersion": "5",
+    "Version": "5.2.0",
     "name": "AzureStorage",
     "bindings": [
       "blobtrigger",
@@ -29,7 +29,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
-    "majorVersion": "5",
+    "Version": "5.2.0",
     "name": "AzureStorageBlobs",
     "bindings": [
       "blobtrigger",
@@ -38,7 +38,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-    "majorVersion": "5",
+    "Version": "5.12.0",
     "name": "ServiceBus",
     "bindings": [
       "servicebustrigger",
@@ -64,7 +64,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "majorVersion": "2",
+    "Version": "2.12.0",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -76,7 +76,7 @@
   },
   {
     "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
-    "majorVersion": "1",
+    "Version": "1.4.0",
     "name": "NetheriteProvider",
     "bindings": [
       "activitytrigger",
@@ -88,7 +88,7 @@
   },
   {
     "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
-    "majorVersion": "1",
+    "Version": "1.1.1",
         "name": "SqlDurabilityProvider",
     "bindings": [
       "activitytrigger",
@@ -126,7 +126,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
-    "majorVersion": "1",
+    "Version": "1.11.1",
     "name": "SignalR",
     "bindings": [
       "signalr",
@@ -167,7 +167,7 @@
   },
   {
     "id": "Azure.Storage.Queues",
-    "majorVersion": "12",
+    "Version": "12.15.0",
     "name": "AzureStorageQueues",
     "bindings": []
   },
