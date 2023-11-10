@@ -1,7 +1,7 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "majorVersion": "5",
+    "Version": "5.2.0",
     "name": "AzureStorage",
     "bindings": [
       "blobtrigger",
@@ -29,7 +29,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
-    "majorVersion": "5",
+    "Version": "5.2.0",
     "name": "AzureStorageBlobs",
     "bindings": [
       "blobtrigger",
@@ -126,7 +126,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
-    "majorVersion": "1",
+    "Version": "1.11.2",
     "name": "SignalR",
     "bindings": [
       "signalr",
@@ -167,7 +167,7 @@
   },
   {
     "id": "Azure.Storage.Queues",
-    "majorVersion": "12",
+    "Version": "12.15.0",
     "name": "AzureStorageQueues",
     "bindings": []
   },
