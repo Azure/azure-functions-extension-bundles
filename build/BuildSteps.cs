@@ -208,6 +208,39 @@ namespace Build
                 }
             }
 
+        public static void GenerateVulnerabilityReport()
+        {
+            Settings.WindowsBuildConfigurations.ForEach((config) => RunVulnerabilityReport(config));
+        }
+
+        public static void RunVulnerabilityReport(BuildConfiguration buildConfig)
+        {
+            string projectDirectory = Path.Combine(Settings.RootBuildDirectory, buildConfig.ConfigId.ToString());
+            string projectFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, "extensions.csproj");
+
+            var currectDirectory = Directory.GetCurrentDirectory();
+            try
+            {
+                Directory.SetCurrentDirectory(Settings.RootBuildDirectory);
+
+                Console.WriteLine(Directory.GetCurrentDirectory());
+                Console.WriteLine($"dotnet list \"{projectFilePath}\" package --include-transitive --vulnerable");
+
+                string output = Shell.GetOutput("dotnet", $"list \"{projectFilePath}\" package --include-transitive --vulnerable");
+
+                if (!output.Contains("has no vulnerable packages given the current sources."))
+                {
+                    Console.WriteLine(output);
+                    throw new Exception($"Vulnerabilities found in {projectFilePath}");
+                }
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(currectDirectory);
+            }
+
+        }
+
             public static void AddBindingInfoToExtensionsJson(string extensionsJson)
             {
                 var extensionsJsonFileContent = FileUtility.ReadAllText(extensionsJson);
