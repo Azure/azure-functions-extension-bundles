@@ -16,6 +16,7 @@ namespace Build
                 .Then(DownloadManifestUtility)
                 .Then(BuildBundleBinariesForWindows)
                 .Then(BuildBundleBinariesForLinux)
+                .Then(GenerateVulnerabilityReport)
                 .Then(RunManifestUtilityWindows)
                 .Then(RunManifestUtilityLinux)
                 .Then(PackageNetCoreV2Bundle)
