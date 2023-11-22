@@ -77,7 +77,7 @@ jobs:
         ./dotnet-install.sh --version 3.1.201 --install-dir .dotnet &&
         PATH=".dotnet:"$PATH && dotnet --info
         cd build
-        dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,RunManifestUtilityWindows
+        dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,RunManifestUtilityWindows,GenerateVulnerabilityReport
     env:
       SBOMUtilSASUrl: $(SBOMUtilSASUrl)
   - task: CopyFiles@2
