@@ -184,11 +184,5 @@
     "Version": "4.3.2",
     "name": "SystemPrivateUri",
     "bindings": []
-  },
-  {
-    "id": "Azure.Identity",
-    "Version": "1.10.2",
-    "name": "AzureIdentity",
-    "bindings": []
   }
 ]
