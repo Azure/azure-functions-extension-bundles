@@ -159,7 +159,8 @@
     "majorVersion": "3",
     "name": "SqlBinding",
     "bindings": [
-      "Sql"
+      "Sql",
+      "SqlTrigger"
     ]
   },
   {
