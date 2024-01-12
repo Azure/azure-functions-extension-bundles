@@ -38,7 +38,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-    "Version": "5.12.0",
+    "majorVersion": "5",
     "name": "ServiceBus",
     "bindings": [
       "servicebustrigger",
@@ -64,7 +64,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "Version": "2.12.0",
+    "majorVersion": "2",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -76,7 +76,7 @@
   },
   {
     "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
-    "Version": "1.2.0",
+    "majorVersion": "1",
     "name": "SqlDurabilityProvider",
     "bindings": [
       "activitytrigger",
@@ -88,7 +88,7 @@
   },
   {
     "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
-    "Version": "1.4.0",
+    "majorVersion": "1",
     "name": "NetheriteProvider",
     "bindings": [
       "activitytrigger",
@@ -109,7 +109,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "Version": "4.4.0",
+    "majorVersion": "4",
     "name": "CosmosDB",
     "bindings": [
       "cosmosdbtrigger",
@@ -176,7 +176,7 @@
   },
   {
     "id": "Azure.Storage.Queues",
-    "Version": "12.16.0",
+    "majorVersion": "12",
     "name": "AzureStorageQueues",
     "bindings": []
   },
@@ -185,5 +185,17 @@
     "Version": "4.3.2",
     "name": "SystemPrivateUri",
     "bindings": []
-  }
+  },
+  {
+    "id": "Microsoft.IdentityModel.JsonWebTokens",
+    "Version": "6.34.0",
+    "name": "SystemIdentityModelTokensJwt",
+    "bindings": []
+  },
+  {
+    "id": "System.IdentityModel.Tokens.Jwt",
+    "Version": "6.34.0",
+    "name": "SystemIdentityModelTokensJwt",
+    "bindings": []
+  },
 ]
