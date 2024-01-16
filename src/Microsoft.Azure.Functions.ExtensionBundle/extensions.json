@@ -198,4 +198,10 @@
     "name": "SystemIdentityModelTokensJwt",
     "bindings": []
   },
+  {
+    "id": "Microsoft.Data.SqlClient",
+    "Version": "5.1.3",
+    "name": "MicrosoftDataSqlClient",
+    "bindings": []
+  }
 ]
