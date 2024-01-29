@@ -23,6 +23,10 @@ namespace Build
 
         public static string GetLatestPackageVersion(string packageId, int majorVersion, bool isPrerelease = false)
         {
+            if (packageId.ToLower().Equals("microsoft.azure.webjobs.extensions.sql"))
+            {
+                return "3.0.529";
+            }
             string url = $"https://api.nuget.org/v3-flatcontainer/{packageId.ToLower()}/index.json";
             var response = HttpClient.GetStringAsync(url).Result;
             var versionsObject = JObject.Parse(response);
