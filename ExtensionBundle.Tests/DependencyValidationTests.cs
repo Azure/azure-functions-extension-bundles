@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 {
     [Collection("Fixture")]
-    public class DependencyValidationTests
+    public class DependencyValidationTests : IClassFixture<Fixture>
     {
         private readonly DependencyContextJsonReader _reader = new DependencyContextJsonReader();
         private readonly IEnumerable<string> _rids = DependencyHelper.GetRuntimeFallbacks();
