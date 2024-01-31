@@ -19,14 +19,14 @@ namespace Build
         public static string BundleConfigJsonFilePath => Path.Combine(SourcePath, BundleConfigJsonFileName);
         public static string[] nugetFeed = new[]
         {
-            "https://mssqltools.pkgs.visualstudio.com/CrossPlatBuildScripts/_packaging/MSDBumpBundleTestFeed/nuget/v3/index.json",
+            "https://azfunc.pkgs.visualstudio.com/e6a70c92-4128-439f-8012-382fe78d6396/_packaging/AzureFunctionsTempStaging/nuget/v3/index.json",
             "https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-net/nuget/v3/index.json",
             "https://www.nuget.org/api/v2/"
         };
 
         public static Dictionary<string, string> nugetSources = new Dictionary<string, string>()
         {
-            { "azfsql", "https://mssqltools.pkgs.visualstudio.com/CrossPlatBuildScripts/_packaging/MSDBumpBundleTestFeed/nuget/v3/index.json"},
+            { "azfsql", "https://azfunc.pkgs.visualstudio.com/e6a70c92-4128-439f-8012-382fe78d6396/_packaging/AzureFunctionsTempStaging/nuget/v3/index.json"},
             { "azureSdk", "https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-net/nuget/v3/index.json"},
             { "nuget", "https://www.nuget.org/api/v2/"}
         };
