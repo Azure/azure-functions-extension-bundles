@@ -176,7 +176,7 @@
   },
   {
     "id": "Azure.Storage.Queues",
-    "majorVersion": "12.17.1",
+    "Version": "12.17.1",
     "name": "AzureStorageQueues",
     "bindings": []
   },
