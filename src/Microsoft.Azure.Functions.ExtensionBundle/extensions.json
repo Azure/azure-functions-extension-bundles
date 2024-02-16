@@ -226,6 +226,7 @@
     "majorVersion": "0",
     "name": "OpenAI.Kusto",
     "bindings": [
+      "SemanticSearch"
     ]
   }
 ]
