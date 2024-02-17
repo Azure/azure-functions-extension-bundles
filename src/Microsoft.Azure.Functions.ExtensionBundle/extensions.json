@@ -211,20 +211,23 @@
     ]
   },
   {
-    "id": "Microsoft.Azure.Functions.Worker.Extensions.OpenAI",
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI",
     "majorVersion": "0",
-    "name": "OpenAI.Worker",
+    "name": "Setup",
     "bindings": [
-      "TextCompletionInput",
-      "ChatBotCreateOutput",
-      "ChatBotQueryInput",
-      "ChatBotPostOutput"
+      "TextCompletion",
+      "ChatBotCreate",
+      "ChatBotQuery",
+      "ChatBotPost",
+      "SemanticSearch",
+      "Embeddings",
+      "AssistantSkillTrigger"
     ]
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.Kusto",
     "majorVersion": "0",
-    "name": "OpenAI.Kusto",
+    "name": "Startup",
     "bindings": [
       "SemanticSearch"
     ]
