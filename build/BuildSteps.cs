@@ -175,7 +175,13 @@ namespace Build
 
         public static void GenerateVulnerabilityReport()
         {
-            Settings.WindowsBuildConfigurations.ForEach((config) => RunVulnerabilityReport(config));
+            Settings.WindowsBuildConfigurations.ForEach((config) =>
+            {
+                if (config.ConfigId != Settings.ConfigId.NetCoreApp2_any_any)
+                {
+                    RunVulnerabilityReport(config);
+                }
+            });
         }
 
         public static void RunVulnerabilityReport(BuildConfiguration buildConfig)
