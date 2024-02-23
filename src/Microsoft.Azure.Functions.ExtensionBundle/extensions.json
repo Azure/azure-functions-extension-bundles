@@ -195,5 +195,27 @@
       "daprState",
       "daprTopicTrigger"
     ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI",
+    "majorVersion": "0",
+    "name": "OpenAI",
+    "bindings": [
+      "TextCompletion",
+      "ChatBotCreate",
+      "ChatBotQuery",
+      "ChatBotPost",
+      "SemanticSearch",
+      "Embeddings",
+      "AssistantSkillTrigger"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.Kusto",
+    "majorVersion": "0",
+    "name": "OpenAIKusto",
+    "bindings": [
+      "SemanticSearch"
+    ]
   }
 ]
