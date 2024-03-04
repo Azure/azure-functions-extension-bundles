@@ -202,9 +202,9 @@
     "name": "OpenAI",
     "bindings": [
       "TextCompletion",
-      "ChatBotCreate",
-      "ChatBotQuery",
-      "ChatBotPost",
+      "AssistantCreate",
+      "AssistantQuery",
+      "AssistantPost",
       "SemanticSearch",
       "Embeddings",
       "AssistantSkillTrigger"
