@@ -203,5 +203,20 @@
     "Version": "5.1.3",
     "name": "MicrosoftDataSqlClient",
     "bindings": []
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
+    "majorVersion": "1",
+    "name": "Dapr",
+    "bindings": [
+      "daprBinding",
+      "daprBindingTrigger",
+      "daprInvoke",
+      "daprPublish",
+      "daprSecret",
+      "daprServiceInvocationTrigger",
+      "daprState",
+      "daprTopicTrigger"
+    ]
   }
 ]
