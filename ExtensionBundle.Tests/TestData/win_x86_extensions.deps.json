@@ -4043,7 +4043,7 @@
       "path": "microsoft.identity.client/4.54.1",
       "hashPath": "microsoft.identity.client.4.54.1.nupkg.sha512"
     },
-    "Microsoft.Identity.Client.Extensions.Msal/2.31.0": {
+    "Microsoft.Identity.Client.Extensions.Msal/4.56.0": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-IhGSqN0szneKC5Qk3/okJQJbDpQfLW/+mvslhzJPox4t2UuIkA2ZHe4w/z62ASye46G9sQWF9qqLXTgNacE2xQ==",

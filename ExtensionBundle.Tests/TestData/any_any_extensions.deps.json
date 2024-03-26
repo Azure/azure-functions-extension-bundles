@@ -3064,7 +3064,7 @@
           "runtimes/win/lib/netcoreapp2.0/System.Text.Encoding.CodePages.dll": {
             "rid": "win",
             "assetType": "runtime",
-            "assemblyVersion": "5.0.0.0",
+            "assemblyVersion": "6.0.0.0",
             "fileVersion": "6.0.21.52210"
           }
         }
