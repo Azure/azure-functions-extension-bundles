@@ -64,7 +64,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "Version": "2.12.0",
+    "majorVersion": "2",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -76,7 +76,7 @@
   },
   {
     "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
-    "Version": "1.2.1",
+    "majorVersion": "1",
     "name": "SqlDurabilityProvider",
     "bindings": [
       "activitytrigger",
