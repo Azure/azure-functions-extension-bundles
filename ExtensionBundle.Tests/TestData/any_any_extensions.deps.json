@@ -31,7 +31,7 @@
           "Microsoft.Rest.ClientRuntime": "2.3.24",
           "System.Private.Uri": "4.3.2",
           "System.Reactive.Reference": "4.4.0.0",
-          "Microsoft.Azure.WebJobs.Extensions.Dapr": "1.0.0"
+          "Microsoft.Azure.Functions.Extensions.Dapr.Core": "99.99.99.0"
         },
         "runtime": {
           "extensions.dll": {}
@@ -3248,9 +3248,12 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.Dapr/1.0.0": {
-        "dependencies": {
-          "Microsoft.Azure.Functions.Extensions.Dapr.Core": "99.99.99.0"
+      "Microsoft.Azure.Functions.Extensions.Dapr.Core/99.99.99.0": {
+        "runtime": {
+          "lib/netstandard2.0/Microsoft.Azure.Functions.Extensions.Dapr.Core.dll": {
+            "assemblyVersion": "99.99.99.0",
+            "fileVersion": "99.99.99.0"
+          }
         }
       }
     }
@@ -5205,7 +5208,7 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Microsoft.Azure.WebJobs.Extensions.Dapr/1.0.0": {
+    "Microsoft.Azure.Functions.Extensions.Dapr.Core/99.99.99.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""
