@@ -133,8 +133,8 @@
     "majorVersion": "1",
     "name": "RabbitMQ",
     "bindings": [
-        "rabbitmqtrigger",
-        "rabbitmq"
+      "rabbitmqtrigger",
+      "rabbitmq"
     ]
   },
   {
@@ -142,8 +142,8 @@
     "majorVersion": "3",
     "name": "Kafka",
     "bindings": [
-        "kafkatrigger",
-        "kafka"
+      "kafkatrigger",
+      "kafka"
     ]
   },
   {
@@ -208,6 +208,14 @@
       "SemanticSearch",
       "Embeddings",
       "AssistantSkillTrigger"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.Kusto",
+    "majorVersion": "0",
+    "name": "OpenAIAzureAISearch",
+    "bindings": [
+      "SemanticSearch"
     ]
   },
   {
