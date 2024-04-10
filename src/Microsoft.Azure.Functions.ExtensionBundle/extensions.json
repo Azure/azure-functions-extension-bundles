@@ -211,7 +211,7 @@
     ]
   },
   {
-    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.Kusto",
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.AzureAISearch",
     "majorVersion": "0",
     "name": "OpenAIAzureAISearch",
     "bindings": [
