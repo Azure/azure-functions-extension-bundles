@@ -166,6 +166,12 @@
     ]
   },
   {
+    "id": "Azure.Identity",
+    "Version": "1.11.0",
+    "name": "AzureIdentity",
+    "bindings": []
+  },
+  {
     "id": "Azure.Storage.Queues",
     "majorVersion": "12",
     "name": "AzureStorageQueues",
