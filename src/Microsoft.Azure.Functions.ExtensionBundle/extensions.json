@@ -166,6 +166,12 @@
     "bindings": []
   },
   {
+    "id": "Microsoft.Identity.Client",
+    "Version": "4.60.3",
+    "name": "AzureIdentityClient",
+    "bindings": []
+  },
+  {
     "id": "Microsoft.Data.SqlClient",
     "Version": "3.1.5",
     "name": "MicrosoftDataSqlClient",
