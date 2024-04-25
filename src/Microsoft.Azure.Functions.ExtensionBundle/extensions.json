@@ -219,6 +219,14 @@
     ]
   },
   {
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.CosmosDBSearch",
+    "majorVersion": "0",
+    "name": "OpenAICosmosDBSearch",
+    "bindings": [
+      "SemanticSearch"
+    ]
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.Kusto",
     "majorVersion": "0",
     "name": "OpenAIKusto",
