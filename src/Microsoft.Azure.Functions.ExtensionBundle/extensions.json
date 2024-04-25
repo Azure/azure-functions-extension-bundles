@@ -158,7 +158,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents",
     "majorVersion": "1",
-    "name": "AuthenticationEvent",
+    "name": "WebJobsAuthenticationEvent",
     "bindings": [
       "AuthenticationEventsTrigger"
     ]
@@ -214,6 +214,14 @@
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.AzureAISearch",
     "majorVersion": "0",
     "name": "OpenAIAzureAISearch",
+    "bindings": [
+      "SemanticSearch"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.CosmosDBSearch",
+    "majorVersion": "0",
+    "name": "OpenAICosmosDBSearch",
     "bindings": [
       "SemanticSearch"
     ]
