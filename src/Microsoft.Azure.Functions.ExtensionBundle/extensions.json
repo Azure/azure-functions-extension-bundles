@@ -158,7 +158,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents",
     "majorVersion": "1",
-    "name": "AuthenticationEvent",
+    "name": "WebJobsAuthenticationEvent",
     "bindings": [
       "AuthenticationEventsTrigger"
     ]
