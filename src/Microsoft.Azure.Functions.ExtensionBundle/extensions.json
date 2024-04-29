@@ -230,5 +230,16 @@
       "daprState",
       "daprTopicTrigger"
     ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Redis",
+    "majorVersion": "1",
+    "name": "Redis",
+    "bindings": [
+      "redisPubSubTrigger",
+      "redisStreamTrigger",
+      "redisListTrigger",
+      "redis"
+    ]
   }
 ]
