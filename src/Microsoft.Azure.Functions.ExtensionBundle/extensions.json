@@ -207,6 +207,7 @@
       "AssistantPost",
       "SemanticSearch",
       "Embeddings",
+      "EmbeddingsStore",
       "AssistantSkillTrigger"
     ]
   },
@@ -215,7 +216,8 @@
     "majorVersion": "0",
     "name": "OpenAIAzureAISearch",
     "bindings": [
-      "SemanticSearch"
+      "SemanticSearch",
+      "EmbeddingsStore"
     ]
   },
   {
@@ -223,7 +225,8 @@
     "majorVersion": "0",
     "name": "OpenAICosmosDBSearch",
     "bindings": [
-      "SemanticSearch"
+      "SemanticSearch",
+      "EmbeddingsStore"
     ]
   },
   {
@@ -231,7 +234,8 @@
     "majorVersion": "0",
     "name": "OpenAIKusto",
     "bindings": [
-      "SemanticSearch"
+      "SemanticSearch",
+      "EmbeddingsStore"
     ]
   }
 ]
