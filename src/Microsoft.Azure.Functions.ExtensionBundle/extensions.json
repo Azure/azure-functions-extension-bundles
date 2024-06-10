@@ -200,13 +200,13 @@
   },
   {
     "id": "Microsoft.IdentityModel.JsonWebTokens",
-    "Version": "6.34.0",
+    "Version": "6.35.0",
     "name": "SystemIdentityModelTokensJwt",
     "bindings": []
   },
   {
     "id": "System.IdentityModel.Tokens.Jwt",
-    "Version": "6.34.0",
+    "Version": "6.35.0",
     "name": "SystemIdentityModelTokensJwt",
     "bindings": []
   },
