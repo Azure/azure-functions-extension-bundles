@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<AssemblyName>Microsoft.Azure.Functions.ExtensionBundle.Tests</AssemblyName>
 		<RootNamespace>Microsoft.Azure.Functions.ExtensionBundle.Tests</RootNamespace>
 		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
