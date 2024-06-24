@@ -103,11 +103,6 @@ namespace Build
         public static void BuildBundleBinariesForWindows()
         {
             Settings.WindowsBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config));
-
-            // temporary fix for missing extensions.json
-            string sourceExtensionsJsonPath = Path.Combine(Settings.RootBinDirectory, @"NetCoreApp3_win_x64\bin_v3\win-x64\extensions.json");
-            string extensionsJsonPath = Path.Combine(Settings.RootBinDirectory, @"NetCoreApp3_win_x86\bin_v3\win-x86\extensions.json");
-            File.Copy(sourceExtensionsJsonPath, extensionsJsonPath, true);
         }
 
         public static void BuildBundleBinariesForLinux()
@@ -201,21 +196,6 @@ namespace Build
             {
                 FileUtility.EnsureDirectoryExists(Directory.GetParent(buildConfig.PublishBinDirectoryPath).FullName);
                 Directory.Move(Path.Combine(buildConfig.PublishDirectoryPath, "bin"), buildConfig.PublishBinDirectoryPath);
-            }
-
-            // Temporary fix to copy assembly needed for cosmosDb extension
-            var additionalAssembliesPath = Path.Combine(Directory.GetParent(projectFilePath).FullName, "bin", "Release", "netcoreapp3.1", buildConfig.RuntimeIdentifier == "any" ? String.Empty : buildConfig.RuntimeIdentifier);
-
-            var configAssembly = "System.Configuration.ConfigurationManager.dll";
-            if (FileUtility.FileExists(Path.Combine(additionalAssembliesPath, configAssembly)))
-            {
-                File.Copy(Path.Combine(additionalAssembliesPath, configAssembly), Path.Combine(buildConfig.PublishBinDirectoryPath, configAssembly));
-            }
-
-            var permissionsAssembly = "System.Security.Permissions.dll";
-            if (FileUtility.FileExists(Path.Combine(additionalAssembliesPath, permissionsAssembly)))
-            {
-                File.Copy(Path.Combine(additionalAssembliesPath, permissionsAssembly), Path.Combine(buildConfig.PublishBinDirectoryPath, permissionsAssembly));
             }
         }
 
