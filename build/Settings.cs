@@ -126,7 +126,7 @@ namespace Build
             linux_x64
         }
 
-        public static BundlePackageConfiguration BundlePackageNetCoreV3Any = new BundlePackageConfiguration()
+        public static BundlePackageConfiguration BundlePackageAny = new BundlePackageConfiguration()
         {
             PackageIdentifier = "any-any",
             ConfigBinariesToInclude = new List<ConfigId>() {
@@ -146,7 +146,7 @@ namespace Build
             CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj")
         };
 
-        public static BundlePackageConfiguration BundlePackageNetCoreV3Linux = new BundlePackageConfiguration()
+        public static BundlePackageConfiguration BundlePackageLinux = new BundlePackageConfiguration()
         {
             PackageIdentifier = "linux-x64",
             ConfigBinariesToInclude = new List<ConfigId>() {
@@ -156,7 +156,7 @@ namespace Build
             CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj")
         };
 
-        public static BundlePackageConfiguration BundlePackageNetCoreV3 = new BundlePackageConfiguration()
+        public static BundlePackageConfiguration BundlePackage = new BundlePackageConfiguration()
         {
             PackageIdentifier = string.Empty,
             ConfigBinariesToInclude = new List<ConfigId>() {
