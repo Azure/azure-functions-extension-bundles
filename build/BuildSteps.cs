@@ -107,11 +107,6 @@ namespace Build
         public static void BuildBundleBinariesForWindows()
         {
             Settings.WindowsBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config));
-
-            // temporary fix for missing extensions.json
-            string sourceExtensionsJsonPath = Path.Combine(Settings.RootBinDirectory, @"NetCoreApp3_win_x64\bin_v3\win-x64\extensions.json");
-            string extensionsJsonPath = Path.Combine(Settings.RootBinDirectory, @"NetCoreApp3_win_x86\bin_v3\win-x86\extensions.json");
-            File.Copy(sourceExtensionsJsonPath, extensionsJsonPath, true);
         }
 
         public static void BuildBundleBinariesForLinux()
@@ -207,15 +202,6 @@ namespace Build
                 Directory.Move(Path.Combine(buildConfig.PublishDirectoryPath, "bin"), buildConfig.PublishBinDirectoryPath);
             }
 
-            // Temporary fix to copy assembly needed for cosmosDb extension
-            var additionalAssembliesPath = Path.Combine(Directory.GetParent(projectFilePath).FullName, "bin", "Release", "netcoreapp3.1", buildConfig.RuntimeIdentifier == "any" ? String.Empty : buildConfig.RuntimeIdentifier);
-
-            var configAssembly = "System.Configuration.ConfigurationManager.dll";
-                File.Copy(Path.Combine(additionalAssembliesPath, configAssembly), Path.Combine(buildConfig.PublishBinDirectoryPath, configAssembly));
-
-            var permissionsAssembly = "System.Security.Permissions.dll";
-                File.Copy(Path.Combine(additionalAssembliesPath, permissionsAssembly), Path.Combine(buildConfig.PublishBinDirectoryPath, permissionsAssembly));
-
         }
 
         public static void AddBindingInfoToExtensionsJson(string extensionsJson)
@@ -297,23 +283,22 @@ namespace Build
             File.Copy(bundlePackageConfig.CsProjFilePath, projectPath);
 
             FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
-            ZipFile.CreateFromDirectory(bundlePath, bundlePackageConfig.GeneratedBundleZipFilePath, CompressionLevel.NoCompression, false);
+            ZipFile.CreateFromDirectory(bundlePath, bundlePackageConfig.GeneratedBundleZipFilePath, CompressionLevel.Optimal, false);
         }
 
-        public static void PackageNetCoreV3Bundle()
+        public static void PackageBundle()
         {
-            CreateExtensionBundle(Settings.BundlePackageNetCoreV3);
+            CreateExtensionBundle(Settings.BundlePackage);
         }
 
-        public static void PackageNetCoreV3BundlesLinux()
+        public static void PackageBundlesLinux()
         {
-            CreateExtensionBundle(Settings.BundlePackageNetCoreV3Any);
-            CreateExtensionBundle(Settings.BundlePackageNetCoreV3Linux);
+            CreateExtensionBundle(Settings.BundlePackageLinux);
         }
 
-        public static void PackageNetCoreV3BundlesWindows()
+        public static void PackageBundlesWindows()
         {
-            CreateExtensionBundle(Settings.BundlePackageNetCoreV3Any);
+            CreateExtensionBundle(Settings.BundlePackageAny);
             CreateExtensionBundle(Settings.BundlePackageNetCoreWindows);
         }
 
@@ -330,7 +315,7 @@ namespace Build
             ZipFile.ExtractToDirectory(Settings.BundlePackageNetCoreWindows.GeneratedBundleZipFilePath, Settings.RUPackagePath);
 
             var RURootPackagePath = Directory.GetParent(Settings.RUPackagePath);
-            ZipFile.CreateFromDirectory(RURootPackagePath.FullName, Path.Combine(Settings.ArtifactsDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package.zip"), CompressionLevel.NoCompression, false);
+            ZipFile.CreateFromDirectory(RURootPackagePath.FullName, Path.Combine(Settings.ArtifactsDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package.zip"), CompressionLevel.Optimal, false);
         }
 
         public static void CreateCDNStoragePackage()
@@ -371,16 +356,16 @@ namespace Build
                 var indexFilePath = Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory, BundleConfiguration.Instance.ExtensionBundleId, Settings.IndexFileName);
                 FileUtility.Write(indexFilePath, JsonConvert.SerializeObject(indexFile));
 
-                AddBundleZipFile(bundleVersionDirectory, Settings.BundlePackageNetCoreV3);
+                AddBundleZipFile(bundleVersionDirectory, Settings.BundlePackage);
 
                 // Add bundle.json
                 CreateBundleJsonFile(bundleVersionDirectory);
 
                 // Add Csproj file
                 string projectPath = Path.Combine(bundleVersionDirectory, "extensions.csproj");
-                File.Copy(Settings.BundlePackageNetCoreV3.CsProjFilePath, projectPath);
+                File.Copy(Settings.BundlePackage.CsProjFilePath, projectPath);
 
-                ZipFile.CreateFromDirectory(Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory), Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}.zip"), CompressionLevel.NoCompression, false);
+                ZipFile.CreateFromDirectory(Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory), Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}.zip"), CompressionLevel.Optimal, false);
             }
         }
 
@@ -392,11 +377,11 @@ namespace Build
                 string packageBundleDirectory = Path.Combine(packageRootDirectoryPath, BundleConfiguration.Instance.ExtensionBundleId, BundleConfiguration.Instance.ExtensionBundleVersion);
                 FileUtility.EnsureDirectoryExists(packageBundleDirectory);
 
-                AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageNetCoreV3Any);
+                AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageAny);
                 AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageNetCoreWindows);
 
                 string packageZipFilePath = Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}_windows.zip");
-                ZipFile.CreateFromDirectory(packageRootDirectoryPath, packageZipFilePath, CompressionLevel.NoCompression, false);
+                ZipFile.CreateFromDirectory(packageRootDirectoryPath, packageZipFilePath, CompressionLevel.Optimal, false);
             }
         }
 
@@ -408,10 +393,10 @@ namespace Build
                 string packageBundleDirectory = Path.Combine(packageRootDirectoryPath, BundleConfiguration.Instance.ExtensionBundleId, BundleConfiguration.Instance.ExtensionBundleVersion);
                 FileUtility.EnsureDirectoryExists(packageBundleDirectory);
 
-                AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageNetCoreV3Linux);
+                AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageLinux);
 
                 string packageZipFilePath = Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}_linux.zip");
-                ZipFile.CreateFromDirectory(packageRootDirectoryPath, packageZipFilePath, CompressionLevel.NoCompression, false);
+                ZipFile.CreateFromDirectory(packageRootDirectoryPath, packageZipFilePath, CompressionLevel.Optimal, false);
             }
         }
 

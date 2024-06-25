@@ -82,24 +82,24 @@ namespace Build
         {
             new BuildConfiguration()
             {
-                ConfigId = ConfigId.NetCoreApp3_win_x86,
-                SourceProjectFileName = "extensions_netcoreapp3.csproj",
+                ConfigId = ConfigId.win_x86,
+                SourceProjectFileName = "extensions.csproj",
                 RuntimeIdentifier = "win-x86",
                 PublishReadyToRun = true,
                 PublishBinDirectorySubPath = Path.Combine("bin_v3", "win-x86")
             },
             new BuildConfiguration()
             {
-                ConfigId = ConfigId.NetCoreApp3_win_x64,
-                SourceProjectFileName = "extensions_netcoreapp3.csproj",
+                ConfigId = ConfigId.win_x64,
+                SourceProjectFileName = "extensions.csproj",
                 RuntimeIdentifier = "win-x64",
                 PublishReadyToRun = true,
                 PublishBinDirectorySubPath = Path.Combine("bin_v3", "win-x64")
             },
             new BuildConfiguration()
             {
-                ConfigId = ConfigId.NetCoreApp3_any_any,
-                SourceProjectFileName = "extensions_netcoreapp3.csproj",
+                ConfigId = ConfigId.any_any,
+                SourceProjectFileName = "extensions.csproj",
                 RuntimeIdentifier = "any",
                 PublishReadyToRun = false,
                 PublishBinDirectorySubPath = "bin"
@@ -110,67 +110,59 @@ namespace Build
         {
             new BuildConfiguration()
             {
-                ConfigId = ConfigId.NetCoreApp3_linux_x64,
-                SourceProjectFileName = "extensions_netcoreapp3.csproj",
+                ConfigId = ConfigId.linux_x64,
+                SourceProjectFileName = "extensions.csproj",
                 RuntimeIdentifier = "linux-x64",
                 PublishReadyToRun = true,
                 PublishBinDirectorySubPath = Path.Combine("bin_v3", "linux-x64")
-            },
-            new BuildConfiguration()
-            {
-                ConfigId = ConfigId.NetCoreApp3_any_any,
-                SourceProjectFileName = "extensions_netcoreapp3.csproj",
-                RuntimeIdentifier = "any",
-                PublishReadyToRun = false,
-                PublishBinDirectorySubPath = "bin"
             }
         };
 
         public enum ConfigId
         {
-            NetCoreApp3_win_x86,
-            NetCoreApp3_win_x64,
-            NetCoreApp3_any_any,
-            NetCoreApp3_linux_x64
+            win_x86,
+            win_x64,
+            any_any,
+            linux_x64
         }
 
-        public static BundlePackageConfiguration BundlePackageNetCoreV3Any = new BundlePackageConfiguration()
+        public static BundlePackageConfiguration BundlePackageAny = new BundlePackageConfiguration()
         {
             PackageIdentifier = "any-any",
             ConfigBinariesToInclude = new List<ConfigId>() {
-                ConfigId.NetCoreApp3_any_any
+                ConfigId.any_any
             },
-            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.NetCoreApp3_any_any.ToString(), "extensions.csproj")
+            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj")
         };
 
         public static BundlePackageConfiguration BundlePackageNetCoreWindows = new BundlePackageConfiguration()
         {
             PackageIdentifier = "win-any",
             ConfigBinariesToInclude = new List<ConfigId>() {
-                ConfigId.NetCoreApp3_any_any,
-                ConfigId.NetCoreApp3_win_x86,
-                ConfigId.NetCoreApp3_win_x64
+                ConfigId.any_any,
+                ConfigId.win_x86,
+                ConfigId.win_x64
             },
-            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.NetCoreApp3_any_any.ToString(), "extensions.csproj")
+            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj")
         };
 
-        public static BundlePackageConfiguration BundlePackageNetCoreV3Linux = new BundlePackageConfiguration()
+        public static BundlePackageConfiguration BundlePackageLinux = new BundlePackageConfiguration()
         {
             PackageIdentifier = "linux-x64",
             ConfigBinariesToInclude = new List<ConfigId>() {
-                ConfigId.NetCoreApp3_any_any,
-                ConfigId.NetCoreApp3_linux_x64
+                ConfigId.any_any,
+                ConfigId.linux_x64
             },
-            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.NetCoreApp3_any_any.ToString(), "extensions.csproj")
+            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj")
         };
 
-        public static BundlePackageConfiguration BundlePackageNetCoreV3 = new BundlePackageConfiguration()
+        public static BundlePackageConfiguration BundlePackage = new BundlePackageConfiguration()
         {
             PackageIdentifier = string.Empty,
             ConfigBinariesToInclude = new List<ConfigId>() {
-                ConfigId.NetCoreApp3_any_any
+                ConfigId.any_any
             },
-            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.NetCoreApp3_any_any.ToString(), "extensions.csproj")
+            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj")
         };
     }
 }
