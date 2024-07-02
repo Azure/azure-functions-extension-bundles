@@ -166,18 +166,6 @@
     ]
   },
   {
-    "id": "Azure.Identity",
-    "Version": "1.11.0",
-    "name": "AzureIdentity",
-    "bindings": []
-  },
-  {
-    "id": "Microsoft.Identity.Client",
-    "Version": "4.60.3",
-    "name": "AzureIdentityClient",
-    "bindings": []
-  },
-  {
     "id": "Azure.Storage.Queues",
     "majorVersion": "12",
     "name": "AzureStorageQueues",
@@ -187,30 +175,6 @@
     "id": "System.Drawing.Common",
     "Version": "4.7.2",
     "name": "SystemDrawingCommon",
-    "bindings": []
-  },
-  {
-    "id": "System.Private.Uri",
-    "Version": "4.3.2",
-    "name": "SystemPrivateUri",
-    "bindings": []
-  },
-  {
-    "id": "Microsoft.Data.SqlClient",
-    "Version": "3.1.5",
-    "name": "MicrosoftDataSqlClient",
-    "bindings": []
-  },
-  {
-    "id": "Microsoft.IdentityModel.JsonWebTokens",
-    "Version": "6.34.0",
-    "name": "SystemIdentityModelTokensJwt",
-    "bindings": []
-  },
-  {
-    "id": "System.IdentityModel.Tokens.Jwt",
-    "Version": "6.34.0",
-    "name": "SystemIdentityModelTokensJwt",
     "bindings": []
   }
 ]
