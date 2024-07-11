@@ -158,5 +158,29 @@
     "Version": "4.3.2",
     "name": "SystemPrivateUri",
     "bindings": []
+  },
+  {
+    "id": "Azure.Identity",
+    "Version": "1.11.4",
+    "name": "AzureIdentity",
+    "bindings": []
+  },
+  {
+    "id": "Microsoft.Data.SqlClient",
+    "Version": "3.1.5",
+    "name": "MicrosoftDataSqlClient",
+    "bindings": []
+  },
+  {
+    "id": "Microsoft.IdentityModel.JsonWebTokens",
+    "Version": "6.34.0",
+    "name": "SystemIdentityModelTokensJwt",
+    "bindings": []
+  },
+  {
+    "id": "System.IdentityModel.Tokens.Jwt",
+    "Version": "6.34.0",
+    "name": "SystemIdentityModelTokensJwt",
+    "bindings": []
   }
 ]
