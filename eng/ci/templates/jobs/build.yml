@@ -1,11 +1,20 @@
 jobs:
 - job: Build
+  displayName: Build and publish artifacts
+
+  templateContext:
+    outputParentDirectory: $(Build.ArtifactStagingDirectory)
+    outputs:
+    - output: pipelineArtifact
+      displayName: Publish bundles
+      path: $(Build.ArtifactStagingDirectory)
+      artifact: zip
 
   steps:
   - task: DotNetCoreCLI@2
     inputs:
       command: 'run'
-      arguments: 'skip DownloadManifestUtility,RunManifestUtilityLinux,RunManifestUtilityWindows'
+      arguments: 'skip:DownloadManifestUtility,RunManifestUtilityLinux,RunManifestUtilityWindows'
       workingDirectory: '.\build'
   - task: CopyFiles@2
     inputs:
@@ -13,8 +22,3 @@ jobs:
       Contents: '*.zip'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       CleanTargetFolder: true
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: 'drop'
-      publishLocation: 'Container'

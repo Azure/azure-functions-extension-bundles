@@ -43,7 +43,7 @@ extends:
       os: windows
 
     stages:
-    - stage: Unit test
+    - stage: RunUnitTests
       dependsOn: []
 
       jobs:
