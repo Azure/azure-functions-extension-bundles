@@ -237,5 +237,14 @@
       "SemanticSearch",
       "EmbeddingsStore"
     ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Fabric",
+    "majorVersion": "0",
+    "name": "Startup",
+    "bindings": [
+      "fabricItem",
+      "udfProperty"
+    ]
   }
 ]
