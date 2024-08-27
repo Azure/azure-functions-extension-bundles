@@ -1,0 +1,17 @@
+jobs:
+- job: RunUnitTests
+  displayName: Run Unit Tests
+
+  steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '3.1.x'
+      performMultiLevelLookup: true
+  - task: DotNetCoreCLI@2
+    displayName: 'Run tests'
+    inputs:
+      command: 'test'
+      arguments: '-c Release'
+      projects: |
+        **/*Tests.csproj
