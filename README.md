@@ -31,7 +31,7 @@ Extension bundle provides a way for non-dotnet function apps to reference and us
 ```
 cd build
 
-dotnet run skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux,DownloadManifestUtility,RunManifestUtilityLinux,RunManifestUtilityWindows
+dotnet run skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux
 ```
 
 ### Linux

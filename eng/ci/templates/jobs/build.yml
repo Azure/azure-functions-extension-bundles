@@ -1,0 +1,33 @@
+jobs:
+- job: Build
+  displayName: Build and publish artifacts
+
+  templateContext:
+    outputParentDirectory: $(Build.ArtifactStagingDirectory)
+    outputs:
+    - output: pipelineArtifact
+      displayName: Publish bundles
+      path: $(Build.ArtifactStagingDirectory)
+      artifact: zip
+
+  steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '2.1.x'
+      performMultiLevelLookup: true
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '3.1.x'
+      performMultiLevelLookup: true
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'run'
+      workingDirectory: '.\build'
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
+      Contents: '*.zip'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      CleanTargetFolder: true
