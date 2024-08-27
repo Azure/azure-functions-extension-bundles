@@ -247,5 +247,11 @@
       "UdfProperty",
       "UserDataFunctionContext"
     ]
+  },
+  {
+    "id": " System.Formats.Asn1",
+    "Version": "6.0.1",
+    "name": "SystemFormatsAsn1",
+    "bindings": []
   }
 ]
