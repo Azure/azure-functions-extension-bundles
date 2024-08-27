@@ -65,21 +65,6 @@ namespace Build
             }
         }
 
-        public static void DownloadManifestUtility()
-        {
-            string downloadPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            FileUtility.EnsureDirectoryExists(downloadPath);
-            string manifestToolZipUri = Environment.GetEnvironmentVariable("SBOMUtilSASUrl");
-            string zipFilePath = Path.Combine(downloadPath, $"ManifestTool.zip");
-            var zipUri = new Uri(manifestToolZipUri);
-
-            if (DownloadZipFile(zipUri, zipFilePath))
-            {
-                FileUtility.EnsureDirectoryExists(Settings.ManifestToolDirectory);
-                ZipFile.ExtractToDirectory(zipFilePath, Settings.ManifestToolDirectory);
-            }
-        }
-
         public static void BuildBundleBinariesForWindows()
         {
             Settings.WindowsBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config));
@@ -119,28 +104,6 @@ namespace Build
                 string version = string.IsNullOrEmpty(extension.Version) ? Helper.GetLatestPackageVersion(extension.Id, extension.MajorVersion) : extension.Version;
                 Shell.Run("dotnet", $"add {projectFilePath} package {extension.Id} -v {version} -n");
             }
-        }
-
-        public static void RunManifestUtilityWindows()
-        {
-            Settings.WindowsBuildConfigurations.ForEach((config) => RunManifestUtility(config));
-        }
-
-        public static void RunManifestUtilityLinux()
-        {
-            Settings.LinuxBuildConfigurations.ForEach((config) => RunManifestUtility(config));
-        }
-        
-        public static void RunManifestUtility(BuildConfiguration buildConfig)
-        {
-            string manifestDll = Path.Combine(Settings.ManifestToolDirectory, "Microsoft.ManifestTool.dll");
-            string manifestToolArguments = $"{manifestDll} generate -PackageName {BundleConfiguration.Instance.ExtensionBundleId} " +
-                $"-BuildDropPath {buildConfig.PublishDirectoryPath} " +
-                $"-BuildComponentPath {buildConfig.PublishDirectoryPath} " +
-                $" -Verbosity Information" +
-                $" -t {Path.Combine(buildConfig.PublishBinDirectoryPath, "manifest.json")} " +
-                $" -PackageVersion {BundleConfiguration.Instance.ExtensionBundleVersion}";
-            Shell.Run("dotnet", manifestToolArguments);
         }
 
         public static void BuildExtensionsBundle(BuildConfiguration buildConfig)
