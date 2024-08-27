@@ -243,8 +243,9 @@
     "majorVersion": "0",
     "name": "Startup",
     "bindings": [
-      "fabricItem",
-      "udfProperty"
+      "FabricItem",
+      "UdfProperty",
+      "UserDataFunctionContext"
     ]
   }
 ]
