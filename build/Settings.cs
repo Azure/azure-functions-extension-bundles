@@ -24,6 +24,7 @@ namespace Build
 
         public static readonly string ToolsDirectory = Path.Combine(Path.GetFullPath(".."), "tools");
 
+        public static readonly string TemplatesArtifactsDirectory = Path.Combine(Path.GetFullPath(".."), "templatesArtifacts");
 
         public static readonly string TemplatesRootDirectory = Path.Combine(RootBinDirectory, StaticContentDirectoryName, "v1");
 
@@ -103,7 +104,7 @@ namespace Build
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "linux-x64",
                 SuppressTfmSupportBuildWarnings = false,
-                PublishReadyToRun = true,
+                PublishReadyToRun = false,
                 PublishBinDirectorySubPath = Path.Combine("bin_v3", "linux-x64")
             },
             new BuildConfiguration()

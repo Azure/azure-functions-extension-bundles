@@ -6,6 +6,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.ExceptionServices;
 
 namespace Build
 {
@@ -34,19 +35,34 @@ namespace Build
             }
         }
 
+
         public static void DownloadTemplates()
         {
-            string downloadPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            FileUtility.EnsureDirectoryExists(downloadPath);
-            string templatesZipUri = $"https://functionscdn.azureedge.net/public/ExtensionBundleTemplates/ExtensionBundle.v2.Templates.{BundleConfiguration.Instance.TemplateVersion}.zip";
-            string zipFilePath = Path.Combine(downloadPath, $"templates.zip");
-            var zipUri = new Uri(templatesZipUri);
-
-            if (DownloadZipFile(zipUri, zipFilePath))
+            bool isLocalBuild = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("BUILD_BUILDID"));
+            if (isLocalBuild)
             {
-                FileUtility.EnsureDirectoryExists(Settings.TemplatesRootDirectory);
-                ZipFile.ExtractToDirectory(zipFilePath, Settings.TemplatesRootDirectory);
+                return;
             }
+
+            var files = Directory.GetFiles(Settings.TemplatesArtifactsDirectory);
+            string zipFileName = $"ExtensionBundle.v{BundleConfiguration.Instance.ExtensionBundleVersion[0]}.Templates";
+
+            foreach (string file in files)
+            {
+                var fileName = Path.GetFileName(file);
+                if (fileName.StartsWith(zipFileName))
+                {
+                    zipFileName = fileName;
+                    break;
+                }
+            }
+
+            Console.WriteLine($"Found matching templates in ${zipFileName}");
+
+            string zipFilePath = Path.Combine(Settings.TemplatesArtifactsDirectory, zipFileName);
+            FileUtility.EnsureDirectoryExists(Settings.TemplatesRootDirectory);
+            ZipFile.ExtractToDirectory(zipFilePath, Settings.TemplatesRootDirectory);
+
 
             if (!FileUtility.DirectoryExists(Settings.TemplatesRootDirectory) || !FileUtility.FileExists(Settings.TemplatesJsonFilePath))
             {
@@ -275,7 +291,6 @@ namespace Build
 
         public static void PackageNetCoreV3BundlesLinux()
         {
-            CreateExtensionBundle(Settings.BundlePackageNetCoreV3Any);
             CreateExtensionBundle(Settings.BundlePackageNetCoreV3Linux);
         }
 
