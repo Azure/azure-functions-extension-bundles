@@ -16,11 +16,24 @@ jobs:
       packageType: 'sdk'
       version: '2.1.x'
       performMultiLevelLookup: true
+      
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
       version: '3.1.x'
       performMultiLevelLookup: true
+
+  - task: DownloadBuildArtifacts@1
+    inputs:
+      buildType: 'specific'
+      project: '3f99e810-c336-441f-8892-84983093ad7f'
+      pipeline: '963'
+      buildVersionToDownload: 'latestFromBranch'
+      branchName: 'refs/heads/release/main'
+      downloadType: 'single'
+      artifactName: 'drop'
+      downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'
+
   - task: DotNetCoreCLI@2
     inputs:
       command: 'run'
@@ -30,4 +43,4 @@ jobs:
       SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
       Contents: '*.zip'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
-      CleanTargetFolder: true
+      CleanTargetFolder: false
