@@ -6,6 +6,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.ExceptionServices;
 
 namespace Build
 {
@@ -36,18 +37,31 @@ namespace Build
 
         public static void DownloadTemplates()
         {
-            string downloadPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            FileUtility.EnsureDirectoryExists(downloadPath);
-            string previewStr = BundleConfiguration.Instance.IsPreviewBundle ? ".Preview" : String.Empty;
-            string templatesZipUri = $"https://functionscdn.azureedge.net/public/ExtensionBundleTemplates/ExtensionBundle{previewStr}.v{BundleConfiguration.Instance.ExtensionBundleVersion[0]}.Templates.{BundleConfiguration.Instance.TemplateVersion}.zip";
-            string zipFilePath = Path.Combine(downloadPath, $"templates.zip");
-            var zipUri = new Uri(templatesZipUri);
-
-            if (DownloadZipFile(zipUri, zipFilePath))
+            bool isLocalBuild = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("BUILD_BUILDID"));
+            if (isLocalBuild)
             {
-                FileUtility.EnsureDirectoryExists(Settings.TemplatesV1RootDirectory);
-                ZipFile.ExtractToDirectory(zipFilePath, Settings.TemplatesV1RootDirectory);
+                return;
             }
+
+            var files = Directory.GetFiles(Settings.TemplatesArtifactsDirectory);
+            string previewStr = BundleConfiguration.Instance.IsPreviewBundle ? ".Preview" : String.Empty;
+            string zipFileName = $"ExtensionBundle{previewStr}.v{BundleConfiguration.Instance.ExtensionBundleVersion[0]}.Templates";
+
+            foreach (string file in files)
+            {
+                var fileName = Path.GetFileName(file);
+                if (fileName.StartsWith(zipFileName))
+                {
+                    zipFileName = fileName;
+                    break;
+                }
+            }
+
+            Console.WriteLine($"Found matching templates in ${zipFileName}");
+
+            string zipFilePath = Path.Combine(Settings.TemplatesArtifactsDirectory, zipFileName);
+            FileUtility.EnsureDirectoryExists(Settings.TemplatesV1RootDirectory);
+            ZipFile.ExtractToDirectory(zipFilePath, Settings.TemplatesV1RootDirectory);
 
             if (!FileUtility.DirectoryExists(Settings.TemplatesV1RootDirectory) || !FileUtility.FileExists(Settings.TemplatesJsonFilePath))
             {
