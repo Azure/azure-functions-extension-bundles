@@ -12,7 +12,6 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             path = "../../../..";
 
             BuildSteps.Clean();
-            BuildSteps.DownloadTemplates();
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
