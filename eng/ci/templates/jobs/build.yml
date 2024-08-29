@@ -11,6 +11,16 @@ jobs:
       artifact: zip
 
   steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '2.1.x'
+      performMultiLevelLookup: true
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '3.1.x'
+      performMultiLevelLookup: true
   - task: DotNetCoreCLI@2
     inputs:
       command: 'run'
