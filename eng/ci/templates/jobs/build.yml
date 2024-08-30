@@ -1,6 +1,10 @@
 jobs:
 - job: Build
-  displayName: Build and publish artifacts
+  displayName: Build and publish artifacts for Windows
+  pool:
+    name: 1es-pool-azfunc
+    image: 1es-windows-2022
+    os: windows
 
   templateContext:
     outputParentDirectory: $(Build.ArtifactStagingDirectory)
@@ -38,9 +42,64 @@ jobs:
     inputs:
       command: 'run'
       workingDirectory: '.\build'
+      arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
+      Contents: '*.zip'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      CleanTargetFolder: false
+
+- job: BuildLinux
+  displayName: Build and publish for Linux
+  pool:
+      name: 1es-pool-azfunc
+      image: 1es-ubuntu-22.04
+      os: linux
+
+  templateContext:
+    outputParentDirectory: $(Build.ArtifactStagingDirectory)
+    outputs:
+    - output: pipelineArtifact
+      displayName: Publish bundles
+      path: $(Build.ArtifactStagingDirectory)
+      artifact: zip2
+
+  steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '2.1.x'
+      performMultiLevelLookup: true
+      
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      version: '3.1.x'
+      performMultiLevelLookup: true
+
+  - task: DownloadBuildArtifacts@1
+    inputs:
+      buildType: 'specific'
+      project: '3f99e810-c336-441f-8892-84983093ad7f'
+      pipeline: '963'
+      buildVersionToDownload: 'latestFromBranch'
+      branchName: 'refs/heads/release/main'
+      downloadType: 'single'
+      artifactName: 'drop'
+      downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
+
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+        PATH=".dotnet:"$PATH && dotnet --info
+        cd build
+        dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport
+      
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: '$(Build.Repository.LocalPath)/artifacts'
       Contents: '*.zip'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       CleanTargetFolder: false

@@ -1,6 +1,10 @@
 jobs:
 - job: RunUnitTests
   displayName: Run Unit Tests
+  pool:
+    name: 1es-pool-azfunc
+    image: 1es-windows-2022
+    os: windows
 
   steps:
   - task: UseDotNet@2

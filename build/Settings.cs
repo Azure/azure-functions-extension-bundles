@@ -37,7 +37,7 @@ namespace Build
 
         public static readonly string ArtifactsDirectory = Path.Combine(Path.GetFullPath(basePath), "artifacts");
 
-        public static readonly string TemplatesArtifactsDirectory = Path.Combine(Path.GetFullPath(basePath), "templatesArtifacts");
+        public static readonly string TemplatesArtifactsDirectory = Path.Combine(Environment.GetEnvironmentVariable("BUILD_REPOSITORY_LOCALPATH"), "templatesArtifacts");
 
         public static readonly string ToolsDirectory = Path.Combine(Path.GetFullPath(basePath), "tools");
 
@@ -124,7 +124,7 @@ namespace Build
                 SourceProjectFileName = "extensions_netcoreapp3.csproj",
                 RuntimeIdentifier = "linux-x64",
                 SuppressTfmSupportBuildWarnings = false,
-                PublishReadyToRun = false,
+                PublishReadyToRun = true,
                 PublishBinDirectorySubPath = Path.Combine("bin_v3", "linux-x64")
             },
             new BuildConfiguration()
