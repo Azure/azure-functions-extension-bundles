@@ -6,7 +6,7 @@ trigger:
     - release/v1.x
     - release/v2.x
     - release/v3.x
-    - release/v4.x.
+    - release/v4.x
     - release/v3.x-preview
     - release/v4.x-preview
 
