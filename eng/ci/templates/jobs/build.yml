@@ -32,6 +32,9 @@ jobs:
     inputs:
       command: 'run'
       workingDirectory: '.\build'
+      if: ${{ not (parameters.official) }}
+      arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux'
+
   - task: CopyFiles@2
     inputs:
       SourceFolder: '$(Build.Repository.LocalPath)\artifacts'

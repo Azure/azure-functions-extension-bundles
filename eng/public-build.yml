@@ -22,7 +22,6 @@ resources:
 extends:
   template: v1/1ES.Unofficial.PipelineTemplate.yml@1es
   parameters:
-    official: false
     pool:
       name: 1es-pool-azfunc-public
       image: 1es-windows-2022
@@ -39,3 +38,5 @@ extends:
       dependsOn: []
       jobs:
       - template: eng/ci/templates/jobs/build.yml@self
+        parameters:
+          official: false
