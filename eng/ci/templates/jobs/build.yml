@@ -28,12 +28,21 @@ jobs:
       downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'
     condition: ${{ parameters.official }}
 
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: 'run'
-      workingDirectory: '.\build'
-      if: ${{ not (parameters.official) }}
-      arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux'
+
+  - ${{ if eq(parameters.official, true) }}:
+    - task: DotNetCoreCLI@2
+      displayName: 'Official Build'
+      inputs:
+        command: 'run'
+        workingDirectory: '.\build'
+
+  - ${{ if eq(parameters.official, false) }}:
+    - task: DotNetCoreCLI@2
+      displayName: 'Public Build'
+      inputs:
+        command: 'run'
+        workingDirectory: '.\build'
+        arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
 
   - task: CopyFiles@2
     inputs:
