@@ -1,8 +1,16 @@
+parameters:
+  - name: official
+    type: boolean
+    default: false
+  - name: poolName
+    type: string
+    default: 1es-pool-azfunc-public
+
 jobs:
 - job: Build
   displayName: Build and publish artifacts for Windows
   pool:
-    name: 1es-pool-azfunc
+    name: ${{ parameters.poolName }}
     image: 1es-windows-2022
     os: windows
 
@@ -27,33 +35,39 @@ jobs:
       version: '3.1.x'
       performMultiLevelLookup: true
 
-  - task: DownloadBuildArtifacts@1
-    inputs:
-      buildType: 'specific'
-      project: '3f99e810-c336-441f-8892-84983093ad7f'
-      pipeline: '963'
-      buildVersionToDownload: 'latestFromBranch'
-      branchName: 'refs/heads/release/main'
-      downloadType: 'single'
-      artifactName: 'drop'
-      downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'
+  - ${{ if eq(parameters.official, true) }}:
+    - task: DownloadBuildArtifacts@1
+      inputs:
+        buildType: 'specific'
+        project: '3f99e810-c336-441f-8892-84983093ad7f'
+        pipeline: '963'
+        buildVersionToDownload: 'latestFromBranch'
+        branchName: 'refs/heads/release/main'
+        downloadType: 'single'
+        artifactName: 'drop'
+        downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'
 
   - task: DotNetCoreCLI@2
     inputs:
       command: 'run'
       workingDirectory: '.\build'
-      arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
-  - task: CopyFiles@2
-    inputs:
-      SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
-      Contents: '*.zip'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-      CleanTargetFolder: false
+      ${{ if eq(parameters.official, true) }}:
+        arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
+      ${{ else }}:
+        arguments: 'skip:DownloadTemplates,,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV2Bundle'
+        
+  - ${{ if eq(parameters.official, true) }}:
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
+        Contents: '*.zip'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        CleanTargetFolder: false
 
 - job: BuildLinux
   displayName: Build and publish for Linux
   pool:
-      name: 1es-pool-azfunc
+      name: ${{ parameters.poolName }}
       image: 1es-ubuntu-22.04
       os: linux
 
@@ -78,28 +92,41 @@ jobs:
       version: '3.1.x'
       performMultiLevelLookup: true
 
-  - task: DownloadBuildArtifacts@1
-    inputs:
-      buildType: 'specific'
-      project: '3f99e810-c336-441f-8892-84983093ad7f'
-      pipeline: '963'
-      buildVersionToDownload: 'latestFromBranch'
-      branchName: 'refs/heads/release/main'
-      downloadType: 'single'
-      artifactName: 'drop'
-      downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
+  - ${{ if eq(parameters.official, true) }}:
+    - task: DownloadBuildArtifacts@1
+      inputs:
+        buildType: 'specific'
+        project: '3f99e810-c336-441f-8892-84983093ad7f'
+        pipeline: '963'
+        buildVersionToDownload: 'latestFromBranch'
+        branchName: 'refs/heads/release/main'
+        downloadType: 'single'
+        artifactName: 'drop'
+        downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
 
-  - task: Bash@3
-    inputs:
-      targetType: 'inline'
-      script: |
-        PATH=".dotnet:"$PATH && dotnet --info
-        cd build
-        dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport
-      
-  - task: CopyFiles@2
-    inputs:
-      SourceFolder: '$(Build.Repository.LocalPath)/artifacts'
-      Contents: '*.zip'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-      CleanTargetFolder: false
+  - ${{ if eq(parameters.official, false) }}:      
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: |
+          PATH=".dotnet:"$PATH && dotnet --info
+          cd build
+          dotnet run skip:DownloadTemplates,PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux
+
+  - ${{ if eq(parameters.official, true) }}:      
+    - task: Bash@3
+      inputs:
+        targetType: 'inline'
+        script: |
+          PATH=".dotnet:"$PATH && dotnet --info
+          cd build
+          dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport
+
+
+  - ${{ if eq(parameters.official, true) }}:      
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.Repository.LocalPath)/artifacts'
+        Contents: '*.zip'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        CleanTargetFolder: false
