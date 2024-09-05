@@ -44,7 +44,7 @@ jobs:
         workingDirectory: '.\build'
         arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
 
-  - ${{ if eq(parameters.official, false) }}:
+  - ${{ if eq(parameters.official, true) }}:
     - task: CopyFiles@2
       inputs:
         SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
