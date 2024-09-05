@@ -2,6 +2,8 @@ trigger:
   branches:
     include:
     - main
+    - release/v2.x
+    - release/v3.x
     - release/v4.x
     - release/v4.x-preview
 
@@ -9,6 +11,8 @@ pr:
   branches:
     include:
     - main
+    - release/v2.x
+    - release/v3.x
     - release/v4.x
     - release/v4.x-preview
 
@@ -38,3 +42,5 @@ extends:
       dependsOn: []
       jobs:
       - template: eng/ci/templates/jobs/build.yml@self
+        parameters:
+          official: false
