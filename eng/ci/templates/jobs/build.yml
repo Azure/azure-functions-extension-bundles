@@ -44,9 +44,10 @@ jobs:
         workingDirectory: '.\build'
         arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
 
-  - task: CopyFiles@2
-    inputs:
-      SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
-      Contents: '*.zip'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-      CleanTargetFolder: false
+  - ${{ if eq(parameters.official, false) }}:
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
+        Contents: '*.zip'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        CleanTargetFolder: false
