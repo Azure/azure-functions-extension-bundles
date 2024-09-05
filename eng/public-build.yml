@@ -38,3 +38,7 @@ extends:
       dependsOn: []
       jobs:
       - template: eng/ci/templates/jobs/build.yml@self
+        parameters:
+          official: false
+          poolName: 1es-pool-azfunc-public
+

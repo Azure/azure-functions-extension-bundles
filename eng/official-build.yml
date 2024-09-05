@@ -58,3 +58,4 @@ extends:
       - template: eng/ci/templates/jobs/build.yml@self
         parameters:
           official: true
+          poolName: 1es-pool-azfunc
