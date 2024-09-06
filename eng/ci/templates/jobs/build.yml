@@ -1,3 +1,8 @@
+parameters:
+  - name: official
+    type: boolean
+    default: false
+    
 jobs:
 - job: Build
   displayName: Build and publish artifacts
@@ -21,14 +26,20 @@ jobs:
       downloadType: 'single'
       artifactName: 'drop'
       downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'
+    condition: ${{ parameters.official }}
 
   - task: DotNetCoreCLI@2
+    displayName: 'Build'
     inputs:
       command: 'run'
       workingDirectory: '.\build'
-  - task: CopyFiles@2
-    inputs:
-      SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
-      Contents: '*.zip'
-      TargetFolder: '$(Build.ArtifactStagingDirectory)'
-      CleanTargetFolder: false
+      ${{ if eq(parameters.official, false) }}:
+        arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
+
+  - ${{ if eq(parameters.official, true) }}:
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
+        Contents: '*.zip'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        CleanTargetFolder: false
