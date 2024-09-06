@@ -1,6 +1,15 @@
+parameters:
+  - name: poolName
+    type: string
+    default: 1es-pool-azfunc-public
+
 jobs:
 - job: RunUnitTests
   displayName: Run Unit Tests
+  pool:
+    name: ${{ parameters.poolName }}
+    image: 1es-windows-2022
+    os: windows
 
   steps:
   - task: UseDotNet@2

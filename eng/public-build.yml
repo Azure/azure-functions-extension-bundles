@@ -33,6 +33,8 @@ extends:
 
       jobs:
       - template: eng/ci/templates/jobs/run-unit-test.yml@self
+        parameters:
+          poolName: 1es-pool-azfunc
     
     - stage: Build
       dependsOn: []
