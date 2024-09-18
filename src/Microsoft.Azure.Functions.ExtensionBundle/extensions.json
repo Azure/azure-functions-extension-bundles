@@ -212,6 +212,14 @@
     ]
   },
   {
+    "id": "Microsoft.Azure.WebJobs.Extensions.MySql",
+    "majorVersion": "1",
+    "name": "MySqlBinding",
+    "bindings": [
+      "MySql"
+    ]
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.AzureAISearch",
     "majorVersion": "0",
     "name": "OpenAIAzureAISearch",
