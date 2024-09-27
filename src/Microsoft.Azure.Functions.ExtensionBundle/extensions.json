@@ -216,7 +216,8 @@
     "majorVersion": "1",
     "name": "MySqlBinding",
     "bindings": [
-      "MySql"
+      "MySql",
+      "MySqlTrigger"
     ]
   },
   {
