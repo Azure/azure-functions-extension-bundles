@@ -262,5 +262,15 @@
     "Version": "6.0.1",
     "name": "SystemFormatsAsn1",
     "bindings": []
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO",
+    "majorVersion": "1",
+    "name": "WebPubSubForSocketIO",
+    "bindings": [
+      "socketiotrigger",
+      "socketionegotiation",
+      "socketio"
+    ]
   }
 ]
