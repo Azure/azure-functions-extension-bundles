@@ -1057,8 +1057,8 @@
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Azure.Functions.Extensions.Dapr.Core.dll": {
-            "assemblyVersion": "99.99.99.0",
-            "fileVersion": "99.99.99.0"
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
           }
         }
       },
@@ -1271,8 +1271,8 @@
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.Dapr.dll": {
-            "assemblyVersion": "99.99.99.0",
-            "fileVersion": "99.99.99.0"
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
           }
         }
       },
@@ -2574,8 +2574,8 @@
         },
         "runtime": {
           "lib/netstandard2.0/System.Memory.Data.dll": {
-            "assemblyVersion": "1.0.2.0",
-            "fileVersion": "1.0.221.20802"
+            "assemblyVersion": "6.0.0.0",
+            "fileVersion": "6.0.21.52210"
           }
         }
       },
