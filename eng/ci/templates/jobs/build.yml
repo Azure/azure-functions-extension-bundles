@@ -34,7 +34,7 @@ jobs:
       command: 'run'
       workingDirectory: '.\build'
       ${{ if eq(parameters.official, false) }}:
-        arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
+        arguments: 'skip:DownloadTemplates,GenerateVulnerabilityReport,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
 
   - ${{ if eq(parameters.official, true) }}:
     - task: CopyFiles@2
