@@ -54,7 +54,7 @@ jobs:
       ${{ if eq(parameters.official, true) }}:
         arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
       ${{ else }}:
-        arguments: 'skip:DownloadTemplates,,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV2Bundle'
+        arguments: 'skip:DownloadTemplates,GenerateVulnerabilityReport,,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV2Bundle'
         
   - ${{ if eq(parameters.official, true) }}:
     - task: CopyFiles@2
