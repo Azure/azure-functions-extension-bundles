@@ -52,9 +52,9 @@ jobs:
       command: 'run'
       workingDirectory: '.\build'
       ${{ if eq(parameters.official, true) }}:
-        arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
+        arguments: 'skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
       ${{ else }}:
-        arguments: 'skip:DownloadTemplates,GenerateVulnerabilityReport,,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV2Bundle'
+        arguments: 'skip:DownloadTemplates,GenerateVulnerabilityReport,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV2Bundle'
         
   - ${{ if eq(parameters.official, true) }}:
     - task: CopyFiles@2
@@ -111,7 +111,7 @@ jobs:
         script: |
           PATH=".dotnet:"$PATH && dotnet --info
           cd build
-          dotnet run skip:DownloadTemplates,PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux
+          dotnet run skip:DownloadTemplates,GenerateVulnerabilityReport,PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux
 
   - ${{ if eq(parameters.official, true) }}:      
     - task: Bash@3
@@ -120,7 +120,7 @@ jobs:
         script: |
           PATH=".dotnet:"$PATH && dotnet --info
           cd build
-          dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport
+          dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport
 
 
   - ${{ if eq(parameters.official, true) }}:      
