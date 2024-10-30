@@ -35,6 +35,8 @@ jobs:
       workingDirectory: '.\build'
       ${{ if eq(parameters.official, false) }}:
         arguments: 'skip:DownloadTemplates,GenerateVulnerabilityReport,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
+      ${{ else }}:
+        arguments: 'skip:GenerateVulnerabilityReport
 
   - ${{ if eq(parameters.official, true) }}:
     - task: CopyFiles@2
