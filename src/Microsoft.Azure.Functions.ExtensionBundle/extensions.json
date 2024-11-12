@@ -1,7 +1,7 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "majorVersion": "5",
+    "Version": "5.3.2",
     "name": "AzureStorage",
     "bindings": [
       "blobtrigger",
@@ -12,7 +12,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
-    "majorVersion": "5",
+    "Version": "5.3.2",
     "name": "AzureStorageQueues",
     "bindings": [
       "queue",
@@ -21,7 +21,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
-    "majorVersion": "5",
+    "Version": "5.3.2",
     "name": "AzureStorageBlobs",
     "bindings": [
       "blobtrigger",
