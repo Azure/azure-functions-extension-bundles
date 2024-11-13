@@ -7,6 +7,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.ExceptionServices;
+using System.Threading.Tasks;
 
 namespace Build
 {
@@ -101,14 +102,15 @@ namespace Build
 
         public static void BuildBundleBinariesForWindows()
         {
-            Settings.WindowsBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config));
+            Settings.WindowsBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config).GetAwaiter().GetResult());
         }
 
         public static void BuildBundleBinariesForLinux()
         {
-            Settings.LinuxBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config));
+            Settings.LinuxBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config).GetAwaiter().GetResult());
         }
-        public static string GenerateBundleProjectFile(BuildConfiguration buildConfig)
+
+        public static async Task<string> GenerateBundleProjectFile(BuildConfiguration buildConfig)
         {
             var sourceNugetConfig = Path.Combine(Settings.SourcePath, Settings.NugetConfigFileName);
             var sourceProjectFilePath = Path.Combine(Settings.SourcePath, buildConfig.SourceProjectFileName);
@@ -120,16 +122,16 @@ namespace Build
             FileUtility.CopyFile(sourceProjectFilePath, targetProjectFilePath);
             FileUtility.CopyFile(sourceNugetConfig, targetNugetConfigFilePath);
 
-            AddExtensionPackages(targetProjectFilePath, BundleConfiguration.Instance.IsPreviewBundle);
+            await AddExtensionPackages(targetProjectFilePath, BundleConfiguration.Instance.IsPreviewBundle);
             return targetProjectFilePath;
         }
 
-        public static void AddExtensionPackages(string projectFilePath, bool addPrereleasePackages)
+        public static async Task AddExtensionPackages(string projectFilePath, bool addPrereleasePackages)
         {
             var extensions = GetExtensionList();
             foreach (var extension in extensions)
             {
-                string version = string.IsNullOrEmpty(extension.Version) ? Helper.GetLatestPackageVersion(extension.Id, extension.MajorVersion, addPrereleasePackages) : extension.Version;
+                string version = string.IsNullOrEmpty(extension.Version) ? await Helper.GetLatestPackageVersion(extension.Id, extension.MajorVersion, addPrereleasePackages) : extension.Version;
                 Shell.Run("dotnet", $"add {projectFilePath} package {extension.Id} -v {version} -n");
             }
         }
@@ -151,9 +153,9 @@ namespace Build
             }
         }
 
-        public static void BuildExtensionsBundle(BuildConfiguration buildConfig)
+        public static async Task BuildExtensionsBundle(BuildConfiguration buildConfig)
         {
-            var projectFilePath = GenerateBundleProjectFile(buildConfig);
+            var projectFilePath = await GenerateBundleProjectFile(buildConfig);
 
             var publishCommandArguments = $"publish {projectFilePath} -c Release -o {buildConfig.PublishDirectoryPath}";
 

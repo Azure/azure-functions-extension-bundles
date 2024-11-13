@@ -86,7 +86,8 @@ namespace Build
                     {
                         throw new FileNotFoundException(ex.Message, ex);
                     }
-                    throw ex;
+
+                    throw ;
                 }
 
                 if (_streamOutput)
