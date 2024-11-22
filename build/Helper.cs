@@ -1,11 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NuGet.Versioning;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Net.Http;
-using System.Text;
 
 namespace Build
 {
@@ -20,28 +14,5 @@ namespace Build
                 MaxConnectionsPerServer = 50
             });
         });
-
-        public static string GetLatestPackageVersion(string packageId, int majorVersion, bool isPrerelease = false)
-        {
-            string url = $"https://api.nuget.org/v3-flatcontainer/{packageId.ToLower()}/index.json";
-            var response = HttpClient.GetStringAsync(url).Result;
-            var versionsObject = JObject.Parse(response);
-
-            var versions = JsonConvert.DeserializeObject<IEnumerable<string>>(versionsObject["versions"].ToString());
-
-            var nuGetVersions = versions.Select(p =>
-            {
-                if (NuGetVersion.TryParse(p, out NuGetVersion nuGetVersion) && nuGetVersion.Major == majorVersion)
-                {
-                    return nuGetVersion;
-                }
-                return null;
-            }).Where(v =>
-            {
-                return v != null && (v.IsPrerelease == false || isPrerelease);
-            });
-
-            return nuGetVersions.OrderByDescending(p => p).FirstOrDefault().OriginalVersion;
-        }
     }
 }

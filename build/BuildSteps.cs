@@ -6,7 +6,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
-using System.Runtime.ExceptionServices;
 
 namespace Build
 {
@@ -129,25 +128,8 @@ namespace Build
             var extensions = GetExtensionList();
             foreach (var extension in extensions)
             {
-                string version = string.IsNullOrEmpty(extension.Version) ? Helper.GetLatestPackageVersion(extension.Id, extension.MajorVersion, addPrereleasePackages) : extension.Version;
+                string version = string.IsNullOrEmpty(extension.Version) ? $"{extension.MajorVersion}.*.*" : extension.Version;
                 Shell.Run("dotnet", $"add {projectFilePath} package {extension.Id} -v {version} -n");
-            }
-        }
-
-        public static void AddPackagesSources()
-        {
-            var extensions = GetExtensionList();
-            foreach (var extension in Settings.nugetSources)
-            {
-                try
-                {
-                    Shell.Run("dotnet", $"nuget add source {extension.Value} -n {extension.Key}");
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-
             }
         }
 
@@ -235,24 +217,6 @@ namespace Build
         {
             var extensionsJsonFileContent = FileUtility.ReadAllText(Settings.ExtensionsJsonFilePath);
             return JsonConvert.DeserializeObject<List<Extension>>(extensionsJsonFileContent);
-        }
-
-        public static bool DownloadZipFile(Uri zipUri, string filePath)
-        {
-            using (var httpClient = new HttpClient())
-            {
-                var response = httpClient.GetAsync(zipUri).GetAwaiter().GetResult();
-                if (!response.IsSuccessStatusCode)
-                {
-                    return false;
-                }
-
-                var content = response.Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
-                var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true);
-                stream.Write(content);
-                stream.Close();
-            }
-            return true;
         }
 
         public static void CreateExtensionBundle(BundlePackageConfiguration bundlePackageConfig)
