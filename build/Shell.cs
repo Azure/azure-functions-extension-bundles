@@ -1,10 +1,10 @@
+using Colors.Net;
+using Colors.Net.StringColorExtensions;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
-using Colors.Net;
-using Colors.Net.StringColorExtensions;
 
 namespace Build
 {
@@ -87,7 +87,7 @@ namespace Build
                         throw new FileNotFoundException(ex.Message, ex);
                     }
 
-                    throw ;
+                    throw;
                 }
 
                 if (_streamOutput)
