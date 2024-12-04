@@ -11,6 +11,12 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 }
 ```
 
+## Build status
+|Branch|Status|
+|------|------|
+|main|[![Build Status](https://azfunc.visualstudio.com/public/_apis/build/status/extension-bundles.public?branchName=main)](https://azfunc.visualstudio.com/public/_build?definitionId=939&_a=summary&repositoryFilter=200&branchFilter=10900%2C10900%2C10900%2C10900)|
+|release/v4.x|[![Build Status](https://azfunc.visualstudio.com/public/_apis/build/status/extension-bundles.public?branchName=release/v4.x)](https://azfunc.visualstudio.com/public/_build?definitionId=939&_a=summary&repositoryFilter=200&branchFilter=11388)|
+
 ## Build Requirements
 - [Dotnet Core SDK 2.2](https://dotnet.microsoft.com/en-us/download/dotnet/2.2)
 - [Dotnet Core SDK 3.1](https://dotnet.microsoft.com/en-us/download/dotnet/3.1)
