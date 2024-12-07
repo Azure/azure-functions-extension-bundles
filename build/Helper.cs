@@ -1,47 +1,27 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NuGet.Versioning;
-using System;
-using System.Collections.Generic;
+﻿using NuGet.Common;
+using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Build
 {
     public class Helper
     {
-        public static HttpClient HttpClient => _lazyClient.Value;
-
-        private static Lazy<HttpClient> _lazyClient = new Lazy<HttpClient>(() =>
+        public static async Task<string> GetLatestPackageVersion(string packageId, int majorVersion, bool isPrerelease = false)
         {
-            return new HttpClient(new HttpClientHandler
-            {
-                MaxConnectionsPerServer = 50
-            });
-        });
+            var repository = Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
+            var resource = await repository.GetResourceAsync<PackageMetadataResource>();
 
-        public static string GetLatestPackageVersion(string packageId, int majorVersion, bool isPrerelease = false)
-        {
-            string url = $"https://api.nuget.org/v3-flatcontainer/{packageId.ToLower()}/index.json";
-            var response = HttpClient.GetStringAsync(url).Result;
-            var versionsObject = JObject.Parse(response);
+            var packages = await resource.GetMetadataAsync(packageId, includePrerelease: isPrerelease, includeUnlisted: false,
+                new SourceCacheContext(), NullLogger.Instance, CancellationToken.None);
 
-            var versions = JsonConvert.DeserializeObject<IEnumerable<string>>(versionsObject["versions"].ToString());
+            var package = packages
+                .OrderByDescending(p => p.Identity.Version)
+                .FirstOrDefault(p => p.Identity.Version.Major == majorVersion);
 
-            var nuGetVersions = versions.Select(p =>
-            {
-                if (NuGetVersion.TryParse(p, out NuGetVersion nuGetVersion) && nuGetVersion.Major == majorVersion)
-                {
-                    return nuGetVersion;
-                }
-                return null;
-            }).Where(v =>
-            {
-                return v != null && (v.IsPrerelease == false || isPrerelease);
-            });
-
-            return nuGetVersions.OrderByDescending(p => p).FirstOrDefault().OriginalVersion;
+            return package?.Identity.Version.OriginalVersion;
         }
     }
 }
