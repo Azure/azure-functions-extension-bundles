@@ -1,5 +1,5 @@
 # Overview
-Extension bundle provides a way for non-dotnet function apps to reference and use to Azure Function extension packages written in C#. It does that by bundling several of the azure function extensions into a single package and then referencing extension bundle via host.json. Below is sample configuration for extension bundles.
+Extension bundles provide a way for non-.NET function apps to reference and use Azure Function extension packages written in C#. It bundles several of the Azure Function extensions into a single package which can then be referenced extension via the `host.json` file. Below is a sample configuration:
 
 ```Json
 {
@@ -14,12 +14,8 @@ Extension bundle provides a way for non-dotnet function apps to reference and us
 ## Build status
 |Branch|Status|
 |------|------|
-|v1.x|[![Build Status](https://azfunc.visualstudio.com/Azure%20Functions/_apis/build/status/Azure.azure-functions-extension-bundles?branchName=v1.x)](https://azfunc.visualstudio.com/Azure%20Functions/_build?definitionId=41&_a=summary&repositoryFilter=26&branchFilter=509%2C509%2C509%2C509%2C509%2C509%2C509%2C509%2C509)|
-|v2.x|[![Build Status](https://azfunc.visualstudio.com/Azure%20Functions/_apis/build/status/Azure.azure-functions-extension-bundles?branchName=v2.x)](https://azfunc.visualstudio.com/Azure%20Functions/_build?definitionId=41&_a=summary&repositoryFilter=26&branchFilter=865%2C865%2C865%2C865%2C865%2C865%2C865%2C865)|
-|v3.x|[![Build Status](https://azfunc.visualstudio.com/Azure%20Functions/_apis/build/status/Azure.azure-functions-extension-bundles?branchName=v3.x)](https://azfunc.visualstudio.com/Azure%20Functions/_build?definitionId=41&_a=summary&repositoryFilter=26&branchFilter=1969%2C1969%2C1969%2C1969)|
-|v3.x-preview|[![Build Status](https://azfunc.visualstudio.com/Azure%20Functions/_apis/build/status/Azure.azure-functions-extension-bundles?branchName=v3.x-preview)](https://azfunc.visualstudio.com/Azure%20Functions/_build?definitionId=41&_a=summary&repositoryFilter=26&branchFilter=3154)|
-|v4.x-preview|[![Build Status](https://azfunc.visualstudio.com/Azure%20Functions/_apis/build/status/Azure.azure-functions-extension-bundles?branchName=v4.x-preview)](https://azfunc.visualstudio.com/Azure%20Functions/_build?definitionId=41&_a=summary&repositoryFilter=26&branchFilter=4220)|
-
+|main|[![Build Status](https://azfunc.visualstudio.com/public/_apis/build/status/extension-bundles.public?branchName=main)](https://azfunc.visualstudio.com/public/_build?definitionId=939&_a=summary&repositoryFilter=200&branchFilter=10900%2C10900%2C10900%2C10900)|
+|release/v4.x|[![Build Status](https://azfunc.visualstudio.com/public/_apis/build/status/extension-bundles.public?branchName=release/v4.x)](https://azfunc.visualstudio.com/public/_build?definitionId=939&_a=summary&repositoryFilter=200&branchFilter=11388)|
 
 ## Build Requirements
 - [Dotnet Core SDK 2.2](https://dotnet.microsoft.com/en-us/download/dotnet/2.2)
@@ -41,7 +37,7 @@ cd build
 dotnet run skip:dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows
 ```
 
-## Add extension to a extension bundle
+## Add extension
 1. Identify the bundle version you want to update and checkout the corresponding branch
 
     |Bundle version | Branch |
@@ -74,7 +70,7 @@ dotnet run skip:dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,C
     ```
 3. Build and test the extension bundle
 
-## Add template to extension bundle.
+## Add template
 - Follow the steps mentioned at the link below to add a template to extension bundle.
     - https://github.com/Azure/azure-functions-templates#adding-a-template-to-extension-bundle
 
@@ -89,7 +85,7 @@ dotnet run skip:dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,C
 1. Set the working directory to be the `build` directory
 1. F5
 
-## Test an Extension Bundle
+## Test
 1. Build extension bundles locally and locate the `artifacts\Microsoft.Azure.Functions.ExtensionBundle.{version}_any-any.zip` file.
 2. Create a function app via core tools, open host.json to verify that it has extension bundle configuration present.
     - Sample commands for node app: `func init . --worker-runtime node`
@@ -98,7 +94,6 @@ dotnet run skip:dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,C
 4. Replace the contents of the bundle directory from step 3 with the contents of the zip file from Step 1.
 
 # Contributing
-
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
 the rights to use your contribution. For details, visit https://cla.microsoft.com.
