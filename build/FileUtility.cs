@@ -65,7 +65,7 @@ namespace Build
                 // Ensure the destination path is within the target directory
                 if (!destinationPath.StartsWith(Path.GetFullPath(to), StringComparison.Ordinal))
                 {
-                    throw new UnauthorizedAccessException("Entry is outside the target directory.");
+                    throw new UnauthorizedAccessException($"Entry '{file.FullName}' is outside the target directory.");
                 }
 
                 file.ExtractToFile(destinationPath, overwrite: true);
