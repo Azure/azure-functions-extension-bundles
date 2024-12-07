@@ -57,12 +57,18 @@ namespace Build
 
         public static void ExtractZipFileForce(string zipFile, string to)
         {
-            using (var archive = ZipFile.OpenRead(zipFile))
+            using var archive = ZipFile.OpenRead(zipFile);
+            foreach (ZipArchiveEntry file in archive.Entries)
             {
-                foreach (ZipArchiveEntry file in archive.Entries)
+                string destinationPath = Path.GetFullPath(Path.Combine(to, file.FullName));
+
+                // Ensure the destination path is within the target directory
+                if (!destinationPath.StartsWith(Path.GetFullPath(to), StringComparison.Ordinal))
                 {
-                    file.ExtractToFile(Path.Combine(to, file.FullName), overwrite: true);
+                    throw new UnauthorizedAccessException("Entry is outside the target directory.");
                 }
+
+                file.ExtractToFile(destinationPath, overwrite: true);
             }
         }
 
