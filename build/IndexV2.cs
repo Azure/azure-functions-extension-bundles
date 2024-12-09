@@ -1,15 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Build
 {
     public class IndexV2
     {
-        public string DefaultVersionRange { get; set; } = "[3.*, 4.0.0)";
-
         public Dictionary<string, Dictionary<string, string>> BundleVersions { get; set; } = new Dictionary<string, Dictionary<string, string>>();
 
         public Template Templates { get; set; } = new Template();
