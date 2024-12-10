@@ -80,56 +80,5 @@ namespace Build
         public static bool FileExists(string path) => Instance.File.Exists(path);
 
         public static bool DirectoryExists(string path) => Instance.Directory.Exists(path);
-
-        private static void DeleteDirectoryContentsSafe(DirectoryInfoBase directoryInfo, bool ignoreErrors)
-        {
-            try
-            {
-                if (directoryInfo.Exists)
-                {
-                    foreach (var fsi in directoryInfo.GetFileSystemInfos())
-                    {
-                        DeleteFileSystemInfo(fsi, ignoreErrors);
-                    }
-                }
-            }
-            catch when (ignoreErrors)
-            {
-            }
-        }
-
-        private static void DeleteFileSystemInfo(FileSystemInfoBase fileSystemInfo, bool ignoreErrors)
-        {
-            if (!fileSystemInfo.Exists)
-            {
-                return;
-            }
-
-            try
-            {
-                fileSystemInfo.Attributes = FileAttributes.Normal;
-            }
-            catch when (ignoreErrors)
-            {
-            }
-
-            if (fileSystemInfo is DirectoryInfoBase directoryInfo)
-            {
-                DeleteDirectoryContentsSafe(directoryInfo, ignoreErrors);
-            }
-
-            DoSafeAction(fileSystemInfo.Delete, ignoreErrors);
-        }
-
-        private static void DoSafeAction(Action action, bool ignoreErrors)
-        {
-            try
-            {
-                action();
-            }
-            catch when (ignoreErrors)
-            {
-            }
-        }
     }
 }
