@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using static Build.BuildSteps;
+﻿using static Build.BuildSteps;
 
 namespace Build
 {
