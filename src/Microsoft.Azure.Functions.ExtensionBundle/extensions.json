@@ -20,14 +20,6 @@
     ]
   },
   {
-    "id": "Microsoft.Azure.WebJobs.Extensions.Tables",
-    "majorVersion": "1",
-    "name": "AzureTables",
-    "bindings": [
-      "table"
-    ]
-  },
-  {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
     "majorVersion": "5",
     "name": "AzureStorageBlobs",
@@ -76,7 +68,7 @@
   },
   {
     "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
-    "version": "1.4.0",
+    "majorVersion": "1",
     "name": "SqlDurabilityProvider",
     "bindings": [
       "activitytrigger",
@@ -138,7 +130,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
-    "majorVersion": "2",
+    "majorVersion": "1",
     "name": "RabbitMQ",
     "bindings": [
       "rabbitmqtrigger",
@@ -164,49 +156,34 @@
     ]
   },
   {
-    "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSub",
+    "id": "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents",
     "majorVersion": "1",
-    "name": "WebPubSub",
+    "name": "WebJobsAuthenticationEvent",
     "bindings": [
-      "webpubsub",
-      "webpubsubconnection",
-      "webpubsubrequest",
-      "webpubsubtrigger"
+      "AuthenticationEventsTrigger"
     ]
   },
   {
-    "id": "Azure.Storage.Queues",
-    "majorVersion": "12",
-    "name": "AzureStorageQueues",
-    "bindings": []
+    "id": "Microsoft.Azure.WebJobs.Extensions.Kusto",
+    "majorVersion": "1",
+    "name": "KustoBinding",
+    "bindings": [
+      "Kusto"
+    ]
   },
   {
-    "id": "System.Private.Uri",
-    "Version": "4.3.2",
-    "name": "SystemPrivateUri",
-    "bindings": []
-  },
-  {
-    "id": "Microsoft.IdentityModel.JsonWebTokens",
-    "Version": "6.35.0",
-    "name": "SystemIdentityModelTokensJwt",
-    "bindings": []
-  },
-  {
-    "id": "System.IdentityModel.Tokens.Jwt",
-    "Version": "6.35.0",
-    "name": "SystemIdentityModelTokensJwt",
-    "bindings": []
-  },
-  {
-    "id": "Microsoft.Data.SqlClient",
-    "Version": "5.1.3",
-    "name": "MicrosoftDataSqlClient",
-    "bindings": []
+    "id": "Microsoft.Azure.WebJobs.Extensions.Redis",
+    "majorVersion": "0",
+    "name": "Redis",
+    "bindings": [
+      "RedisPubSubTrigger",
+      "RedisStreamTrigger",
+      "RedisListTrigger"
+    ]
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
-    "majorVersion": "1",
+    "majorVersion": "0",
     "name": "Dapr",
     "bindings": [
       "daprBinding",
@@ -220,14 +197,64 @@
     ]
   },
   {
-    "id": "Microsoft.Azure.WebJobs.Extensions.Redis",
-    "majorVersion": "1",
-    "name": "Redis",
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI",
+    "majorVersion": "0",
+    "name": "OpenAI",
     "bindings": [
-      "redisPubSubTrigger",
-      "redisStreamTrigger",
-      "redisListTrigger",
-      "redis"
+      "TextCompletion",
+      "AssistantCreate",
+      "AssistantQuery",
+      "AssistantPost",
+      "SemanticSearch",
+      "Embeddings",
+      "EmbeddingsStore",
+      "AssistantSkillTrigger"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.MySql",
+    "majorVersion": "1",
+    "name": "MySqlBinding",
+    "bindings": [
+      "MySql",
+      "MySqlTrigger"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.AzureAISearch",
+    "majorVersion": "0",
+    "name": "OpenAIAzureAISearch",
+    "bindings": [
+      "SemanticSearch",
+      "EmbeddingsStore"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.CosmosDBSearch",
+    "majorVersion": "0",
+    "name": "OpenAICosmosDBSearch",
+    "bindings": [
+      "SemanticSearch",
+      "EmbeddingsStore"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.Kusto",
+    "majorVersion": "0",
+    "name": "OpenAIKusto",
+    "bindings": [
+      "SemanticSearch",
+      "EmbeddingsStore"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Fabric",
+    "majorVersion": "0",
+    "name": "Startup",
+    "bindings": [
+      "FabricItem",
+      "UdfProperty",
+      "UserDataFunctionContext"
     ]
   },
   {
