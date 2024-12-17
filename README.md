@@ -16,7 +16,7 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 
 |Branch|Status|
 |------|------|
-|main-preview|[![Build Status](https://azfunc.visualstudio.com/public/_apis/build/status/extension-bundles.public?branchName=main-preview)](https://azfunc.visualstudio.com/public/_build?definitionId=939&_a=summary&branchFilter=12530)|
+|main|[![Build Status](https://azfunc.visualstudio.com/public/_apis/build/status/extension-bundles.public?branchName=main)](https://azfunc.visualstudio.com/public/_build?definitionId=939&branchFilter=10900%2C10900%2C10900%2C10900%2C10900%2C10900)|
 
 ## Build Requirements
 
