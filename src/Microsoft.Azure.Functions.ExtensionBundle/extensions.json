@@ -200,7 +200,7 @@
   },
   {
     "id": "Microsoft.Data.SqlClient",
-    "Version": "5.1.3",
+    "majorVersion": "5",
     "name": "MicrosoftDataSqlClient",
     "bindings": []
   },
