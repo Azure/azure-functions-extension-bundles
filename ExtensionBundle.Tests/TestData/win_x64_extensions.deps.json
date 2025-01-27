@@ -831,7 +831,7 @@
           "Azure.Storage.Blobs": "12.20.0",
           "Azure.Storage.Queues":"12.18.0",
           "Microsoft.Azure.DurableTask.Core": "3.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.1"
         },
         "runtime": {
           "lib/netstandard2.0/DurableTask.AzureStorage.dll": {
@@ -1177,8 +1177,8 @@
         },
         "runtime": {
           "lib/net6.0/Microsoft.Azure.WebJobs.Extensions.DurableTask.dll": {
-            "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.13.4.0"
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.0.0.0"
           }
         }
       },
@@ -3638,12 +3638,12 @@
       "path": "microsoft.azure.cosmos/3.41.0",
       "hashPath": "microsoft.azure.cosmos.3.41.0.nupkg.sha512"
     },
-    "Microsoft.Azure.DurableTask.ApplicationInsights/2.0.0": {
+    "Microsoft.Azure.DurableTask.ApplicationInsights/0.2.0": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-/mBhUF82NJq1mNr2u/7LkP3oDPqtw9jpH8Xo2yYxjwpIX3REK9bvgH1hqcBOLQTZIMGRDqjq6W/pEEzLqH1iZg==",
-      "path": "microsoft.azure.durabletask.applicationinsights/2.0.0",
-      "hashPath": "microsoft.azure.durabletask.applicationinsights.2.0.0.nupkg.sha512"
+      "path": "microsoft.azure.durabletask.applicationinsights/0.2.0",
+      "hashPath": "microsoft.azure.durabletask.applicationinsights.0.2.0.nupkg.sha512"
     },
     "Microsoft.Azure.DurableTask.AzureStorage/2.0.1": {
       "type": "package",

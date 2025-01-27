@@ -805,7 +805,7 @@
           "Azure.Storage.Blobs": "12.20.0",
           "Azure.Storage.Queues":"12.18.0",
           "Microsoft.Azure.DurableTask.Core": "3.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0"
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.1"
         },
         "runtime": {
           "lib/netstandard2.0/DurableTask.AzureStorage.dll": {
@@ -1151,8 +1151,8 @@
         },
         "runtime": {
           "lib/net6.0/Microsoft.Azure.WebJobs.Extensions.DurableTask.dll": {
-            "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.13.4.0"
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.0.0.0"
           }
         }
       },
