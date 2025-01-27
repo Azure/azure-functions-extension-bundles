@@ -815,6 +815,7 @@
       },
       "Microsoft.Azure.DurableTask.AzureStorage/2.0.1": {
         "dependencies": {
+          "Azure.Core":"1.41.0",
           "Azure.Data.Tables": "12.9.1",
           "Azure.Storage.Blobs": "12.20.0",
           "Azure.Storage.Queues":"12.18.0",
@@ -831,7 +832,7 @@
       "Microsoft.Azure.DurableTask.Core/3.0.0": {
         "dependencies": {
           "Castle.Core": "5.0.0",
-          "Microsoft.Extensions.Logging.Abstractions": "6.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "6.0.1",
           "Newtonsoft.Json": "13.0.3",
           "System.Diagnostics.DiagnosticSource": "6.0.1",
           "System.Reactive.Compatibility": "4.4.1",
@@ -1537,7 +1538,7 @@
           "System.Threading.Channels": "4.7.1"
         },
         "runtime": {
-          "lib/netstandard2.0/DurableTask.SqlServer.dll": {
+          "lib/net6.0/DurableTask.SqlServer.dll": {
             "assemblyVersion": "1.5.0.0",
             "fileVersion": "1.5.0.61594"
           }
