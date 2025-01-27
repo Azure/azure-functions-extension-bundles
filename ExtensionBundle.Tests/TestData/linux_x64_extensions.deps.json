@@ -838,7 +838,6 @@
           "Azure.Storage.Blobs": "12.22.1",
           "Microsoft.Azure.DurableTask.Core": "3.0.0",
           "Microsoft.Azure.EventHubs.Processor": "4.3.2",
-          "Microsoft.Azure.Storage.Blob": "11.2.3",
           "Microsoft.FASTER.Core": "2.6.5",
           "Newtonsoft.Json": "13.0.3",
           "System.Threading.Channels": "4.7.1"
