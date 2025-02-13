@@ -71,8 +71,8 @@ namespace Build
 
         public static List<IndexFileV2Metadata> IndexFiles = new List<IndexFileV2Metadata>()
         {
-            new IndexFileV2Metadata("https://functionscdnstaging.azureedge.net", BundleConfiguration.Instance.ExtensionBundleId, "cdnStaging"),
-            new IndexFileV2Metadata("https://functionscdn.azureedge.net", BundleConfiguration.Instance.ExtensionBundleId, "cdnProd")
+            new IndexFileV2Metadata("https://cdn-staging.functions.azure.com", BundleConfiguration.Instance.ExtensionBundleId, "cdnStaging"),
+            new IndexFileV2Metadata("https://cdn.functions.azure.com", BundleConfiguration.Instance.ExtensionBundleId, "cdnProd")
         };
 
         public static List<BuildConfiguration> WindowsBuildConfigurations = new List<BuildConfiguration>()
