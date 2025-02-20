@@ -2,6 +2,7 @@ trigger:
   branches:
     include:
     - main
+    - main-v3
     - v1.x
     - release/v1.x
     - release/v2.x
