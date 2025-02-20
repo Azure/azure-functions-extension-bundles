@@ -88,7 +88,7 @@
   },
   {
     "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
-    "majorVersion": "1",
+    "version": "1.4.0",
     "name": "SqlDurabilityProvider",
     "bindings": [
       "activitytrigger",
