@@ -2,6 +2,7 @@ trigger:
   branches:
     include:
     - main
+    - main-v3
     - release/v4.x
     - release/v4.x-preview
 
@@ -9,6 +10,7 @@ pr:
   branches:
     include:
     - main
+    - main-v3
     - release/v4.x
     - release/v4.x-preview
 
