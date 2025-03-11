@@ -31,8 +31,8 @@ body:
       label: Bump Major Version
       description: Are you bumping the major version of the extension or any dependency?
       options:
-        - Yes
-        - No
+        - 'Yes'
+        - 'No'
     validations:
       required: true
 
