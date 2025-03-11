@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        This form is for extension owners to file a request for new version to be deployed. Please review the [preview and GA checklist for extensions here](https://eng.ms/docs/cloud-ai-platform/devdiv/serverless-paas-balam/serverless-paas-vikr/app-service-web-apps/app-service-team-documents/functionteamdocs/faqs/extensions). 
+        This form is for extension owners to file a request for new version to be deployed. Please review the [preview and GA checklist for extensions here](https://eng.ms/docs/cloud-ai-platform/devdiv/serverless-paas-balam/serverless-paas-vikr/app-service-web-apps/app-service-team-documents/functionteamdocs/faqs/extensions).
   - type: input
     id: extension-name
     attributes:
@@ -16,7 +16,7 @@ body:
     validations:
       required: true
 
-  - type: textarea
+  - type: input
     id: version
     attributes:
       label: Version

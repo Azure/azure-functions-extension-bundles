@@ -8,7 +8,7 @@ body:
       value: |
         This form is for extension owners to file a new extension request for the extension they want to write for Azure Functions. Please review the [preview and GA checklist for a new extension here](https://eng.ms/docs/cloud-ai-platform/devdiv/serverless-paas-balam/serverless-paas-vikr/app-service-web-apps/app-service-team-documents/functionteamdocs/faqs/extensions). 
         This epic is the high level item and should *NOT* be assumed as a task. The features and tasks should be added using the "Add tasklist" feature below (once the epic is created). Once the epic is approved, extension owners should link this to their development PRs.
-  - type: textarea
+  - type: input
     id: extension-name
     attributes:
       label: Extension Name
@@ -17,7 +17,7 @@ body:
     validations:
       required: true
 
-  - type: textarea
+  - type: input
     id: version
     attributes:
       label: Version
