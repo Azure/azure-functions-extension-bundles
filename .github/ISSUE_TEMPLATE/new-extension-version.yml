@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         This form is for extension owners to file a request for new version to be deployed. Please review the [preview and GA checklist for extensions here](https://eng.ms/docs/cloud-ai-platform/devdiv/serverless-paas-balam/serverless-paas-vikr/app-service-web-apps/app-service-team-documents/functionteamdocs/faqs/extensions). 
-  - type: textarea
+  - type: input
     id: extension-name
     attributes:
       label: Extension Name
@@ -28,7 +28,7 @@ body:
   - type: dropdown
     id: bump-major-version
     attributes:
-      label: Bump Major Version
+      label: Bumping Major Version of the Extension or Dependency
       description: Are you bumping the major version of the extension or any dependency?
       options:
         - 'Yes'
