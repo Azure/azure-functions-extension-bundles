@@ -1,0 +1,125 @@
+name: New Extension Request
+description: File a new extension request
+title: '[Ext]: New Extension Request: {Extension Name}'
+labels: epic, triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This form is for extension owners to file a new extension request for the extension they want to write for Azure Functions. Please review the [preview and GA checklist for a new extension here](https://eng.ms/docs/cloud-ai-platform/devdiv/serverless-paas-balam/serverless-paas-vikr/app-service-web-apps/app-service-team-documents/functionteamdocs/faqs/extensions). 
+        This epic is the high level item and should *NOT* be assumed as a task. The features and tasks should be added using the "Add tasklist" feature below (once the epic is created). Once the epic is approved, extension owners should link this to their development PRs.
+  - type: textarea
+    id: extension-name
+    attributes:
+      label: Extension Name
+      description: What is the name of the extension?
+      placeholder: Enter the extension name
+    validations:
+      required: true
+
+  - type: textarea
+    id: version
+    attributes:
+      label: Version
+      description: What is the version of the extension?
+      placeholder: Enter the version
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Provide a brief description of the extension.
+      placeholder: Enter the description. Think about the customer while writing this section.
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependency-tree
+    attributes:
+      label: Dependency Tree
+      description: List the dependencies of the extension.
+      placeholder: Enter the dependency tree
+    validations:
+      required: true
+
+  - type: dropdown
+    id: main-preview-version
+    attributes:
+      label: Main/Preview Version
+      description: Is this the main or preview version?
+      options:
+        - Main
+        - Preview
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing-plan
+    attributes:
+      label: Testing Plan
+      description: Describe the testing plan for the extension.
+      placeholder: Enter the testing plan
+    validations:
+      required: true
+
+  - type: textarea
+    id: documents-link
+    attributes:
+      label: Resources/doc and other relevant docs
+      description: Any link to the document generated for this feature.
+      placeholder: ex. sharepoint link
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: partners
+    attributes:
+      label: Partners Involved
+      description: Please select the relevant Partner that you might need to involve. Also update the correct tag for automation to track.
+      options:
+        - label: Portal
+          required: false
+        - label: AzCLI
+          required: false
+        - label: Core Tools
+          required: false
+        - label: VSCode
+          required: false
+        - label: VS
+          required: false
+        - label: Linux Platform (Images and other)
+          required: false
+        - label: Windows Platform (Worker)
+          required: false
+        - label: Host
+          required: false
+        - label: Antares
+          required: false
+
+  - type: textarea
+    id: extra-notes
+    attributes:
+      label: Any extra notes not captured?
+      description: Extra Notes
+      placeholder: Extra Notes
+      value: 'Any extra notes for this epic'
+    validations:
+      required: false
+
+  - type: dropdown
+    id: estimated-size
+    attributes:
+      label: Estimated Size
+      description: What is the estimated size of the epic
+      options:
+        - S
+        - M
+        - L
+        - XL
+        - XXL (Why?)
+        - XS (Why?)
+      default: 0
+    validations:
+      required: true
