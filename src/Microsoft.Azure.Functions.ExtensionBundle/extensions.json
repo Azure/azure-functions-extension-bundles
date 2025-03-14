@@ -92,7 +92,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged",
-    "Version": "0.4.2-alpha",
+    "majorVersion": "0",
     "name": "AzureManagedProvider",
     "bindings": [
       "activitytrigger",
