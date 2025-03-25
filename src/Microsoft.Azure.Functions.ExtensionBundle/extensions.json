@@ -188,19 +188,19 @@
   },
   {
     "id": "Microsoft.IdentityModel.JsonWebTokens",
-    "Version": "7.5.0",
+    "Version": "6.35.0",
     "name": "SystemIdentityModelTokensJwt",
     "bindings": []
   },
   {
     "id": "System.IdentityModel.Tokens.Jwt",
-    "Version": "7.5.0",
+    "Version": "6.35.0",
     "name": "SystemIdentityModelTokensJwt",
     "bindings": []
   },
   {
     "id": "Microsoft.Data.SqlClient",
-    "Version": "6.0.1",
+    "Version": "5.2.2",
     "name": "MicrosoftDataSqlClient",
     "bindings": []
   },
