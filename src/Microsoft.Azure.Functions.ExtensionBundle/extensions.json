@@ -205,6 +205,12 @@
     "bindings": []
   },
   {
+    "id": "System.Drawing.Common",
+    "Version": "6.0.0",
+    "name": "SystemDrawingCommon",
+    "bindings": []
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
     "majorVersion": "1",
     "name": "Dapr",
