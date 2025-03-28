@@ -207,7 +207,7 @@
   {
     "id": "System.Drawing.Common",
     "Version": "6.0.0",
-    "name": "SystemDrawingCommon", // pinning until MySQL extension fixes this transitive dependency
+    "name": "SystemDrawingCommon",
     "bindings": []
   },
   {
