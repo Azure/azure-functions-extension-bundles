@@ -2,44 +2,44 @@ parameters:
   - name: official
     type: boolean
     default: false
-
+    
 jobs:
-  - job: Build
-    displayName: Build and publish artifacts
+- job: Build
+  displayName: Build and publish artifacts
 
-    templateContext:
-      outputParentDirectory: $(Build.ArtifactStagingDirectory)
-      outputs:
-        - output: pipelineArtifact
-          displayName: Publish bundles
-          path: $(Build.ArtifactStagingDirectory)
-          artifact: zip
+  templateContext:
+    outputParentDirectory: $(Build.ArtifactStagingDirectory)
+    outputs:
+    - output: pipelineArtifact
+      displayName: Publish bundles
+      path: $(Build.ArtifactStagingDirectory)
+      artifact: zip
 
-    steps:
-      - task: DownloadBuildArtifacts@1
-        inputs:
-          buildType: 'specific'
-          project: '3f99e810-c336-441f-8892-84983093ad7f'
-          pipeline: '963'
-          buildVersionToDownload: 'latestFromBranch'
-          branchName: 'refs/heads/release/main'
-          downloadType: 'single'
-          artifactName: 'drop'
-          downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'
-        condition: ${{ parameters.official }}
+  steps:
+  - task: DownloadBuildArtifacts@1
+    inputs:
+      buildType: 'specific'
+      project: '3f99e810-c336-441f-8892-84983093ad7f'
+      pipeline: '963'
+      buildVersionToDownload: 'latestFromBranch'
+      branchName: 'refs/heads/release/main'
+      downloadType: 'single'
+      artifactName: 'drop'
+      downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'
+    condition: ${{ parameters.official }}
 
-      - task: DotNetCoreCLI@2
-        displayName: 'Build'
-        inputs:
-          command: 'run'
-          workingDirectory: '.\build'
-          ${{ if eq(parameters.official, false) }}:
-            arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
+  - task: DotNetCoreCLI@2
+    displayName: 'Build'
+    inputs:
+      command: 'run'
+      workingDirectory: '.\build'
+      ${{ if eq(parameters.official, false) }}:
+        arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
 
-      - ${{ if eq(parameters.official, true) }}:
-          - task: CopyFiles@2
-            inputs:
-              SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
-              Contents: '*.zip'
-              TargetFolder: '$(Build.ArtifactStagingDirectory)'
-              CleanTargetFolder: false
+  - ${{ if eq(parameters.official, true) }}:
+    - task: CopyFiles@2
+      inputs:
+        SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
+        Contents: '*.zip'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        CleanTargetFolder: false
