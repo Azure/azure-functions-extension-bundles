@@ -14,17 +14,6 @@ namespace Build
         public static string ExtensionsJsonFilePath => Path.Combine(SourcePath, ExtensionsJsonFileName);
 
         public static string BundleConfigJsonFilePath => Path.Combine(SourcePath, BundleConfigJsonFileName);
-        public static string[] nugetFeed = new[]
-        {
-            "https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-net/nuget/v3/index.json",
-            "https://www.nuget.org/api/v2/"
-        };
-
-        public static Dictionary<string, string> nugetSources = new Dictionary<string, string>()
-        {
-            { "azureSdk", "https://pkgs.dev.azure.com/azure-sdk/public/_packaging/azure-sdk-for-net/nuget/v3/index.json"},
-            { "nuget", "https://www.nuget.org/api/v2/"}
-        };
 
         public static readonly string StaticContentDirectoryName = "StaticContent";
 
