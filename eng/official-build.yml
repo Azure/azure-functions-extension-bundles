@@ -3,6 +3,7 @@ trigger:
     include:
     - main
     - main-preview
+    - main-experimental
     - main-v2
     - main-v3
     - release/v4.x
@@ -22,6 +23,7 @@ schedules:
     include:
     - main
     - main-preview
+    - main-experimental
   always: true
 
 # CI only, does not trigger on PRs.

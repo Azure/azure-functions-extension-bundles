@@ -6,7 +6,7 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 {
     "version": "2.0",
     "extensionBundle": {
-        "id": "Microsoft.Azure.Functions.ExtensionBundle.Preview",
+        "id": "Microsoft.Azure.Functions.ExtensionBundle.Experimental",
         "version": "[4.*, 5.0.0)"
     }
 }
@@ -16,7 +16,7 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 
 |Branch|Status|
 |------|------|
-|main-preview|[![Build Status](https://azfunc.visualstudio.com/public/_apis/build/status/extension-bundles.public?branchName=main-preview)](https://azfunc.visualstudio.com/public/_build?definitionId=939&_a=summary&branchFilter=12530)|
+|main-experimental|[![Build Status](https://dev.azure.com/azfunc/public/_apis/build/status/extension-bundles.public?branchName=main-experimental)](https://dev.azure.com/azfunc/public/_build?definitionId=939&branchFilter=13485)|
 
 ## Build Requirements
 
@@ -51,6 +51,7 @@ dotnet run skip:dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,C
     | v2.x | https://github.com/Azure/azure-functions-extension-bundles/tree/main-v2 |
     | v3.x | https://github.com/Azure/azure-functions-extension-bundles/tree/main-v3 |
     | v4.x-preview | https://github.com/Azure/azure-functions-extension-bundles/tree/main-preview |
+    | v4.x-experimental | https://github.com/Azure/azure-functions-extension-bundles/tree/main-experimental |
 
 2. Add the following details to [extensions.json](src/Microsoft.Azure.Functions.ExtensionBundle/extensions.json) file
 

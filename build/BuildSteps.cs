@@ -44,8 +44,8 @@ namespace Build
             }
 
             var files = Directory.GetFiles(Settings.TemplatesArtifactsDirectory);
-            string previewStr = BundleConfiguration.Instance.IsPreviewBundle ? ".Preview" : String.Empty;
-            string zipFileName = $"ExtensionBundle{previewStr}.v{BundleConfiguration.Instance.ExtensionBundleVersion[0]}.Templates";
+            string experimentalStr = BundleConfiguration.Instance.IsExperimentalBundle ? ".Experimental" : String.Empty;
+            string zipFileName = $"ExtensionBundle{experimentalStr}.v{BundleConfiguration.Instance.ExtensionBundleVersion[0]}.Templates";
 
             foreach (string file in files)
             {
@@ -121,7 +121,7 @@ namespace Build
             FileUtility.CopyFile(sourceProjectFilePath, targetProjectFilePath);
             FileUtility.CopyFile(sourceNugetConfig, targetNugetConfigFilePath);
 
-            await AddExtensionPackages(targetProjectFilePath, BundleConfiguration.Instance.IsPreviewBundle);
+            await AddExtensionPackages(targetProjectFilePath, BundleConfiguration.Instance.IsExperimentalBundle);
             return targetProjectFilePath;
         }
 
