@@ -1,7 +1,7 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "version": "5.3.3",
+    "majorVersion": "5",
     "name": "AzureStorage",
     "bindings": [
       "blobtrigger",
@@ -12,7 +12,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
-    "version": "5.3.3",
+    "majorVersion": "5",
     "name": "AzureStorageQueues",
     "bindings": [
       "queue",
@@ -29,7 +29,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
-    "version": "5.3.3",
+    "majorVersion": "5",
     "name": "AzureStorageBlobs",
     "bindings": [
       "blobtrigger",
@@ -205,6 +205,12 @@
     "bindings": []
   },
   {
+    "id": "System.Drawing.Common",
+    "Version": "6.0.0",
+    "name": "SystemDrawingCommon",
+    "bindings": []
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
     "majorVersion": "1",
     "name": "Dapr",
@@ -235,5 +241,13 @@
     "Version": "6.0.1",
     "name": "SystemFormatsAsn1",
     "bindings": []
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.MySql",
+    "majorVersion": "1",
+    "name": "MySqlBinding",
+    "bindings": [
+      "MySql"
+    ]
   }
 ]
