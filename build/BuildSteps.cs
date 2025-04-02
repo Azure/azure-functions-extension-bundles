@@ -44,7 +44,7 @@ namespace Build
             }
 
             var files = Directory.GetFiles(Settings.TemplatesArtifactsDirectory);
-            string experimentalStr = BundleConfiguration.Instance.IsExperimentalBundle ? ".Experimental" : String.Empty;
+            string experimentalStr = BundleConfiguration.Instance.IsExperimentalBundle ? ".Preview" : String.Empty;  // use preview templates as experimental bundle does not have separate templates
             string zipFileName = $"ExtensionBundle{experimentalStr}.v{BundleConfiguration.Instance.ExtensionBundleVersion[0]}.Templates";
 
             foreach (string file in files)
