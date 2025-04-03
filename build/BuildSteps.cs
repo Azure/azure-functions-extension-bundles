@@ -209,9 +209,12 @@ namespace Build
                 AddBindingInfoToExtensionsJson(extensionJsonFilePath);
             }
 
-            // Copy templates
-            var staticContentDirectory = Path.Combine(bundlePath, Settings.StaticContentDirectoryName);
-            FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, staticContentDirectory);
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("BUILD_BUILDID")))   // skipped for local build
+            {
+                // Copy templates
+                var staticContentDirectory = Path.Combine(bundlePath, Settings.StaticContentDirectoryName);
+                FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, staticContentDirectory);
+            }
 
             // Add bundle.json
             CreateBundleJsonFile(bundlePath);
