@@ -260,16 +260,6 @@
     ]
   },
   {
-    "id": "Microsoft.Azure.WebJobs.Extensions.Fabric",
-    "majorVersion": "0",
-    "name": "Startup",
-    "bindings": [
-      "FabricItem",
-      "UdfProperty",
-      "UserDataFunctionContext"
-    ]
-  },
-  {
     "id": " System.Formats.Asn1",
     "Version": "6.0.1",
     "name": "SystemFormatsAsn1",
