@@ -44,8 +44,8 @@ namespace Build
             }
 
             var files = Directory.GetFiles(Settings.TemplatesArtifactsDirectory);
-            string previewStr = BundleConfiguration.Instance.IsPreviewBundle ? ".Preview" : String.Empty;
-            string zipFileName = $"ExtensionBundle{previewStr}.v{BundleConfiguration.Instance.ExtensionBundleVersion[0]}.Templates";
+            string experimentalStr = BundleConfiguration.Instance.IsExperimentalBundle ? ".Preview" : String.Empty;  // use preview templates as experimental bundle does not have separate templates
+            string zipFileName = $"ExtensionBundle{experimentalStr}.v{BundleConfiguration.Instance.ExtensionBundleVersion[0]}.Templates";
 
             foreach (string file in files)
             {
@@ -121,7 +121,7 @@ namespace Build
             FileUtility.CopyFile(sourceProjectFilePath, targetProjectFilePath);
             FileUtility.CopyFile(sourceNugetConfig, targetNugetConfigFilePath);
 
-            await AddExtensionPackages(targetProjectFilePath, BundleConfiguration.Instance.IsPreviewBundle);
+            await AddExtensionPackages(targetProjectFilePath, BundleConfiguration.Instance.IsExperimentalBundle);
             return targetProjectFilePath;
         }
 
@@ -209,9 +209,12 @@ namespace Build
                 AddBindingInfoToExtensionsJson(extensionJsonFilePath);
             }
 
-            // Copy templates
-            var staticContentDirectory = Path.Combine(bundlePath, Settings.StaticContentDirectoryName);
-            FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, staticContentDirectory);
+            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("BUILD_BUILDID")))   // skipped for local build
+            {
+                // Copy templates
+                var staticContentDirectory = Path.Combine(bundlePath, Settings.StaticContentDirectoryName);
+                FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, staticContentDirectory);
+            }
 
             // Add bundle.json
             CreateBundleJsonFile(bundlePath);

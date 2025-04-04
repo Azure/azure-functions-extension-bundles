@@ -1,4 +1,20 @@
-# Overview
+# Azure Functions Extension Bundles
+
+## Overview
+
+### IMPORTANT: Experimental Bundle Notice
+
+This extension bundle is experimental and may contain breaking changes without prior notice. It includes features that are still under development and not yet ready for production use. Users should be aware that:
+
+- Bindings or triggers may change between versions
+- Extensions may be added, removed, or replaced without warning
+- Performance characteristics and stability may vary across releases
+- Security updates may require version upgrades
+- Testing in non-production environments is strongly recommended
+
+Use this bundle at your own risk in development and testing environments only.
+
+## What are Extension Bundles?
 
 Extension bundles provide a way for non-.NET function apps to reference and use Azure Function extension packages written in C#. It bundles several of the Azure Function extensions into a single package which can then be referenced extension via the `host.json` file. Below is a sample configuration:
 
@@ -6,7 +22,7 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 {
     "version": "2.0",
     "extensionBundle": {
-        "id": "Microsoft.Azure.Functions.ExtensionBundle.Preview",
+        "id": "Microsoft.Azure.Functions.ExtensionBundle.Experimental",
         "version": "[4.*, 5.0.0)"
     }
 }
@@ -16,12 +32,11 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 
 |Branch|Status|
 |------|------|
-|main-preview|[![Build Status](https://azfunc.visualstudio.com/public/_apis/build/status/extension-bundles.public?branchName=main-preview)](https://azfunc.visualstudio.com/public/_build?definitionId=939&_a=summary&branchFilter=12530)|
+|main-experimental|[![Build Status](https://dev.azure.com/azfunc/public/_apis/build/status/extension-bundles.public?branchName=main-experimental)](https://dev.azure.com/azfunc/public/_build?definitionId=939&branchFilter=13485)|
 
 ## Build Requirements
 
-- [Dotnet Core SDK 2.2](https://dotnet.microsoft.com/en-us/download/dotnet/2.2)
-- [Dotnet Core SDK 3.1](https://dotnet.microsoft.com/en-us/download/dotnet/3.1)
+- [Dotnet SDK 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 
 ## Build Steps
 
@@ -30,7 +45,7 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 ```bash
 cd build
 
-dotnet run skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux
+dotnet run skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux,PackageBundlesLinux
 ```
 
 ### Linux
@@ -47,10 +62,7 @@ dotnet run skip:dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,C
 
     |Bundle version | Branch |
     |------|------|
-    | v1.x | https://github.com/Azure/azure-functions-extension-bundles/tree/v1.x |
-    | v2.x | https://github.com/Azure/azure-functions-extension-bundles/tree/main-v2 |
-    | v3.x | https://github.com/Azure/azure-functions-extension-bundles/tree/main-v3 |
-    | v4.x-preview | https://github.com/Azure/azure-functions-extension-bundles/tree/main-preview |
+    | v4.x-experimental | https://github.com/Azure/azure-functions-extension-bundles/tree/main-experimental |
 
 2. Add the following details to [extensions.json](src/Microsoft.Azure.Functions.ExtensionBundle/extensions.json) file
 

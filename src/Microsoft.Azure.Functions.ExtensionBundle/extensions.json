@@ -39,7 +39,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-    "majorVersion": "5",
+    "majorVersion": "6",
     "name": "EventHubs",
     "bindings": [
       "eventhubtrigger",
@@ -260,16 +260,6 @@
     ]
   },
   {
-    "id": "Microsoft.Azure.WebJobs.Extensions.Fabric",
-    "majorVersion": "0",
-    "name": "Startup",
-    "bindings": [
-      "FabricItem",
-      "UdfProperty",
-      "UserDataFunctionContext"
-    ]
-  },
-  {
     "id": " System.Formats.Asn1",
     "Version": "6.0.1",
     "name": "SystemFormatsAsn1",
@@ -283,6 +273,15 @@
       "socketiotrigger",
       "socketionegotiation",
       "socketio"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.Functions.Extensions.Mcp",
+    "majorVersion": "1",
+    "name": "Startup",
+    "bindings": [
+      "mcpToolTrigger",
+      "mcpToolProperty"
     ]
   }
 ]

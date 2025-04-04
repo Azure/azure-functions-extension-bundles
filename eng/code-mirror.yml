@@ -3,6 +3,7 @@ trigger:
     include:
     - main
     - main-preview
+    - main-experimental
     - main-v2
     - main-v3
     - v1.x

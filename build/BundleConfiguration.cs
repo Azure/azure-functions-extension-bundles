@@ -28,10 +28,7 @@ namespace Build
         [JsonProperty("bundleVersion")]
         public string ExtensionBundleVersion { get; private set; }
 
-        [JsonProperty("templateVersion")]
-        public string TemplateVersion { get; private set; }
-
-        [JsonProperty("isPreviewBundle")]
-        public bool IsPreviewBundle { get; private set; }
+        [JsonProperty("isExperimentalBundle")]
+        public bool IsExperimentalBundle { get; private set; }
     }
 }

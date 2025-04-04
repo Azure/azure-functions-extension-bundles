@@ -3,6 +3,7 @@ trigger:
     include:
       - main
       - main-preview
+      - main-experimental
       - main-v2
       - main-v3
       - release/v2.x
@@ -15,6 +16,7 @@ pr:
     include:
       - main
       - main-preview
+      - main-experimental
       - main-v2
       - main-v3
       - release/v2.x
@@ -30,6 +32,7 @@ schedules:
       include:
         - main
         - main-preview
+        - main-experimental
     always: true
 
 resources:
