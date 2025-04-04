@@ -287,8 +287,8 @@
   },
   {
     "id": "Microsoft.Azure.Functions.Extensions.Mcp",
-    "version": "1.0.0-beta423",
-    "name": "Mcp",
+    "majorVersion": "1",
+    "name": "Startup",
     "bindings": [
       "mcpToolTrigger",
       "mcpToolProperty"
