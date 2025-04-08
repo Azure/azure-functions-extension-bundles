@@ -142,7 +142,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
-    "majorVersion": "1",
+    "majorVersion": "2",
     "name": "RabbitMQ",
     "bindings": [
       "rabbitmqtrigger",
