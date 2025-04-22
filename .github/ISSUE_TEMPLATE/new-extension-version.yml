@@ -1,0 +1,119 @@
+name: New Extension Version Request
+description: File a new extension version Request
+title: '[Ext]: New Extension Version Request: {Extension Name} - {Version Number}'
+labels: task, new-extension-version-request, triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This form is for extension owners to file a request for new version to be deployed. Please review the [preview and GA checklist for extensions here](https://eng.ms/docs/cloud-ai-platform/devdiv/serverless-paas-balam/serverless-paas-vikr/app-service-web-apps/app-service-team-documents/functionteamdocs/faqs/extensions).
+  - type: input
+    id: extension-name
+    attributes:
+      label: Extension Name
+      description: What is the name of the extension?
+      placeholder: Enter the extension name
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What is the version of the extension?
+      placeholder: Enter the version
+    validations:
+      required: true
+
+  - type: dropdown
+    id: bump-major-version
+    attributes:
+      label: Bumping Major Version of the Extension or Dependency
+      description: Are you bumping the major version of the extension or any dependency?
+      options:
+        - 'Yes'
+        - 'No'
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Provide a changelog/description in this version.
+      placeholder: Enter the description.
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependency-tree
+    attributes:
+      label: Dependency Tree
+      description: List the change in dependencies of the extension.
+      placeholder: List the change in dependency tree.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: main-preview-version
+    attributes:
+      label: Main/Preview Version
+      description: Is this the main or preview version?
+      options:
+        - Main
+        - Preview
+    validations:
+      required: true
+
+  - type: textarea
+    id: testing-plan
+    attributes:
+      label: Testing Plan
+      description: Describe the testing plan for the newer version.
+      placeholder: Enter the testing plan
+    validations:
+      required: false
+
+  - type: textarea
+    id: documents-link
+    attributes:
+      label: Resources/doc and other relevant docs
+      description: Any link to the document generated for this feature.
+      placeholder: ex. sharepoint link
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: partners
+    attributes:
+      label: Partners Involved
+      description: Please select the relevant Partner that you might need to involve. Also update the correct tag for automation to track.
+      options:
+        - label: Portal
+          required: false
+        - label: AzCLI
+          required: false
+        - label: Core Tools
+          required: false
+        - label: VSCode
+          required: false
+        - label: VS
+          required: false
+        - label: Linux Platform (Images and other)
+          required: false
+        - label: Windows Platform (Worker)
+          required: false
+        - label: Host
+          required: false
+        - label: Antares
+          required: false
+
+  - type: textarea
+    id: extra-notes
+    attributes:
+      label: Any extra notes not captured?
+      description: Extra Notes
+      placeholder: Extra Notes
+      value: 'Any extra notes for this epic'
+    validations:
+      required: false
