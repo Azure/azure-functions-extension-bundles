@@ -6,12 +6,13 @@ resolves #issue_for_this_pr
 
 ## Pull request checklist
 
-[ ] Link for PRs to port changes to other branches:
-    [ ] main-preview
-    [ ] main-experimental
-    [ ] main-v2
-    [ ] main-v3
-[ ] Extensions related documentation updated and add link to the documentation
+- [ ] Link for PRs to port changes to all branches, if not applicable for a branch, explain why:
+  - [ ] main
+  - [ ] main-preview
+  - [ ] main-experimental
+  - [ ] main-v2
+  - [ ] main-v3
+- [ ] Extensions related documentation updated and add link to the documentation
 
 ## Additional information
 
