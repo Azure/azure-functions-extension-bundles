@@ -1,18 +1,44 @@
-<!-- Please provide all the information below.  -->
+# Pull Request
 
-# Issue describing the changes in this PR
+## Description
 
-resolves #issue_for_this_pr
+<!-- Please provide a clear and concise description of your changes -->
 
-## Pull request checklist
+## Issue Link
 
-[ ] Link for PRs to port changes to other branches:
-    [ ] main-preview
-    [ ] main-experimental
-    [ ] main-v2
-    [ ] main-v3
-[ ] Extensions related documentation updated and add link to the documentation
+<!-- Link to the issue this PR addresses -->
+Resolves #
 
-## Additional information
+## Type of Change
 
-Additional PR information
+- [ ] Bug fix
+- [ ] New feature
+- [ ] Breaking change
+- [ ] Documentation update
+- [ ] Performance improvement
+- [ ] Refactoring
+
+## Branch Propagation
+
+<!-- For each branch, check if the change should be ported and link PRs, or explain why not -->
+- [ ] main
+- [ ] main-preview
+- [ ] main-experimental
+- [ ] main-v2
+- [ ] main-v3
+
+## Checklist
+
+- [ ] I have performed a self-review of my code
+- [ ] I have added/updated tests that prove my fix or feature works
+- [ ] I have updated relevant documentation
+- [ ] I have verified my changes in a local environment or internal build artifact
+- [ ] I have added appropriate comments to complex code
+
+## Documentation Updates
+
+<!-- If applicable, provide links to updated documentation -->
+
+## Additional Information
+
+<!-- Any other information that would be helpful for reviewers -->
