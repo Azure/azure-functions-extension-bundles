@@ -4,7 +4,7 @@
 
 resolves #issue_for_this_pr
 
-## Pull request checklist
+## Pull Request Checklist
 
 - [ ] Link for PRs to port changes to all branches, if not applicable for a branch, explain why:
   - [ ] main
