@@ -20,8 +20,7 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 
 ## Build Requirements
 
-- [Dotnet Core SDK 2.2](https://dotnet.microsoft.com/en-us/download/dotnet/2.2)
-- [Dotnet Core SDK 3.1](https://dotnet.microsoft.com/en-us/download/dotnet/3.1)
+- [Dotnet Core SDK 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 
 ## Build Steps
 
@@ -51,6 +50,7 @@ dotnet run skip:dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,C
     | v2.x | https://github.com/Azure/azure-functions-extension-bundles/tree/main-v2 |
     | v3.x | https://github.com/Azure/azure-functions-extension-bundles/tree/main-v3 |
     | v4.x-preview | https://github.com/Azure/azure-functions-extension-bundles/tree/main-preview |
+    | v4.x-experimental | https://github.com/Azure/azure-functions-extension-bundles/tree/main-experimental |
 
 2. Add the following details to [extensions.json](src/Microsoft.Azure.Functions.ExtensionBundle/extensions.json) file
 
