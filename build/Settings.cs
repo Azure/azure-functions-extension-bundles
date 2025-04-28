@@ -45,8 +45,6 @@ namespace Build
 
         public static readonly string RUPackagePath = Path.Combine(RootBinDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package", BundleConfiguration.Instance.ExtensionBundleVersion);
 
-        public static readonly string IndexV2FileName = "index-v2.json";
-
         public static readonly string IndexFileName = "index.json";
 
         public static List<IndexFileV2Metadata> IndexFiles = new List<IndexFileV2Metadata>()
