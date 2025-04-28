@@ -176,5 +176,11 @@
     "Version": "4.7.2",
     "name": "SystemDrawingCommon",
     "bindings": []
+  },
+  {
+    "id": "MessagePack",
+    "Version": "2.5.192",
+    "name": "MessagePack",
+    "bindings": []
   }
 ]
