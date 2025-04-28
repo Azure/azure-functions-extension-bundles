@@ -320,18 +320,6 @@ namespace Build
         {
             foreach (var indexFileMetadata in Settings.IndexFiles)
             {
-                // Generating v2 index file
-                var indexV2File = GetIndexV2File($"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/index-v2.json");
-                var bundleResource = new IndexV2.BundleResource()
-                {
-                    Bindings = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{BundleConfiguration.Instance.ExtensionBundleVersion}/StaticContent/v1/bindings/bindings.json",
-                    Functions = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{BundleConfiguration.Instance.ExtensionBundleVersion}/StaticContent/v1/templates/templates.json",
-                    Resources = $"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/{BundleConfiguration.Instance.ExtensionBundleVersion}/StaticContent/v1/resources/" + "Resources.{locale}.json"
-                };
-
-                indexV2File.TryAdd(BundleConfiguration.Instance.ExtensionBundleVersion, bundleResource);
-
-                // write index-v2 file
                 string directoryPath = Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory, BundleConfiguration.Instance.ExtensionBundleId);
                 FileUtility.EnsureDirectoryExists(directoryPath);
 
@@ -339,13 +327,10 @@ namespace Build
                 var contentDirectory = Path.Combine(bundleVersionDirectory, Settings.StaticContentDirectoryName);
                 FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, contentDirectory);
 
-                var indexV2FilePath = Path.Combine(directoryPath, Settings.IndexV2FileName);
                 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
                 {
                     ContractResolver = new CamelCasePropertyNamesContractResolver()
                 };
-
-                FileUtility.Write(indexV2FilePath, JsonConvert.SerializeObject(indexV2File));
 
                 // Generating v1 index file
                 var indexFile = GetIndexFile($"{indexFileMetadata.EndPointUrl}/public/ExtensionBundles/{indexFileMetadata.BundleId}/index.json");
@@ -395,21 +380,6 @@ namespace Build
 
                 string packageZipFilePath = Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}_linux.zip");
                 ZipFile.CreateFromDirectory(packageRootDirectoryPath, packageZipFilePath, CompressionLevel.NoCompression, false);
-            }
-        }
-
-        public static IndexV2 GetIndexV2File(string path)
-        {
-            using (var httpClient = new HttpClient())
-            {
-                var response = httpClient.GetAsync(path).Result;
-
-                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
-                {
-                    return new IndexV2();
-                }
-
-                return JsonConvert.DeserializeObject<IndexV2>(response.Content.ReadAsStringAsync().Result);
             }
         }
 
