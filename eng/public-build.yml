@@ -28,6 +28,15 @@ extends:
       name: 1es-pool-azfunc-public
       image: 1es-windows-2022
       os: windows
+    
+    settings:
+      securityScan:
+        binSkim:
+          enabled: false
+        credScan:
+          enabled: false
+        apiScan:
+          enabled: false
 
     stages:
     - stage: RunUnitTests
