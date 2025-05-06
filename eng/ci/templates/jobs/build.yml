@@ -63,6 +63,12 @@ jobs:
         Contents: '*.zip'
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
         CleanTargetFolder: false
+  
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.Repository.LocalPath)\artifacts'
+      ArtifactName: 'drop_build'
+      publishLocation: 'Container'
 
 - job: BuildLinux
   displayName: Build and publish for Linux
