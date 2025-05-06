@@ -56,18 +56,12 @@ jobs:
       ${{ else }}:
         arguments: 'skip:DownloadTemplates,GenerateVulnerabilityReport,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV2Bundle'
         
-  - ${{ if eq(parameters.official, true) }}:
-    - task: CopyFiles@2
-      inputs:
-        SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
-        Contents: '*.zip'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)'
-        CleanTargetFolder: false
-  
-  - outputs:
-    pipelineArtifact:
-      artifactName: 'drop_build'
-      targetPath: '$(Build.Repository.LocalPath)\artifacts'
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
+      Contents: '*.zip'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      CleanTargetFolder: false
 
 - job: BuildLinux
   displayName: Build and publish for Linux
