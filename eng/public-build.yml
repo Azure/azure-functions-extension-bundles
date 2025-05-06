@@ -22,8 +22,10 @@ resources:
     ref: refs/tags/release
 
 extends:
-  template: v1/1ES.Unofficial.Slim.yml@1es
+  template: v1/1ES.Unofficial.PipelineTemplate.yml@1es
   parameters:
+    runSecurityScan: false
+
     pool:
       name: 1es-pool-azfunc-public
       image: 1es-windows-2022
