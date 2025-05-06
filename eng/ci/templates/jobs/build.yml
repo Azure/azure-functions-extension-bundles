@@ -58,7 +58,7 @@ jobs:
         
   - task: CopyFiles@2
     inputs:
-      SourceFolder: '$(Build.Repository.LocalPath)\artifacts'
+      SourceFolder: '$(Build.Repository.LocalPath)\build'
       Contents: '*.zip'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       CleanTargetFolder: false
