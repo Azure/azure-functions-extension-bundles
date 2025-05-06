@@ -50,7 +50,7 @@ jobs:
   - task: DotNetCoreCLI@2
     inputs:
       command: 'run'
-      workingDirectory: '.\build'
+      workingDirectory: '$(Build.Repository.LocalPath)'
       ${{ if eq(parameters.official, true) }}:
         arguments: 'skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
       ${{ else }}:
