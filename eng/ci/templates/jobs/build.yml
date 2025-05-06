@@ -64,11 +64,10 @@ jobs:
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
         CleanTargetFolder: false
   
-  - task: PublishBuildArtifacts@1
-    inputs:
-      PathtoPublish: '$(Build.Repository.LocalPath)\artifacts'
-      ArtifactName: 'drop_build'
-      publishLocation: 'Container'
+  - outputs:
+    pipelineArtifact:
+      artifactName: 'drop_build'
+      targetPath: '$(Build.Repository.LocalPath)\artifacts'
 
 - job: BuildLinux
   displayName: Build and publish for Linux
