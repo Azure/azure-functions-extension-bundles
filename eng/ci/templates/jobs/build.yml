@@ -50,7 +50,7 @@ jobs:
   - task: DotNetCoreCLI@2
     inputs:
       command: 'run'
-      workingDirectory: '$(Build.Repository.LocalPath)'
+      workingDirectory: '.\build'
       ${{ if eq(parameters.official, true) }}:
         arguments: 'skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
       ${{ else }}:
@@ -58,7 +58,7 @@ jobs:
         
   - task: CopyFiles@2
     inputs:
-      SourceFolder: '.\build'
+      SourceFolder: '$(Build.Repository.LocalPath)'
       Contents: '**'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       CleanTargetFolder: false
