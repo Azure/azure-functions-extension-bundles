@@ -62,6 +62,11 @@ jobs:
       Contents: '**'
       TargetFolder: '$(Build.ArtifactStagingDirectory)'
       CleanTargetFolder: false
+  
+  - task: MicrosoftSecurityDevOps@1
+    displayName: 'Run MSDO with BinSkim disabled'
+    inputs:
+      tools: 'CredScan,APIScan'
 
 - job: BuildLinux
   displayName: Build and publish for Linux
