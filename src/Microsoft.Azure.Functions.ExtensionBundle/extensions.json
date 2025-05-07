@@ -156,7 +156,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Sql",
-    "version": "3.1.376",
+    "version": "3.1.490",
     "name": "SqlBinding",
     "bindings": [
       "Sql",
@@ -237,7 +237,7 @@
     ]
   },
   {
-    "id": "System.Formats.Asn1",
+    "id": " System.Formats.Asn1",
     "Version": "6.0.1",
     "name": "SystemFormatsAsn1",
     "bindings": []
