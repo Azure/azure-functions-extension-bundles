@@ -270,7 +270,7 @@
     ]
   },
   {
-    "id": " System.Formats.Asn1",
+    "id": "System.Formats.Asn1",
     "Version": "6.0.1",
     "name": "SystemFormatsAsn1",
     "bindings": []
@@ -283,6 +283,15 @@
       "socketiotrigger",
       "socketionegotiation",
       "socketio"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.Functions.Extensions.Mcp",
+    "majorVersion": "1",
+    "name": "Mcp",
+    "bindings": [
+      "mcpToolTrigger",
+      "mcpToolProperty"
     ]
   }
 ]
