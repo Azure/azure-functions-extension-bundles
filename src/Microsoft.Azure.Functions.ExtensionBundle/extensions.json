@@ -251,6 +251,15 @@
     ]
   },
   {
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.CosmosDBNoSqlSearch",
+    "majorVersion": "0",
+    "name": "OpenAICosmosDBNoSqlSearch",
+    "bindings": [
+      "SemanticSearch",
+      "EmbeddingsStore"
+    ]
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.Kusto",
     "majorVersion": "0",
     "name": "OpenAIKusto",
@@ -270,7 +279,7 @@
     ]
   },
   {
-    "id": " System.Formats.Asn1",
+    "id": "System.Formats.Asn1",
     "Version": "6.0.1",
     "name": "SystemFormatsAsn1",
     "bindings": []
@@ -283,6 +292,15 @@
       "socketiotrigger",
       "socketionegotiation",
       "socketio"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.Functions.Extensions.Mcp",
+    "majorVersion": "1",
+    "name": "Mcp",
+    "bindings": [
+      "mcpToolTrigger",
+      "mcpToolProperty"
     ]
   }
 ]
