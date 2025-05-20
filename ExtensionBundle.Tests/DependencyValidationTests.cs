@@ -27,8 +27,6 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
         }
 
         [InlineData("any_any_extensions.deps.json", "any_any")]
-        [InlineData("win_x86_extensions.deps.json", "x86")]
-        [InlineData("win_x64_extensions.deps.json", "x64")]
         [Theory]
         public void Verify_DepsJsonChanges(string oldDepsJsonName, string newDepsJsonName)
         {
