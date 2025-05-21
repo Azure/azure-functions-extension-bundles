@@ -24,7 +24,7 @@ Copyright (c) 2007 James Newton-King
 Copyright (c) 2004-2015 Castle Project
 Copyright 2019 The Apache Software Foundation.
 Copyright 2004-2015 The Apache Software Foundation.
-1Copyright 2019 The Apache Software Foundation. Avro provides Rich
+Copyright 2019 The Apache Software Foundation. Avro provides Rich
 Copyright (c) 2019 The Apache Software Foundation. Avro Apache Serialization Binary Json Schema
 
 
