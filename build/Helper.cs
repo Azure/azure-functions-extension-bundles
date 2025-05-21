@@ -11,7 +11,7 @@ namespace Build
     {
         public static async Task<string> GetLatestPackageVersion(string packageId, int majorVersion, bool isPrerelease = false)
         {
-            var repository = Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
+            var repository = Repository.Factory.GetCoreV3("https://pkgs.dev.azure.com/azfunc/public/_packaging/bundlestestfeed/nuget/v3/index.json");
             var resource = await repository.GetResourceAsync<PackageMetadataResource>();
 
             var packages = await resource.GetMetadataAsync(packageId, includePrerelease: isPrerelease, includeUnlisted: false,
