@@ -98,14 +98,9 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             var added = newAssets.Except(oldAssets, comparer).ToList();
             added = added.Where(f => !(f.Path.Contains(assemblyToIgnore) && f.AssemblyVersion == null)).ToList();
 
-            bool succeed = removed.Count == 0 && added.Count == 0;
-
-            if (succeed)
-            {
-                return (succeed, null);
-            }
-
             IList<RuntimeFile> changed = new List<RuntimeFile>();
+            bool hasMajorVersionChanges = false;
+
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("IMPORTANT: The dependencies in extensions have changed and MUST be reviewed before proceeding. Please follow up with brettsam, fabiocav, nasoni or mathewc for approval.");
             sb.AppendLine();
@@ -130,6 +125,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
                     sb.AppendLine($"    - {fileName}: {oldFile.AssemblyVersion}/{oldFile.FileVersion} -> {newFile.AssemblyVersion}/{newFile.FileVersion}");
                     changed.Add(oldFile);
                     changed.Add(newFile);
+                    hasMajorVersionChanges = true; // Add this flag to track major version changes
                 }
             }
 
@@ -145,6 +141,8 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             {
                 sb.AppendLine($"    - {Path.GetFileName(f.Path)}: {f.AssemblyVersion}/{f.FileVersion}");
             }
+
+            bool succeed = removed.Count == 0 && added.Count == 0 && !hasMajorVersionChanges;
 
             return (succeed, sb.ToString());
         }
