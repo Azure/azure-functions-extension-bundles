@@ -102,7 +102,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             bool hasMajorVersionChanges = false;
 
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("IMPORTANT: The dependencies in extensions have changed and MUST be reviewed before proceeding. Please follow up with brettsam, fabiocav, nasoni or mathewc for approval.");
+            sb.AppendLine("IMPORTANT: The dependencies in extensions have changed and MUST be reviewed before proceeding. Please follow up with vameru-team (vameru, manvkaur, tsushi) for approval.");
             sb.AppendLine();
             sb.AppendLine($"Previous file: {oldDepsJson}");
             sb.AppendLine($"New file:      {newDepsJson}");
