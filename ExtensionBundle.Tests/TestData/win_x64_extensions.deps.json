@@ -15,15 +15,15 @@
           "Microsoft.Azure.WebJobs.Extensions.Dapr": "1.0.1",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.1.0",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "3.4.4",
-          "Microsoft.Azure.WebJobs.Extensions.EventHubs": "5.5.0",
-          "Microsoft.Azure.WebJobs.Extensions.Kafka": "4.1.0",
+          "Microsoft.Azure.WebJobs.Extensions.EventHubs": "6.5.1",
+          "Microsoft.Azure.WebJobs.Extensions.Kafka": "4.1.1",
           "Microsoft.Azure.WebJobs.Extensions.MySql": "1.0.129",
-          "Microsoft.Azure.WebJobs.Extensions.RabbitMQ": "2.0.4",
+          "Microsoft.Azure.WebJobs.Extensions.RabbitMQ": "2.1.0",
           "Microsoft.Azure.WebJobs.Extensions.Redis": "1.0.0",
           "Microsoft.Azure.WebJobs.Extensions.SendGrid": "3.1.0",
           "Microsoft.Azure.WebJobs.Extensions.ServiceBus": "5.16.6",
           "Microsoft.Azure.WebJobs.Extensions.SignalRService": "2.0.1",
-          "Microsoft.Azure.WebJobs.Extensions.Sql": "3.1.376",
+          "Microsoft.Azure.WebJobs.Extensions.Sql": "3.1.490",
           "Microsoft.Azure.WebJobs.Extensions.Storage": "5.3.4",
           "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs": "5.3.4",
           "Microsoft.Azure.WebJobs.Extensions.Storage.Queues": "5.3.4",
@@ -130,34 +130,29 @@
           }
         }
       },
-      "Azure.Messaging.EventHubs/5.11.5": {
+      "Azure.Messaging.EventHubs/5.12.1": {
         "dependencies": {
           "Azure.Core": "1.44.1",
           "Azure.Core.Amqp": "1.3.1",
           "Microsoft.Azure.Amqp": "2.6.9",
-          "Microsoft.Bcl.AsyncInterfaces": "8.0.0",
-          "System.Diagnostics.DiagnosticSource": "8.0.1",
-          "System.Memory.Data": "6.0.1",
-          "System.Reflection.TypeExtensions": "4.7.0",
-          "System.Threading.Channels": "6.0.0",
-          "System.Threading.Tasks.Extensions": "4.5.4"
+          "System.Reflection.TypeExtensions": "4.7.0"
         },
         "runtime": {
-          "lib/netstandard2.0/Azure.Messaging.EventHubs.dll": {
-            "assemblyVersion": "5.11.5.0",
-            "fileVersion": "5.1100.524.38102"
+          "lib/net8.0/Azure.Messaging.EventHubs.dll": {
+            "assemblyVersion": "5.12.1.0",
+            "fileVersion": "5.1200.125.20902"
           }
         }
       },
       "Azure.Messaging.EventHubs.Processor/5.11.5": {
         "dependencies": {
-          "Azure.Messaging.EventHubs": "5.11.5",
+          "Azure.Messaging.EventHubs": "5.12.1",
           "Azure.Storage.Blobs": "12.23.0",
           "Microsoft.Azure.Amqp": "2.6.9",
           "Microsoft.Bcl.AsyncInterfaces": "8.0.0",
           "System.Diagnostics.DiagnosticSource": "8.0.1",
           "System.Reflection.TypeExtensions": "4.7.0",
-          "System.Threading.Channels": "6.0.0",
+          "System.Threading.Channels": "7.0.0",
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "runtime": {
@@ -875,7 +870,7 @@
         "dependencies": {
           "Azure.Core": "1.44.1",
           "Azure.Data.Tables": "12.9.1",
-          "Azure.Messaging.EventHubs": "5.11.5",
+          "Azure.Messaging.EventHubs": "5.12.1",
           "Azure.Messaging.EventHubs.Processor": "5.11.5",
           "Azure.Storage.Blobs": "12.23.0",
           "Microsoft.Azure.DurableTask.Core": "3.1.0",
@@ -1103,17 +1098,17 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.EventHubs/5.5.0": {
+      "Microsoft.Azure.WebJobs.Extensions.EventHubs/6.5.1": {
         "dependencies": {
-          "Azure.Messaging.EventHubs": "5.11.5",
+          "Azure.Messaging.EventHubs": "5.12.1",
           "Azure.Storage.Blobs": "12.23.0",
           "Microsoft.Azure.WebJobs": "3.0.41",
           "Microsoft.Extensions.Azure": "1.10.0"
         },
         "runtime": {
-          "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.EventHubs.dll": {
-            "assemblyVersion": "5.5.0.0",
-            "fileVersion": "5.500.23.41402"
+          "lib/net8.0/Microsoft.Azure.WebJobs.Extensions.EventHubs.dll": {
+            "assemblyVersion": "6.5.1.0",
+            "fileVersion": "6.500.125.20902"
           }
         }
       },
@@ -1133,7 +1128,7 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.Kafka/4.1.0": {
+      "Microsoft.Azure.WebJobs.Extensions.Kafka/4.1.1": {
         "dependencies": {
           "Confluent.Kafka": "2.4.0",
           "Confluent.SchemaRegistry": "2.4.0",
@@ -1141,12 +1136,12 @@
           "Confluent.SchemaRegistry.Serdes.Protobuf": "2.4.0",
           "Microsoft.Azure.WebJobs": "3.0.41",
           "System.Diagnostics.DiagnosticSource": "8.0.1",
-          "System.Threading.Channels": "6.0.0"
+          "System.Threading.Channels": "7.0.0"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.Kafka.dll": {
-            "assemblyVersion": "4.1.0.0",
-            "fileVersion": "4.1.0.0"
+            "assemblyVersion": "4.1.1.0",
+            "fileVersion": "4.1.1.0"
           }
         }
       },
@@ -1172,18 +1167,18 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.RabbitMQ/2.0.4": {
+      "Microsoft.Azure.WebJobs.Extensions.RabbitMQ/2.1.0": {
         "dependencies": {
           "Microsoft.Azure.WebJobs": "3.0.41",
           "Newtonsoft.Json": "13.0.3",
-          "RabbitMQ.Client": "6.4.0",
+          "RabbitMQ.Client": "6.8.1",
           "System.Diagnostics.DiagnosticSource": "8.0.1",
-          "System.Json": "4.7.1"
+          "System.Json": "4.8.0"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.RabbitMQ.dll": {
-            "assemblyVersion": "2.0.4.0",
-            "fileVersion": "2.0.4.0"
+            "assemblyVersion": "2.1.0.0",
+            "fileVersion": "2.1.0.0"
           }
         }
       },
@@ -1259,7 +1254,7 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.Sql/3.1.376": {
+      "Microsoft.Azure.WebJobs.Extensions.Sql/3.1.490": {
         "dependencies": {
           "Azure.Core": "1.44.1",
           "Azure.Identity": "1.13.1",
@@ -1269,13 +1264,12 @@
           "Microsoft.Data.SqlClient": "5.2.2",
           "Microsoft.SqlServer.TransactSql.ScriptDom": "161.9135.0",
           "Newtonsoft.Json": "13.0.3",
-          "System.Runtime.Caching": "8.0.1",
-          "morelinq": "4.1.0"
+          "System.Runtime.Caching": "8.0.1"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.Sql.dll": {
-            "assemblyVersion": "3.1.376.0",
-            "fileVersion": "3.1.376.0"
+            "assemblyVersion": "3.1.490.0",
+            "fileVersion": "3.1.490.0"
           }
         }
       },
@@ -2005,15 +1999,15 @@
           }
         }
       },
-      "RabbitMQ.Client/6.4.0": {
+      "RabbitMQ.Client/6.8.1": {
         "dependencies": {
           "System.Memory": "4.5.5",
-          "System.Threading.Channels": "6.0.0"
+          "System.Threading.Channels": "7.0.0"
         },
         "runtime": {
           "lib/netstandard2.0/RabbitMQ.Client.dll": {
             "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.4.0.0"
+            "fileVersion": "6.8.1.0"
           }
         }
       },
@@ -2488,11 +2482,11 @@
         }
       },
       "System.IO.Pipelines/6.0.3": {},
-      "System.Json/4.7.1": {
+      "System.Json/4.8.0": {
         "runtime": {
-          "lib/netstandard2.0/System.Json.dll": {
-            "assemblyVersion": "2.0.8.0",
-            "fileVersion": "4.700.20.21406"
+          "lib/net6.0/System.Json.dll": {
+            "assemblyVersion": "4.8.0.0",
+            "fileVersion": "4.800.24.56208"
           }
         }
       },
@@ -3032,7 +3026,7 @@
           "System.Threading.Tasks": "4.3.0"
         }
       },
-      "System.Threading.Channels/6.0.0": {},
+      "System.Threading.Channels/7.0.0": {},
       "System.Threading.Overlapped/4.3.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.1",
@@ -3197,12 +3191,12 @@
       "path": "azure.messaging.eventgrid/4.21.0",
       "hashPath": "azure.messaging.eventgrid.4.21.0.nupkg.sha512"
     },
-    "Azure.Messaging.EventHubs/5.11.5": {
+    "Azure.Messaging.EventHubs/5.12.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-y/jccDQmdBYMSyovJj6rgCVefKEpsnmepISKfD6FoR3oUbGdAwaHyvKcHnMpZQRvYcF7F2EFq6v9MrYQGtfLIw==",
-      "path": "azure.messaging.eventhubs/5.11.5",
-      "hashPath": "azure.messaging.eventhubs.5.11.5.nupkg.sha512"
+      "sha512": "sha512-EGwiegZ3lB6csXQ1MLqOTVAJhEEhXejaPcCla/oB1L8a1s4BaCxPjUAdFeAr0O6cI7bjzVbh9JHRik8R264Jkw==",
+      "path": "azure.messaging.eventhubs/5.12.1",
+      "hashPath": "azure.messaging.eventhubs.5.12.1.nupkg.sha512"
     },
     "Azure.Messaging.EventHubs.Processor/5.11.5": {
       "type": "package",
@@ -3771,12 +3765,12 @@
       "path": "microsoft.azure.webjobs.extensions.eventgrid/3.4.4",
       "hashPath": "microsoft.azure.webjobs.extensions.eventgrid.3.4.4.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.EventHubs/5.5.0": {
+    "Microsoft.Azure.WebJobs.Extensions.EventHubs/6.5.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Ur6FCILAUd9HJliA4JdOkom5D0bOtKi1pOTwDDI0UZY9s0w1Bf8bG4Q09f/gDSJzsCVyfk5ij49CH2Wp6is8Uw==",
-      "path": "microsoft.azure.webjobs.extensions.eventhubs/5.5.0",
-      "hashPath": "microsoft.azure.webjobs.extensions.eventhubs.5.5.0.nupkg.sha512"
+      "sha512": "sha512-yWA5ur5F/VyjyXpw19uJSKaU/W9w3PitAjK3svAPf16XxxxaDc+Qr2iF1U/ydEQ/6SOA86dh4gEC7FGtk3DGFQ==",
+      "path": "microsoft.azure.webjobs.extensions.eventhubs/6.5.1",
+      "hashPath": "microsoft.azure.webjobs.extensions.eventhubs.6.5.1.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.Http/3.2.0": {
       "type": "package",
@@ -3785,12 +3779,12 @@
       "path": "microsoft.azure.webjobs.extensions.http/3.2.0",
       "hashPath": "microsoft.azure.webjobs.extensions.http.3.2.0.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.Kafka/4.1.0": {
+    "Microsoft.Azure.WebJobs.Extensions.Kafka/4.1.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-crV3C6NUM6b9qwIvoNKiIfPslOIxtM+IEr2ViAy6EpGG+pXkYfMipi3ePKOBYVTyH87sBAtkHc4CBladu3jUPg==",
-      "path": "microsoft.azure.webjobs.extensions.kafka/4.1.0",
-      "hashPath": "microsoft.azure.webjobs.extensions.kafka.4.1.0.nupkg.sha512"
+      "sha512": "sha512-xAKkD8RcIIn9J0UMW+wSORQM0pSSUBiYvzVpKIsR2RtMhRaxp3alXqbNgZiGAnLu82Vn93SOXs8G39aONRsjxQ==",
+      "path": "microsoft.azure.webjobs.extensions.kafka/4.1.1",
+      "hashPath": "microsoft.azure.webjobs.extensions.kafka.4.1.1.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.MySql/1.0.129": {
       "type": "package",
@@ -3799,12 +3793,12 @@
       "path": "microsoft.azure.webjobs.extensions.mysql/1.0.129",
       "hashPath": "microsoft.azure.webjobs.extensions.mysql.1.0.129.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.RabbitMQ/2.0.4": {
+    "Microsoft.Azure.WebJobs.Extensions.RabbitMQ/2.1.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-qyKbthL3CUEC2OX0WU617SEjPpE+XQ+m3+uIprr7iMgfEsuvWnRW1VWVfu5yfR1UWq+dw8eXemJLWY7WGPLdgw==",
-      "path": "microsoft.azure.webjobs.extensions.rabbitmq/2.0.4",
-      "hashPath": "microsoft.azure.webjobs.extensions.rabbitmq.2.0.4.nupkg.sha512"
+      "sha512": "sha512-nThsI7u/xrPtdcFQ2VlpAVfyovrHE7w4u19UTrtum0y8eCjth76m2rr0+L7HJGN0Im0h1qg4Gv/DEgr4VIuK1w==",
+      "path": "microsoft.azure.webjobs.extensions.rabbitmq/2.1.0",
+      "hashPath": "microsoft.azure.webjobs.extensions.rabbitmq.2.1.0.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.Redis/1.0.0": {
       "type": "package",
@@ -3841,12 +3835,12 @@
       "path": "microsoft.azure.webjobs.extensions.signalrservice/2.0.1",
       "hashPath": "microsoft.azure.webjobs.extensions.signalrservice.2.0.1.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.Sql/3.1.376": {
+    "Microsoft.Azure.WebJobs.Extensions.Sql/3.1.490": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-FK/XVJ0PXiShpMAR/ijDvzt5uz5HQixe0nZN6JZZyVQ4xtdGVf/10gx7UW21lwOeE/RZX/re8//ENzD9+8YKxg==",
-      "path": "microsoft.azure.webjobs.extensions.sql/3.1.376",
-      "hashPath": "microsoft.azure.webjobs.extensions.sql.3.1.376.nupkg.sha512"
+      "sha512": "sha512-mXLWyllX60xY2yolOql9ur41M/szUBOC16+cAY/33xceqeyJe0HCcb3OWpmViaM/G38Pcoos56K6/vQw3K80vA==",
+      "path": "microsoft.azure.webjobs.extensions.sql/3.1.490",
+      "hashPath": "microsoft.azure.webjobs.extensions.sql.3.1.490.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.Storage/5.3.4": {
       "type": "package",
@@ -4303,12 +4297,12 @@
       "path": "pipelines.sockets.unofficial/2.2.8",
       "hashPath": "pipelines.sockets.unofficial.2.2.8.nupkg.sha512"
     },
-    "RabbitMQ.Client/6.4.0": {
+    "RabbitMQ.Client/6.8.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-1znR1gGU+xYVSpO5z8nQolcUKA/yydnxQn7Ug9+RUXxTSLMm/eE58VKGwahPBjELXvDnX0k/kBrAitFLRjx9LA==",
-      "path": "rabbitmq.client/6.4.0",
-      "hashPath": "rabbitmq.client.6.4.0.nupkg.sha512"
+      "sha512": "sha512-jNsmGgmCNw2S/NzskeN2ijtGywtH4Sk/G6jWUTD5sY9SrC27Xz6BsLIiB8hdsfjeyWCa4j4GvCIGkpE8wrjU1Q==",
+      "path": "rabbitmq.client/6.8.1",
+      "hashPath": "rabbitmq.client.6.8.1.nupkg.sha512"
     },
     "runtime.any.System.Collections/4.3.0": {
       "type": "package",
@@ -4842,12 +4836,12 @@
       "path": "system.io.pipelines/6.0.3",
       "hashPath": "system.io.pipelines.6.0.3.nupkg.sha512"
     },
-    "System.Json/4.7.1": {
+    "System.Json/4.8.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-XymImdgljgVEkd9trFSKWlNJac1Hr+L9lwFLQSUUQfFMkm88AHI6DINAMhpoiUWQIPLIqEjR702eydUb4Qb3Ng==",
-      "path": "system.json/4.7.1",
-      "hashPath": "system.json.4.7.1.nupkg.sha512"
+      "sha512": "sha512-N+++rhhzGQ2gqclJBObp5UpLojpB9njsetq2e2lY+rmdbnANc88dzj3mr05Law+u9h0Wl6sBXqtJl1QUtIxmgQ==",
+      "path": "system.json/4.8.0",
+      "hashPath": "system.json.4.8.0.nupkg.sha512"
     },
     "System.Linq/4.3.0": {
       "type": "package",
@@ -5241,12 +5235,12 @@
       "path": "system.threading/4.3.0",
       "hashPath": "system.threading.4.3.0.nupkg.sha512"
     },
-    "System.Threading.Channels/6.0.0": {
+    "System.Threading.Channels/7.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-TY8/9+tI0mNaUMgntOxxaq2ndTkdXqLSxvPmas7XEqOlv9lQtB7wLjYGd756lOaO7Dvb5r/WXhluM+0Xe87v5Q==",
-      "path": "system.threading.channels/6.0.0",
-      "hashPath": "system.threading.channels.6.0.0.nupkg.sha512"
+      "sha512": "sha512-qmeeYNROMsONF6ndEZcIQ+VxR4Q/TX/7uIVLJqtwIWL7dDWeh0l1UIqgo4wYyjG//5lUNhwkLDSFl+pAWO6oiA==",
+      "path": "system.threading.channels/7.0.0",
+      "hashPath": "system.threading.channels.7.0.0.nupkg.sha512"
     },
     "System.Threading.Overlapped/4.3.0": {
       "type": "package",
