@@ -38,8 +38,11 @@ namespace Build
         public static void DownloadTemplates()
         {
             bool isLocalBuild = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("BUILD_BUILDID"));
-            if (isLocalBuild)
+            // Local package build requires DownloadTemplates operation. Put the value on the environment variable TEMPLATES_ARTIFACTS_DIRECTORY to skip the download operation.
+            bool isLocalBuildWithTemplates = string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEMPLATES_ARTIFACTS_DIRECTORY"));
+            if (isLocalBuild && isLocalBuildWithTemplates)
             {
+                Console.WriteLine("Skipping template download for local build without templates artifacts directory.");
                 return;
             }
 
