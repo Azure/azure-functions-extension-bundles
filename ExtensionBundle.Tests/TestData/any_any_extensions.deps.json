@@ -9,7 +9,7 @@
       "extensions/1.0.0": {
         "dependencies": {
           "Microsoft.Azure.DurableTask.Netherite.AzureFunctions": "3.1.0",
-          "Microsoft.Azure.Functions.Extensions.Mcp": "1.0.0-preview.4",
+          "Microsoft.Azure.Functions.Extensions.Mcp": "1.0.0-preview.6",
           "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents": "1.0.1",
           "Microsoft.Azure.WebJobs.Extensions.CosmosDB": "4.9.0",
           "Microsoft.Azure.WebJobs.Extensions.Dapr": "0.17.0-preview01",
@@ -18,7 +18,7 @@
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "3.4.4",
           "Microsoft.Azure.WebJobs.Extensions.EventHubs": "6.5.1",
           "Microsoft.Azure.WebJobs.Extensions.Fabric": "0.2.9-rc",
-          "Microsoft.Azure.WebJobs.Extensions.Kafka": "4.1.0",
+          "Microsoft.Azure.WebJobs.Extensions.Kafka": "4.1.1",
           "Microsoft.Azure.WebJobs.Extensions.Kusto": "1.0.11-Preview",
           "Microsoft.Azure.WebJobs.Extensions.MySql": "1.0.129",
           "Microsoft.Azure.WebJobs.Extensions.OpenAI": "0.19.0-alpha",
@@ -26,7 +26,7 @@
           "Microsoft.Azure.WebJobs.Extensions.OpenAI.CosmosDBNoSqlSearch": "0.1.0-alpha",
           "Microsoft.Azure.WebJobs.Extensions.OpenAI.CosmosDBSearch": "0.4.0-alpha",
           "Microsoft.Azure.WebJobs.Extensions.OpenAI.Kusto": "0.17.0-alpha",
-          "Microsoft.Azure.WebJobs.Extensions.RabbitMQ": "2.0.4",
+          "Microsoft.Azure.WebJobs.Extensions.RabbitMQ": "2.1.0",
           "Microsoft.Azure.WebJobs.Extensions.Redis": "0.5.0-preview",
           "Microsoft.Azure.WebJobs.Extensions.SendGrid": "3.1.0",
           "Microsoft.Azure.WebJobs.Extensions.ServiceBus": "5.16.6",
@@ -1196,7 +1196,7 @@
           }
         }
       },
-      "Microsoft.Azure.Functions.Extensions.Mcp/1.0.0-preview.4": {
+      "Microsoft.Azure.Functions.Extensions.Mcp/1.0.0-preview.6": {
         "dependencies": {
           "Azure.Storage.Queues": "12.22.0",
           "Microsoft.Azure.WebJobs": "3.0.41",
@@ -1557,7 +1557,7 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.Kafka/4.1.0": {
+      "Microsoft.Azure.WebJobs.Extensions.Kafka/4.1.1": {
         "dependencies": {
           "Confluent.Kafka": "2.4.0",
           "Confluent.SchemaRegistry": "2.4.0",
@@ -1569,8 +1569,8 @@
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.Kafka.dll": {
-            "assemblyVersion": "4.1.0.0",
-            "fileVersion": "4.1.0.0"
+            "assemblyVersion": "4.1.1.0",
+            "fileVersion": "4.1.1.0"
           }
         }
       },
@@ -1679,18 +1679,18 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.RabbitMQ/2.0.4": {
+      "Microsoft.Azure.WebJobs.Extensions.RabbitMQ/2.1.0": {
         "dependencies": {
           "Microsoft.Azure.WebJobs": "3.0.41",
           "Newtonsoft.Json": "13.0.3",
-          "RabbitMQ.Client": "6.4.0",
+          "RabbitMQ.Client": "6.8.1",
           "System.Diagnostics.DiagnosticSource": "8.0.1",
-          "System.Json": "4.7.1"
+          "System.Json": "4.8.0"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.RabbitMQ.dll": {
-            "assemblyVersion": "2.0.4.0",
-            "fileVersion": "2.0.4.0"
+            "assemblyVersion": "2.1.0.0",
+            "fileVersion": "2.1.0.0"
           }
         }
       },
@@ -2769,7 +2769,7 @@
           }
         }
       },
-      "RabbitMQ.Client/6.4.0": {
+      "RabbitMQ.Client/6.8.1": {
         "dependencies": {
           "System.Memory": "4.5.5",
           "System.Threading.Channels": "8.0.0"
@@ -2777,7 +2777,7 @@
         "runtime": {
           "lib/netstandard2.0/RabbitMQ.Client.dll": {
             "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.4.0.0"
+            "fileVersion": "6.8.1.0"
           }
         }
       },
@@ -3216,11 +3216,11 @@
         }
       },
       "System.IO.Pipelines/8.0.0": {},
-      "System.Json/4.7.1": {
+      "System.Json/4.8.0": {
         "runtime": {
-          "lib/netstandard2.0/System.Json.dll": {
-            "assemblyVersion": "2.0.8.0",
-            "fileVersion": "4.700.20.21406"
+          "lib/net6.0/System.Json.dll": {
+            "assemblyVersion": "4.8.0.0",
+            "fileVersion": "4.800.24.56208"
           }
         }
       },
@@ -4467,12 +4467,12 @@
       "path": "microsoft.azure.functions.extensions.dapr.core/0.17.0-preview01",
       "hashPath": "microsoft.azure.functions.extensions.dapr.core.0.17.0-preview01.nupkg.sha512"
     },
-    "Microsoft.Azure.Functions.Extensions.Mcp/1.0.0-preview.4": {
+    "Microsoft.Azure.Functions.Extensions.Mcp/1.0.0-preview.6": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-65zfmpSzgmOhKpezk0Zikrp7LJfRzei6ganDoEh3S68DAaADmJ6uB/kEUBlCUjf856oFJpIhmslyH685SgcZQQ==",
-      "path": "microsoft.azure.functions.extensions.mcp/1.0.0-preview.4",
-      "hashPath": "microsoft.azure.functions.extensions.mcp.1.0.0-preview.4.nupkg.sha512"
+      "sha512": "sha512-Vka8f4rq3zTgTMT7P2mdrCNgqXfFbaNkYh4Uvc6U7oRWqH3yd4E2WHBB1/PXQ1tc1b0PzygQZKt535KEi9WKlw==",
+      "path": "microsoft.azure.functions.extensions.mcp/1.0.0-preview.6",
+      "hashPath": "microsoft.azure.functions.extensions.mcp.1.0.0-preview.6.nupkg.sha512"
     },
     "Microsoft.Azure.Kusto.Cloud.Platform/12.2.7": {
       "type": "package",
@@ -4628,12 +4628,12 @@
       "path": "microsoft.azure.webjobs.extensions.http/3.2.0",
       "hashPath": "microsoft.azure.webjobs.extensions.http.3.2.0.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.Kafka/4.1.0": {
+    "Microsoft.Azure.WebJobs.Extensions.Kafka/4.1.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-crV3C6NUM6b9qwIvoNKiIfPslOIxtM+IEr2ViAy6EpGG+pXkYfMipi3ePKOBYVTyH87sBAtkHc4CBladu3jUPg==",
-      "path": "microsoft.azure.webjobs.extensions.kafka/4.1.0",
-      "hashPath": "microsoft.azure.webjobs.extensions.kafka.4.1.0.nupkg.sha512"
+      "sha512": "sha512-xAKkD8RcIIn9J0UMW+wSORQM0pSSUBiYvzVpKIsR2RtMhRaxp3alXqbNgZiGAnLu82Vn93SOXs8G39aONRsjxQ==",
+      "path": "microsoft.azure.webjobs.extensions.kafka/4.1.1",
+      "hashPath": "microsoft.azure.webjobs.extensions.kafka.4.1.1.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.Kusto/1.0.11-Preview": {
       "type": "package",
@@ -4684,12 +4684,12 @@
       "path": "microsoft.azure.webjobs.extensions.openai.kusto/0.17.0-alpha",
       "hashPath": "microsoft.azure.webjobs.extensions.openai.kusto.0.17.0-alpha.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.RabbitMQ/2.0.4": {
+    "Microsoft.Azure.WebJobs.Extensions.RabbitMQ/2.1.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-qyKbthL3CUEC2OX0WU617SEjPpE+XQ+m3+uIprr7iMgfEsuvWnRW1VWVfu5yfR1UWq+dw8eXemJLWY7WGPLdgw==",
-      "path": "microsoft.azure.webjobs.extensions.rabbitmq/2.0.4",
-      "hashPath": "microsoft.azure.webjobs.extensions.rabbitmq.2.0.4.nupkg.sha512"
+      "sha512": "sha512-nThsI7u/xrPtdcFQ2VlpAVfyovrHE7w4u19UTrtum0y8eCjth76m2rr0+L7HJGN0Im0h1qg4Gv/DEgr4VIuK1w==",
+      "path": "microsoft.azure.webjobs.extensions.rabbitmq/2.1.0",
+      "hashPath": "microsoft.azure.webjobs.extensions.rabbitmq.2.1.0.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.Redis/0.5.0-preview": {
       "type": "package",
@@ -5300,12 +5300,12 @@
       "path": "pipelines.sockets.unofficial/2.2.8",
       "hashPath": "pipelines.sockets.unofficial.2.2.8.nupkg.sha512"
     },
-    "RabbitMQ.Client/6.4.0": {
+    "RabbitMQ.Client/6.8.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-1znR1gGU+xYVSpO5z8nQolcUKA/yydnxQn7Ug9+RUXxTSLMm/eE58VKGwahPBjELXvDnX0k/kBrAitFLRjx9LA==",
-      "path": "rabbitmq.client/6.4.0",
-      "hashPath": "rabbitmq.client.6.4.0.nupkg.sha512"
+      "sha512": "sha512-jNsmGgmCNw2S/NzskeN2ijtGywtH4Sk/G6jWUTD5sY9SrC27Xz6BsLIiB8hdsfjeyWCa4j4GvCIGkpE8wrjU1Q==",
+      "path": "rabbitmq.client/6.8.1",
+      "hashPath": "rabbitmq.client.6.8.1.nupkg.sha512"
     },
     "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.2": {
       "type": "package",
@@ -5706,12 +5706,12 @@
       "path": "system.io.pipelines/8.0.0",
       "hashPath": "system.io.pipelines.8.0.0.nupkg.sha512"
     },
-    "System.Json/4.7.1": {
+    "System.Json/4.8.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-XymImdgljgVEkd9trFSKWlNJac1Hr+L9lwFLQSUUQfFMkm88AHI6DINAMhpoiUWQIPLIqEjR702eydUb4Qb3Ng==",
-      "path": "system.json/4.7.1",
-      "hashPath": "system.json.4.7.1.nupkg.sha512"
+      "sha512": "sha512-N+++rhhzGQ2gqclJBObp5UpLojpB9njsetq2e2lY+rmdbnANc88dzj3mr05Law+u9h0Wl6sBXqtJl1QUtIxmgQ==",
+      "path": "system.json/4.8.0",
+      "hashPath": "system.json.4.8.0.nupkg.sha512"
     },
     "System.Linq/4.3.0": {
       "type": "package",
