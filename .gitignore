@@ -333,3 +333,6 @@ ASALocalRun/
 
 build_temp/
 tools/
+
+# Local Packaging Directory
+templatesArtifacts/
