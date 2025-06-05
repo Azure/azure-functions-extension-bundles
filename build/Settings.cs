@@ -37,7 +37,7 @@ namespace Build
 
         public static readonly string ArtifactsDirectory = Path.Combine(Path.GetFullPath(basePath), "artifacts");
 
-        public static readonly string TemplatesArtifactsDirectory = Path.Combine(Environment.GetEnvironmentVariable("BUILD_REPOSITORY_LOCALPATH"), "templatesArtifacts");
+        public static readonly string TemplatesArtifactsDirectory = Path.Combine(Environment.GetEnvironmentVariable("BUILD_REPOSITORY_LOCALPATH") ?? "", "templatesArtifacts");
 
         public static readonly string ToolsDirectory = Path.Combine(Path.GetFullPath(basePath), "tools");
 

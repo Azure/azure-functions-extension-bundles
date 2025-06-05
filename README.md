@@ -25,21 +25,53 @@ Extension bundle provides a way for non-dotnet function apps to reference and us
 - [Dotnet Core SDK 2.2](https://dotnet.microsoft.com/en-us/download/dotnet/2.2)
 - [Dotnet Core SDK 3.1](https://dotnet.microsoft.com/en-us/download/dotnet/3.1)
 
-## Build Steps
+## Local Build and Packaging
 
-### Windows
+### Prerequisites
+
+Before building locally, you need to obtain the latest template artifacts and place them in the `templatesArtifacts` directory at the repository root.
+
+Required template files (example versions):
+
 ```
-cd build
+ExtensionBundle.Preview.v3.Templates.3.0.5130.zip
+ExtensionBundle.Preview.v4.Templates.4.0.5130.zip
+ExtensionBundle.v1.Templates.1.0.5130.zip
+ExtensionBundle.v2.Templates.1.0.5130.zip
+ExtensionBundle.v3.Templates.1.0.5130.zip
+ExtensionBundle.v4.Templates.1.0.5130.zip
+```
 
+**How to obtain template artifacts:**
+
+- Download the files from the [templates.public](https://dev.azure.com/azfunc/public/_build/results?buildId=221883) Pipeline
+
+### Building on Windows
+
+```powershell
+# Set environment variables
+$env:BUILD_REPOSITORY_LOCALPATH = "<ExtensionBundleRepoPath>"
+$env:TEMPLATES_ARTIFACTS_DIRECTORY = "templatesArtifacts"
+
+# Navigate to build directory and run
+cd build
 dotnet run skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux
 ```
 
-### Linux
-```
-cd build
+### Building on Linux
 
+```bash
+# Set environment variables
+export BUILD_REPOSITORY_LOCALPATH="<ExtensionBundleRepoPath>"
+export TEMPLATES_ARTIFACTS_DIRECTORY="templatesArtifacts"
+
+# Navigate to build directory and run
+cd build
 dotnet run skip:dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,DownloadManifestUtility,RunManifestUtilityWindows,RunManifestUtilityLinux
 ```
+
+**Note:** Replace `<ExtensionBundleRepoPath>` with the actual path to your extension bundle repository.
+
 
 ## Add extension to a extension bundle
 1. Identify the bundle version you want to update and checkout the corresponding branch
