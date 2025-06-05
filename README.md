@@ -38,23 +38,53 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 
 - [Dotnet SDK 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 
-## Build Steps
+## Local Build and Packaging
 
-### Windows
+### Prerequisites
 
-```bash
-cd build
+Before building locally, you need to obtain the latest template artifacts and place them in the `templatesArtifacts` directory at the repository root.
 
-dotnet run skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux,PackageBundlesLinux
+Required template files (example versions):
+
+```
+ExtensionBundle.Preview.v3.Templates.3.0.5130.zip
+ExtensionBundle.Preview.v4.Templates.4.0.5130.zip
+ExtensionBundle.v1.Templates.1.0.5130.zip
+ExtensionBundle.v2.Templates.1.0.5130.zip
+ExtensionBundle.v3.Templates.1.0.5130.zip
+ExtensionBundle.v4.Templates.1.0.5130.zip
 ```
 
-### Linux
+**How to obtain template artifacts:**
+
+- Download the files from the [templates.public](https://dev.azure.com/azfunc/public/_build/results?buildId=221883) Pipeline
+
+### Building on Windows
+
+```powershell
+# Set environment variables
+$env:BUILD_REPOSITORY_LOCALPATH = "<ExtensionBundleRepoPath>"
+$env:TEMPLATES_ARTIFACTS_DIRECTORY = "templatesArtifacts"
+
+# Navigate to build directory and run
+cd build
+dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux
+```
+
+### Building on Linux
 
 ```bash
-cd build
+# Set environment variables
+export BUILD_REPOSITORY_LOCALPATH="<ExtensionBundleRepoPath>"
+export TEMPLATES_ARTIFACTS_DIRECTORY="templatesArtifacts"
 
-dotnet run skip:dotnet run skip:PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows
+# Navigate to build directory and run
+cd build
+dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows
 ```
+
+**Note:** Replace `<ExtensionBundleRepoPath>` with the actual path to your extension bundle repository.
+
 
 ## Add extension
 
