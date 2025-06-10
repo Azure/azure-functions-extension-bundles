@@ -1,8 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using static Build.BasePath;
 
 namespace Build
@@ -68,14 +65,12 @@ namespace Build
 
         public static readonly string RUPackagePath = Path.Combine(RootBinDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package", BundleConfiguration.Instance.ExtensionBundleVersion);
 
-        public static readonly string IndexV2FileName = "index-v2.json";
-
         public static readonly string IndexFileName = "index.json";
 
         public static List<IndexFileV2Metadata> IndexFiles = new List<IndexFileV2Metadata>()
         {
-            new IndexFileV2Metadata("https://functionscdnstaging.azureedge.net", BundleConfiguration.Instance.ExtensionBundleId, "cdnStaging"),
-            new IndexFileV2Metadata("https://functionscdn.azureedge.net", BundleConfiguration.Instance.ExtensionBundleId, "cdnProd")
+            new IndexFileV2Metadata("https://cdn-staging.functions.azure.com", BundleConfiguration.Instance.ExtensionBundleId, "cdnStaging"),
+            new IndexFileV2Metadata("https://cdn.functions.azure.com", BundleConfiguration.Instance.ExtensionBundleId, "cdnProd")
         };
 
         public static List<BuildConfiguration> WindowsBuildConfigurations = new List<BuildConfiguration>()

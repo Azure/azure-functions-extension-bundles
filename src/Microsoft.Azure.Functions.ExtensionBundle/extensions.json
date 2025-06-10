@@ -39,7 +39,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-    "majorVersion": "5",
+    "majorVersion": "6",
     "name": "EventHubs",
     "bindings": [
       "eventhubtrigger",
@@ -56,7 +56,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "majorVersion": "2",
+    "majorVersion": "3",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -80,8 +80,20 @@
   },
   {
     "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
-    "majorVersion": "1",
+    "majorVersion": "3",
     "name": "NetheriteProvider",
+    "bindings": [
+      "activitytrigger",
+      "orchestrationtrigger",
+      "entitytrigger",
+      "durableclient",
+      "orchestrationclient"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged",
+    "majorVersion": "0",
+    "name": "AzureManagedProvider",
     "bindings": [
       "activitytrigger",
       "orchestrationtrigger",
@@ -118,7 +130,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
-    "majorVersion": "1",
+    "majorVersion": "2",
     "name": "SignalR",
     "bindings": [
       "signalr",
@@ -130,7 +142,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
-    "majorVersion": "1",
+    "majorVersion": "2",
     "name": "RabbitMQ",
     "bindings": [
       "rabbitmqtrigger",
@@ -139,7 +151,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Kafka",
-    "majorVersion": "3",
+    "majorVersion": "4",
     "name": "Kafka",
     "bindings": [
       "kafkatrigger",
@@ -239,6 +251,15 @@
     ]
   },
   {
+    "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.CosmosDBNoSqlSearch",
+    "majorVersion": "0",
+    "name": "OpenAICosmosDBNoSqlSearch",
+    "bindings": [
+      "SemanticSearch",
+      "EmbeddingsStore"
+    ]
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.Kusto",
     "majorVersion": "0",
     "name": "OpenAIKusto",
@@ -258,9 +279,28 @@
     ]
   },
   {
-    "id": " System.Formats.Asn1",
+    "id": "System.Formats.Asn1",
     "Version": "6.0.1",
     "name": "SystemFormatsAsn1",
     "bindings": []
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO",
+    "majorVersion": "1",
+    "name": "WebPubSubForSocketIO",
+    "bindings": [
+      "socketiotrigger",
+      "socketionegotiation",
+      "socketio"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.Functions.Extensions.Mcp",
+    "majorVersion": "1",
+    "name": "Mcp",
+    "bindings": [
+      "mcpToolTrigger",
+      "mcpToolProperty"
+    ]
   }
 ]
