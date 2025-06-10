@@ -249,7 +249,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Fabric",
-    "majorVersion": "0",
+    "majorVersion": "1",
     "name": "Startup",
     "bindings": [
       "FabricItem",
