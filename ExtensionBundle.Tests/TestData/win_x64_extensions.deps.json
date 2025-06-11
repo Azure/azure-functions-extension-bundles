@@ -14,12 +14,12 @@
           "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents": "1.0.1",
           "Microsoft.Azure.WebJobs.Extensions.CosmosDB": "4.9.0",
           "Microsoft.Azure.WebJobs.Extensions.Dapr": "0.17.0-preview01",
-          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.1.0",
+          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.2.0",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged": "0.4.2-alpha",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "3.4.4",
           "Microsoft.Azure.WebJobs.Extensions.EventHubs": "6.5.1",
-          "Microsoft.Azure.WebJobs.Extensions.Fabric": "0.2.9-rc",
-          "Microsoft.Azure.WebJobs.Extensions.Kafka": "4.1.1",
+          "Microsoft.Azure.WebJobs.Extensions.Fabric": "1.0.15",
+          "Microsoft.Azure.WebJobs.Extensions.Kafka": "4.1.2",
           "Microsoft.Azure.WebJobs.Extensions.Kusto": "1.0.11-Preview",
           "Microsoft.Azure.WebJobs.Extensions.MySql": "1.0.129",
           "Microsoft.Azure.WebJobs.Extensions.OpenAI": "0.19.0-alpha",
@@ -32,7 +32,7 @@
           "Microsoft.Azure.WebJobs.Extensions.SendGrid": "3.1.0",
           "Microsoft.Azure.WebJobs.Extensions.ServiceBus": "5.16.6",
           "Microsoft.Azure.WebJobs.Extensions.SignalRService": "2.0.1",
-          "Microsoft.Azure.WebJobs.Extensions.Sql": "3.1.490",
+          "Microsoft.Azure.WebJobs.Extensions.Sql": "3.1.512",
           "Microsoft.Azure.WebJobs.Extensions.Storage": "5.3.4",
           "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs": "5.3.4",
           "Microsoft.Azure.WebJobs.Extensions.Storage.Queues": "5.3.4",
@@ -563,20 +563,20 @@
           }
         }
       },
-      "Microsoft.ApplicationInsights/2.22.0": {
+      "Microsoft.ApplicationInsights/2.23.0": {
         "dependencies": {
           "System.Diagnostics.DiagnosticSource": "8.0.1"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.ApplicationInsights.dll": {
-            "assemblyVersion": "2.22.0.997",
-            "fileVersion": "2.22.0.997"
+            "assemblyVersion": "2.23.0.29",
+            "fileVersion": "2.23.0.29"
           }
         }
       },
       "Microsoft.ApplicationInsights.AspNetCore/2.21.0": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "2.22.0",
+          "Microsoft.ApplicationInsights": "2.23.0",
           "Microsoft.ApplicationInsights.DependencyCollector": "2.21.0",
           "Microsoft.ApplicationInsights.EventCounterCollector": "2.21.0",
           "Microsoft.ApplicationInsights.PerfCounterCollector": "2.21.0",
@@ -597,7 +597,7 @@
       },
       "Microsoft.ApplicationInsights.DependencyCollector/2.21.0": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "2.22.0",
+          "Microsoft.ApplicationInsights": "2.23.0",
           "System.Diagnostics.DiagnosticSource": "8.0.1"
         },
         "runtime": {
@@ -609,7 +609,7 @@
       },
       "Microsoft.ApplicationInsights.EventCounterCollector/2.21.0": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "2.22.0"
+          "Microsoft.ApplicationInsights": "2.23.0"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.AI.EventCounterCollector.dll": {
@@ -620,7 +620,7 @@
       },
       "Microsoft.ApplicationInsights.PerfCounterCollector/2.21.0": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "2.22.0",
+          "Microsoft.ApplicationInsights": "2.23.0",
           "Microsoft.Extensions.Caching.Memory": "1.0.0",
           "System.Diagnostics.PerformanceCounter": "4.7.0"
         },
@@ -633,7 +633,7 @@
       },
       "Microsoft.ApplicationInsights.WindowsServer/2.21.0": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "2.22.0",
+          "Microsoft.ApplicationInsights": "2.23.0",
           "Microsoft.ApplicationInsights.DependencyCollector": "2.21.0",
           "Microsoft.ApplicationInsights.PerfCounterCollector": "2.21.0",
           "Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel": "2.21.0",
@@ -648,7 +648,7 @@
       },
       "Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel/2.21.0": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "2.22.0",
+          "Microsoft.ApplicationInsights": "2.23.0",
           "System.IO.FileSystem.AccessControl": "4.7.0"
         },
         "runtime": {
@@ -970,37 +970,37 @@
           }
         }
       },
-      "Microsoft.Azure.DurableTask.ApplicationInsights/0.3.0": {
+      "Microsoft.Azure.DurableTask.ApplicationInsights/0.4.0": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "2.22.0",
-          "Microsoft.Azure.DurableTask.Core": "3.1.0",
+          "Microsoft.ApplicationInsights": "2.23.0",
+          "Microsoft.Azure.DurableTask.Core": "3.2.0",
           "Microsoft.Bcl.AsyncInterfaces": "10.0.0-preview.2.25163.2"
         },
         "runtime": {
           "lib/netstandard2.0/DurableTask.ApplicationInsights.dll": {
-            "assemblyVersion": "0.3.0.0",
-            "fileVersion": "0.3.0.14742"
+            "assemblyVersion": "0.4.0.0",
+            "fileVersion": "0.4.0.25381"
           }
         }
       },
-      "Microsoft.Azure.DurableTask.AzureStorage/2.1.0": {
+      "Microsoft.Azure.DurableTask.AzureStorage/2.2.0": {
         "dependencies": {
           "Azure.Core": "1.44.1",
           "Azure.Data.Tables": "12.10.0",
           "Azure.Storage.Blobs": "12.23.0",
           "Azure.Storage.Queues": "12.22.0",
-          "Microsoft.Azure.DurableTask.Core": "3.1.0",
+          "Microsoft.Azure.DurableTask.Core": "3.2.0",
           "Microsoft.Bcl.AsyncInterfaces": "10.0.0-preview.2.25163.2",
           "System.Linq.Async": "6.0.1"
         },
         "runtime": {
           "lib/netstandard2.0/DurableTask.AzureStorage.dll": {
-            "assemblyVersion": "2.1.0.0",
-            "fileVersion": "2.1.0.14742"
+            "assemblyVersion": "2.2.0.0",
+            "fileVersion": "2.2.0.25381"
           }
         }
       },
-      "Microsoft.Azure.DurableTask.Core/3.1.0": {
+      "Microsoft.Azure.DurableTask.Core/3.2.0": {
         "dependencies": {
           "Castle.Core": "5.0.0",
           "Microsoft.Extensions.Logging.Abstractions": "8.0.3",
@@ -1011,8 +1011,8 @@
         },
         "runtime": {
           "lib/netstandard2.0/DurableTask.Core.dll": {
-            "assemblyVersion": "3.1.0.0",
-            "fileVersion": "3.1.0.14742"
+            "assemblyVersion": "3.2.0.0",
+            "fileVersion": "3.2.0.25381"
           }
         }
       },
@@ -1023,7 +1023,7 @@
           "Azure.Messaging.EventHubs": "5.12.1",
           "Azure.Messaging.EventHubs.Processor": "5.11.5",
           "Azure.Storage.Blobs": "12.23.0",
-          "Microsoft.Azure.DurableTask.Core": "3.1.0",
+          "Microsoft.Azure.DurableTask.Core": "3.2.0",
           "Microsoft.FASTER.Core": "2.6.5",
           "Newtonsoft.Json": "13.0.3"
         },
@@ -1036,9 +1036,9 @@
       },
       "Microsoft.Azure.DurableTask.Netherite.AzureFunctions/3.1.0": {
         "dependencies": {
-          "Microsoft.Azure.DurableTask.Core": "3.1.0",
+          "Microsoft.Azure.DurableTask.Core": "3.2.0",
           "Microsoft.Azure.DurableTask.Netherite": "3.1.0",
-          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.1.0"
+          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.2.0"
         },
         "runtime": {
           "lib/net6.0/DurableTask.Netherite.AzureFunctions.dll": {
@@ -1100,7 +1100,7 @@
           "System.Collections.Immutable": "8.0.0",
           "System.IdentityModel.Tokens.Jwt": "7.5.1",
           "System.Net.Http": "4.3.4",
-          "System.Security.AccessControl": "6.0.0",
+          "System.Security.AccessControl": "6.0.1",
           "System.Security.Cryptography.Cng": "5.0.0",
           "System.Security.Principal.Windows": "5.0.0"
         },
@@ -1324,14 +1324,14 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.DurableTask/3.1.0": {
+      "Microsoft.Azure.WebJobs.Extensions.DurableTask/3.2.0": {
         "dependencies": {
           "Azure.Identity": "1.13.2",
           "Grpc.Core": "2.46.6",
           "Microsoft.AspNetCore.Mvc.WebApiCompatShim": "2.2.0",
-          "Microsoft.Azure.DurableTask.ApplicationInsights": "0.3.0",
-          "Microsoft.Azure.DurableTask.AzureStorage": "2.1.0",
-          "Microsoft.Azure.DurableTask.Core": "3.1.0",
+          "Microsoft.Azure.DurableTask.ApplicationInsights": "0.4.0",
+          "Microsoft.Azure.DurableTask.AzureStorage": "2.2.0",
+          "Microsoft.Azure.DurableTask.Core": "3.2.0",
           "Microsoft.Azure.WebJobs": "3.0.41",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask.Analyzers": "0.5.0",
           "Microsoft.Azure.WebJobs.Extensions.Rpc": "3.0.39",
@@ -1341,7 +1341,7 @@
         "runtime": {
           "lib/net6.0/Microsoft.Azure.WebJobs.Extensions.DurableTask.dll": {
             "assemblyVersion": "3.0.0.0",
-            "fileVersion": "3.1.0.0"
+            "fileVersion": "3.2.0.0"
           }
         }
       },
@@ -1353,8 +1353,8 @@
           "Google.Protobuf": "3.28.2",
           "Grpc.Net.Client": "2.67.0",
           "Grpc.Tools": "2.68.1",
-          "Microsoft.Azure.DurableTask.Core": "3.1.0",
-          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.1.0",
+          "Microsoft.Azure.DurableTask.Core": "3.2.0",
+          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.2.0",
           "Microsoft.Bcl.AsyncInterfaces": "10.0.0-preview.2.25163.2",
           "Microsoft.DurableTask.AzureManagedBackend": "0.4.2-alpha",
           "System.Text.Json": "8.0.5",
@@ -1394,7 +1394,7 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.Fabric/0.2.9-rc": {
+      "Microsoft.Azure.WebJobs.Extensions.Fabric/1.0.15": {
         "dependencies": {
           "Azure.Core": "1.44.1",
           "Azure.Identity": "1.13.2",
@@ -1407,12 +1407,12 @@
         },
         "runtime": {
           "lib/netstandard2.1/Microsoft.Azure.Extensions.Fabric.Shared.dll": {
-            "assemblyVersion": "0.2.9.0",
-            "fileVersion": "0.2.9.0"
+            "assemblyVersion": "1.0.15.0",
+            "fileVersion": "1.0.15.0"
           },
           "lib/netstandard2.1/Microsoft.Azure.WebJobs.Extensions.Fabric.dll": {
-            "assemblyVersion": "0.2.9.0",
-            "fileVersion": "0.2.9.0"
+            "assemblyVersion": "1.0.15.0",
+            "fileVersion": "1.0.15.0"
           }
         }
       },
@@ -1432,7 +1432,7 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.Kafka/4.1.1": {
+      "Microsoft.Azure.WebJobs.Extensions.Kafka/4.1.2": {
         "dependencies": {
           "Confluent.Kafka": "2.4.0",
           "Confluent.SchemaRegistry": "2.4.0",
@@ -1444,8 +1444,8 @@
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.Kafka.dll": {
-            "assemblyVersion": "4.1.1.0",
-            "fileVersion": "4.1.1.0"
+            "assemblyVersion": "4.1.2.0",
+            "fileVersion": "4.1.2.0"
           }
         }
       },
@@ -1466,7 +1466,7 @@
       "Microsoft.Azure.WebJobs.Extensions.MySql/1.0.129": {
         "dependencies": {
           "Azure.Identity": "1.13.2",
-          "Microsoft.ApplicationInsights": "2.22.0",
+          "Microsoft.ApplicationInsights": "2.23.0",
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.Azure.WebJobs": "3.0.41",
           "Microsoft.Bcl.AsyncInterfaces": "10.0.0-preview.2.25163.2",
@@ -1641,22 +1641,23 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.Sql/3.1.490": {
+      "Microsoft.Azure.WebJobs.Extensions.Sql/3.1.512": {
         "dependencies": {
           "Azure.Core": "1.44.1",
           "Azure.Identity": "1.13.2",
-          "Microsoft.ApplicationInsights": "2.22.0",
+          "Microsoft.ApplicationInsights": "2.23.0",
           "Microsoft.AspNetCore.Http": "2.2.2",
           "Microsoft.Azure.WebJobs": "3.0.41",
           "Microsoft.Data.SqlClient": "5.2.2",
           "Microsoft.SqlServer.TransactSql.ScriptDom": "161.9135.0",
           "Newtonsoft.Json": "13.0.3",
-          "System.Runtime.Caching": "8.0.1"
+          "System.Runtime.Caching": "8.0.1",
+          "System.Security.AccessControl": "6.0.1"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.Sql.dll": {
-            "assemblyVersion": "3.1.490.0",
-            "fileVersion": "3.1.490.0"
+            "assemblyVersion": "3.1.512.0",
+            "fileVersion": "3.1.512.0"
           }
         }
       },
@@ -1747,7 +1748,7 @@
       },
       "Microsoft.Azure.WebJobs.Script.Abstractions/1.0.4-preview": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "2.22.0",
+          "Microsoft.ApplicationInsights": "2.23.0",
           "Microsoft.ApplicationInsights.AspNetCore": "2.21.0",
           "Microsoft.ApplicationInsights.DependencyCollector": "2.21.0",
           "Microsoft.ApplicationInsights.WindowsServer": "2.21.0",
@@ -1878,7 +1879,7 @@
           "Azure.Identity": "1.13.2",
           "Google.Protobuf": "3.28.2",
           "Grpc.Net.Client": "2.67.0",
-          "Microsoft.Azure.DurableTask.Core": "3.1.0",
+          "Microsoft.Azure.DurableTask.Core": "3.2.0",
           "Microsoft.Bcl.AsyncInterfaces": "10.0.0-preview.2.25163.2",
           "System.Text.Json": "8.0.5",
           "System.Threading.Channels": "8.0.0"
@@ -1894,7 +1895,7 @@
         "dependencies": {
           "Azure.Core": "1.44.1",
           "Azure.Identity": "1.13.2",
-          "Microsoft.Azure.DurableTask.Core": "3.1.0",
+          "Microsoft.Azure.DurableTask.Core": "3.2.0",
           "Microsoft.Data.SqlClient": "5.2.2",
           "Microsoft.IdentityModel.JsonWebTokens": "7.6.3",
           "SemanticVersion": "2.1.0",
@@ -1910,7 +1911,7 @@
       },
       "Microsoft.DurableTask.SqlServer.AzureFunctions/1.5.1": {
         "dependencies": {
-          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.1.0",
+          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.2.0",
           "Microsoft.DurableTask.SqlServer": "1.5.1"
         },
         "runtime": {
@@ -2102,7 +2103,7 @@
       },
       "Microsoft.Extensions.Logging.ApplicationInsights/2.21.0": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "2.22.0",
+          "Microsoft.ApplicationInsights": "2.23.0",
           "Microsoft.Extensions.Logging": "7.0.0"
         },
         "runtime": {
@@ -2340,7 +2341,7 @@
       },
       "Microsoft.Win32.Registry/5.0.0": {
         "dependencies": {
-          "System.Security.AccessControl": "6.0.0",
+          "System.Security.AccessControl": "6.0.1",
           "System.Security.Principal.Windows": "5.0.0"
         }
       },
@@ -3097,7 +3098,7 @@
       },
       "System.IO.FileSystem.AccessControl/4.7.0": {
         "dependencies": {
-          "System.Security.AccessControl": "6.0.0",
+          "System.Security.AccessControl": "6.0.1",
           "System.Security.Principal.Windows": "5.0.0"
         }
       },
@@ -3470,7 +3471,7 @@
           "System.Runtime.Extensions": "4.3.0"
         }
       },
-      "System.Security.AccessControl/6.0.0": {},
+      "System.Security.AccessControl/6.0.1": {},
       "System.Security.Cryptography.Algorithms/4.3.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "3.1.9",
@@ -4063,12 +4064,12 @@
       "path": "messagepack.annotations/2.5.192",
       "hashPath": "messagepack.annotations.2.5.192.nupkg.sha512"
     },
-    "Microsoft.ApplicationInsights/2.22.0": {
+    "Microsoft.ApplicationInsights/2.23.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-3AOM9bZtku7RQwHyMEY3tQMrHIgjcfRDa6YQpd/QG2LDGvMydSlL9Di+8LLMt7J2RDdfJ7/2jdYv6yHcMJAnNw==",
-      "path": "microsoft.applicationinsights/2.22.0",
-      "hashPath": "microsoft.applicationinsights.2.22.0.nupkg.sha512"
+      "sha512": "sha512-nWArUZTdU7iqZLycLKWe0TDms48KKGE6pONH2terYNa8REXiqixrMOkf1sk5DHGMaUTqONU2YkS4SAXBhLStgw==",
+      "path": "microsoft.applicationinsights/2.23.0",
+      "hashPath": "microsoft.applicationinsights.2.23.0.nupkg.sha512"
     },
     "Microsoft.ApplicationInsights.AspNetCore/2.21.0": {
       "type": "package",
@@ -4322,26 +4323,26 @@
       "path": "microsoft.azure.cosmos/3.49.0",
       "hashPath": "microsoft.azure.cosmos.3.49.0.nupkg.sha512"
     },
-    "Microsoft.Azure.DurableTask.ApplicationInsights/0.3.0": {
+    "Microsoft.Azure.DurableTask.ApplicationInsights/0.4.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-foj3cSDQKDjlhQ5XRQ59r1ItUl95qG1nIz+cGF43ioiaMfo0NaRdOPxaAhR3Lv2y0FAfyV8p0lI7WL65l+k8NQ==",
-      "path": "microsoft.azure.durabletask.applicationinsights/0.3.0",
-      "hashPath": "microsoft.azure.durabletask.applicationinsights.0.3.0.nupkg.sha512"
+      "sha512": "sha512-2U6I8i/tL7Asi6CqvANmbNuG2dDSciyr0NThY+vMMdBLELlOk0UDZaxWTDjCX79QzTfIzPCj6jZ29lwWiyrKqA==",
+      "path": "microsoft.azure.durabletask.applicationinsights/0.4.0",
+      "hashPath": "microsoft.azure.durabletask.applicationinsights.0.4.0.nupkg.sha512"
     },
-    "Microsoft.Azure.DurableTask.AzureStorage/2.1.0": {
+    "Microsoft.Azure.DurableTask.AzureStorage/2.2.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-UMlqii/PjdHsL+h4RcFMEJUEMfDeH4UAFl2J35N1IzldcRa39MZm/6mVe4OcpY0nMC0Mx1/4w44AdCzi0ZGeaA==",
-      "path": "microsoft.azure.durabletask.azurestorage/2.1.0",
-      "hashPath": "microsoft.azure.durabletask.azurestorage.2.1.0.nupkg.sha512"
+      "sha512": "sha512-ta8sCuIbUY6klEqmGOd59fnEauvbMGxSUeR6LOP42axqD+48UYTZmFPN7H+vkLlJyeplk1IQPcep3olXOyoIwg==",
+      "path": "microsoft.azure.durabletask.azurestorage/2.2.0",
+      "hashPath": "microsoft.azure.durabletask.azurestorage.2.2.0.nupkg.sha512"
     },
-    "Microsoft.Azure.DurableTask.Core/3.1.0": {
+    "Microsoft.Azure.DurableTask.Core/3.2.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-y5a/Jhr2wVAubd8yt0JAKevUliDXDXUdPKa50DYDuqd4WVm/SLU0fsVMMYAywKXkPasjZX3s5okje7tw94p4YQ==",
-      "path": "microsoft.azure.durabletask.core/3.1.0",
-      "hashPath": "microsoft.azure.durabletask.core.3.1.0.nupkg.sha512"
+      "sha512": "sha512-lssn7ssuD/rbYWkDnt91XPWFddGTYnXZe+SSsbugqBF7VAhpJUuwDYGknRT96+oq0THOkHHdgN+eAp5pPLAbRw==",
+      "path": "microsoft.azure.durabletask.core/3.2.0",
+      "hashPath": "microsoft.azure.durabletask.core.3.2.0.nupkg.sha512"
     },
     "Microsoft.Azure.DurableTask.Netherite/3.1.0": {
       "type": "package",
@@ -4490,12 +4491,12 @@
       "path": "microsoft.azure.webjobs.extensions.dapr/0.17.0-preview01",
       "hashPath": "microsoft.azure.webjobs.extensions.dapr.0.17.0-preview01.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.DurableTask/3.1.0": {
+    "Microsoft.Azure.WebJobs.Extensions.DurableTask/3.2.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-sEiF5+RcYf6DkL8eL50IpKNUejySuwqnH29hXb8k02HZ5UVNWoS5AWPo0usDwD0f6nuJtOOum3RB5DLZGkRPlA==",
-      "path": "microsoft.azure.webjobs.extensions.durabletask/3.1.0",
-      "hashPath": "microsoft.azure.webjobs.extensions.durabletask.3.1.0.nupkg.sha512"
+      "sha512": "sha512-a+fTO5NDTGCuvCQ8oVe/9lRsnt2fa9KhIOtV9ylRHhkXTEIulJxUb6uHs1E/0gwLxyXNNhZOkJMdEjVJ/FrnIw==",
+      "path": "microsoft.azure.webjobs.extensions.durabletask/3.2.0",
+      "hashPath": "microsoft.azure.webjobs.extensions.durabletask.3.2.0.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.DurableTask.Analyzers/0.5.0": {
       "type": "package",
@@ -4525,12 +4526,12 @@
       "path": "microsoft.azure.webjobs.extensions.eventhubs/6.5.1",
       "hashPath": "microsoft.azure.webjobs.extensions.eventhubs.6.5.1.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.Fabric/0.2.9-rc": {
+    "Microsoft.Azure.WebJobs.Extensions.Fabric/1.0.15": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-vrgRqOPjkyOF/MDectRoNpbYvTOlsmggG/Qf8ERULdFCXSb1jJKftdNfEot/mz8fBzm2MyGkOP0ilyJzOLyVmQ==",
-      "path": "microsoft.azure.webjobs.extensions.fabric/0.2.9-rc",
-      "hashPath": "microsoft.azure.webjobs.extensions.fabric.0.2.9-rc.nupkg.sha512"
+      "sha512": "sha512-j6XgpxdpMoZT57KuIQlO9jg1q981SxIvaPI3SlzUQwFCkGDq53fN7+1C/OhzSLzrxH4Feh/X83/QfskMJtoDvA==",
+      "path": "microsoft.azure.webjobs.extensions.fabric/1.0.15",
+      "hashPath": "microsoft.azure.webjobs.extensions.fabric.1.0.15.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.Http/3.2.0": {
       "type": "package",
@@ -4539,12 +4540,12 @@
       "path": "microsoft.azure.webjobs.extensions.http/3.2.0",
       "hashPath": "microsoft.azure.webjobs.extensions.http.3.2.0.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.Kafka/4.1.1": {
+    "Microsoft.Azure.WebJobs.Extensions.Kafka/4.1.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-xAKkD8RcIIn9J0UMW+wSORQM0pSSUBiYvzVpKIsR2RtMhRaxp3alXqbNgZiGAnLu82Vn93SOXs8G39aONRsjxQ==",
-      "path": "microsoft.azure.webjobs.extensions.kafka/4.1.1",
-      "hashPath": "microsoft.azure.webjobs.extensions.kafka.4.1.1.nupkg.sha512"
+      "sha512": "sha512-AKYb3io+Qp/ymLupa/NjdYk0cqYsXVESF428kwUCGAafCxUqCcyqyx5WLUX8S1Y/Q15pjA5nczlH5w/QcCvEYQ==",
+      "path": "microsoft.azure.webjobs.extensions.kafka/4.1.2",
+      "hashPath": "microsoft.azure.webjobs.extensions.kafka.4.1.2.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.Kusto/1.0.11-Preview": {
       "type": "package",
@@ -4637,12 +4638,12 @@
       "path": "microsoft.azure.webjobs.extensions.signalrservice/2.0.1",
       "hashPath": "microsoft.azure.webjobs.extensions.signalrservice.2.0.1.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.Sql/3.1.490": {
+    "Microsoft.Azure.WebJobs.Extensions.Sql/3.1.512": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-mXLWyllX60xY2yolOql9ur41M/szUBOC16+cAY/33xceqeyJe0HCcb3OWpmViaM/G38Pcoos56K6/vQw3K80vA==",
-      "path": "microsoft.azure.webjobs.extensions.sql/3.1.490",
-      "hashPath": "microsoft.azure.webjobs.extensions.sql.3.1.490.nupkg.sha512"
+      "sha512": "sha512-eJkxpLb6jNbbw2I/WxY5VLsdA0IeSGxzasYE1WZWm9tJ4kd1rGeKV6WuXxxgji4umz2kkUtcnrPj0wU7F98OVw==",
+      "path": "microsoft.azure.webjobs.extensions.sql/3.1.512",
+      "hashPath": "microsoft.azure.webjobs.extensions.sql.3.1.512.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.Storage/5.3.4": {
       "type": "package",
@@ -6058,12 +6059,12 @@
       "path": "system.runtime.numerics/4.3.0",
       "hashPath": "system.runtime.numerics.4.3.0.nupkg.sha512"
     },
-    "System.Security.AccessControl/6.0.0": {
+    "System.Security.AccessControl/6.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-AUADIc0LIEQe7MzC+I0cl0rAT8RrTAKFHl53yHjEUzNVIaUlhFY11vc2ebiVJzVBuOzun6F7FBA+8KAbGTTedQ==",
-      "path": "system.security.accesscontrol/6.0.0",
-      "hashPath": "system.security.accesscontrol.6.0.0.nupkg.sha512"
+      "sha512": "sha512-IQ4NXP/B3Ayzvw0rDQzVTYsCKyy0Jp9KI6aYcK7UnGVlR9+Awz++TIPCQtPYfLJfOpm8ajowMR09V7quD3sEHw==",
+      "path": "system.security.accesscontrol/6.0.1",
+      "hashPath": "system.security.accesscontrol.6.0.1.nupkg.sha512"
     },
     "System.Security.Cryptography.Algorithms/4.3.0": {
       "type": "package",
