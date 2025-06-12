@@ -1,0 +1,539 @@
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+"""Simplified unittest helpers for Azure Functions extension bundles tests.
+
+This version only supports running tests via Azure Functions Core Tools,
+removing dependencies on azure_functions_worker and proxy_worker modules.
+"""
+
+import configparser
+import functools
+import logging
+import os
+import pathlib
+import platform
+import re
+import shutil
+import socket
+import subprocess
+import sys
+import tempfile
+import time
+import unittest
+from typing import Dict, List, Optional, Tuple
+
+# Constants
+PROJECT_ROOT = pathlib.Path(__file__).parent.parent.parent
+TESTS_ROOT = PROJECT_ROOT / 'tests'
+EMULATOR_TESTS_FOLDER = pathlib.Path('emulator_tests')
+BUILD_DIR = PROJECT_ROOT / 'build'
+WORKER_CONFIG = PROJECT_ROOT / 'worker.config.ini'
+PYAZURE_WEBHOST_DEBUG = 'PYAZURE_WEBHOST_DEBUG'
+ARCHIVE_WEBHOST_LOGS = 'ARCHIVE_WEBHOST_LOGS'
+CONSUMPTION_DOCKER_TEST = 'CONSUMPTION_DOCKER_TEST'
+DEDICATED_DOCKER_TEST = 'DEDICATED_DOCKER_TEST'
+ON_WINDOWS = platform.system() == 'Windows'
+LOCALHOST = "127.0.0.1"
+
+# The template of host.json for test functions
+HOST_JSON_TEMPLATE = """\
+{
+    "version": "2.0",
+    "logging": {"logLevel": {"default": "Trace"}},
+    "extensionBundle": {
+    "id": "Microsoft.Azure.Functions.ExtensionBundle",
+    "version": "[4.0.0, 5.0.0)"
+    }
+}
+"""
+
+
+def is_envvar_true(name):
+    """Check if an environment variable is set to a 'truthy' value."""
+    value = os.environ.get(name, '').strip().lower()
+    return value in ('1', 'true', 'yes', 'y')
+
+
+class WebHostTestCaseMeta(type(unittest.TestCase)):
+    """Metaclass for WebHostTestCase to handle log checking."""
+
+    def __new__(mcls, name, bases, dct):
+        if is_envvar_true(DEDICATED_DOCKER_TEST) \
+                or is_envvar_true(CONSUMPTION_DOCKER_TEST):
+            return super().__new__(mcls, name, bases, dct)
+
+        # Process test methods to capture logs
+        for attrname, attr in dct.items():
+            if attrname.startswith('test_') and callable(attr):
+                test_case = attr
+                check_log_name = attrname.replace('test_', 'check_log_', 1)
+                check_log_case = dct.get(check_log_name)
+
+                # Create a wrapper that runs the test and checks logs if needed
+                @functools.wraps(test_case)
+                def wrapper(self, *args, __meth__=test_case,
+                           __check_log__=check_log_case, **kwargs):
+                    if (__check_log__ is not None
+                            and callable(__check_log__)
+                            and not is_envvar_true(PYAZURE_WEBHOST_DEBUG)):
+
+                        # Check logging output for unit test scenarios
+                        result = self._run_test(__meth__, *args, **kwargs)
+
+                        # Trim off host output timestamps
+                        host_output = getattr(self, 'host_out', '')
+                        output_lines = host_output.splitlines()
+                        ts_re = r"^\[\d+(\/|-)\d+(\/|-)\d+T*\d+\:\d+\:\d+.*(" \
+                                r"A|P)*M*\]"
+                        output = list(map(lambda s:
+                                          re.sub(ts_re, '', s).strip(),
+                                          output_lines))
+
+                        # Execute check_log_ test cases
+                        self._run_test(__check_log__, host_out=output)
+                        return result
+                    else:
+                        # Check normal unit test
+                        return self._run_test(__meth__, *args, **kwargs)
+
+                dct[attrname] = wrapper
+
+        return super().__new__(mcls, name, bases, dct)
+
+
+class WebHostTestCase(unittest.TestCase, metaclass=WebHostTestCaseMeta):
+    """Base class for integration tests that need a WebHost.
+
+    In addition to automatically starting up a WebHost instance,
+    this test case class logs WebHost stdout/stderr in case
+    a unit test fails.
+    
+    This version is simplified to only work with Core Tools.
+    """
+    host_stdout_logger = logging.getLogger('webhosttests')
+    env_variables = {}
+
+    @classmethod
+    def get_script_dir(cls):
+        """Return the directory containing the function app for testing.
+        
+        Must be implemented by subclasses.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def get_libraries_to_install(cls) -> List:
+        """Return a list of libraries to install in the function app."""
+        return []
+
+    @classmethod
+    def get_environment_variables(cls) -> Dict:
+        """Return environment variables to set for the function app."""
+        return {}
+
+    @classmethod
+    def docker_tests_enabled(cls) -> Tuple[bool, str]:
+        """Check if docker tests are enabled."""
+        if is_envvar_true(CONSUMPTION_DOCKER_TEST):
+            return True, CONSUMPTION_DOCKER_TEST
+        elif is_envvar_true(DEDICATED_DOCKER_TEST):
+            return True, DEDICATED_DOCKER_TEST
+        else:
+            return False, None
+
+    @classmethod
+    def setUpClass(cls):
+        """Set up the test environment before running any tests."""
+        script_dir = pathlib.Path(cls.get_script_dir())
+        is_unit_test = True if 'unittests' in script_dir.parts else False
+
+        docker_tests_enabled, sku = cls.docker_tests_enabled()
+
+        cls.host_stdout = None if is_envvar_true(PYAZURE_WEBHOST_DEBUG) \
+            else tempfile.NamedTemporaryFile('w+t')
+
+        try:
+            if docker_tests_enabled:
+                raise NotImplementedError(
+                    "Docker tests are not supported in this simplified version")
+            else:
+                _setup_func_app(TESTS_ROOT / script_dir, is_unit_test)
+                try:
+                    cls.webhost = start_webhost(script_dir=script_dir,
+                                                stdout=cls.host_stdout)
+                except Exception:
+                    raise
+
+            if not cls.webhost.is_healthy() and cls.host_stdout is not None:
+                cls.host_out = cls.host_stdout.read()
+                if cls.host_out is not None and len(cls.host_out) > 0:
+                    error_message = 'WebHost is not started correctly.'
+                    cls.host_stdout_logger.error(
+                        f'{error_message}\n{cls.host_stdout.name}: {cls.host_out}')
+                    raise RuntimeError(error_message)
+        except Exception as ex:
+            cls.host_stdout_logger.error(f"WebHost is not started correctly. {ex}")
+            cls.tearDownClass()
+            raise
+
+    @classmethod
+    def tearDownClass(cls):
+        """Clean up after all tests are run."""
+        if hasattr(cls, 'webhost') and cls.webhost:
+            cls.webhost.close()
+            cls.webhost = None
+
+        if hasattr(cls, 'host_stdout') and cls.host_stdout is not None:
+            if is_envvar_true(ARCHIVE_WEBHOST_LOGS):
+                cls.host_stdout.seek(0)
+                content = cls.host_stdout.read()
+                if content is not None and len(content) > 0:
+                    version_info = sys.version_info
+                    log_file = (
+                        "logs/"
+                        f"{cls.__module__}_{cls.__name__}"
+                        f"{version_info.minor}_webhost.log"
+                    )
+                    os.makedirs(os.path.dirname(log_file), exist_ok=True)
+                    with open(log_file, 'w+') as file:
+                        file.write(content)
+                    cls.host_stdout_logger.info(f"WebHost log is archived to {log_file} in the artifact")
+
+            cls.host_stdout.close()
+            cls.host_stdout = None
+
+        script_dir = pathlib.Path(cls.get_script_dir())
+        _teardown_func_app(TESTS_ROOT / script_dir)
+
+    def _run_test(self, test, *args, **kwargs):
+        """Run a test method with log capturing."""
+        if self.host_stdout is None:
+            test(self, *args, **kwargs)
+        else:
+            # Discard any host stdout left from the previous test
+            self.host_stdout.read()
+            last_pos = self.host_stdout.tell()
+
+            test_exception = None
+            try:
+                test(self, *args, **kwargs)
+            except Exception as e:
+                test_exception = e
+            finally:
+                try:
+                    self.host_stdout.seek(last_pos)
+                    self.host_out = self.host_stdout.read()
+                    if self.host_out is not None and len(self.host_out) > 0:
+                        self.host_stdout_logger.error(
+                            'Captured WebHost log generated during test '
+                            '%s from %s :\n%s', test.__name__,
+                            self.host_stdout.name, self.host_out)
+                finally:
+                    if test_exception is not None:
+                        raise test_exception
+
+
+def _find_open_port():
+    """Find an available port to use for the Azure Functions host."""
+    with socket.socket() as s:
+        s.bind((LOCALHOST, 0))
+        s.listen(1)
+        return s.getsockname()[1]
+
+
+def popen_webhost(*, stdout, stderr, script_root, port=None):
+    """Start the Azure Functions host process."""
+    import requests  # Import here to avoid global import issues
+    
+    testconfig = None
+    if WORKER_CONFIG.exists():
+        testconfig = configparser.ConfigParser()
+        testconfig.read(WORKER_CONFIG)
+
+    # Get Core Tools executable path
+    coretools_exe = os.environ.get('CORE_TOOLS_EXE_PATH')
+    if not coretools_exe:
+        # Try to find Core Tools in the build directory
+        potential_paths = [
+            BUILD_DIR / "webhost" / "func.exe",
+            BUILD_DIR / "webhost" / "func"
+        ]
+        for path in potential_paths:
+            if path.exists():
+                coretools_exe = str(path)
+                break
+    
+    if not coretools_exe:
+        raise RuntimeError('\n'.join([
+            'Unable to locate Azure Functions Core Tools binary.',
+            'Please do one of the following:',
+            ' * run the following command from the root folder of',
+            '   the project:',
+            '',
+            f'cd tests && python -m invoke -c test_setup webhost',
+            '',
+            ' * or set the CORE_TOOLS_EXE_PATH environment variable',
+            '   to point to the func.exe or func binary.',
+            '',
+            'Setting "export PYAZURE_WEBHOST_DEBUG=true" to get the full',
+            'stdout and stderr from function host.'
+        ]))
+
+    coretools_exe = coretools_exe.strip()
+    logging.info(f"Using Azure Functions Core Tools at: {coretools_exe}")
+    
+    # Check if the Core Tools binary exists and is executable
+    if not os.path.isfile(coretools_exe):
+        raise RuntimeError(f"Core Tools binary not found at {coretools_exe}")
+    
+    if not ON_WINDOWS and not os.access(coretools_exe, os.X_OK):
+        logging.warning(f"Core Tools binary at {coretools_exe} is not executable. Attempting to fix permissions.")
+        try:
+            os.chmod(coretools_exe, os.stat(coretools_exe).st_mode | 0o111)
+        except Exception as e:
+            logging.error(f"Failed to set executable permissions: {e}")
+    
+    hostexe_args = [str(coretools_exe), 'host', 'start', '--verbose']
+    if port is not None:
+        hostexe_args.extend(['--port', str(port)])    
+        logging.info(f"Starting Core Tools with command: {' '.join(hostexe_args)}")
+    logging.info(f"Working directory: {script_root}")
+
+    # Check if the directory exists
+    if not os.path.isdir(script_root):
+        raise RuntimeError(f"Function app directory does not exist: {script_root}")    # Set up the environment for the host
+    extra_env = {
+        'AzureWebJobsScriptRoot': str(script_root),
+        'host:logger:consoleLoggingMode': 'always',
+        'AZURE_FUNCTIONS_ENVIRONMENT': 'development',
+        'AzureWebJobsSecretStorageType': 'files',
+        'FUNCTIONS_WORKER_RUNTIME': 'python',
+        'FUNCTIONS_WORKER_RUNTIME_VERSION': f'{sys.version_info.major}.{sys.version_info.minor}',  # Use current Python version
+        'AzureWebJobsStorage': os.environ.get('AzureWebJobsStorage', 'UseDevelopmentStorage=true'),
+        'FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI': os.environ.get('FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI', 'http://localhost:3000')
+    }# Add connection strings from config
+    if testconfig and 'azure' in testconfig:
+        for key in ['storage_key', 'cosmosdb_key', 'eventhub_key', 
+                   'servicebus_key', 'sql_key', 'eventgrid_topic_uri', 
+                   'eventgrid_topic_key']:
+            value = testconfig['azure'].get(key)
+            if value:
+                # Convert key name to the appropriate connection string format
+                env_key = f"AzureWebJobs{key.split('_')[0].capitalize()}"
+                if 'key' in key:
+                    env_key += "ConnectionString"
+                elif 'uri' in key:
+                    env_key += "Uri"
+                extra_env[env_key] = value    # Log the environment setup
+    logging.debug(f"Function host environment: {extra_env}")
+
+    # Write manual execution instructions to a file
+    config_file = pathlib.Path(script_root) / "webhost_config.txt"
+    with open(config_file, 'w') as f:
+        f.write("-" * 70 + "\n")
+        f.write("To run this command manually, execute the following:\n\n")
+        f.write("Environment Variables:\n\n")
+        
+        # Create PowerShell formatted environment variables
+        for key, value in extra_env.items():
+            if ON_WINDOWS:
+                f.write(f"$env:{key} = '{value}'\n")
+            else:
+                f.write(f"export {key}='{value}'\n")
+        
+        f.write("\nCurrent Directory:\n\n")
+        f.write(f"cd {script_root}\n")
+        
+        f.write("\nRun core tools:\n\n")
+        f.write(f"{coretools_exe} {' '.join(hostexe_args[1:])}\n")  # Skip the executable name
+        f.write("-" * 70 + "\n")
+
+    # Also print to console that the config file was created
+    print(f"\nWebHost configuration written to: {config_file}")
+    print("You can view this file to see how to run the Function Host manually.\n")
+
+    # Start the process
+    try:
+        return subprocess.Popen(
+            hostexe_args,
+            cwd=script_root,
+            env={
+                **os.environ,
+                **extra_env,
+            },
+            stdout=stdout,
+            stderr=stderr)
+    except Exception as e:
+        raise RuntimeError(f"Failed to start Azure Functions Core Tools: {e}")
+
+
+class _WebHostProxy:
+    """Proxy class for interacting with the Functions host."""
+
+    def __init__(self, proc, addr):
+        self._proc = proc
+        self._addr = addr    
+        
+    def is_healthy(self):
+        """Check if the Function host is responding."""
+        import requests  # Import here to avoid global import issues
+        try:
+            r = requests.get(self._addr, timeout=5)
+            if 200 <= r.status_code < 300:
+                return True
+            else:
+                logging.debug(f"Health check returned status code {r.status_code}")
+                return False
+        except requests.exceptions.ConnectionError as e:
+            logging.debug(f"Health check connection error: {e}")
+            return False
+        except requests.exceptions.Timeout:
+            logging.debug("Health check timed out after 5 seconds")
+            return False
+        except Exception as e:
+            logging.debug(f"Unexpected error in health check: {e}")
+            return False
+
+    def request(self, meth, funcname, *args, **kwargs):
+        """Make a request to a function in the host."""
+        import requests  # Import here to avoid global import issues
+        request_method = getattr(requests, meth.lower())
+        params = dict(kwargs.pop('params', {}))
+        no_prefix = kwargs.pop('no_prefix', False)
+        if 'code' not in params:
+            params['code'] = 'testFunctionKey'
+
+        url = self._addr + ('/' if no_prefix else '/api/') + funcname
+        return request_method(url, *args, params=params, **kwargs)
+
+    def close(self):
+        """Terminate the Function host process."""
+        if self._proc.stdout:
+            self._proc.stdout.close()
+        if self._proc.stderr:
+            self._proc.stderr.close()
+
+        self._proc.terminate()
+        try:
+            self._proc.wait(20)
+        except subprocess.TimeoutExpired:
+            self._proc.kill()
+
+
+def start_webhost(*, script_dir=None, stdout=None):
+    """Start the Azure Functions host and return a proxy to interact with it."""
+    script_root = TESTS_ROOT / script_dir
+    
+    # Use a temporary file to capture output if not specified
+    # This allows us to both log the output and retrieve it in case of failure
+    capture_output_for_logging = False
+    if stdout is None:
+        if is_envvar_true(PYAZURE_WEBHOST_DEBUG):
+            stdout = sys.stdout
+            logging.info("Capturing Azure Functions host output to stdout")
+        else:
+            capture_output_for_logging = True
+            stdout = tempfile.NamedTemporaryFile('w+', suffix='.log', delete=False)
+            logging.info(f"Capturing Azure Functions host output to {stdout.name}")
+
+    port = _find_open_port()
+
+    proc = popen_webhost(stdout=stdout, stderr=subprocess.STDOUT,
+                        script_root=script_root, port=port)
+    
+    addr = f'http://{LOCALHOST}:{port}'
+    proxy = _WebHostProxy(proc, addr)
+    
+    # Implement health check retries instead of fixed sleep
+    max_retries = 30
+    retry_delay = 1
+    logging.info(f"Waiting for Azure Functions host to start on {addr}...")
+    
+    for i in range(max_retries):
+        if proxy.is_healthy():
+            logging.info(f"Azure Functions host is healthy after {i+1} attempts")
+            return proxy
+        
+        # If not healthy yet, sleep and retry
+        logging.info(f"Waiting for Azure Functions host to start (attempt {i+1}/{max_retries})")
+        time.sleep(retry_delay)
+    
+    # If we get here, we've exhausted all retries
+    # Let's check if there was any output from the process
+    output = ""
+    if capture_output_for_logging and hasattr(stdout, 'name'):
+        try:
+            if hasattr(stdout, 'close'):
+                stdout.close()
+            with open(stdout.name, 'r') as f:
+                output = f.read()
+            # Keep the log file for inspection
+            logging.error(f"Azure Functions host output log is available at: {stdout.name}")
+        except Exception as e:
+            logging.error(f"Failed to read Azure Functions host output: {e}")
+    
+    error_msg = (
+        f"Azure Functions host failed to start after {max_retries} attempts. "
+        f"Check logs for errors and ensure the port {port} is available.\n"
+    )
+    
+    if output:
+        error_msg += f"\nHost process output:\n{output[:2000]}"
+        if len(output) > 2000:
+            error_msg += "\n... (output truncated) ..."
+    
+    raise RuntimeError(error_msg)
+
+
+def remove_path(path):
+    """Remove a file or directory."""
+    if path.is_symlink():
+        path.unlink()
+    elif path.is_dir():
+        shutil.rmtree(str(path))
+    elif path.exists():
+        path.unlink()
+
+
+def _setup_func_app(app_root, is_unit_test=False):
+    """Set up the function app for testing."""
+    host_json = app_root / 'host.json'
+    
+    # Create host.json if it doesn't exist
+    if not host_json.exists():
+        with open(host_json, 'w') as f:
+            f.write(HOST_JSON_TEMPLATE)
+
+
+def _teardown_func_app(app_root):
+    """Clean up after testing."""
+    host_json = app_root / 'host.json'
+    libraries_path = app_root / '.python_packages'
+    
+    # Only remove host.json and libraries path if they exist
+    for path in (host_json, libraries_path):
+        remove_path(path)
+
+
+def retryable_test(
+        number_of_retries: int,
+        interval_sec: int,
+        expected_exception: type = Exception
+):
+    """Decorator to retry a test multiple times if it fails."""
+    def decorate(func):
+        def call(*args, **kwargs):
+            retries = number_of_retries
+            while True:
+                try:
+                    return func(*args, **kwargs)
+                except expected_exception as e:
+                    retries -= 1
+                    if retries <= 0:
+                        raise e
+
+                time.sleep(interval_sec)
+
+        return call
+
+    return decorate
