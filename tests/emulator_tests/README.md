@@ -126,9 +126,6 @@ python -m invoke -c test_setup webhost
 Set up required environment variables:
 
 ```powershell
-# Core Tools executable path
-$env:CORE_TOOLS_EXE_PATH = "C:\repo\azure-functions-extension-bundles\tests\build\webhost\func.exe"
-
 # Storage connection (for Azurite)
 $env:AzureWebJobsStorage = "UseDevelopmentStorage=true"
 

@@ -26,7 +26,7 @@ from typing import Dict, List, Optional, Tuple
 PROJECT_ROOT = pathlib.Path(__file__).parent.parent.parent
 TESTS_ROOT = PROJECT_ROOT / 'tests'
 EMULATOR_TESTS_FOLDER = pathlib.Path('emulator_tests')
-BUILD_DIR = PROJECT_ROOT / 'build'
+BUILD_DIR = TESTS_ROOT / 'build'  # Same as BUILD_DIR in test_setup.py - webhost extracted here
 WORKER_CONFIG = PROJECT_ROOT / 'worker.config.ini'
 PYAZURE_WEBHOST_DEBUG = 'PYAZURE_WEBHOST_DEBUG'
 ARCHIVE_WEBHOST_LOGS = 'ARCHIVE_WEBHOST_LOGS'
@@ -248,20 +248,28 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
     testconfig = None
     if WORKER_CONFIG.exists():
         testconfig = configparser.ConfigParser()
-        testconfig.read(WORKER_CONFIG)
-
-    # Get Core Tools executable path
+        testconfig.read(WORKER_CONFIG)    # Get Core Tools executable path
     coretools_exe = os.environ.get('CORE_TOOLS_EXE_PATH')
     if not coretools_exe:
-        # Try to find Core Tools in the build directory
-        potential_paths = [
-            BUILD_DIR / "webhost" / "func.exe",
-            BUILD_DIR / "webhost" / "func"
-        ]
-        for path in potential_paths:
-            if path.exists():
-                coretools_exe = str(path)
-                break
+        # Default to the webhost directory structure from test_setup.py
+        # BUILD_DIR / "webhost" is where test_setup.py extracts Core Tools
+        if ON_WINDOWS:
+            default_path = BUILD_DIR / "webhost" / "func.exe"
+        else:
+            default_path = BUILD_DIR / "webhost" / "func"
+        
+        if default_path.exists():
+            coretools_exe = str(default_path)
+        else:
+            # Try to find Core Tools in the build directory (fallback)
+            potential_paths = [
+                BUILD_DIR / "webhost" / "func.exe",
+                BUILD_DIR / "webhost" / "func"
+            ]
+            for path in potential_paths:
+                if path.exists():
+                    coretools_exe = str(path)
+                    break
     
     if not coretools_exe:
         raise RuntimeError('\n'.join([
