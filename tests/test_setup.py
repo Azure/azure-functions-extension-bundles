@@ -6,8 +6,11 @@ This file defines tasks for building Protos, webhost and extensions
 
 To use these tasks, you can run the following commands:
 
+1. Set up the Mock Server for Extension Bundles:
+    invoke -c test_setup mock-extension-site
 2. Set up the Azure Functions Core Tools webhost:
    invoke -c test_setup webhost
+   
 """
 import os
 import pathlib

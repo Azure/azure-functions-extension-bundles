@@ -344,8 +344,8 @@ tests/build/
 webhost_config.txt
 
 # Python
-venv/
-.venv/
+venv*/
+.venv*/
 .pytest_cache/
 
 # VSCode
