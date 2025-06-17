@@ -137,12 +137,6 @@ python -m invoke -c test_setup webhost
 Set up required environment variables:
 
 ```powershell
-# Storage connection (for Azurite)
-$env:AzureWebJobsStorage = "UseDevelopmentStorage=true"
-
-# Extension bundle source (points to mock site)
-$env:FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI = "http://localhost:3000"
-
 # Optional: Enable verbose output for debugging
 $env:PYAZURE_WEBHOST_DEBUG = "true"
 
