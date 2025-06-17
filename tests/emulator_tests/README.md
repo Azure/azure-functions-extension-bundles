@@ -13,9 +13,19 @@ The original emulator test code is taken from https://github.com/Azure/azure-fun
 
 **Other utils and test code is unchanged from original.**
 
+### Extension Bundle Version Testing
+
+The test framework automatically references the `bundleVersion` from `src/Microsoft.Azure.Functions.ExtensionBundle/bundleConfig.json` and tests against that specific version. This ensures that:
+
+- Tests use the exact same extension bundle version being built
+- No manual version updates are needed in test files when the bundle version changes
+- The `host.json` template in tests automatically uses the correct version from `bundleConfig.json`
+
+**Example**: If `bundleConfig.json` contains `"bundleVersion": "4.25.0"`, the test framework will automatically configure functions to use extension bundle version `"4.25.0"`.
+
 ## Prerequisites
 
-- **Python 3.8+** installed
+- **Python 3.12** installed
 - **Docker Desktop** running (for storage emulator)
 - **PowerShell** (recommended for Windows)
 - **.NET 8 SDK** (for building extension bundles)
@@ -82,6 +92,7 @@ Install the project with dev dependencies from `pyproject.toml`:
 
 ```powershell
 # Install with dev dependencies
+cd tests
 pip install -e ".[dev]"
 
 # This installs all required packages including:
@@ -143,6 +154,7 @@ $env:ARCHIVE_WEBHOST_LOGS = "true"
 
 Now you can run the emulator tests:```powershell
 # Run all emulator tests
+cd .. 
 python -m pytest tests/emulator_tests -v
 
 # Run a specific test file

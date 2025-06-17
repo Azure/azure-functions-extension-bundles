@@ -8,6 +8,7 @@ removing dependencies on azure_functions_worker and proxy_worker modules.
 
 import configparser
 import functools
+import json
 import logging
 import os
 import pathlib
@@ -35,17 +36,37 @@ DEDICATED_DOCKER_TEST = 'DEDICATED_DOCKER_TEST'
 ON_WINDOWS = platform.system() == 'Windows'
 LOCALHOST = "127.0.0.1"
 
-# The template of host.json for test functions
-HOST_JSON_TEMPLATE = """\
-{
+
+def _get_bundle_version():
+    """Get the bundle version from bundleConfig.json."""
+    bundle_config_path = PROJECT_ROOT / 'src' / 'Microsoft.Azure.Functions.ExtensionBundle' / 'bundleConfig.json'
+    try:
+        with open(bundle_config_path, 'r') as f:
+            config = json.load(f)
+            return config.get('bundleVersion', '4.25.0')  # Default fallback
+    except (FileNotFoundError, json.JSONDecodeError, KeyError):
+        # Fallback to default version if file is not found or invalid
+        return '4.25.0'
+
+
+def _get_host_json_template():
+    """Get the host.json template with the correct bundle version."""
+    bundle_version = _get_bundle_version()
+    
+    return f"""\
+{{
     "version": "2.0",
-    "logging": {"logLevel": {"default": "Trace"}},
-    "extensionBundle": {
+    "logging": {{"logLevel": {{"default": "Trace"}}}},
+    "extensionBundle": {{
     "id": "Microsoft.Azure.Functions.ExtensionBundle",
-    "version": "[4.0.0, 5.0.0)"
-    }
-}
+    "version": "{bundle_version}"
+    }}
+}}
 """
+
+
+# The template of host.json for test functions
+HOST_JSON_TEMPLATE = _get_host_json_template()
 
 
 def is_envvar_true(name):
