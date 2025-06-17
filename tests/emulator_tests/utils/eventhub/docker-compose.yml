@@ -26,6 +26,14 @@ services:
       - "10000:10000"
       - "10001:10001"
       - "10002:10002"
+  # We need this config for the error `The API version 2025-11-05 is not supported by Azurite. Please upgrade Azurite to latest version and retry. If you are using Azurite in Visual Studio, please check you have installed latest Visual Studio patch. Azurite command line parameter "--skipApiVersionCheck" or Visual Studio Code configuration "Skip Api Version Check" can skip this error.'
+    command: >
+      azurite
+      --location /data
+      --blobHost 0.0.0.0
+      --queueHost 0.0.0.0
+      --tableHost 0.0.0.0
+      --skipApiVersionCheck      
     networks:
       eh-emulator:
         aliases:

@@ -204,6 +204,34 @@ The test framework will automatically create configuration files to help with de
 
 ## Advanced Configuration
 
+### Preview Extension Bundle Testing
+
+To test with Preview extension bundles:
+
+1. **Update bundleConfig.json**:
+   ```json
+   {
+       "bundleId": "Microsoft.Azure.Functions.ExtensionBundle.Preview",
+       "bundleVersion": "4.25.1",
+       "templateVersion": "4.0.3043",
+       "isPreviewBundle": true
+   }
+   ```
+
+2. **Stop and restart the mock server**:
+   ```powershell
+   # Stop the current mock extension site (Ctrl+C in the terminal running it)
+   
+   # Restart with the updated configuration
+   python -m invoke -c test_setup mock-extension-site
+   ```
+
+3. **Verify Preview bundle is being served**:
+   - Check the mock server output for: `Microsoft.Azure.Functions.ExtensionBundle.Preview`
+   - Verify the index URL: `http://localhost:3000/ExtensionBundles/Microsoft.Azure.Functions.ExtensionBundle.Preview/index.json`
+
+**Note**: The test framework automatically detects whether you're using regular or Preview bundles based on the `bundleConfig.json` configuration and adjusts the host.json template accordingly.
+
 ### Custom Extension Bundle Versions
 
 To test with specific extension bundle versions:

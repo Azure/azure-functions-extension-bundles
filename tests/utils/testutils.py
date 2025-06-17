@@ -37,36 +37,71 @@ ON_WINDOWS = platform.system() == 'Windows'
 LOCALHOST = "127.0.0.1"
 
 
-def _get_bundle_version():
-    """Get the bundle version from bundleConfig.json."""
+def _get_bundle_config():
+    """Get the bundle configuration from bundleConfig.json."""
     bundle_config_path = PROJECT_ROOT / 'src' / 'Microsoft.Azure.Functions.ExtensionBundle' / 'bundleConfig.json'
+    
+    # Debug: Print the path being checked
+    if is_envvar_true(PYAZURE_WEBHOST_DEBUG):
+        print(f"[DEBUG] Looking for bundleConfig.json at: {bundle_config_path}")
+        print(f"[DEBUG] Path exists: {bundle_config_path.exists()}")
+        
     try:
         with open(bundle_config_path, 'r') as f:
             config = json.load(f)
-            return config.get('bundleVersion', '4.25.0')  # Default fallback
-    except (FileNotFoundError, json.JSONDecodeError, KeyError):
-        # Fallback to default version if file is not found or invalid
-        return '4.25.0'
+            
+            # Debug: Print the loaded config
+            if is_envvar_true(PYAZURE_WEBHOST_DEBUG):
+                print(f"[DEBUG] Loaded bundle config: {config}")
+                
+            return config
+    except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
+        # Debug: Print why we're falling back
+        if is_envvar_true(PYAZURE_WEBHOST_DEBUG):
+            print(f"[DEBUG] Failed to load bundleConfig.json: {e}")
+            print(f"[DEBUG] Using fallback configuration")
+            
+        # Fallback to default configuration if file is not found or invalid
+        return {
+            'bundleId': 'Microsoft.Azure.Functions.ExtensionBundle',
+            'bundleVersion': '4.25.0',
+            'isPreviewBundle': False
+        }
+
+
+def _get_bundle_version():
+    """Get the bundle version from bundleConfig.json."""
+    config = _get_bundle_config()
+    return config.get('bundleVersion', '4.25.0')
+
+
+def _get_bundle_id():
+    """Get the bundle ID from bundleConfig.json."""
+    config = _get_bundle_config()
+    return config.get('bundleId', 'Microsoft.Azure.Functions.ExtensionBundle')
 
 
 def _get_host_json_template():
-    """Get the host.json template with the correct bundle version."""
+    """Get the host.json template with the correct bundle ID and version."""
     bundle_version = _get_bundle_version()
+    bundle_id = _get_bundle_id()
     
     return f"""\
 {{
     "version": "2.0",
     "logging": {{"logLevel": {{"default": "Trace"}}}},
     "extensionBundle": {{
-    "id": "Microsoft.Azure.Functions.ExtensionBundle",
+    "id": "{bundle_id}",
     "version": "{bundle_version}"
     }}
 }}
 """
 
 
-# The template of host.json for test functions
-HOST_JSON_TEMPLATE = _get_host_json_template()
+# The template of host.json for test functions - generated dynamically
+def get_host_json_template():
+    """Get the current host.json template with the correct bundle configuration."""
+    return _get_host_json_template()
 
 
 def is_envvar_true(name):
@@ -354,9 +389,7 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
                 elif 'uri' in key:
                     env_key += "Uri"
                 extra_env[env_key] = value    # Log the environment setup
-    logging.debug(f"Function host environment: {extra_env}")
-
-    # Write manual execution instructions to a file
+    logging.debug(f"Function host environment: {extra_env}")    # Write manual execution instructions to a file
     config_file = pathlib.Path(script_root) / "webhost_config.txt"
     with open(config_file, 'w') as f:
         f.write("-" * 70 + "\n")
@@ -375,7 +408,25 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         
         f.write("\nRun core tools:\n\n")
         f.write(f"{coretools_exe} {' '.join(hostexe_args[1:])}\n")  # Skip the executable name
-        f.write("-" * 70 + "\n")
+          # Add host.json content
+        f.write("\n" + "-" * 70 + "\n")
+        f.write("host.json Configuration:\n\n")
+        try:
+            host_json_path = pathlib.Path(script_root) / "host.json"
+            if host_json_path.exists():
+                with open(host_json_path, 'r') as host_file:
+                    host_content = host_file.read()
+                f.write(host_content)
+            else:
+                f.write("host.json file not found in the function app directory.\n")
+                f.write("Expected template content:\n")
+                f.write(get_host_json_template())
+        except Exception as e:
+            f.write(f"Error reading host.json: {e}\n")
+            f.write("Expected template content:\n")
+            f.write(get_host_json_template())
+        
+        f.write("\n" + "-" * 70 + "\n")
 
     # Also print to console that the config file was created
     print(f"\nWebHost configuration written to: {config_file}")
@@ -527,11 +578,10 @@ def remove_path(path):
 def _setup_func_app(app_root, is_unit_test=False):
     """Set up the function app for testing."""
     host_json = app_root / 'host.json'
-    
-    # Create host.json if it doesn't exist
+      # Create host.json if it doesn't exist
     if not host_json.exists():
         with open(host_json, 'w') as f:
-            f.write(HOST_JSON_TEMPLATE)
+            f.write(get_host_json_template())
 
 
 def _teardown_func_app(app_root):

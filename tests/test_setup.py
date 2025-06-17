@@ -179,12 +179,35 @@ def clean(c):
 
 def _extract_version_from_filename(filename):
     """Extract version number from extension bundle filename."""
-    # Pattern: Microsoft.Azure.Functions.ExtensionBundle.4.24.1_any-any.zip
-    pattern = r'Microsoft\.Azure\.Functions\.ExtensionBundle\.(\d+\.\d+\.\d+)_.*\.zip'
-    match = re.match(pattern, filename)
+    # Pattern for regular bundle: Microsoft.Azure.Functions.ExtensionBundle.4.24.1_any-any.zip
+    # Pattern for preview bundle: Microsoft.Azure.Functions.ExtensionBundle.Preview.4.25.1_win-any.zip
+    
+    # Try preview pattern first
+    preview_pattern = r'Microsoft\.Azure\.Functions\.ExtensionBundle\.Preview\.(\d+\.\d+\.\d+)_.*\.zip'
+    match = re.match(preview_pattern, filename)
     if match:
         return match.group(1)
+    
+    # Try regular pattern
+    regular_pattern = r'Microsoft\.Azure\.Functions\.ExtensionBundle\.(\d+\.\d+\.\d+)_.*\.zip'
+    match = re.match(regular_pattern, filename)
+    if match:
+        return match.group(1)
+    
     return None
+
+
+def _is_preview_bundle(filename):
+    """Check if the filename is a preview bundle."""
+    return 'Preview' in filename
+
+
+def _get_bundle_id(filename):
+    """Get the bundle ID from filename."""
+    if _is_preview_bundle(filename):
+        return "Microsoft.Azure.Functions.ExtensionBundle.Preview"
+    else:
+        return "Microsoft.Azure.Functions.ExtensionBundle"
 
 
 def _setup_extension_bundle_structure(temp_dir, artifacts_dir):
@@ -193,49 +216,66 @@ def _setup_extension_bundle_structure(temp_dir, artifacts_dir):
     
     # Create the directory structure
     extension_bundles_dir = temp_dir / "ExtensionBundles"
-    ms_bundle_dir = extension_bundles_dir / "Microsoft.Azure.Functions.ExtensionBundle"
-    ms_bundle_dir.mkdir(parents=True, exist_ok=True)
+    extension_bundles_dir.mkdir(parents=True, exist_ok=True)
     
-    # Find all ExtensionBundle zip files
+    # Find all ExtensionBundle zip files (both regular and preview)
     artifacts_path = pathlib.Path(artifacts_dir)
-    bundle_files = list(artifacts_path.glob("Microsoft.Azure.Functions.ExtensionBundle.*.zip"))
+    bundle_files = list(artifacts_path.glob("Microsoft.Azure.Functions.ExtensionBundle*.zip"))
     
     if not bundle_files:
         print("No ExtensionBundle files found in artifacts directory", file=sys.stderr)
         return None
     
-    # Group files by version
-    versions = {}
+    # Group files by bundle type and version
+    bundle_groups = {
+        "Microsoft.Azure.Functions.ExtensionBundle": {},
+        "Microsoft.Azure.Functions.ExtensionBundle.Preview": {}
+    }
+    
     for file_path in bundle_files:
         version = _extract_version_from_filename(file_path.name)
-        if version:
-            if version not in versions:
-                versions[version] = []
-            versions[version].append(file_path)
+        bundle_id = _get_bundle_id(file_path.name)
+        
+        if version and bundle_id in bundle_groups:
+            if version not in bundle_groups[bundle_id]:
+                bundle_groups[bundle_id][version] = []
+            bundle_groups[bundle_id][version].append(file_path)
     
-    if not versions:
+    # Create directory structure and copy files for each bundle type
+    created_bundles = {}
+    for bundle_id, versions in bundle_groups.items():
+        if not versions:
+            continue
+            
+        print(f"Found {bundle_id} versions: {list(versions.keys())}")
+        
+        # Create bundle directory
+        bundle_dir = extension_bundles_dir / bundle_id
+        bundle_dir.mkdir(exist_ok=True)
+        
+        # Create version directories and copy files
+        for version, files in versions.items():
+            version_dir = bundle_dir / version
+            version_dir.mkdir(exist_ok=True)
+            
+            for file_path in files:
+                dest_path = version_dir / file_path.name
+                print(f"Copying {file_path.name} to {dest_path}")
+                shutil.copy2(file_path, dest_path)
+        
+        # Create index.json with all versions for this bundle
+        index_content = sorted(versions.keys())
+        index_path = bundle_dir / "index.json"
+        with open(index_path, 'w') as f:
+            json.dump(index_content, f, indent=2)
+        
+        print(f"Created index.json for {bundle_id} with versions: {index_content}")
+        created_bundles[bundle_id] = index_content
+    
+    if not created_bundles:
         print("No valid ExtensionBundle versions found", file=sys.stderr)
         return None
     
-    print(f"Found versions: {list(versions.keys())}")
-    
-    # Create version directories and copy files
-    for version, files in versions.items():
-        version_dir = ms_bundle_dir / version
-        version_dir.mkdir(exist_ok=True)
-        
-        for file_path in files:
-            dest_path = version_dir / file_path.name
-            print(f"Copying {file_path.name} to {dest_path}")
-            shutil.copy2(file_path, dest_path)
-    
-    # Create index.json with all versions
-    index_content = sorted(versions.keys())
-    index_path = ms_bundle_dir / "index.json"
-    with open(index_path, 'w') as f:
-        json.dump(index_content, f, indent=2)
-    
-    print(f"Created index.json with versions: {index_content}")
     return temp_dir
 
 
@@ -307,29 +347,37 @@ def mock_extension_site(c, port=3000, artifacts_dir=None, keep_alive=False):
         if not mock_dir:
             print("Failed to setup ExtensionBundle structure", file=sys.stderr)
             sys.exit(1)
-        
-        # Start mock server
+          # Start mock server
         server, server_thread = _start_mock_server(mock_dir, port)
         
         print("\n" + "="*70)
         print("Mock ExtensionBundle site is ready!")
         print("="*70)
         print(f"Base URL: http://localhost:{server.server_port}")
-        print(f"Index URL: http://localhost:{server.server_port}/ExtensionBundles/Microsoft.Azure.Functions.ExtensionBundle/index.json")
-        print("\nExample download URLs:")
         
-        # Show example URLs for available versions
-        index_file = mock_dir / "ExtensionBundles" / "Microsoft.Azure.Functions.ExtensionBundle" / "index.json"
-        if index_file.exists():
-            with open(index_file, 'r') as f:
-                versions = json.load(f)
+        # Show index URLs and example download URLs for both bundle types
+        bundle_types = ["Microsoft.Azure.Functions.ExtensionBundle", "Microsoft.Azure.Functions.ExtensionBundle.Preview"]
+        
+        for bundle_id in bundle_types:
+            bundle_dir = mock_dir / "ExtensionBundles" / bundle_id
+            index_file = bundle_dir / "index.json"
             
-            for version in versions[:2]:  # Show first 2 versions as examples
-                version_dir = mock_dir / "ExtensionBundles" / "Microsoft.Azure.Functions.ExtensionBundle" / version
-                if version_dir.exists():
-                    zip_files = list(version_dir.glob("*.zip"))
-                    for zip_file in zip_files[:2]:  # Show first 2 files per version
-                        print(f"  http://localhost:{server.server_port}/ExtensionBundles/Microsoft.Azure.Functions.ExtensionBundle/{version}/{zip_file.name}")
+            if index_file.exists():
+                print(f"\n{bundle_id}:")
+                print(f"  Index URL: http://localhost:{server.server_port}/ExtensionBundles/{bundle_id}/index.json")
+                
+                with open(index_file, 'r') as f:
+                    versions = json.load(f)
+                
+                print(f"  Available versions: {versions}")
+                print("  Example download URLs:")
+                
+                for version in versions[:2]:  # Show first 2 versions as examples
+                    version_dir = bundle_dir / version
+                    if version_dir.exists():
+                        zip_files = list(version_dir.glob("*.zip"))
+                        for zip_file in zip_files[:2]:  # Show first 2 files per version
+                            print(f"    http://localhost:{server.server_port}/ExtensionBundles/{bundle_id}/{version}/{zip_file.name}")
         
         print("="*70)
         
