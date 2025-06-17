@@ -28,8 +28,6 @@ from socketserver import TCPServer
 
 from invoke import task
 
-from utils.constants import EXTENSIONS_CSPROJ_TEMPLATE, NUGET_CONFIG
-
 ROOT_DIR = pathlib.Path(__file__).parent
 ARTIFACTS_DIR = ROOT_DIR / 'artifacts'
 BUILD_DIR = ROOT_DIR / 'build'

@@ -38,7 +38,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             }
 
             string oldDepsJson = Path.GetFullPath($"../../../TestData/{oldDepsJsonName}");
-            string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
+            string webhostBinPath = Path.Combine("..", "..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
                                             .Where(path => path.Contains(newDepsJsonName))
                                             .FirstOrDefault();
@@ -65,7 +65,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
             }
 
             string oldDepsJson = Path.GetFullPath("../../../TestData/linux_x64_extensions.deps.json");
-            string webhostBinPath = Path.Combine("..", "..", "..", "..", "build_temp");
+            string webhostBinPath = Path.Combine("..", "..", "..", "..", "..", "build_temp");
             string newDepsJson = Directory.GetFiles(Path.GetFullPath(webhostBinPath), "extensions.deps.json", SearchOption.AllDirectories)
                                             .Where(path => path.Contains("x64"))
                                             .FirstOrDefault();
