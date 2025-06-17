@@ -37,8 +37,8 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://github.com/Azure/azure-functions-python-worker?tab=readme-ov-file#-azure-functions-python-worker"
-Repository = "https://github.com/Azure/azure-functions-python-worker"
+Documentation = "https://github.com/Azure/azure-functions-extension-bundles?tab=readme-ov-file#overview"
+Repository = "https://github.com/Azure/azure-functions-extension-bundles"
 
 [project.optional-dependencies]
 dev = [
