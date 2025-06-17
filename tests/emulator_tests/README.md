@@ -541,6 +541,75 @@ When tests fail, check these files for detailed information:
    - The framework automatically reuses host instances within test classes
    - Group related tests in the same test class for better performance
 
+## How to Add Emulator Tests
+
+### 1. **Add Emulator Services**
+
+Add required emulator services by creating Docker Compose configurations in the `utils/` directory:
+
+```yaml
+# Example: tests/emulator_tests/utils/your_service/docker-compose.yml
+services:
+  your-emulator:
+    image: "mcr.microsoft.com/your-service-emulator:latest"
+    ports:
+      - "your_port:your_port"
+    # ... other configuration
+```
+
+**Reference**: See `tests/emulator_tests/utils/eventhub/docker-compose.yml` for a complete example.
+
+### 2. **Add Function Apps**
+
+Create function apps with target trigger/input/output bindings:
+
+```
+tests/emulator_tests/your_functions/
+├── your_function_name/
+│   ├── __init__.py          # Function implementation
+│   └── function.json        # Function metadata and bindings
+```
+
+**Dependencies**: Add any additional dependencies to `tests/pyproject.toml` under the `[project.optional-dependencies]` dev section.
+
+**Reference**: See `tests/emulator_tests/blob_functions/` directory structure for examples of various blob trigger, input, and output binding configurations.
+
+### 3. **Add Test Cases**
+
+Create test files following the naming pattern `test_*.py`:
+
+```python
+# tests/emulator_tests/test_your_functions.py
+from utils.testutils import WebHostTestCase
+
+class TestYourFunctions(WebHostTestCase):
+    @classmethod
+    def get_script_dir(cls):
+        return 'emulator_tests/your_functions'
+    
+    def test_your_function(self):
+        # Your test implementation
+        r = self.webhost.request('get', 'YourFunctionName')
+        self.assertEqual(r.status_code, 200)
+```
+
+**Reference**: See `tests/emulator_tests/test_blob_functions.py` for comprehensive examples of testing various Azure Functions scenarios.
+
+### 4. **Important Notes**
+
+- **No host.json required**: The host.json file is automatically generated during test execution with the correct extension bundle configuration
+- **Function metadata**: Use `function.json` files to define triggers, inputs, and outputs for each function
+- **Test isolation**: Each test class gets its own Function Host instance for isolation
+- **Emulator dependencies**: Ensure required emulators (Azurite, Event Hubs, etc.) are running before tests
+
+### 5. **Test Structure Best Practices**
+
+- Group related functions in the same directory (e.g., `blob_functions/`, `http_functions/`)
+- Use descriptive test method names that indicate what scenario is being tested
+- Include both positive and negative test cases
+- Test different binding configurations (trigger, input, output)
+- Verify both function execution and binding behavior
+
 ## Additional Resources
 
 - **Main README.md**: For building and packaging extension bundles
