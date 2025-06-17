@@ -47,9 +47,7 @@ extends:
     pool:
       name: 1es-pool-azfunc
       image: 1es-windows-2022
-      os: windows
-
-    stages:
+      os: windows    stages:
     - stage: RunUnitTests
       dependsOn: []
 
@@ -64,3 +62,11 @@ extends:
       - template: eng/ci/templates/jobs/build.yml@self
         parameters:
           official: true
+
+    - stage: EmulatorTests
+      dependsOn: []
+      # Run emulator tests for preview branches and main, but skip for release branches
+      condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+
+      jobs:
+      - template: eng/ci/templates/jobs/emulator-tests.yml@self

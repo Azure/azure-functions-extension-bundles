@@ -23,6 +23,47 @@ The test framework automatically references the `bundleVersion` from `src/Micros
 
 **Example**: If `bundleConfig.json` contains `"bundleVersion": "4.25.0"`, the test framework will automatically configure functions to use extension bundle version `"4.25.0"`.
 
+## CI/CD Integration
+
+### Automated Testing in Azure DevOps
+
+Emulator tests run automatically in the CI pipeline for:
+- **All pull requests** to main, preview, and release branches
+- **Main branch builds** and **preview branch builds**
+- **Manual builds** (emulator tests are skipped for nightly scheduled builds)
+
+The CI pipeline:
+1. **Builds Linux extension bundles** as prerequisites
+2. **Starts emulator services** using Docker Compose (Event Hubs, Storage, etc.)
+3. **Sets up Python 3.12** environment with test dependencies
+4. **Runs mock extension site** to simulate CDN behavior on port 8000
+5. **Sets environment variables** including `FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI=http://localhost:8000`
+6. **Executes emulator tests** with proper artifact collection
+7. **Publishes test results** and debug artifacts to Azure DevOps
+
+**CI Configuration Files:**
+- [`eng/ci/templates/jobs/emulator-tests.yml`](../../eng/ci/templates/jobs/emulator-tests.yml) - Emulator test job template
+- [`eng/public-build.yml`](../../eng/public-build.yml) - Public CI pipeline
+- [`eng/official-build.yml`](../../eng/official-build.yml) - Official release pipeline
+
+### Validating CI Setup Locally
+
+Before pushing changes, validate your setup:
+
+```bash
+# Linux/macOS
+./validate-ci.sh
+
+# Windows PowerShell
+.\validate-ci.ps1
+```
+
+These scripts check:
+- Required files and dependencies
+- Docker and Python availability
+- bundleConfig.json validity
+- CI template syntax
+
 ## Prerequisites
 
 - **Python 3.12** installed

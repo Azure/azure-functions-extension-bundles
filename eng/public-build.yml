@@ -49,9 +49,7 @@ extends:
 
     settings:
       # PR's from forks do not have sufficient permissions to set tags.
-      skipBuildTagsForGitHubPullRequests: ${{ variables['System.PullRequest.IsFork'] }}
-
-    stages:
+      skipBuildTagsForGitHubPullRequests: ${{ variables['System.PullRequest.IsFork'] }}    stages:
       - stage: RunUnitTests
         dependsOn: []
 
@@ -64,3 +62,10 @@ extends:
           - template: eng/ci/templates/jobs/build.yml@self
             parameters:
               official: false
+
+      - stage: EmulatorTests
+        dependsOn: []
+        condition: ne(variables['Build.Reason'], 'Schedule')  # Skip on nightly builds
+
+        jobs:
+          - template: eng/ci/templates/jobs/emulator-tests.yml@self

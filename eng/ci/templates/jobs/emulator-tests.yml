@@ -1,0 +1,166 @@
+# Azure Functions Extension Bundle - Emulator Tests CI Job Template
+#
+# This template runs comprehensive emulator-based tests for Azure Functions Extension Bundles.
+# It supports both regular and Preview bundles by dynamically reading configuration from bundleConfig.json.
+#
+# Key features:
+# - Runs on Linux agents with Docker support for emulator services
+# - Builds Linux extension bundles as a prerequisite
+# - Starts Azure service emulators (Event Hubs, Storage, etc.) via Docker Compose
+# - Sets up Python 3.12 environment with test dependencies from pyproject.toml
+# - Runs mock extension bundle site to simulate CDN behavior
+# - Executes pytest-based emulator tests with proper artifact collection
+# - Publishes test results and debug artifacts to Azure DevOps
+#
+# Dependencies:
+# - Docker and Docker Compose available on the agent
+# - Python 3.12 support
+# - Access to build Linux extension bundles
+# - Network access for emulator services
+
+jobs:
+- job: EmulatorTests
+  displayName: Run Emulator Tests
+  pool:
+    name: 1es-pool-azfunc-public
+    image: 1es-ubuntu-22.04
+    os: linux
+
+  templateContext:
+    outputParentDirectory: $(Build.ArtifactStagingDirectory)
+    outputs:
+    - output: pipelineArtifact
+      displayName: Publish emulator test artifacts
+      path: $(Build.ArtifactStagingDirectory)
+      artifact: emulator-test-results
+
+  steps:  # Build the Linux bundle first
+  - task: DotNetCoreCLI@2
+    displayName: 'Build Linux Bundle'
+    inputs:
+      command: 'run'
+      workingDirectory: './build'
+      arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesWindows'
+
+  # Verify build artifacts exist
+  - script: |
+      echo "Checking for build artifacts..."
+      if ls bin/any_any/*.zip 2>/dev/null; then
+        echo "✓ any_any bundle artifacts found"
+      else
+        echo "✗ No any_any bundle artifacts found"
+        exit 1
+      fi
+      
+      if [ -f "src/Microsoft.Azure.Functions.ExtensionBundle/bundleConfig.json" ]; then
+        echo "✓ bundleConfig.json found"
+        cat src/Microsoft.Azure.Functions.ExtensionBundle/bundleConfig.json
+      else
+        echo "✗ bundleConfig.json not found"
+        exit 1
+      fi
+    displayName: 'Verify Build Artifacts'
+
+  # Start emulator services with Docker Compose
+  - script: |
+      cd tests/emulator_tests/utils/eventhub
+      docker-compose up -d
+      echo "Waiting for emulator services to start..."
+      sleep 30
+      docker-compose ps
+    displayName: 'Start Emulator Services'
+
+  # Set up Python 3.12 and create virtual environment
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.12'
+      addToPath: true
+      architecture: 'x64'
+    displayName: 'Set up Python 3.12'
+
+  - script: |
+      cd tests
+      python -m venv venv
+      source venv/bin/activate
+      pip install --upgrade pip
+      pip install -e .[dev]
+    displayName: 'Install Python Dependencies'  # Start mock extension site in background
+  - script: |
+      cd tests
+      source venv/bin/activate
+      echo "Starting mock extension site on port 8000..."
+      invoke mock-extension-site --port 8000 --keep-alive &
+      MOCK_SITE_PID=$!
+      echo "Mock site started with PID: $MOCK_SITE_PID"
+      echo "##vso[task.setvariable variable=MOCK_SITE_PID]$MOCK_SITE_PID"
+      sleep 10
+      
+      # Verify mock site is running on port 8000
+      if curl -f http://localhost:8000/ 2>/dev/null; then
+        echo "✅ Mock extension site is running successfully on port 8000"
+        echo "Extension bundle source URI: http://localhost:8000"
+      else
+        echo "❌ Warning: Mock extension site may not be responding on port 8000"
+        ps aux | grep mock-extension-site
+        netstat -tlnp | grep :8000 || echo "No process listening on port 8000"
+      fi
+    displayName: 'Start Mock Extension Site'
+
+  # Set up webhost
+  - script: |
+      cd tests
+      source venv/bin/activate
+      invoke webhost
+    displayName: 'Setup WebHost'
+  # Set debug environment variable and run tests
+  - script: |
+      cd tests
+      source venv/bin/activate
+      export PYAZURE_WEBHOST_DEBUG=1
+      export FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI="http://localhost:8000"
+      echo "Running emulator tests..."
+      echo "Mock extension site URL: $FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI"
+      pytest emulator_tests/ -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results.xml
+    displayName: 'Run Emulator Tests'
+    env:
+      PYAZURE_WEBHOST_DEBUG: 1
+      FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI: "http://localhost:8000"
+
+  # Copy webhost config for debugging
+  - script: |
+      if [ -f tests/webhost_config.txt ]; then
+        cp tests/webhost_config.txt $(Build.ArtifactStagingDirectory)/
+        echo "WebHost config copied for artifact upload"
+      else
+        echo "Warning: webhost_config.txt not found"
+      fi
+    displayName: 'Copy WebHost Config'
+    condition: always()
+
+  # Publish test results
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFiles: '$(Build.ArtifactStagingDirectory)/test-results.xml'
+      testRunTitle: 'Emulator Tests'
+      failTaskOnFailedTests: true
+    condition: always()
+    displayName: 'Publish Test Results'
+  # Cleanup: stop emulator services and mock site
+  - script: |
+      echo "Cleaning up services..."
+      
+      # Stop mock site if PID is available
+      if [ ! -z "$MOCK_SITE_PID" ]; then
+        echo "Stopping mock site (PID: $MOCK_SITE_PID)"
+        kill $MOCK_SITE_PID 2>/dev/null || true
+      fi
+      
+      # Stop any remaining mock-extension-site processes
+      pkill -f mock-extension-site || true
+      
+      # Stop emulator services
+      cd tests/emulator_tests/utils/eventhub
+      docker-compose down -v
+      echo "Cleanup completed"
+    displayName: 'Cleanup Services'
+    condition: always()
