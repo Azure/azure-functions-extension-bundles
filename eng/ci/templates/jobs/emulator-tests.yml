@@ -17,6 +17,10 @@
 # - Python 3.12 support
 # - Access to build Linux extension bundles
 # - Network access for emulator services
+parameters:
+  - name: official
+    type: boolean
+    default: false
 
 jobs:
 - job: EmulatorTests
@@ -35,6 +39,7 @@ jobs:
 
   steps:
   # Download template artifacts for the build
+  # Official templates
   - task: DownloadBuildArtifacts@1
     inputs:
       buildType: 'specific'
@@ -45,6 +50,20 @@ jobs:
       downloadType: 'single'
       artifactName: 'drop'
       downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
+    condition: ${{ parameters.official }}
+
+  # Public templates
+  - task: DownloadBuildArtifacts@1
+    inputs:
+      buildType: 'specific'
+      project: 'ae7e3bf3-d41a-4480-9ac0-b6cf9df9ac24'
+      pipeline: '976'
+      buildVersionToDownload: 'latestFromBranch'
+      branchName: 'refs/heads/dev'
+      downloadType: 'single'
+      artifactName: 'drop'
+      downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
+    condition: ${{ eq(parameters.official, false) }}
 
   # Build the Linux bundle first
   - task: DotNetCoreCLI@2

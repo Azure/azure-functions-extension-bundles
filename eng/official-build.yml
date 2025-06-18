@@ -70,3 +70,5 @@ extends:
 
       jobs:
       - template: eng/ci/templates/jobs/emulator-tests.yml@self
+        parameters:
+          official: true
