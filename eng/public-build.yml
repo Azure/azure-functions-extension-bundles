@@ -45,11 +45,11 @@ extends:
     pool:
       name: 1es-pool-azfunc-public
       image: 1es-windows-2022
-      os: windows
-
-    settings:
+      os: windows    settings:
       # PR's from forks do not have sufficient permissions to set tags.
-      skipBuildTagsForGitHubPullRequests: ${{ variables['System.PullRequest.IsFork'] }}    stages:
+      skipBuildTagsForGitHubPullRequests: ${{ variables['System.PullRequest.IsFork'] }}
+
+    stages:
       - stage: RunUnitTests
         dependsOn: []
 
