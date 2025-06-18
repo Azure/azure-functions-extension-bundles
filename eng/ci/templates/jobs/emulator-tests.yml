@@ -156,7 +156,9 @@ jobs:
       cd tests
       source venv/bin/activate
       echo "Starting mock extension site on port 8000..."
-      invoke mock-extension-site --port 8000 --keep-alive &
+      
+      python -m invoke -c test_setup mock-extension-site --port 8000 &
+
       MOCK_SITE_PID=$!
       echo "Mock site started with PID: $MOCK_SITE_PID"
       echo "##vso[task.setvariable variable=MOCK_SITE_PID]$MOCK_SITE_PID"
@@ -177,17 +179,18 @@ jobs:
   - script: |
       cd tests
       source venv/bin/activate
-      invoke webhost
+      python -m invoke -c test_setup webhost
     displayName: 'Setup WebHost'
   # Set debug environment variable and run tests
   - script: |
       cd tests
       source venv/bin/activate
+      cd ..
       export PYAZURE_WEBHOST_DEBUG=1
       export FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI="http://localhost:8000"
       echo "Running emulator tests..."
       echo "Mock extension site URL: $FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI"
-      pytest emulator_tests/ -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results.xml
+      python -m pytest tests/emulator_tests -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results.xml
     displayName: 'Run Emulator Tests'
     env:
       PYAZURE_WEBHOST_DEBUG: 1
