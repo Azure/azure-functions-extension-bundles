@@ -129,15 +129,12 @@ jobs:
   # Start emulator services with Docker Compose
   - script: |
       docker version
-      docker-compose version
       docker compose version
-      sudo apt-get update 
-      sudo apt-get install -y docker-compose-plugin
       cd tests/emulator_tests/utils/eventhub
-      docker-compose up -d
+      docker compose up -d
       echo "Waiting for emulator services to start..."
       sleep 30
-      docker-compose ps
+      docker compose ps
     displayName: 'Start Emulator Services'
 
   # Set up Python 3.12 and create virtual environment
@@ -230,7 +227,7 @@ jobs:
       
       # Stop emulator services
       cd tests/emulator_tests/utils/eventhub
-      docker-compose down -v
+      docker compose down -v
       echo "Cleanup completed"
     displayName: 'Cleanup Services'
     condition: always()
