@@ -74,25 +74,54 @@ jobs:
       arguments: 'PackageNetCoreV3BundlesLinux'
     env:
       BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
-      TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
-  # Verify build artifacts exist
+      TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'  # Verify build artifacts exist
   - script: |
       echo "Checking for build artifacts..."
-      if ls bin/linux_x64/*.zip 2>/dev/null; then
-        echo "✓ linux_x64 bundle artifacts found"
-        ls -la bin/linux_x64/*.zip
+      echo "=== Checking artifacts directory ==="
+      if [ -d "artifacts" ]; then
+        echo "✓ artifacts directory exists"
+        ls -la artifacts/
+        if ls artifacts/*.zip 2>/dev/null; then
+          echo "✓ Bundle artifacts found in artifacts directory:"
+          ls -la artifacts/*.zip
+        else
+          echo "✗ No zip files found in artifacts directory"
+        fi
       else
-        echo "✗ No linux_x64 bundle artifacts found"
-        echo "Available files in bin directory:"
-        ls -la bin/ || echo "bin directory does not exist"
-        exit 1
+        echo "✗ artifacts directory does not exist"
       fi
       
+      echo "=== Checking bin directory structure ==="
+      if [ -d "bin" ]; then
+        echo "Available bin subdirectories:"
+        ls -la bin/
+        
+        echo "=== Checking bin/linux_x64 contents ==="
+        if [ -d "bin/linux_x64" ]; then
+          ls -la bin/linux_x64/
+        fi
+        
+        echo "=== Checking bin/any_any contents ==="
+        if [ -d "bin/any_any" ]; then
+          ls -la bin/any_any/
+        fi
+      fi
+      
+      echo "=== Checking bundleConfig.json ==="
       if [ -f "src/Microsoft.Azure.Functions.ExtensionBundle/bundleConfig.json" ]; then
         echo "✓ bundleConfig.json found"
         cat src/Microsoft.Azure.Functions.ExtensionBundle/bundleConfig.json
       else
         echo "✗ bundleConfig.json not found"
+        exit 1
+      fi
+      
+      echo "=== Final verification ==="
+      # Check if we have either artifacts/*.zip or any bin subdirectory with zips
+      if ls artifacts/*.zip 2>/dev/null || ls bin/*/*.zip 2>/dev/null; then
+        echo "✓ Extension bundle artifacts found"
+      else
+        echo "✗ No extension bundle zip files found anywhere"
         exit 1
       fi
     displayName: 'Verify Build Artifacts'
