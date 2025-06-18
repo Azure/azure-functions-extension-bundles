@@ -75,14 +75,16 @@ jobs:
     env:
       BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
       TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
-
   # Verify build artifacts exist
   - script: |
       echo "Checking for build artifacts..."
-      if ls bin/any_any/*.zip 2>/dev/null; then
-        echo "✓ any_any bundle artifacts found"
+      if ls bin/linux_x64/*.zip 2>/dev/null; then
+        echo "✓ linux_x64 bundle artifacts found"
+        ls -la bin/linux_x64/*.zip
       else
-        echo "✗ No any_any bundle artifacts found"
+        echo "✗ No linux_x64 bundle artifacts found"
+        echo "Available files in bin directory:"
+        ls -la bin/ || echo "bin directory does not exist"
         exit 1
       fi
       
