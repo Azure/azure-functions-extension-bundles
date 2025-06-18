@@ -34,6 +34,16 @@ jobs:
       path: $(Build.ArtifactStagingDirectory)
       artifact: emulator-test-results
 
+  - task: DownloadBuildArtifacts@1
+    inputs:
+      buildType: 'specific'
+      project: '3f99e810-c336-441f-8892-84983093ad7f'
+      pipeline: '963'
+      buildVersionToDownload: 'latestFromBranch'
+      branchName: 'refs/heads/dev'
+      downloadType: 'single'
+      artifactName: 'drop'
+      downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'
   steps:  # Build the Linux bundle first
   - task: DotNetCoreCLI@2
     displayName: 'Build Linux Bundle'
@@ -41,6 +51,9 @@ jobs:
       command: 'run'
       workingDirectory: './build'
       arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesWindows'
+    env:
+      BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
+      TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
 
   # Verify build artifacts exist
   - script: |
