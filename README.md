@@ -154,7 +154,7 @@ The project uses Azure DevOps pipelines with multiple stages:
 
 **Pipeline Configuration:**
 - **Public builds**: [`eng/public-build.yml`](eng/public-build.yml) - Runs for PRs and main branch
-- **Official builds**: [`eng/official-build.yml`](eng/official-build.yml) - Runs for releases (emulator tests disabled for release branches)
+- **Official builds**: [`eng/official-build.yml`](eng/official-build.yml) - Runs for internal build/test
 - **Emulator test template**: [`eng/ci/templates/jobs/emulator-tests.yml`](eng/ci/templates/jobs/emulator-tests.yml)
 
 **Emulator Test CI Features:**
