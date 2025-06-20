@@ -20,7 +20,7 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 
 ## Build Requirements
 
-- [Dotnet Core SDK 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 
 ## Local Build and Packaging
 
@@ -30,7 +30,7 @@ Before building locally, you need to obtain the latest template artifacts and pl
 
 Required template files (example versions):
 
-```
+```text
 ExtensionBundle.Preview.v3.Templates.3.0.5130.zip
 ExtensionBundle.Preview.v4.Templates.4.0.5130.zip
 ExtensionBundle.v1.Templates.1.0.5130.zip
@@ -68,7 +68,6 @@ dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesWindows,Creat
 ```
 
 **Note:** Replace `<ExtensionBundleRepoPath>` with the actual path to your extension bundle repository.
-
 
 ## Add extension
 
@@ -124,12 +123,47 @@ dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesWindows,Creat
 
 ## Test
 
+### Manual Testing
+
 1. Build extension bundles locally and locate the `artifacts\Microsoft.Azure.Functions.ExtensionBundle.{version}_any-any.zip` file.
 2. Create a function app via core tools, open host.json to verify that it has extension bundle configuration present.
     - Sample commands for node app: `func init . --worker-runtime node`
 3. Execute the `func GetExtensionBundlePath` to find the path to the bundle being used.
     - Sample response: `%userprofile%\.azure-functions-core-tools\Functions\ExtensionBundles\Microsoft.Azure.Functions.ExtensionBundle\2.8.4`
 4. Replace the contents of the bundle directory from step 3 with the contents of the zip file from Step 1.
+
+### Emulator-based Testing
+
+For comprehensive testing including Preview bundles and integration scenarios, see the emulator test framework at:
+- **Setup and Usage**: [`tests/emulator_tests/README.md`](tests/emulator_tests/README.md)
+- **Test Location**: `tests/emulator_tests/`
+
+The emulator tests run automatically in CI for all PR builds and main branch builds, providing:
+- Automated testing against Azure service emulators (Event Hubs, Storage, etc.)
+- Support for both regular and Preview extension bundles
+- Dynamic bundle version detection from `bundleConfig.json`
+- Integration testing with Azure Functions Core Tools
+
+### CI/CD Pipeline
+
+The project uses Azure DevOps pipelines with multiple stages:
+
+1. **Unit Tests** (`RunUnitTests` stage): Runs .NET unit tests
+2. **Build** (`Build` stage): Builds extension bundles for multiple platforms
+3. **Emulator Tests** (`EmulatorTests` stage): Runs Python-based emulator tests on Linux
+
+**Pipeline Configuration:**
+- **Public builds**: [`eng/public-build.yml`](eng/public-build.yml) - Runs for PRs and main branch
+- **Official builds**: [`eng/official-build.yml`](eng/official-build.yml) - Runs for internal build/test
+- **Emulator test template**: [`eng/ci/templates/jobs/emulator-tests.yml`](eng/ci/templates/jobs/emulator-tests.yml)
+
+**Emulator Test CI Features:**
+- Uses Linux agents with Docker support for emulator services
+- Automatically builds Linux extension bundles
+- Sets up Python 3.12 environment and installs test dependencies
+- Starts mock extension bundle site for testing
+- Publishes test results and artifacts to Azure DevOps
+- Includes webhost configuration files for debugging
 
 ## Contributing
 
