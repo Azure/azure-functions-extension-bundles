@@ -241,7 +241,8 @@ namespace Build
                 FileUtility.CopyDirectory(buildConfig.PublishBinDirectoryPath, targetBundleBinariesPath);
 
                 string extensionJsonFilePath = Path.Join(targetBundleBinariesPath, Settings.ExtensionsJsonFileName);
-                AddBindingInfoToExtensionsJson(extensionJsonFilePath);            }
+                AddBindingInfoToExtensionsJson(extensionJsonFilePath);           
+            }
 
             // Copy templates (only if StaticContent directory exists)
             if (FileUtility.DirectoryExists(Settings.StaticContentDirectoryPath))
