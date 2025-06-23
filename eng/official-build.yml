@@ -43,7 +43,8 @@ extends:
     pool:
       name: 1es-pool-azfunc
       image: 1es-windows-2022
-      os: windows    stages:
+      os: windows    
+    stages:
     - stage: RunUnitTests
       dependsOn: []
 
