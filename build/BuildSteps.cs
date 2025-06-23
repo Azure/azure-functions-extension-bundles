@@ -241,7 +241,7 @@ namespace Build
                 FileUtility.CopyDirectory(buildConfig.PublishBinDirectoryPath, targetBundleBinariesPath);
 
                 string extensionJsonFilePath = Path.Join(targetBundleBinariesPath, Settings.ExtensionsJsonFileName);
-                AddBindingInfoToExtensionsJson(extensionJsonFilePath);           
+                AddBindingInfoToExtensionsJson(extensionJsonFilePath);
             }
 
             // Copy templates (only if StaticContent directory exists)
@@ -281,7 +281,9 @@ namespace Build
         {
             CreateExtensionBundle(Settings.BundlePackageNetCoreV3Any);
             CreateExtensionBundle(Settings.BundlePackageNetCoreWindows);
-        }        public static void AddBundleZipFile(string rootPath, BundlePackageConfiguration packageConfig)
+        }
+
+        public static void AddBundleZipFile(string rootPath, BundlePackageConfiguration packageConfig)
         {
             FileUtility.EnsureDirectoryExists(rootPath);
             string bundleZipDestinationPath = Path.Combine(rootPath, packageConfig.GeneratedBundleZipFileName);
@@ -303,8 +305,9 @@ namespace Build
             foreach (var indexFileMetadata in Settings.IndexFiles)
             {
                 string directoryPath = Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory, BundleConfiguration.Instance.ExtensionBundleId);
-                FileUtility.EnsureDirectoryExists(directoryPath);                var bundleVersionDirectory = Path.Combine(directoryPath, BundleConfiguration.Instance.ExtensionBundleVersion);
-                
+                FileUtility.EnsureDirectoryExists(directoryPath); 
+                var bundleVersionDirectory = Path.Combine(directoryPath, BundleConfiguration.Instance.ExtensionBundleVersion);
+
                 // Copy templates (only if StaticContent directory exists)
                 if (FileUtility.DirectoryExists(Settings.StaticContentDirectoryPath))
                 {
