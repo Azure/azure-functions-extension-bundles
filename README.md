@@ -36,7 +36,7 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 
 ## Build Requirements
 
-- [Dotnet SDK 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 
 ## Local Build and Packaging
 
@@ -46,7 +46,7 @@ Before building locally, you need to obtain the latest template artifacts and pl
 
 Required template files (example versions):
 
-```
+```text
 ExtensionBundle.Preview.v3.Templates.3.0.5130.zip
 ExtensionBundle.Preview.v4.Templates.4.0.5130.zip
 ExtensionBundle.v1.Templates.1.0.5130.zip
@@ -84,7 +84,6 @@ dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesWindows,Creat
 ```
 
 **Note:** Replace `<ExtensionBundleRepoPath>` with the actual path to your extension bundle repository.
-
 
 ## Add extension
 
