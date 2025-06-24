@@ -16,7 +16,6 @@ Write-Host "✅ Repository root confirmed" -ForegroundColor Green
 
 # Check required files exist
 $requiredFiles = @(
-    "tests\pyproject.toml",
     "tests\test_setup.py",
     "tests\utils\testutils.py",
     "tests\emulator_tests\utils\eventhub\docker-compose.yml",

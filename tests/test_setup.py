@@ -24,7 +24,6 @@ import re
 import threading
 import time
 from http.server import HTTPServer, SimpleHTTPRequestHandler
-from socketserver import TCPServer
 
 from invoke import task
 
