@@ -134,7 +134,7 @@ Install the project with dev dependencies from `pyproject.toml`:
 ```powershell
 # Install with dev dependencies
 cd tests
-pip install -e ".[dev]"
+pip install -r requirements.txt
 
 # This installs all required packages including:
 # - pytest, requests, psutil
@@ -148,6 +148,7 @@ Start the mock extension bundle download site:
 
 ```powershell
 # Start mock site (serves extension bundles locally)
+cd tests
 python -m invoke -c test_setup mock-extension-site
 
 # This will:
@@ -475,7 +476,7 @@ You can create additional debug configurations for different test files:
 7. **Import Errors**: If you see import errors during debugging, verify that:
    - The virtual environment is activated
    - VS Code is using the correct Python interpreter
-   - All dependencies are installed with `pip install -e ".[dev]"`
+   - All dependencies are installed with `cd tests && pip install -r requirements.txt`
 ```
 
 ## Troubleshooting
@@ -530,7 +531,7 @@ You can create additional debug configurations for different test files:
    which python  # Should point to venv/Scripts/python.exe
    
    # Reinstall dependencies if needed
-   pip install -e ".[dev]" --force-reinstall
+   pip install -r requirements.txt --force-reinstall
    ```
 
 6. **Port Conflicts**:
