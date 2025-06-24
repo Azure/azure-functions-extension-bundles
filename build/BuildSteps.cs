@@ -244,9 +244,17 @@ namespace Build
                 AddBindingInfoToExtensionsJson(extensionJsonFilePath);
             }
 
-            // Copy templates
-            var staticContentDirectory = Path.Combine(bundlePath, Settings.StaticContentDirectoryName);
-            FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, staticContentDirectory);
+            // Copy templates (only if StaticContent directory exists)
+            if (FileUtility.DirectoryExists(Settings.StaticContentDirectoryPath))
+            {
+                var staticContentDirectory = Path.Combine(bundlePath, Settings.StaticContentDirectoryName);
+                FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, staticContentDirectory);
+                Console.WriteLine($"Copied StaticContent from {Settings.StaticContentDirectoryPath}");
+            }
+            else
+            {
+                Console.WriteLine($"StaticContent directory not found at {Settings.StaticContentDirectoryPath}, skipping template copy for local development");
+            }
 
             // Add bundle.json
             CreateBundleJsonFile(bundlePath);
@@ -277,6 +285,7 @@ namespace Build
 
         public static void AddBundleZipFile(string rootPath, BundlePackageConfiguration packageConfig)
         {
+            FileUtility.EnsureDirectoryExists(rootPath);
             string bundleZipDestinationPath = Path.Combine(rootPath, packageConfig.GeneratedBundleZipFileName);
             FileUtility.CopyFile(packageConfig.GeneratedBundleZipFilePath, bundleZipDestinationPath);
         }
@@ -296,11 +305,20 @@ namespace Build
             foreach (var indexFileMetadata in Settings.IndexFiles)
             {
                 string directoryPath = Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory, BundleConfiguration.Instance.ExtensionBundleId);
-                FileUtility.EnsureDirectoryExists(directoryPath);
-
+                FileUtility.EnsureDirectoryExists(directoryPath); 
                 var bundleVersionDirectory = Path.Combine(directoryPath, BundleConfiguration.Instance.ExtensionBundleVersion);
-                var contentDirectory = Path.Combine(bundleVersionDirectory, Settings.StaticContentDirectoryName);
-                FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, contentDirectory);
+
+                // Copy templates (only if StaticContent directory exists)
+                if (FileUtility.DirectoryExists(Settings.StaticContentDirectoryPath))
+                {
+                    var contentDirectory = Path.Combine(bundleVersionDirectory, Settings.StaticContentDirectoryName);
+                    FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, contentDirectory);
+                    Console.WriteLine($"Copied StaticContent to CDN package at {contentDirectory}");
+                }
+                else
+                {
+                    Console.WriteLine($"StaticContent directory not found, skipping template copy for CDN package");
+                }
 
                 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
                 {

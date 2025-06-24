@@ -346,7 +346,15 @@ webhost_config.txt
 # Python
 venv*/
 .venv*/
+env*/
+.env*/
 .pytest_cache/
 
 # VSCode
 .vscode/
+
+# azurite files
+__azurite*
+AzuriteConfig
+__blobstorage__/
+__queuestorage__/

@@ -153,7 +153,7 @@ jobs:
       python -m venv venv
       source venv/bin/activate
       pip install --upgrade pip
-      pip install -e .[dev]
+      pip install -r requirements.txt
     displayName: 'Install Python Dependencies'  # Start mock extension site in background
   - script: |
       cd tests
