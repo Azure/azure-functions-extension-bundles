@@ -22,6 +22,9 @@ parameters:
     type: boolean
     default: false
 
+  - name: poolName
+    type: string
+
 jobs:
 - job: EmulatorTests
   displayName: Run Emulator Tests
