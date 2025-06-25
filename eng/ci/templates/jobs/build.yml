@@ -42,7 +42,7 @@ jobs:
         project: '3f99e810-c336-441f-8892-84983093ad7f'
         pipeline: '963'
         buildVersionToDownload: 'latestFromBranch'
-        branchName: 'refs/heads/release/main'
+        branchName: 'refs/heads/dev'
         downloadType: 'single'
         artifactName: 'drop'
         downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'

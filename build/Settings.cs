@@ -39,8 +39,6 @@ namespace Build
         public static readonly string ExtensionsJsonFileName = "extensions.json";
 
         public static readonly string BundleConfigJsonFileName = "bundleConfig.json";
-
-        public static string ExtensionBundleVersionRange = "[2.*, 3.0.0)";
         public static readonly string NugetConfigFileName = "NuGet.Config";
 
         public static readonly string RUPackagePath = Path.Combine(RootBinDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package", BundleConfiguration.Instance.ExtensionBundleVersion);
