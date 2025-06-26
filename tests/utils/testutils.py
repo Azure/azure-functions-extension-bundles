@@ -374,8 +374,10 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         'FUNCTIONS_WORKER_RUNTIME': 'python',
         'FUNCTIONS_WORKER_RUNTIME_VERSION': f'{sys.version_info.major}.{sys.version_info.minor}',  # Use current Python version
         'AzureWebJobsStorage': os.environ.get('AzureWebJobsStorage', 'UseDevelopmentStorage=true'),
-        'FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI': os.environ.get('FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI', DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI)
-    }# Add connection strings from config
+        'FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI': os.environ.get('FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI', DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI),
+        "MySqlConnectionString": "Server='localhost';UserID ='root';Password='password';Database='testdb';Port=3307",
+        "WEBSITE_SITE_NAME": "SamplesPython"
+    }  # Add connection strings from config
     if testconfig and 'azure' in testconfig:
         for key in ['storage_key', 'cosmosdb_key', 'eventhub_key', 
                    'servicebus_key', 'sql_key', 'eventgrid_topic_uri', 
