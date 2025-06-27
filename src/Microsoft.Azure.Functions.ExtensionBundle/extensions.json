@@ -121,6 +121,15 @@
     ]
   },
   {
+    "id": "Microsoft.Azure.WebJobs.Extensions.AzureCosmosDb.Mongo",
+    "majorVersion": "1",
+    "name": "CosmosDBMongo",
+    "bindings": [
+      "cosmosdbmongotrigger",
+      "cosmosdbmongo"
+    ]
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
     "majorVersion": "3",
     "name": "Twilio",
