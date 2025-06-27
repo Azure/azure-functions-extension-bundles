@@ -36,6 +36,8 @@ DEDICATED_DOCKER_TEST = 'DEDICATED_DOCKER_TEST'
 ON_WINDOWS = platform.system() == 'Windows'
 LOCALHOST = "127.0.0.1"
 DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI = 'http://localhost:3000'
+DEFAULT_MYSQL_CONNECTION_STRING = "Server=localhost;UserID=root;Password=password;Database=testdb;Port=3307"
+MYSQL_WEBSITE_SITE_NAME = "SampleMysqlPythonApp"
 
 def _get_bundle_config():
     """Get the bundle configuration from bundleConfig.json."""
@@ -375,8 +377,8 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         'FUNCTIONS_WORKER_RUNTIME_VERSION': f'{sys.version_info.major}.{sys.version_info.minor}',  # Use current Python version
         'AzureWebJobsStorage': os.environ.get('AzureWebJobsStorage', 'UseDevelopmentStorage=true'),
         'FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI': os.environ.get('FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI', DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI),
-        "MySqlConnectionString": "Server='localhost';UserID ='root';Password='password';Database='testdb';Port=3307",
-        "WEBSITE_SITE_NAME": "SamplesPython"
+        "MySqlConnectionString": os.environ.get('MySqlConnectionString', DEFAULT_MYSQL_CONNECTION_STRING),
+        "WEBSITE_SITE_NAME": MYSQL_WEBSITE_SITE_NAME
     }  # Add connection strings from config
     if testconfig and 'azure' in testconfig:
         for key in ['storage_key', 'cosmosdb_key', 'eventhub_key', 
