@@ -7,13 +7,11 @@ removing dependencies on azure_functions_worker and proxy_worker modules.
 """
 
 import configparser
-import functools
 import json
 import logging
 import os
 import pathlib
 import platform
-import re
 import shutil
 import socket
 import subprocess
@@ -21,7 +19,6 @@ import sys
 import tempfile
 import time
 import unittest
-from typing import Dict, List, Optional, Tuple
 
 # Constants
 PROJECT_ROOT = pathlib.Path(__file__).parent.parent.parent
@@ -31,8 +28,6 @@ BUILD_DIR = TESTS_ROOT / 'build'  # Same as BUILD_DIR in test_setup.py - webhost
 WORKER_CONFIG = PROJECT_ROOT / 'worker.config.ini'
 PYAZURE_WEBHOST_DEBUG = 'PYAZURE_WEBHOST_DEBUG'
 ARCHIVE_WEBHOST_LOGS = 'ARCHIVE_WEBHOST_LOGS'
-CONSUMPTION_DOCKER_TEST = 'CONSUMPTION_DOCKER_TEST'
-DEDICATED_DOCKER_TEST = 'DEDICATED_DOCKER_TEST'
 ON_WINDOWS = platform.system() == 'Windows'
 LOCALHOST = "127.0.0.1"
 DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI = 'http://localhost:3000'
@@ -99,7 +94,6 @@ def _get_host_json_template():
 }}
 """
 
-
 # The template of host.json for test functions - generated dynamically
 def get_host_json_template():
     """Get the current host.json template with the correct bundle configuration."""
@@ -112,64 +106,13 @@ def is_envvar_true(name):
     return value in ('1', 'true', 'yes', 'y')
 
 
-class WebHostTestCaseMeta(type(unittest.TestCase)):
-    """Metaclass for WebHostTestCase to handle log checking."""
-
-    def __new__(mcls, name, bases, dct):
-        if is_envvar_true(DEDICATED_DOCKER_TEST) \
-                or is_envvar_true(CONSUMPTION_DOCKER_TEST):
-            return super().__new__(mcls, name, bases, dct)
-
-        # Process test methods to capture logs
-        for attrname, attr in dct.items():
-            if attrname.startswith('test_') and callable(attr):
-                test_case = attr
-                check_log_name = attrname.replace('test_', 'check_log_', 1)
-                check_log_case = dct.get(check_log_name)
-
-                # Create a wrapper that runs the test and checks logs if needed
-                @functools.wraps(test_case)
-                def wrapper(self, *args, __meth__=test_case,
-                           __check_log__=check_log_case, **kwargs):
-                    if (__check_log__ is not None
-                            and callable(__check_log__)
-                            and not is_envvar_true(PYAZURE_WEBHOST_DEBUG)):
-
-                        # Check logging output for unit test scenarios
-                        result = self._run_test(__meth__, *args, **kwargs)
-
-                        # Trim off host output timestamps
-                        host_output = getattr(self, 'host_out', '')
-                        output_lines = host_output.splitlines()
-                        ts_re = r"^\[\d+(\/|-)\d+(\/|-)\d+T*\d+\:\d+\:\d+.*(" \
-                                r"A|P)*M*\]"
-                        output = list(map(lambda s:
-                                          re.sub(ts_re, '', s).strip(),
-                                          output_lines))
-
-                        # Execute check_log_ test cases
-                        self._run_test(__check_log__, host_out=output)
-                        return result
-                    else:
-                        # Check normal unit test
-                        return self._run_test(__meth__, *args, **kwargs)
-
-                dct[attrname] = wrapper
-
-        return super().__new__(mcls, name, bases, dct)
-
-
-class WebHostTestCase(unittest.TestCase, metaclass=WebHostTestCaseMeta):
+class WebHostTestCase(unittest.TestCase):
     """Base class for integration tests that need a WebHost.
 
-    In addition to automatically starting up a WebHost instance,
-    this test case class logs WebHost stdout/stderr in case
-    a unit test fails.
-    
-    This version is simplified to only work with Core Tools.
+    Simplified test case that automatically starts up a WebHost instance
+    and logs errors if the host fails to start.
     """
     host_stdout_logger = logging.getLogger('webhosttests')
-    env_variables = {}
 
     @classmethod
     def get_script_dir(cls):
@@ -180,115 +123,72 @@ class WebHostTestCase(unittest.TestCase, metaclass=WebHostTestCaseMeta):
         raise NotImplementedError
 
     @classmethod
-    def get_libraries_to_install(cls) -> List:
-        """Return a list of libraries to install in the function app."""
-        return []
-
-    @classmethod
-    def get_environment_variables(cls) -> Dict:
-        """Return environment variables to set for the function app."""
-        return {}
-
-    @classmethod
-    def docker_tests_enabled(cls) -> Tuple[bool, str]:
-        """Check if docker tests are enabled."""
-        if is_envvar_true(CONSUMPTION_DOCKER_TEST):
-            return True, CONSUMPTION_DOCKER_TEST
-        elif is_envvar_true(DEDICATED_DOCKER_TEST):
-            return True, DEDICATED_DOCKER_TEST
-        else:
-            return False, None
-
-    @classmethod
     def setUpClass(cls):
         """Set up the test environment before running any tests."""
         script_dir = pathlib.Path(cls.get_script_dir())
-        is_unit_test = True if 'unittests' in script_dir.parts else False
 
-        docker_tests_enabled, sku = cls.docker_tests_enabled()
-
+        # Only capture output to file if debug mode is disabled
         cls.host_stdout = None if is_envvar_true(PYAZURE_WEBHOST_DEBUG) \
             else tempfile.NamedTemporaryFile('w+t')
 
         try:
-            if docker_tests_enabled:
-                raise NotImplementedError(
-                    "Docker tests are not supported in this simplified version")
-            else:
-                _setup_func_app(TESTS_ROOT / script_dir, is_unit_test)
-                try:
-                    cls.webhost = start_webhost(script_dir=script_dir,
-                                                stdout=cls.host_stdout)
-                except Exception:
-                    raise
-
-            if not cls.webhost.is_healthy() and cls.host_stdout is not None:
-                cls.host_out = cls.host_stdout.read()
-                if cls.host_out is not None and len(cls.host_out) > 0:
-                    error_message = 'WebHost is not started correctly.'
-                    cls.host_stdout_logger.error(
-                        f'{error_message}\n{cls.host_stdout.name}: {cls.host_out}')
-                    raise RuntimeError(error_message)
+            _setup_func_app(TESTS_ROOT / script_dir)
+            cls.webhost = start_webhost(script_dir=script_dir, stdout=cls.host_stdout)
+            
+            if not cls.webhost.is_healthy():
+                error_message = 'WebHost failed to start or is not responding.'
+                if cls.host_stdout is not None:
+                    cls.host_stdout.seek(0)
+                    host_output = cls.host_stdout.read()
+                    if host_output:
+                        cls.host_stdout_logger.error(f'{error_message}\n{cls.host_stdout.name}: {host_output}')
+                raise RuntimeError(error_message)
         except Exception as ex:
-            cls.host_stdout_logger.error(f"WebHost is not started correctly. {ex}")
+            cls.host_stdout_logger.error(f"Failed to start WebHost: {ex}")
             cls.tearDownClass()
             raise
 
     @classmethod
     def tearDownClass(cls):
         """Clean up after all tests are run."""
+        # Clean up webhost
         if hasattr(cls, 'webhost') and cls.webhost:
-            cls.webhost.close()
+            try:
+                cls.webhost.close()
+            except Exception as e:
+                cls.host_stdout_logger.warning(f"Error closing webhost: {e}")
             cls.webhost = None
 
+        # Handle output logging and archival
         if hasattr(cls, 'host_stdout') and cls.host_stdout is not None:
-            if is_envvar_true(ARCHIVE_WEBHOST_LOGS):
-                cls.host_stdout.seek(0)
-                content = cls.host_stdout.read()
-                if content is not None and len(content) > 0:
-                    version_info = sys.version_info
-                    log_file = (
-                        "logs/"
-                        f"{cls.__module__}_{cls.__name__}"
-                        f"{version_info.minor}_webhost.log"
-                    )
-                    os.makedirs(os.path.dirname(log_file), exist_ok=True)
-                    with open(log_file, 'w+') as file:
-                        file.write(content)
-                    cls.host_stdout_logger.info(f"WebHost log is archived to {log_file} in the artifact")
-
-            cls.host_stdout.close()
-            cls.host_stdout = None
-
-        script_dir = pathlib.Path(cls.get_script_dir())
-        _teardown_func_app(TESTS_ROOT / script_dir)
-
-    def _run_test(self, test, *args, **kwargs):
-        """Run a test method with log capturing."""
-        if self.host_stdout is None:
-            test(self, *args, **kwargs)
-        else:
-            # Discard any host stdout left from the previous test
-            self.host_stdout.read()
-            last_pos = self.host_stdout.tell()
-
-            test_exception = None
             try:
-                test(self, *args, **kwargs)
+                if is_envvar_true(ARCHIVE_WEBHOST_LOGS):
+                    cls.host_stdout.seek(0)
+                    content = cls.host_stdout.read()
+                    if content and len(content) > 0:
+                        version_info = sys.version_info
+                        log_file = (
+                            "logs/"
+                            f"{cls.__module__}_{cls.__name__}"
+                            f"{version_info.minor}_webhost.log"
+                        )
+                        os.makedirs(os.path.dirname(log_file), exist_ok=True)
+                        with open(log_file, 'w+') as file:
+                            file.write(content)
+                        cls.host_stdout_logger.info(f"WebHost log archived to {log_file}")
+                
+                cls.host_stdout.close()
             except Exception as e:
-                test_exception = e
+                cls.host_stdout_logger.warning(f"Error handling host stdout: {e}")
             finally:
-                try:
-                    self.host_stdout.seek(last_pos)
-                    self.host_out = self.host_stdout.read()
-                    if self.host_out is not None and len(self.host_out) > 0:
-                        self.host_stdout_logger.error(
-                            'Captured WebHost log generated during test '
-                            '%s from %s :\n%s', test.__name__,
-                            self.host_stdout.name, self.host_out)
-                finally:
-                    if test_exception is not None:
-                        raise test_exception
+                cls.host_stdout = None
+
+        # Clean up function app
+        try:
+            script_dir = pathlib.Path(cls.get_script_dir())
+            _teardown_func_app(TESTS_ROOT / script_dir)
+        except Exception as e:
+            cls.host_stdout_logger.warning(f"Error cleaning up function app: {e}")
 
 
 def _find_open_port():
@@ -300,9 +200,7 @@ def _find_open_port():
 
 
 def popen_webhost(*, stdout, stderr, script_root, port=None):
-    """Start the Azure Functions host process."""
-    import requests  # Import here to avoid global import issues
-    
+    """Start the Azure Functions host process."""    
     testconfig = None
     if WORKER_CONFIG.exists():
         testconfig = configparser.ConfigParser()
@@ -579,10 +477,10 @@ def remove_path(path):
         path.unlink()
 
 
-def _setup_func_app(app_root, is_unit_test=False):
+def _setup_func_app(app_root):
     """Set up the function app for testing."""
     host_json = app_root / 'host.json'
-      # Create host.json if it doesn't exist
+    # Create host.json if it doesn't exist
     if not host_json.exists():
         with open(host_json, 'w') as f:
             f.write(get_host_json_template())
