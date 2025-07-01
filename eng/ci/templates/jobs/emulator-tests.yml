@@ -137,6 +137,10 @@ jobs:
       docker compose up -d
       echo "Waiting for emulator services to start..."
       sleep 30
+      cd ../mysql
+      docker compose up -d
+      echo "Waiting for mysql service to start..."
+      sleep 30
       docker compose ps
     displayName: 'Start Emulator Services'
 
