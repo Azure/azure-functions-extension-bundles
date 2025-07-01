@@ -186,7 +186,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Kusto",
-    "majorVersion": "1",
+    "version": "1.0.11-Preview",
     "name": "KustoBinding",
     "bindings": [
       "Kusto"
