@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "name": "changes",
+      "type": "mysqlTrigger",
+      "direction": "in",
+      "tableName": "person",
+      "connectionStringSetting": "MySqlConnectionString"
+    }
+  ],
+  "disabled": false
+}

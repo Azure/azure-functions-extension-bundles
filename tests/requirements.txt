@@ -1,3 +1,4 @@
 pytest
 invoke
+mysql-connector-python
 requests

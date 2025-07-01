@@ -137,6 +137,10 @@ jobs:
       docker compose up -d
       echo "Waiting for emulator services to start..."
       sleep 30
+      cd ../mysql
+      docker compose up -d
+      echo "Waiting for mysql service to start..."
+      sleep 30
       docker compose ps
     displayName: 'Start Emulator Services'
 
@@ -191,6 +195,7 @@ jobs:
       cd ..
       export PYAZURE_WEBHOST_DEBUG=1
       export FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI="http://localhost:8000"
+      export MySqlConnectionString="Server=localhost;UserID =root;Password=password;Database=testdb;Port=3307"
       echo "Running emulator tests..."
       echo "Mock extension site URL: $FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI"
       python -m pytest tests/emulator_tests -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results.xml
