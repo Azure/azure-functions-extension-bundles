@@ -96,6 +96,7 @@ Start the Docker-based storage emulator using Docker Compose:
 ```powershell
 # Start Azurite storage emulator using Docker Compose
 docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml up -d
+docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml up -d
 
 # This will start:
 # - Azurite storage emulator on ports 10000, 10001, 10002
@@ -103,11 +104,15 @@ docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml up -d
 
 # To verify services are running
 docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml ps
+docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml ps
+
 ```
 
 **To stop the services when done:**
 ```powershell
 docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml down
+docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml down
+
 ```
 
 ### 3. **Set Up Python Virtual Environment**
