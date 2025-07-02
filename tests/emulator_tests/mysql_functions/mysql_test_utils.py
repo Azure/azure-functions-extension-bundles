@@ -13,19 +13,42 @@ class MySqlTestHelper:
         # Get the individual connection parameters from environment variable
         # if the environment variable is not set, use the provided defaults
         connection_string = os.environ.get("MySqlConnectionString")
-        conn_args = {}
         self.connection = None
 
         print("[DEBUG] Connection String:", connection_string)
-        for kv in connection_string.split(';'):
-            key, value = kv.split('=')
-            conn_args[key.strip()] = value
-
-        self.host = conn_args.get('Server', host)
-        self.port = conn_args.get('Port', port)
-        self.database = conn_args.get('Database', database)
-        self.user = conn_args.get('UserID', user)
-        self.password = conn_args.get('Password', password)
+        
+        # If connection string is provided, parse it; otherwise use defaults
+        if connection_string:
+            conn_args = {}
+            try:
+                for kv in connection_string.split(';'):
+                    if '=' in kv:  # Ensure the key-value pair is valid
+                        key, value = kv.split('=', 1)  # Split only on first '=' in case value contains '='
+                        conn_args[key.strip()] = value.strip()
+                
+                self.host = conn_args.get('Server', host)
+                self.port = int(conn_args.get('Port', port))  # Ensure port is an integer
+                self.database = conn_args.get('Database', database)
+                self.user = conn_args.get('UserID', user)
+                self.password = conn_args.get('Password', password)
+                
+                print("[INFO] Using connection string parameters")
+            except (ValueError, AttributeError) as e:
+                print(f"[WARNING] Error parsing connection string: {e}. Using default parameters.")
+                # Fall back to default parameters
+                self.host = host
+                self.port = port
+                self.database = database
+                self.user = user
+                self.password = password
+        else:
+            print("[INFO] MySqlConnectionString environment variable not set. Using default parameters.")
+            # Use provided default parameters
+            self.host = host
+            self.port = port
+            self.database = database
+            self.user = user
+            self.password = password
 
     def connect(self):
         """Establish connection to MySQL database"""

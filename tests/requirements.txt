@@ -2,3 +2,4 @@ pytest
 invoke
 mysql-connector-python
 requests
+azure-functions
