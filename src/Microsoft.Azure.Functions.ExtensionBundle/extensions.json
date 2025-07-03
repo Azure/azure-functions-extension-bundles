@@ -311,14 +311,5 @@
       "mcpToolTrigger",
       "mcpToolProperty"
     ]
-  },
-  {
-    "id": "Microsoft.Azure.WebJobs.Extensions.MySql",
-    "majorVersion": "1",
-    "name": "MySqlBinding",
-    "bindings": [
-      "MySql",
-      "MySqlTrigger"
-    ]
   }
 ]
