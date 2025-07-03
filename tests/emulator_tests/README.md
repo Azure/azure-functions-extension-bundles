@@ -81,11 +81,7 @@ Build the extension bundle locally. For detailed build instructions, see the "Lo
 
 **Quick build process:**
 
-```powershell
-# From the repository root
-cd build
-dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux
-```
+Follow - [Building on Linux](../../README.md#building-on-linux)
 
 This will generate extension bundle packages in the `artifacts/` directory.
 
