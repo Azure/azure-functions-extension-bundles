@@ -51,9 +51,6 @@ The CI pipeline:
 Before pushing changes, validate your setup:
 
 ```bash
-# Linux/macOS
-./validate-ci.sh
-
 # Windows PowerShell
 .\validate-ci.ps1
 ```
@@ -133,8 +130,6 @@ python -m venv venv
 ```
 
 ### 4. **Install Python Dependencies**
-
-Install the project with dev dependencies from `pyproject.toml`:
 
 ```powershell
 # Install with dev dependencies
@@ -216,8 +211,6 @@ python -m pytest tests/emulator_tests --cov=utils --cov-report=html
 For convenience, here's a PowerShell script that sets up everything:
 
 ```powershell
-# setup-emulator-tests.ps1
-
 # Navigate to tests directory
 Set-Location "C:\repo\azure-functions-extension-bundles\tests"
 
@@ -225,9 +218,6 @@ Set-Location "C:\repo\azure-functions-extension-bundles\tests"
 .\venv\Scripts\Activate.ps1
 
 # Set environment variables
-$env:CORE_TOOLS_EXE_PATH = "C:\repo\azure-functions-extension-bundles\tests\build\webhost\func.exe"
-$env:AzureWebJobsStorage = "UseDevelopmentStorage=true"
-$env:FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI = "http://localhost:3000"
 $env:PYAZURE_WEBHOST_DEBUG = "true"
 
 # Start background services (run each in separate terminals)
@@ -443,6 +433,7 @@ You can create additional debug configurations for different test files:
     "PYTHONPATH": "${workspaceFolder};${workspaceFolder}\\tests",
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI": "http://localhost:3000",
+    "PYTHON_ISOLATE_WORKER_DEPENDENCIES":"1",
     "CORE_TOOLS_EXE_PATH": "${workspaceFolder}\\tests\\build\\webhost\\func.exe",
     "PYAZURE_WEBHOST_DEBUG": "true"
   },
