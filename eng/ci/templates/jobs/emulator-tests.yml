@@ -80,6 +80,7 @@ jobs:
         env:
           BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
           TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts' # Verify build artifacts exist
+
       - script: |
           echo "Checking for build artifacts..."
           echo "=== Checking artifacts directory ==="
