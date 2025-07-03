@@ -336,3 +336,25 @@ tools/
 
 # Local Packaging Directory
 templatesArtifacts/
+
+tests/azure_functions_bundle_e2e.egg-info/
+tests/build/
+
+# Core Tools Manual Configuration
+webhost_config.txt
+
+# Python
+venv*/
+.venv*/
+env*/
+.env*/
+.pytest_cache/
+
+# VSCode
+.vscode/
+
+# azurite files
+__azurite*
+AzuriteConfig
+__blobstorage__/
+__queuestorage__/
