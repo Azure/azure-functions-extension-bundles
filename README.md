@@ -18,7 +18,6 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 |------|------|
 |main-preview|[![Build Status](https://azfunc.visualstudio.com/public/_apis/build/status/extension-bundles.public?branchName=main-preview)](https://azfunc.visualstudio.com/public/_build?definitionId=939&_a=summary&branchFilter=12530)|
 
-
 ## Build Requirements
 
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
@@ -26,6 +25,8 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 ## Local Build and Packaging
 
 ### Prerequisites
+
+#### (Optional) Download Templates
 
 Before building locally, you need to obtain the latest template artifacts and place them in the `templatesArtifacts` directory at the repository root.
 
@@ -43,6 +44,12 @@ ExtensionBundle.v4.Templates.1.0.5130.zip
 **How to obtain template artifacts:**
 
 - Download the files from the [templates.public](https://dev.azure.com/azfunc/public/_build/results?buildId=221883) Pipeline
+
+#### (Optional) Using Custom NuGet feed for local testing
+
+- Set up a NuGet feed with `NuGet Gallery (https://api.nuget.org/v3/index.json)` as upstream sources.
+- Update [NuGet.Config](src/Microsoft.Azure.Functions.ExtensionBundle/NuGet.Config) and [Helper.cs](build/Helper.cs#L14) with the custom NuGet feed.
+- Publish extension packages to new feed and build the project using below instructions.
 
 ### Building on Windows
 
@@ -109,10 +116,10 @@ dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesWindows,Creat
 ## Add template
 
 - Follow the steps mentioned at the link below to add a template to extension bundle.
-  - https://github.com/Azure/azure-functions-templates#adding-a-template-to-extension-bundle
+  - [Adding a template to Extension bundle](https://github.com/Azure/azure-functions-templates#adding-a-template-to-extension-bundle)
 
 - Also follow the steps mentioned at the link below to test templates added to extension bundle
-  - https://github.com/Azure/azure-functions-templates#testing-script-type-template-via-core-tools
+  - [Testing script type template via Core tools](https://github.com/Azure/azure-functions-templates#testing-script-type-template-via-core-tools)
 
 ## Debugging the build process in Visual Studio
 
@@ -136,10 +143,12 @@ dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesWindows,Creat
 ### Emulator-based Testing
 
 For comprehensive testing including Preview bundles and integration scenarios, see the emulator test framework at:
+
 - **Setup and Usage**: [`tests/emulator_tests/README.md`](tests/emulator_tests/README.md)
 - **Test Location**: `tests/emulator_tests/`
 
 The emulator tests run automatically in CI for all PR builds and main branch builds, providing:
+
 - Automated testing against Azure service emulators (Event Hubs, Storage, etc.)
 - Support for both regular and Preview extension bundles
 - Dynamic bundle version detection from `bundleConfig.json`
@@ -154,11 +163,13 @@ The project uses Azure DevOps pipelines with multiple stages:
 3. **Emulator Tests** (`EmulatorTests` stage): Runs Python-based emulator tests on Linux
 
 **Pipeline Configuration:**
+
 - **Public builds**: [`eng/public-build.yml`](eng/public-build.yml) - Runs for PRs and main branch
 - **Official builds**: [`eng/official-build.yml`](eng/official-build.yml) - Runs for internal build/test
 - **Emulator test template**: [`eng/ci/templates/jobs/emulator-tests.yml`](eng/ci/templates/jobs/emulator-tests.yml)
 
 **Emulator Test CI Features:**
+
 - Uses Linux agents with Docker support for emulator services
 - Automatically builds Linux extension bundles
 - Sets up Python 3.12 environment and installs test dependencies

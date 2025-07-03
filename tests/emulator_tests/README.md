@@ -4,7 +4,7 @@ This guide covers the complete setup and execution of emulator tests for Azure F
 
 ## About This Testing Framework
 
-The original emulator test code is taken from https://github.com/Azure/azure-functions-python-worker and unchanged the test code. We use it for testing extension bundle scenario.
+The original emulator test code is taken from [azure-functions-python-worker](https://github.com/Azure/azure-functions-python-worker) and unchanged the test code. We use it for testing extension bundle scenario.
 
 **We modified the following:**
 
@@ -28,11 +28,13 @@ The test framework automatically references the `bundleVersion` from `src/Micros
 ### Automated Testing in Azure DevOps
 
 Emulator tests run automatically in the CI pipeline for:
+
 - **All pull requests** to main, preview, and release branches
 - **Main branch builds** and **preview branch builds**
 - **Manual builds** (emulator tests are skipped for nightly scheduled builds)
 
 The CI pipeline:
+
 1. **Builds Linux extension bundles** as prerequisites
 2. **Starts emulator services** using Docker Compose (Event Hubs, Storage, etc.)
 3. **Sets up Python 3.12** environment with test dependencies
@@ -42,6 +44,7 @@ The CI pipeline:
 7. **Publishes test results** and debug artifacts to Azure DevOps
 
 **CI Configuration Files:**
+
 - [`eng/ci/templates/jobs/emulator-tests.yml`](../../eng/ci/templates/jobs/emulator-tests.yml) - Emulator test job template
 - [`eng/public-build.yml`](../../eng/public-build.yml) - Public CI pipeline
 - [`eng/official-build.yml`](../../eng/official-build.yml) - Official release pipeline
@@ -52,10 +55,12 @@ Before pushing changes, validate your setup:
 
 ```bash
 # Windows PowerShell
+cd tests
 .\validate-ci.ps1
 ```
 
 These scripts check:
+
 - Required files and dependencies
 - Docker and Python availability
 - bundleConfig.json validity
@@ -106,6 +111,7 @@ docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml ps
 ```
 
 **To stop the services when done:**
+
 ```powershell
 docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml down
 docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml down
@@ -188,21 +194,36 @@ $env:ARCHIVE_WEBHOST_LOGS = "true"
 
 ### 8. **Run Tests**
 
-Now you can run the emulator tests:```powershell
-# Run all emulator tests
-cd .. 
+Now you can run the emulator tests:
+
+#### Run all emulator tests
+
+```powershell
+cd ..
 python -m pytest tests/emulator_tests -v
+```
 
-# Run a specific test file
+#### Run a specific test file
+
+```powershell
 python -m pytest tests/emulator_tests/test_blob_functions.py -v
+```
 
-# Run a specific test method
+#### Run a specific test method
+
+```powershell
 python -m pytest tests/emulator_tests/test_blob_functions.py::TestBlobFunctions::test_blob_trigger -v
+```
 
-# Run with extra verbose output
+#### Run with extra verbose output
+
+```powershell
 python -m pytest tests/emulator_tests -v -s
+```
 
-# Run with coverage report
+#### Run with coverage report
+
+```powershell
 python -m pytest tests/emulator_tests --cov=utils --cov-report=html
 ```
 
@@ -246,6 +267,7 @@ The test framework will automatically create configuration files to help with de
 To test with Preview extension bundles:
 
 1. **Update bundleConfig.json**:
+
    ```json
    {
        "bundleId": "Microsoft.Azure.Functions.ExtensionBundle.Preview",
@@ -256,6 +278,7 @@ To test with Preview extension bundles:
    ```
 
 2. **Stop and restart the mock server**:
+
    ```powershell
    # Stop the current mock extension site (Ctrl+C in the terminal running it)
    
@@ -304,14 +327,14 @@ $env:FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI = "http://localhost:3001"
 
 The `testutils.py` module provides a comprehensive testing framework for Azure Functions Extension Bundles.
 
-### Key Features:
+### Key Features
 
 1. **Automatic Host Management**: Automatically starts and stops Azure Functions Core Tools
 2. **Health Check Retries**: Implements intelligent health checks with retries
 3. **Extension Bundle Integration**: Automatically configures extension bundle download from mock site
 4. **Configuration Logging**: Writes detailed configuration to `webhost_config.txt` for debugging
 
-### Example Test Class:
+### Example Test Class
 
 ```python
 from utils.testutils import WebHostTestCase, retryable_test
@@ -334,7 +357,7 @@ class MyFunctionTest(WebHostTestCase):
         pass
 ```
 
-### Test Framework Features:
+### Test Framework Features
 
 - **`WebHostTestCase`**: Base class that automatically manages Function Host lifecycle
 - **`@retryable_test`**: Decorator for tests that may need multiple attempts
@@ -385,16 +408,18 @@ The project includes a debug configuration in `.vscode/launch.json`:
 1. **Prerequisites**: Ensure you've completed the setup steps (Docker services, virtual environment, Core Tools, etc.)
 
 2. **Set Python Interpreter in VS Code**:
-   ```
+
+   ```text
    - Open Command Palette (Ctrl+Shift+P)
    - Type "Python: Select Interpreter"
    - Select the interpreter from your virtual environment: 
      `c:\repo\azure-functions-extension-bundles\tests\venv\Scripts\python.exe`
    ```
-   
+
    **Note**: This step is crucial for VS Code to use the correct Python environment with all installed dependencies.
 
 3. **Start Required Services**:
+
    ```powershell
    # Start Docker services (Azurite + Event Hubs emulator)
    docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml up -d
@@ -473,13 +498,13 @@ You can create additional debug configurations for different test files:
    - The virtual environment is activated
    - VS Code is using the correct Python interpreter
    - All dependencies are installed with `cd tests && pip install -r requirements.txt`
-```
 
 ## Troubleshooting
 
 ### Common Issues and Solutions
 
 1. **Functions Host Not Found**:
+
    ```powershell
    # Ensure Core Tools is downloaded and extracted
    python -m invoke -c test_setup webhost
@@ -492,6 +517,7 @@ You can create additional debug configurations for different test files:
    ```
 
 2. **Mock Extension Site Connection Issues**:
+
    ```powershell
    # Check if mock site is running
    curl http://localhost:3000/ExtensionBundles/Microsoft.Azure.Functions.ExtensionBundle/index.json
@@ -501,6 +527,7 @@ You can create additional debug configurations for different test files:
    ```
 
 3. **Storage Connection Issues**:
+
    ```powershell
    # Ensure Docker services are running
    docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml ps
@@ -513,6 +540,7 @@ You can create additional debug configurations for different test files:
    ```
 
 4. **Extension Bundle Download Failures**:
+
    ```powershell
    # Verify extension bundles exist in artifacts
    Get-ChildItem C:\repo\azure-functions-extension-bundles\artifacts\Microsoft.Azure.Functions.ExtensionBundle*.zip
@@ -522,6 +550,7 @@ You can create additional debug configurations for different test files:
    ```
 
 5. **Python Virtual Environment Issues**:
+
    ```powershell
    # Verify virtual environment is activated
    which python  # Should point to venv/Scripts/python.exe
@@ -531,6 +560,7 @@ You can create additional debug configurations for different test files:
    ```
 
 6. **Port Conflicts**:
+
    ```powershell
    # Check what's using ports 3000 and 7071
    netstat -ano | findstr ":3000\|:7071"
@@ -561,12 +591,14 @@ When tests fail, check these files for detailed information:
 ### Performance Tips
 
 1. **Parallel Test Execution**:
+
    ```powershell
    # Run tests in parallel (be careful with shared resources)
    python -m pytest tests/emulator_tests -n auto
    ```
 
 2. **Test Selection**:
+
    ```powershell
    # Run only fast tests
    python -m pytest tests/emulator_tests -m "not slow"
@@ -601,11 +633,13 @@ services:
 
 Create function apps with target trigger/input/output bindings:
 
-```
-tests/emulator_tests/your_functions/
-├── your_function_name/
-│   ├── __init__.py          # Function implementation
-│   └── function.json        # Function metadata and bindings
+```text
+tests/emulator_tests/
+├── your_extension_name/
+│   ├── function_app.py       # Function implementation
+├── utils
+|   ├──your_extension
+|   |    ├── docker-compose.yml # Setting up the emulator or docker container for extension dependencies
 ```
 
 **Dependencies**: Add any additional dependencies to `tests/pyproject.toml` under the `[project.optional-dependencies]` dev section.
@@ -650,7 +684,7 @@ class TestYourFunctions(WebHostTestCase):
 
 ## Additional Resources
 
-- **Main README.md**: For building and packaging extension bundles
-- **Core Tools Documentation**: https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local
-- **Azurite Documentation**: https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite
-- **pytest Documentation**: https://docs.pytest.org/
+- [Main README.md](../../README.md): For building and packaging extension bundles
+- [Core Tools Documentation](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
+- [Azurite Documentation](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite)
+- [pytest Documentation](https://docs.pytest.org/)

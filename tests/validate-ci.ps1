@@ -6,20 +6,20 @@ $ErrorActionPreference = "Stop"
 Write-Host "🔍 Validating Azure Functions Extension Bundle CI Setup" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
 
-# Check if we're in the right directory
-if (-not (Test-Path "src\Microsoft.Azure.Functions.ExtensionBundle\bundleConfig.json")) {
-    Write-Host "❌ Error: Please run this script from the repository root" -ForegroundColor Red
+# Check if we're in the right directory (now from tests folder)
+if (-not (Test-Path "..\src\Microsoft.Azure.Functions.ExtensionBundle\bundleConfig.json")) {
+    Write-Host "❌ Error: Please run this script from the tests directory" -ForegroundColor Red
     exit 1
 }
 
-Write-Host "✅ Repository root confirmed" -ForegroundColor Green
+Write-Host "✅ Tests directory confirmed" -ForegroundColor Green
 
 # Check required files exist
 $requiredFiles = @(
-    "tests\test_setup.py",
-    "tests\utils\testutils.py",
-    "tests\emulator_tests\utils\eventhub\docker-compose.yml",
-    "eng\ci\templates\jobs\emulator-tests.yml"
+    "test_setup.py",
+    "utils\testutils.py",
+    "emulator_tests\utils\eventhub\docker-compose.yml",
+    "..\eng\ci\templates\jobs\emulator-tests.yml"
 )
 
 foreach ($file in $requiredFiles) {
@@ -72,7 +72,7 @@ try {
 # Validate bundleConfig.json
 Write-Host "🔍 Validating bundleConfig.json..." -ForegroundColor Cyan
 try {
-    $bundleConfig = Get-Content "src\Microsoft.Azure.Functions.ExtensionBundle\bundleConfig.json" | ConvertFrom-Json
+    $bundleConfig = Get-Content "..\src\Microsoft.Azure.Functions.ExtensionBundle\bundleConfig.json" | ConvertFrom-Json
     Write-Host "Bundle ID: $($bundleConfig.bundleId)" -ForegroundColor White
     Write-Host "Bundle Version: $($bundleConfig.bundleVersion)" -ForegroundColor White
     Write-Host "Is Preview: $($bundleConfig.isPreviewBundle)" -ForegroundColor White
@@ -93,8 +93,8 @@ try {
 
 # Check CI template exists and basic syntax
 Write-Host "🔍 Validating CI template..." -ForegroundColor Cyan
-if (Test-Path "eng\ci\templates\jobs\emulator-tests.yml") {
-    $templateContent = Get-Content "eng\ci\templates\jobs\emulator-tests.yml" -Raw
+if (Test-Path "..\eng\ci\templates\jobs\emulator-tests.yml") {
+    $templateContent = Get-Content "..\eng\ci\templates\jobs\emulator-tests.yml" -Raw
     if ($templateContent -match "jobs:" -and $templateContent -match "EmulatorTests") {
         Write-Host "✅ CI template appears valid" -ForegroundColor Green
     } else {
@@ -109,8 +109,8 @@ if (Test-Path "eng\ci\templates\jobs\emulator-tests.yml") {
 # Optional: Test Docker Compose configuration
 Write-Host "🔍 Testing emulator services configuration..." -ForegroundColor Cyan
 try {
-    Push-Location "tests\emulator_tests\utils\eventhub"
-    $composeCheck = docker-compose config 2>$null
+    Push-Location "emulator_tests\utils\eventhub"
+    docker-compose config 2>$null | Out-Null
     Write-Host "✅ Docker Compose configuration is valid" -ForegroundColor Green
 } catch {
     Write-Host "⚠️  Warning: Docker Compose configuration validation failed" -ForegroundColor Yellow
@@ -122,10 +122,9 @@ Write-Host ""
 Write-Host "🎉 All validations passed!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
-Write-Host "1. Build locally: 'cd build && dotnet run'" -ForegroundColor White
-Write-Host "2. Test emulator setup: 'cd tests && python test_setup.py'" -ForegroundColor White
+Write-Host "1. Build locally: 'cd ..\build && dotnet run'" -ForegroundColor White
+Write-Host "2. Test emulator setup: 'python test_setup.py'" -ForegroundColor White
 Write-Host "3. Run emulator tests with mock site:" -ForegroundColor White
-Write-Host "   cd tests" -ForegroundColor Gray
 Write-Host "   invoke mock-extension-site --port 8000 --keep-alive &" -ForegroundColor Gray
 Write-Host "   `$env:FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI='http://localhost:8000'" -ForegroundColor Gray
 Write-Host "   pytest emulator_tests/" -ForegroundColor Gray
