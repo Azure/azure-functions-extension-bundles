@@ -76,7 +76,7 @@ jobs:
         inputs:
           command: 'run'
           workingDirectory: './build'
-          arguments: 'PackageNetCoreV3BundlesLinux'
+          arguments: 'PackageBundlesLinux'
         env:
           BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
           TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts' # Verify build artifacts exist
