@@ -273,6 +273,7 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         'host:logger:consoleLoggingMode': 'always',
         'AZURE_FUNCTIONS_ENVIRONMENT': 'development',
         'AzureWebJobsSecretStorageType': 'files',
+        'PYTHON_ENABLE_WORKER_EXTENSIONS':'1',
         'FUNCTIONS_WORKER_RUNTIME': 'python',
         'FUNCTIONS_WORKER_RUNTIME_VERSION': f'{sys.version_info.major}.{sys.version_info.minor}',  # Use current Python version
         'AzureWebJobsStorage': os.environ.get('AzureWebJobsStorage', 'UseDevelopmentStorage=true'),
