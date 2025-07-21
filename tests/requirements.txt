@@ -3,3 +3,4 @@ invoke
 mysql-connector-python
 requests
 azure-functions
+fabric-user-data-functions
