@@ -9,7 +9,7 @@
     ".NETCoreApp,Version=v3.1/linux-x64": {
       "extensions/1.0.0": {
         "dependencies": {
-          "Azure.Storage.Queues": "12.22.0",
+          "Azure.Storage.Queues": "12.23.0",
           "Microsoft.Azure.DurableTask.Netherite.AzureFunctions": "1.5.4",
           "Microsoft.Azure.WebJobs.Extensions.CosmosDB": "3.0.10",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask": "2.13.7",
@@ -169,7 +169,7 @@
       },
       "Azure.Storage.Blobs/12.21.1": {
         "dependencies": {
-          "Azure.Storage.Common": "12.23.0",
+          "Azure.Storage.Common": "12.24.0",
           "System.Text.Json": "8.0.5"
         },
         "runtime": {
@@ -179,28 +179,26 @@
           }
         }
       },
-      "Azure.Storage.Common/12.23.0": {
+      "Azure.Storage.Common/12.24.0": {
         "dependencies": {
           "Azure.Core": "1.46.2",
-          "System.IO.Hashing": "6.0.0"
+          "System.IO.Hashing": "8.0.0"
         },
         "runtime": {
           "lib/netstandard2.0/Azure.Storage.Common.dll": {
-            "assemblyVersion": "12.23.0.0",
-            "fileVersion": "12.2300.25.16105"
+            "assemblyVersion": "12.24.0.0",
+            "fileVersion": "12.2400.25.36407"
           }
         }
       },
-      "Azure.Storage.Queues/12.22.0": {
+      "Azure.Storage.Queues/12.23.0": {
         "dependencies": {
-          "Azure.Storage.Common": "12.23.0",
-          "System.Memory.Data": "6.0.1",
-          "System.Text.Json": "8.0.5"
+          "Azure.Storage.Common": "12.24.0"
         },
         "runtime": {
           "lib/netstandard2.1/Azure.Storage.Queues.dll": {
-            "assemblyVersion": "12.22.0.0",
-            "fileVersion": "12.2200.25.16105"
+            "assemblyVersion": "12.23.0.0",
+            "fileVersion": "12.2300.25.36407"
           }
         }
       },
@@ -1171,7 +1169,7 @@
       "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs/5.3.3": {
         "dependencies": {
           "Azure.Storage.Blobs": "12.21.1",
-          "Azure.Storage.Queues": "12.22.0",
+          "Azure.Storage.Queues": "12.23.0",
           "Microsoft.Azure.WebJobs": "3.0.41",
           "Microsoft.Extensions.Azure": "1.12.0"
         },
@@ -1184,7 +1182,7 @@
       },
       "Microsoft.Azure.WebJobs.Extensions.Storage.Queues/5.3.3": {
         "dependencies": {
-          "Azure.Storage.Queues": "12.22.0",
+          "Azure.Storage.Queues": "12.23.0",
           "Microsoft.Azure.WebJobs": "3.0.41",
           "Microsoft.Extensions.Azure": "1.12.0"
         },
@@ -2272,15 +2270,15 @@
           "System.Runtime": "4.3.0"
         }
       },
-      "System.IO.Hashing/6.0.0": {
+      "System.IO.Hashing/8.0.0": {
         "dependencies": {
           "System.Buffers": "4.5.1",
           "System.Memory": "4.5.5"
         },
         "runtime": {
           "lib/netstandard2.0/System.IO.Hashing.dll": {
-            "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.21.52210"
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.23.53103"
           }
         }
       },
@@ -3227,19 +3225,19 @@
       "path": "azure.storage.blobs/12.21.1",
       "hashPath": "azure.storage.blobs.12.21.1.nupkg.sha512"
     },
-    "Azure.Storage.Common/12.23.0": {
+    "Azure.Storage.Common/12.24.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-X/pe1LS3lC6s6MSL7A6FzRfnB6P72rNBt5oSuyan6Q4Jxr+KiN9Ufwqo32YLHOVfPcB8ESZZ4rBDketn+J37Rw==",
-      "path": "azure.storage.common/12.23.0",
-      "hashPath": "azure.storage.common.12.23.0.nupkg.sha512"
+      "sha512": "sha512-JOmmSgNvH/zRWRihT6PZapEdTNESP4YtGS5OjbkUAg6EFiM6Ite7hDkqzJrA7QKmi1SRwZ40vpHi1McVpQuhgw==",
+      "path": "azure.storage.common/12.24.0",
+      "hashPath": "azure.storage.common.12.24.0.nupkg.sha512"
     },
-    "Azure.Storage.Queues/12.22.0": {
+    "Azure.Storage.Queues/12.23.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-HPQgOlfH+rJ4CL4V8ePFnsT/KKnvLU35ytxC3fsTTqOazhQ0593C0aPVu258DRN8bQCbx4OpNpjtiO9czDy3VQ==",
-      "path": "azure.storage.queues/12.22.0",
-      "hashPath": "azure.storage.queues.12.22.0.nupkg.sha512"
+      "sha512": "sha512-8uhYJvlUPrXwD5uxC2L4uPYogk/9VpI1309lwcSku8+odNdAWLlZBAeVfwwZVRSPOGOhWBc/m2LKT/u0D2V+4w==",
+      "path": "azure.storage.queues/12.23.0",
+      "hashPath": "azure.storage.queues.12.23.0.nupkg.sha512"
     },
     "Castle.Core/5.0.0": {
       "type": "package",
@@ -4711,12 +4709,12 @@
       "path": "system.io.filesystem.primitives/4.3.0",
       "hashPath": "system.io.filesystem.primitives.4.3.0.nupkg.sha512"
     },
-    "System.IO.Hashing/6.0.0": {
+    "System.IO.Hashing/8.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-Rfm2jYCaUeGysFEZjDe7j1R4x6Z6BzumS/vUT5a1AA/AWJuGX71PoGB0RmpyX3VmrGqVnAwtfMn39OHR8Y/5+g==",
-      "path": "system.io.hashing/6.0.0",
-      "hashPath": "system.io.hashing.6.0.0.nupkg.sha512"
+      "sha512": "sha512-ne1843evDugl0md7Fjzy6QjJrzsjh46ZKbhf8GwBXb5f/gw97J4bxMs0NQKifDuThh/f0bZ0e62NPl1jzTuRqA==",
+      "path": "system.io.hashing/8.0.0",
+      "hashPath": "system.io.hashing.8.0.0.nupkg.sha512"
     },
     "System.IO.Pipelines/4.7.3": {
       "type": "package",
