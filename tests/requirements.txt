@@ -1,5 +1,23 @@
-pytest
+pytest~=7.4.4
 invoke
 mysql-connector-python
-requests
+requests==2.*
 azure-functions
+
+# Azure SDK packages for emulator tests
+azure-cosmos
+azure-eventhub
+python-dateutil~=2.9.0
+
+# Testing framework extensions
+pytest-asyncio
+pytest-rerunfailures
+pytest-xdist
+pytest-cov
+pytest-sugar
+pytest-randomly
+pytest-instafail
+
+# Additional utilities
+coverage
+python-dotenv
