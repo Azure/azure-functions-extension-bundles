@@ -6,7 +6,7 @@
 # Key features:
 # - Runs on Linux agents with Docker support for emulator services
 # - Builds Linux extension bundles as a prerequisite
-# - Starts Azure service emulators (Event Hubs, Storage, etc.) via Docker Compose
+# - Starts Azure service emulators (Event Hubs, Storage, CosmosDB, Service Bus, etc.) via Docker Compose
 # - Sets up Python 3.12 environment with test dependencies from pyproject.toml
 # - Runs mock extension bundle site to simulate CDN behavior
 # - Executes pytest-based emulator tests with proper artifact collection
@@ -129,20 +129,30 @@ jobs:
       fi
     displayName: 'Verify Build Artifacts'
 
-  # Start emulator services with Docker Compose
+  # Start CosmosDB Emulator
+  - script: |
+      echo "Starting CosmosDB Emulator..."
+      docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+      docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmosdb-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+      echo "Waiting for CosmosDB Emulator to start..."
+      sleep 60
+      docker ps
+    displayName: 'Start CosmosDB Emulator'
+
+  # Start emulator services with Docker Compose (EventHub, Storage, MySQL)
   - script: |
       docker version
       docker compose version
       cd tests/emulator_tests/utils/eventhub
       docker compose up -d
-      echo "Waiting for emulator services to start..."
+      echo "Waiting for eventhub emulator services to start..."
       sleep 30
       cd ../mysql
       docker compose up -d
       echo "Waiting for mysql service to start..."
       sleep 30
       docker compose ps
-    displayName: 'Start Emulator Services'
+    displayName: 'Start EventHub and MySQL Emulator Services'
 
   # Set up Python 3.12 and create virtual environment
   - task: UsePythonVersion@0
@@ -188,21 +198,68 @@ jobs:
       source venv/bin/activate
       python -m invoke -c test_setup webhost
     displayName: 'Setup WebHost'
-  # Set debug environment variable and run tests
+
+  # Run tests excluding Service Bus
   - script: |
       cd tests
       source venv/bin/activate
       cd ..
       export PYAZURE_WEBHOST_DEBUG=1
       export FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI="http://localhost:8000"
-      export MySqlConnectionString="Server=localhost;UserID =root;Password=password;Database=testdb;Port=3307"
-      echo "Running emulator tests..."
+      export MySqlConnectionString="Server=localhost;UserID=root;Password=password;Database=testdb;Port=3307"
+      echo "Running emulator tests (excluding Service Bus)..."
       echo "Mock extension site URL: $FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI"
-      python -m pytest tests/emulator_tests -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results.xml
-    displayName: 'Run Emulator Tests'
+      python -m pytest tests/emulator_tests --ignore=tests/emulator_tests/test_servicebus_functions.py -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results-main.xml
+    displayName: 'Run Main Emulator Tests'
     env:
       PYAZURE_WEBHOST_DEBUG: 1
       FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI: "http://localhost:8000"
+      AzureWebJobsStorage: "UseDevelopmentStorage=true"
+      AzureWebJobsEventHubConnectionString: $(EmulatorEventHubConnectionString)
+      AzureWebJobsCosmosDBConnectionString: $(EmulatorCosmosDBConnectionString)
+      CosmosDBEmulatorUrl: $(CosmosDBEmulatorUrl)
+      CosmosDBEmulatorKey: $(CosmosDBEmulatorKey)
+
+  # Stop EventHub Emulator and Start Service Bus Emulator
+  - script: |
+      echo "Stopping EventHub Emulator to free up ports..."
+      docker stop eventhubs-emulator || true
+      docker container rm --force eventhubs-emulator || true
+      
+      echo "Starting Service Bus Emulator..."
+      cd tests/emulator_tests/utils/servicebus
+      # Ensure SQL password is available for the compose file
+      echo "SQL Password variable is set: $(if [ -z "$AzureWebJobsSQLPassword" ]; then echo "NO"; else echo "YES"; fi)"
+      docker compose pull
+      docker compose up -d
+      echo "Waiting for Service Bus emulator to start..."
+      sleep 30
+      docker compose ps
+      
+      # Verify that SQL Edge and Service Bus emulator are running
+      docker logs sqledge || echo "SQL Edge logs not available"
+      docker logs servicebus-emulator || echo "Service Bus emulator logs not available"
+    displayName: 'Start Service Bus Emulator'
+    env:
+      AzureWebJobsSQLPassword: $(AzureWebJobsSQLPassword)
+
+  # Run Service Bus tests separately
+  - script: |
+      cd tests
+      source venv/bin/activate
+      cd ..
+      export PYAZURE_WEBHOST_DEBUG=1
+      export FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI="http://localhost:8000"
+      echo "Running Service Bus emulator tests..."
+      echo "SQL Password is set for tests: $(if [ -z "$AzureWebJobsSQLPassword" ]; then echo "NO"; else echo "YES"; fi)"
+      python -m pytest tests/emulator_tests/test_servicebus_functions.py -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results-servicebus.xml
+    displayName: 'Run Service Bus Emulator Tests'
+    env:
+      PYAZURE_WEBHOST_DEBUG: 1
+      FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI: "http://localhost:8000"
+      AzureWebJobsStorage: "UseDevelopmentStorage=true"
+      AzureWebJobsServiceBusConnectionString: $(EmulatorServiceBusConnectionString)
+      AzureWebJobsSQLPassword: $(AzureWebJobsSQLPassword)
 
   # Copy webhost config for debugging
   - script: |
@@ -218,7 +275,7 @@ jobs:
   # Publish test results
   - task: PublishTestResults@2
     inputs:
-      testResultsFiles: '$(Build.ArtifactStagingDirectory)/test-results.xml'
+      testResultsFiles: '$(Build.ArtifactStagingDirectory)/test-results-*.xml'
       testRunTitle: 'Emulator Tests'
       failTaskOnFailedTests: true
     condition: always()
@@ -236,9 +293,22 @@ jobs:
       # Stop any remaining mock-extension-site processes
       pkill -f mock-extension-site || true
       
-      # Stop emulator services
+      # Stop CosmosDB emulator
+      docker stop cosmosdb-emulator || true
+      docker container rm --force cosmosdb-emulator || true
+      
+      # Stop EventHub emulator services
       cd tests/emulator_tests/utils/eventhub
       docker compose down -v
+      
+      # Stop MySQL emulator
+      cd ../mysql
+      docker compose down -v
+      
+      # Stop Service Bus emulator
+      cd ../servicebus
+      docker compose down -v
+      
       echo "Cleanup completed"
     displayName: 'Cleanup Services'
     condition: always()
