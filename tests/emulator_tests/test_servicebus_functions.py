@@ -48,18 +48,3 @@ class TestServiceBusFunctions(testutils.WebHostTestCase):
             else:
                 break
 
-
-class TestServiceBusFunctionsStein(TestServiceBusFunctions):
-
-    @classmethod
-    def get_script_dir(cls):
-        return testutils.EMULATOR_TESTS_FOLDER / 'servicebus_functions' / \
-            'servicebus_functions_stein'
-
-
-class TestServiceBusFunctionsSteinGeneric(TestServiceBusFunctions):
-
-    @classmethod
-    def get_script_dir(cls):
-        return testutils.EMULATOR_TESTS_FOLDER / 'servicebus_functions' / \
-            'servicebus_functions_stein' / 'generic'

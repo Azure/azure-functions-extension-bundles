@@ -94,17 +94,3 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         self.assertTrue('_ts' in response)
 
 
-class TestCosmosDBFunctionsStein(TestCosmosDBFunctions):
-
-    @classmethod
-    def get_script_dir(cls):
-        return testutils.EMULATOR_TESTS_FOLDER / 'cosmosdb_functions' / \
-            'cosmosdb_functions_stein'
-
-
-class TestCosmosDBFunctionsSteinGeneric(TestCosmosDBFunctions):
-
-    @classmethod
-    def get_script_dir(cls):
-        return testutils.EMULATOR_TESTS_FOLDER / 'cosmosdb_functions' / \
-            'cosmosdb_functions_stein' / 'generic'

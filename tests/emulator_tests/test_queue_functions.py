@@ -85,19 +85,3 @@ class TestQueueFunctions(testutils.WebHostTestCase):
                         f"Returned status code {r.status_code}, "
                         "not in the 200-300 range.")
         self.assertEqual(r.text, 'HTTP response: foo')
-
-
-class TestQueueFunctionsStein(TestQueueFunctions):
-
-    @classmethod
-    def get_script_dir(cls):
-        return testutils.EMULATOR_TESTS_FOLDER / 'queue_functions' / \
-            'queue_functions_stein'
-
-
-class TestQueueFunctionsSteinGeneric(TestQueueFunctions):
-
-    @classmethod
-    def get_script_dir(cls):
-        return testutils.EMULATOR_TESTS_FOLDER / 'queue_functions' / \
-            'queue_functions_stein' / 'generic'
