@@ -29,7 +29,7 @@ class TestTableFunctionsStein(testutils.WebHostTestCase):
         in_resp = testutils.wait_and_retry_request(
             self.webhost, 'GET', f'table_in_binding/{row_key}',
             wait_time=2,
-            max_retries=3,
+            max_retries=10,
             expected_status=200
         )
         

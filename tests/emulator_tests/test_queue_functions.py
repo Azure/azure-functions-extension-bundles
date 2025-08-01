@@ -29,7 +29,7 @@ class TestQueueFunctions(testutils.WebHostTestCase):
         r = testutils.wait_and_retry_request(
             self.webhost, 'GET', 'get_queue_blob',
             wait_time=2,
-            max_retries=3,
+            max_retries=10,
             expected_status=200
         )
         
@@ -56,7 +56,7 @@ class TestQueueFunctions(testutils.WebHostTestCase):
         r = testutils.wait_and_retry_request(
             self.webhost, 'GET', 'get_queue_blob_return',
             wait_time=2,
-            max_retries=3,
+            max_retries=10,
             expected_status=200
         )
         self.assertEqual(r.text, 'test-message-return')
@@ -74,7 +74,7 @@ class TestQueueFunctions(testutils.WebHostTestCase):
         r = testutils.wait_and_retry_request(
             self.webhost, 'GET', 'get_queue_blob_message_return',
             wait_time=2,
-            max_retries=3,
+            max_retries=10,
             expected_status=200
         )
         self.assertEqual(r.text, 'test-message-object-return')

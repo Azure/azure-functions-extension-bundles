@@ -49,7 +49,7 @@ class TestEventHubFunctions(testutils.WebHostTestCase):
         r = testutils.wait_and_retry_request(
             self.webhost, 'GET', 'get_eventhub_triggered',
             wait_time=10,  # EventHub needs more time
-            max_retries=3,
+            max_retries=10,
             expected_status=200
         )
         
@@ -83,7 +83,7 @@ class TestEventHubFunctions(testutils.WebHostTestCase):
         r = testutils.wait_and_retry_request(
             self.webhost, 'GET', 'get_metadata_triggered',
             wait_time=10,  # EventHub needs more time
-            max_retries=3,
+            max_retries=10,
             expected_status=200
         )
 

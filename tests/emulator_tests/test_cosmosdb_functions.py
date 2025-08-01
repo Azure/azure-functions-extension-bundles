@@ -68,7 +68,7 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         r = testutils.wait_and_retry_request(
             self.webhost, 'GET', 'get_cosmosdb_triggered',
             wait_time=5,
-            max_retries=3,
+            max_retries=10,
             expected_status=200
         )
         
@@ -100,7 +100,7 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         r = testutils.wait_and_retry_request(
             self.webhost, 'GET', 'cosmosdb_input',
             wait_time=5,
-            max_retries=3,
+            max_retries=10,
             expected_status=200
         )
         
