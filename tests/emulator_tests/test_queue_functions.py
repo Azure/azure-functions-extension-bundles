@@ -80,14 +80,18 @@ class TestQueueFunctions(testutils.WebHostTestCase):
         self.assertEqual(r.text, 'test-message-object-return')
 
     def test_queue_untyped_return(self):
-        r = self.webhost.request('POST', 'put_queue_untyped_return',
-                                 data='test-untyped-return')
-        self.assertEqual(r.status_code, 200)
+        r = testutils.make_request_with_retry(
+            self.webhost, 'POST', 'put_queue_untyped_return',
+            data='test-untyped-return',
+            expected_status=200
+        )
 
-        # wait for queue_trigger to process the queue item
-        time.sleep(1)
-
-        r = self.webhost.request('GET', 'get_queue_untyped_blob_return')
+        r = testutils.wait_and_retry_request(
+            self.webhost, 'GET', 'get_queue_untyped_blob_return',
+            wait_time=2,
+            max_retries=10,
+            expected_status=200
+        )
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.text, 'test-untyped-return')
 
