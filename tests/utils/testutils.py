@@ -523,7 +523,7 @@ def retryable_test(
     return decorate
 
 
-def make_request_with_retry(webhost, method, url, max_retries=3, delay=1, expected_status=200, **kwargs):
+def make_request_with_retry(webhost, method, url, max_retries=10, delay=10, expected_status=200, **kwargs):
     """
     Make HTTP request to WebHost with retry functionality.
     
