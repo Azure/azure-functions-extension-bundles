@@ -521,3 +521,102 @@ def retryable_test(
         return call
 
     return decorate
+
+
+def make_request_with_retry(webhost, method, url, max_retries=3, delay=1, expected_status=200, **kwargs):
+    """
+    Make HTTP request to WebHost with retry functionality.
+    
+    Args:
+        webhost: WebHostTestCase webhost instance
+        method: HTTP method ('GET', 'POST', etc.)
+        url: Request URL
+        max_retries: Maximum number of retries (default: 3)
+        delay: Delay between retries in seconds (default: 1)
+        expected_status: Expected status code (default: 200)
+        **kwargs: Additional parameters passed to requests.request
+    
+    Returns:
+        requests.Response: Successful response
+        
+    Raises:
+        AssertionError: If all retries fail
+    """
+    last_response = None
+    last_error = None
+    
+    for attempt in range(max_retries + 1):
+        try:
+            logging.info(f"Making {method} request to {url} (attempt {attempt + 1}/{max_retries + 1})")
+            response = webhost.request(method, url, **kwargs)
+            
+            # Handle None response
+            if response is None:
+                last_error = f"Response is None for {method} {url}"
+                logging.warning(f"Attempt {attempt + 1}: {last_error}")
+                if attempt < max_retries:
+                    time.sleep(delay)
+                    continue
+                else:
+                    break
+            
+            last_response = response
+            
+            # Log response details
+            logging.info(f"Response status: {response.status_code}")
+            logging.info(f"Response headers: {dict(response.headers)}")
+            logging.info(f"Response text (first 500 chars): {response.text[:500]}")
+            
+            # Success if expected status code
+            if response.status_code == expected_status:
+                logging.info(f"Request successful on attempt {attempt + 1}")
+                return response
+            
+            # Handle error status
+            last_error = f"Unexpected status code {response.status_code} for {method} {url}. Response: {response.text[:500]}"
+            logging.warning(f"Attempt {attempt + 1}: {last_error}")
+            
+        except Exception as e:
+            last_error = f"Exception during {method} {url}: {str(e)}"
+            logging.warning(f"Attempt {attempt + 1}: {last_error}")
+        
+        # Wait before retry (except on last attempt)
+        if attempt < max_retries:
+            logging.info(f"Waiting {delay} seconds before retry...")
+            time.sleep(delay)
+    
+    # All retries failed
+    error_msg = f"Request failed after {max_retries + 1} attempts. Last error: {last_error}"
+    if last_response is not None:
+        error_msg += f"\nLast response status: {last_response.status_code}"
+        error_msg += f"\nLast response text: {last_response.text}"
+    
+    logging.error(error_msg)
+    raise AssertionError(error_msg)
+
+
+def wait_and_retry_request(webhost, method, url, wait_time=5, max_retries=3, expected_status=200, **kwargs):
+    """
+    Wait for a period then make HTTP request with retry functionality (for trigger waiting).
+    
+    Args:
+        webhost: WebHostTestCase webhost instance  
+        method: HTTP method
+        url: Request URL
+        wait_time: Initial wait time in seconds (default: 5)
+        max_retries: Maximum number of retries (default: 3)
+        expected_status: Expected status code (default: 200)
+        **kwargs: Additional parameters passed to requests.request
+    
+    Returns:
+        requests.Response: Successful response
+    """
+    logging.info(f"Waiting {wait_time} seconds for trigger to execute...")
+    time.sleep(wait_time)
+    
+    return make_request_with_retry(
+        webhost, method, url, 
+        max_retries=max_retries, 
+        expected_status=expected_status, 
+        **kwargs
+    )

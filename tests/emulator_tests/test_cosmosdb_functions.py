@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import json
+import logging
 import os
 import time
 
@@ -8,6 +9,8 @@ from azure.cosmos import CosmosClient, PartitionKey
 from unittest import skip
 
 from tests.utils import testutils
+
+logger = logging.getLogger(__name__)
 
 url = os.getenv("CosmosDBEmulatorUrl")
 key = os.getenv("CosmosDBEmulatorKey")
@@ -50,15 +53,25 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         data = str(round(time.time()))
         doc = {'id': 'cosmosdb-trigger-test',
                'data': data}
-        r = self.webhost.request('POST', 'put_document',
-                                 data=json.dumps(doc))
-        self.assertEqual(r.status_code, 200)
+        
+        # Create document in CosmosDB (should succeed immediately)
+        logger.info("Creating document in CosmosDB...")
+        r = testutils.make_request_with_retry(
+            self.webhost, 'POST', 'put_document',
+            data=json.dumps(doc),
+            expected_status=200
+        )
         self.assertEqual(r.text, 'OK')
 
-        time.sleep(5)  # Wait for the trigger to execute
-
-        r = self.webhost.request('GET', 'get_cosmosdb_triggered')
-        self.assertEqual(r.status_code, 200)
+        # Wait for trigger execution then retry request
+        logger.info("Waiting for CosmosDB trigger to execute...")
+        r = testutils.wait_and_retry_request(
+            self.webhost, 'GET', 'get_cosmosdb_triggered',
+            wait_time=5,
+            max_retries=3,
+            expected_status=200
+        )
+        
         response = r.json()
         response.pop('_metadata', None)
 
@@ -73,15 +86,24 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         data = str(round(time.time()))
         doc = {'id': 'cosmosdb-input-test',
                'data': data}
-        r = self.webhost.request('POST', 'put_document',
-                                 data=json.dumps(doc))
-        self.assertEqual(r.status_code, 200)
+        
+        # Create document for input test
+        logger.info("Creating document for input test...")
+        r = testutils.make_request_with_retry(
+            self.webhost, 'POST', 'put_document',
+            data=json.dumps(doc),
+            expected_status=200
+        )
         self.assertEqual(r.text, 'OK')
 
-        time.sleep(5)  # Wait for the trigger to execute
-
-        r = self.webhost.request('GET', 'cosmosdb_input')
-        self.assertEqual(r.status_code, 200)
+        # Test input binding (wait and retry)
+        r = testutils.wait_and_retry_request(
+            self.webhost, 'GET', 'cosmosdb_input',
+            wait_time=5,
+            max_retries=3,
+            expected_status=200
+        )
+        
         response = r.json()
 
         # _lsn is present for cosmosdb change feed only,

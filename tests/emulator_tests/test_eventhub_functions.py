@@ -1,12 +1,15 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import json
+import logging
 import sys
 import time
 
 from unittest import skipIf
 
 from tests.utils import testutils
+
+logger = logging.getLogger(__name__)
 
 
 class TestEventHubFunctions(testutils.WebHostTestCase):
@@ -32,24 +35,24 @@ class TestEventHubFunctions(testutils.WebHostTestCase):
         data = str(round(time.time()))
         doc = {'id': data}
 
-        # Invoke eventhub_output HttpTrigger to generate an Eventhub Event.
-        r = self.webhost.request('POST', 'eventhub_output',
-                                 data=json.dumps(doc))
-        self.assertEqual(r.status_code, 200)
+        # Invoke eventhub_output HttpTrigger to generate an EventHub Event
+        logger.info("Generating EventHub event...")
+        r = testutils.make_request_with_retry(
+            self.webhost, 'POST', 'eventhub_output',
+            data=json.dumps(doc),
+            expected_status=200
+        )
         self.assertEqual(r.text, 'OK')
 
-        # Once the event get generated, allow function host to poll from
-        # EventHub and wait for eventhub_trigger to execute,
-        # converting the event metadata into a blob.
-        time.sleep(5)
-
-        # Call get_eventhub_triggered to retrieve event metadata from blob.
-        r = self.webhost.request('GET', 'get_eventhub_triggered')
-
-        # Waiting for the blob get updated with the latest data from the
-        # eventhub output binding
-        time.sleep(5)
-        self.assertEqual(r.status_code, 200)
+        # Wait for eventhub_trigger to execute and convert event into blob
+        logger.info("Waiting for EventHub trigger to execute...")
+        r = testutils.wait_and_retry_request(
+            self.webhost, 'GET', 'get_eventhub_triggered',
+            wait_time=10,  # EventHub needs more time
+            max_retries=3,
+            expected_status=200
+        )
+        
         response = r.json()
 
         # Check if the event body matches the initial data
@@ -61,31 +64,28 @@ class TestEventHubFunctions(testutils.WebHostTestCase):
     @testutils.retryable_test(3, 5)
     def test_eventhub_trigger_with_metadata(self):
         # Generate a unique event body for EventHub event
-        # Record the start_time and end_time for checking event enqueue time
         random_number = str(round(time.time()) % 1000)
         req_body = {
             'body': random_number
         }
 
-        # Invoke metadata_output HttpTrigger to generate an EventHub event
-        # from azure-eventhub SDK
-        r = self.webhost.request('POST', 'metadata_output',
-                                 data=json.dumps(req_body))
-        self.assertEqual(r.status_code, 200)
+        # Invoke metadata_output HttpTrigger to generate an EventHub event from azure-eventhub SDK
+        logger.info("Generating EventHub event with metadata...")
+        r = testutils.make_request_with_retry(
+            self.webhost, 'POST', 'metadata_output',
+            data=json.dumps(req_body),
+            expected_status=200
+        )
         self.assertIn('OK', r.text)
 
-        # Once the event get generated, allow function host to pool from
-        # EventHub and wait for eventhub_trigger to execute,
-        # converting the event metadata into a blob.
-        time.sleep(5)
-
-        # Call get_metadata_triggered to retrieve event metadata from blob
-        r = self.webhost.request('GET', 'get_metadata_triggered')
-
-        # Waiting for the blob get updated with the latest data from the
-        # eventhub output binding
-        time.sleep(5)
-        self.assertEqual(r.status_code, 200)
+        # Wait for eventhub_trigger to execute and convert event metadata into blob
+        logger.info("Waiting for EventHub metadata trigger to execute...")
+        r = testutils.wait_and_retry_request(
+            self.webhost, 'GET', 'get_metadata_triggered',
+            wait_time=10,  # EventHub needs more time
+            max_retries=3,
+            expected_status=200
+        )
 
         # Check if the event body matches the unique random_number
         event = r.json()

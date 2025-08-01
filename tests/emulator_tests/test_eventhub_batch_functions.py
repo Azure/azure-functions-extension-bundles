@@ -1,6 +1,7 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import json
+import logging
 import sys
 import time
 from datetime import datetime
@@ -8,6 +9,9 @@ from unittest.case import skipIf
 
 from dateutil import parser
 from tests.utils import testutils
+
+logger = logging.getLogger(__name__)
+
 
 class TestEventHubBatchFunctions(testutils.WebHostTestCase):
 
@@ -30,21 +34,27 @@ class TestEventHubBatchFunctions(testutils.WebHostTestCase):
             doc = {'PartitionKey': partition_key, 'RowKey': i}
             docs.append(doc)
 
-        r = self.webhost.request('POST', 'eventhub_output_batch',
-                                 data=json.dumps(docs))
-        self.assertEqual(r.status_code, 200)
+        # Send events to EventHub
+        logger.info("Sending events to EventHub batch...")
+        r = testutils.make_request_with_retry(
+            self.webhost, 'POST', 'eventhub_output_batch',
+            data=json.dumps(docs),
+            expected_status=200
+        )
 
         row_keys = [i for i in range(NUM_EVENTS)]
         seen = [False] * NUM_EVENTS
         row_keys_seen = dict(zip(row_keys, seen))
 
-        # Allow trigger to fire.
-        time.sleep(5)
-
-        r = self.webhost.request(
-            'GET',
-            'get_eventhub_batch_triggered')
-        self.assertEqual(r.status_code, 200)
+        # Wait for trigger to fire and retry request
+        logger.info("Waiting for EventHub batch trigger to execute...")
+        r = testutils.wait_and_retry_request(
+            self.webhost, 'GET', 'get_eventhub_batch_triggered',
+            wait_time=5,
+            max_retries=3,
+            expected_status=200
+        )
+        
         entries = r.json()
         for entry in entries:
             self.assertEqual(entry['PartitionKey'], partition_key)
@@ -67,23 +77,24 @@ class TestEventHubBatchFunctions(testutils.WebHostTestCase):
             'body': random_number
         }
 
-        # Invoke metadata_output HttpTrigger to generate an EventHub event
-        # from azure-eventhub SDK
-        r = self.webhost.request('POST',
-                                 f'metadata_output_batch?count={count}',
-                                 data=json.dumps(req_body))
-        self.assertEqual(r.status_code, 200)
+        # Invoke metadata_output HttpTrigger to generate an EventHub event from azure-eventhub SDK
+        logger.info("Generating EventHub events with metadata...")
+        r = testutils.make_request_with_retry(
+            self.webhost, 'POST', f'metadata_output_batch?count={count}',
+            data=json.dumps(req_body),
+            expected_status=200
+        )
         self.assertIn('OK', r.text)
         end_time = datetime.utcnow()
 
-        # Once the event get generated, allow function host to pool from
-        # EventHub and wait for metadata_multiple to execute,
-        # converting the event metadata into a blob.
-        time.sleep(5)
-
-        # Call get_metadata_batch_triggered to retrieve event metadata
-        r = self.webhost.request('GET', 'get_metadata_batch_triggered')
-        self.assertEqual(r.status_code, 200)
+        # Wait for metadata_multiple trigger to execute and convert event metadata into blob
+        logger.info("Waiting for EventHub metadata trigger to execute...")
+        r = testutils.wait_and_retry_request(
+            self.webhost, 'GET', 'get_metadata_batch_triggered',
+            wait_time=5,
+            max_retries=3,
+            expected_status=200
+        )
 
         # Check metadata and events length, events should be batched processed
         events = r.json()
