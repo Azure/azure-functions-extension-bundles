@@ -129,6 +129,16 @@ jobs:
         artifact: emulator-test-results-$(TEST_GROUP)
 
   steps:
+  # Initial listing for debugging (added)
+  - script: |
+      echo "=== Initial workspace listing ==="
+      pwd
+      ls -al .
+      for d in artifacts bin templatesArtifacts tests; do
+        echo "--- $d ---";
+        ls -al "$d" 2>/dev/null || echo "(missing)"; done
+    displayName: 'Initial Workspace Listing'
+
   # Download prepared artifacts (instead of rebuilding)
   - task: DownloadPipelineArtifact@2
     displayName: 'Download bundle artifacts'
@@ -149,13 +159,19 @@ jobs:
       path: '$(Build.Repository.LocalPath)/templatesArtifacts'
 
   - script: |
+      echo "Listing downloaded directories..."
+      ls -al artifacts || true
+      ls -al bin || true
+      ls -al templatesArtifacts || true
       echo "Checking for downloaded artifacts..."
       if ls artifacts/*.zip 2>/dev/null || ls bin/*/*.zip 2>/dev/null; then
         echo "✓ Extension bundle artifacts downloaded"
+        echo "Artifacts:"
+        ls -1 artifacts/*.zip 2>/dev/null || true
+        ls -1 bin/*/*.zip 2>/dev/null || true
       else
         echo "✗ No extension bundle zip files found"
-        ls -la artifacts || true
-        ls -la bin || true
+        find . -maxdepth 5 -type f -name '*.zip' -print || true
         exit 1
       fi
     displayName: 'Verify Downloaded Artifacts'
@@ -164,8 +180,11 @@ jobs:
   - task: Cache@2
     displayName: 'Cache pip'
     inputs:
-      key: 'pip | "$(Agent.OS)" | 3.12 | $(Build.Repository.LocalPath)/tests/requirements.txt'
-      restoreKeys: 'pip | "$(Agent.OS)"'
+      key: 'pip | $(Agent.OS) | py312 | $(Build.Repository.LocalPath)/tests/requirements.txt'
+      restoreKeys: |
+        pip | $(Agent.OS) | py312
+        pip | $(Agent.OS)
+        pip
       path: '~/.cache/pip'
 
   # Set up Python 3.12 and create virtual environment
@@ -253,8 +272,7 @@ jobs:
         echo "Extension bundle source URI: http://localhost:8000"
       else
         echo "❌ Warning: Mock extension site may not be responding on port 8000"
-        ps aux | grep mock-extension-site
-        netstat -tlnp | grep :8000 || echo "No process listening on port 8000"
+        netstat -tlnp | grep :8000 || true
       fi
     displayName: 'Start Mock Extension Site'
 
@@ -273,18 +291,11 @@ jobs:
       export PYAZURE_WEBHOST_DEBUG=1
       export FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI="http://localhost:8000"
       export MySqlConnectionString="Server=localhost;UserID=root;Password=password;Database=testdb;Port=3307"
-      
-      echo "Running $(DISPLAY_NAME) tests..."
-      echo "Test files: $(TEST_FILES)"
-      echo "Mock extension site URL: $FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI"
-      
-      # Convert TEST_FILES string to array for pytest
       IFS=' ' read -ra FILES <<< "$(TEST_FILES)"
       TEST_PATHS=""
       for file in "${FILES[@]}"; do
         TEST_PATHS="$TEST_PATHS tests/emulator_tests/$file"
       done
-      
       echo "Running pytest with paths: $TEST_PATHS"
       python -m pytest $TEST_PATHS -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results-$(TEST_GROUP).xml
     displayName: 'Run $(DISPLAY_NAME) Tests'
