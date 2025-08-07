@@ -35,11 +35,10 @@ class TestEventHubBatchFunctions(testutils.WebHostTestCase):
 
         # Send events to EventHub
         logger.info("Sending events to EventHub batch...")
-        r = testutils.make_request_with_retry(
-            self.webhost, 'POST', 'eventhub_output_batch',
-            data=json.dumps(docs),
-            expected_status=200
-        )
+        r = self.webhost.request('POST', 'eventhub_output_batch',
+                                data=json.dumps(docs),
+                                max_retries=3,
+                                expected_status=200)
 
         row_keys = [i for i in range(NUM_EVENTS)]
         seen = [False] * NUM_EVENTS
@@ -47,12 +46,10 @@ class TestEventHubBatchFunctions(testutils.WebHostTestCase):
 
         # Wait for trigger to fire and retry request
         logger.info("Waiting for EventHub batch trigger to execute...")
-        r = testutils.wait_and_retry_request(
-            self.webhost, 'GET', 'get_eventhub_batch_triggered',
-            wait_time=5,
-            max_retries=10,
-            expected_status=200
-        )
+        r = self.webhost.wait_and_request('GET', 'get_eventhub_batch_triggered',
+                                         wait_time=5,
+                                         max_retries=10,
+                                         expected_status=200)
         
         entries = r.json()
         for entry in entries:
@@ -75,22 +72,19 @@ class TestEventHubBatchFunctions(testutils.WebHostTestCase):
 
         # Invoke metadata_output HttpTrigger to generate an EventHub event from azure-eventhub SDK
         logger.info("Generating EventHub events with metadata...")
-        r = testutils.make_request_with_retry(
-            self.webhost, 'POST', f'metadata_output_batch?count={count}',
-            data=json.dumps(req_body),
-            expected_status=200
-        )
+        r = self.webhost.request('POST', f'metadata_output_batch?count={count}',
+                                data=json.dumps(req_body),
+                                max_retries=3,
+                                expected_status=200)
         self.assertIn('OK', r.text)
         end_time = datetime.utcnow()
 
         # Wait for metadata_multiple trigger to execute and convert event metadata into blob
         logger.info("Waiting for EventHub metadata trigger to execute...")
-        r = testutils.wait_and_retry_request(
-            self.webhost, 'GET', 'get_metadata_batch_triggered',
-            wait_time=5,
-            max_retries=10,
-            expected_status=200
-        )
+        r = self.webhost.wait_and_request('GET', 'get_metadata_batch_triggered',
+                                         wait_time=5,
+                                         max_retries=10,
+                                         expected_status=200)
 
         # Check metadata and events length, events should be batched processed
         events = r.json()

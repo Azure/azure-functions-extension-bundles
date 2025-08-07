@@ -17,21 +17,18 @@ class TestQueueFunctions(testutils.WebHostTestCase):
     def test_queue_basic(self):
         # Send message to queue
         logger.info("Sending message to queue...")
-        r = testutils.make_request_with_retry(
-            self.webhost, 'POST', 'put_queue',
-            data='test-message',
-            expected_status=200
-        )
+        r = self.webhost.request('POST', 'put_queue',
+                                data='test-message',
+                                max_retries=3,
+                                expected_status=200)
         self.assertEqual(r.text, 'OK')
 
         # Wait for queue_trigger to process the queue item
         logger.info("Waiting for queue trigger to process message...")
-        r = testutils.wait_and_retry_request(
-            self.webhost, 'GET', 'get_queue_blob',
-            wait_time=2,
-            max_retries=10,
-            expected_status=200
-        )
+        r = self.webhost.wait_and_request('GET', 'get_queue_blob',
+                                         wait_time=2,
+                                         max_retries=10,
+                                         expected_status=200)
         
         msg_info = r.json()
 
@@ -46,52 +43,44 @@ class TestQueueFunctions(testutils.WebHostTestCase):
     def test_queue_return(self):
         # Send message with return value test
         logger.info("Testing queue return value...")
-        r = testutils.make_request_with_retry(
-            self.webhost, 'POST', 'put_queue_return',
-            data='test-message-return',
-            expected_status=200
-        )
+        r = self.webhost.request('POST', 'put_queue_return',
+                                data='test-message-return',
+                                max_retries=3,
+                                expected_status=200)
 
         # Wait for queue_trigger to process the queue item
-        r = testutils.wait_and_retry_request(
-            self.webhost, 'GET', 'get_queue_blob_return',
-            wait_time=2,
-            max_retries=10,
-            expected_status=200
-        )
+        r = self.webhost.wait_and_request('GET', 'get_queue_blob_return',
+                                         wait_time=2,
+                                         max_retries=10,
+                                         expected_status=200)
         self.assertEqual(r.text, 'test-message-return')
 
     def test_queue_message_object_return(self):
         # Send message object return test
         logger.info("Testing queue message object return...")
-        r = testutils.make_request_with_retry(
-            self.webhost, 'POST', 'put_queue_message_return',
-            data='test-message-object-return',
-            expected_status=200
-        )
+        r = self.webhost.request('POST', 'put_queue_message_return',
+                                data='test-message-object-return',
+                                max_retries=3,
+                                expected_status=200)
 
         # Wait for queue_trigger to process the queue item
-        r = testutils.wait_and_retry_request(
-            self.webhost, 'GET', 'get_queue_blob_message_return',
-            wait_time=2,
-            max_retries=10,
-            expected_status=200
-        )
+        r = self.webhost.wait_and_request('GET', 'get_queue_blob_message_return',
+                                         wait_time=2,
+                                         max_retries=10,
+                                         expected_status=200)
         self.assertEqual(r.text, 'test-message-object-return')
 
     def test_queue_untyped_return(self):
-        r = testutils.make_request_with_retry(
+        r = self.webhost.request('POST',
             self.webhost, 'POST', 'put_queue_untyped_return',
             data='test-untyped-return',
             expected_status=200
         )
 
-        r = testutils.wait_and_retry_request(
-            self.webhost, 'GET', 'get_queue_untyped_blob_return',
-            wait_time=2,
-            max_retries=10,
-            expected_status=200
-        )
+        r = self.webhost.wait_and_request('GET', 'get_queue_untyped_blob_return',
+                                         wait_time=2,
+                                         max_retries=10,
+                                         expected_status=200)
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.text, 'test-untyped-return')
 

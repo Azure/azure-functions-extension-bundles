@@ -56,21 +56,18 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         
         # Create document in CosmosDB (should succeed immediately)
         logger.info("Creating document in CosmosDB...")
-        r = testutils.make_request_with_retry(
-            self.webhost, 'POST', 'put_document',
-            data=json.dumps(doc),
-            expected_status=200
-        )
+        r = self.webhost.request('POST', 'put_document',
+                                data=json.dumps(doc),
+                                max_retries=3,
+                                expected_status=200)
         self.assertEqual(r.text, 'OK')
 
         # Wait for trigger execution then retry request
         logger.info("Waiting for CosmosDB trigger to execute...")
-        r = testutils.wait_and_retry_request(
-            self.webhost, 'GET', 'get_cosmosdb_triggered',
-            wait_time=5,
-            max_retries=10,
-            expected_status=200
-        )
+        r = self.webhost.wait_and_request('GET', 'get_cosmosdb_triggered',
+                                         wait_time=5,
+                                         max_retries=10,
+                                         expected_status=200)
         
         response = r.json()
         response.pop('_metadata', None)
@@ -89,20 +86,17 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         
         # Create document for input test
         logger.info("Creating document for input test...")
-        r = testutils.make_request_with_retry(
-            self.webhost, 'POST', 'put_document',
-            data=json.dumps(doc),
-            expected_status=200
-        )
+        r = self.webhost.request('POST', 'put_document',
+                                data=json.dumps(doc),
+                                max_retries=3,
+                                expected_status=200)
         self.assertEqual(r.text, 'OK')
 
         # Test input binding (wait and retry)
-        r = testutils.wait_and_retry_request(
-            self.webhost, 'GET', 'cosmosdb_input',
-            wait_time=5,
-            max_retries=10,
-            expected_status=200
-        )
+        r = self.webhost.wait_and_request('GET', 'cosmosdb_input',
+                                         wait_time=5,
+                                         max_retries=10,
+                                         expected_status=200)
         
         response = r.json()
 

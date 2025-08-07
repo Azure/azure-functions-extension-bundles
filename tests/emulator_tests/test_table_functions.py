@@ -18,20 +18,17 @@ class TestTableFunctionsStein(testutils.WebHostTestCase):
     def test_table_bindings(self):
         # Create table entry using output binding
         logger.info("Creating table entry with output binding...")
-        out_resp = testutils.make_request_with_retry(
-            self.webhost, 'POST', 'table_out_binding',
-            expected_status=200
-        )
+        out_resp = self.webhost.request('POST', 'table_out_binding',
+                                       max_retries=3,
+                                       expected_status=200)
         row_key = json.loads(out_resp.text)['RowKey']
 
         # Retrieve table entry using input binding with retry
         logger.info(f"Retrieving table entry with row key: {row_key}")
-        in_resp = testutils.wait_and_retry_request(
-            self.webhost, 'GET', f'table_in_binding/{row_key}',
-            wait_time=2,
-            max_retries=10,
-            expected_status=200
-        )
+        in_resp = self.webhost.wait_and_request('GET', f'table_in_binding/{row_key}',
+                                               wait_time=2,
+                                               max_retries=10,
+                                               expected_status=200)
         
         # Verify the row key is present in the response
         row_key_present = False

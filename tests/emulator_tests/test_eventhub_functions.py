@@ -37,21 +37,18 @@ class TestEventHubFunctions(testutils.WebHostTestCase):
 
         # Invoke eventhub_output HttpTrigger to generate an EventHub Event
         logger.info("Generating EventHub event...")
-        r = testutils.make_request_with_retry(
-            self.webhost, 'POST', 'eventhub_output',
-            data=json.dumps(doc),
-            expected_status=200
-        )
+        r = self.webhost.request('POST', 'eventhub_output',
+                                data=json.dumps(doc),
+                                max_retries=3,
+                                expected_status=200)
         self.assertEqual(r.text, 'OK')
 
         # Wait for eventhub_trigger to execute and convert event into blob
         logger.info("Waiting for EventHub trigger to execute...")
-        r = testutils.wait_and_retry_request(
-            self.webhost, 'GET', 'get_eventhub_triggered',
-            wait_time=10,  # EventHub needs more time
-            max_retries=10,
-            expected_status=200
-        )
+        r = self.webhost.wait_and_request('GET', 'get_eventhub_triggered',
+                                         wait_time=10,  # EventHub needs more time
+                                         max_retries=10,
+                                         expected_status=200)
         
         response = r.json()
 
@@ -71,21 +68,18 @@ class TestEventHubFunctions(testutils.WebHostTestCase):
 
         # Invoke metadata_output HttpTrigger to generate an EventHub event from azure-eventhub SDK
         logger.info("Generating EventHub event with metadata...")
-        r = testutils.make_request_with_retry(
-            self.webhost, 'POST', 'metadata_output',
-            data=json.dumps(req_body),
-            expected_status=200
-        )
+        r = self.webhost.request('POST', 'metadata_output',
+                                data=json.dumps(req_body),
+                                max_retries=3,
+                                expected_status=200)
         self.assertIn('OK', r.text)
 
         # Wait for eventhub_trigger to execute and convert event metadata into blob
         logger.info("Waiting for EventHub metadata trigger to execute...")
-        r = testutils.wait_and_retry_request(
-            self.webhost, 'GET', 'get_metadata_triggered',
-            wait_time=10,  # EventHub needs more time
-            max_retries=10,
-            expected_status=200
-        )
+        r = self.webhost.wait_and_request('GET', 'get_metadata_triggered',
+                                         wait_time=10,  # EventHub needs more time
+                                         max_retries=10,
+                                         expected_status=200)
 
         # Check if the event body matches the unique random_number
         event = r.json()

@@ -21,21 +21,18 @@ class TestServiceBusFunctions(testutils.WebHostTestCase):
         
         # Send message to Service Bus queue
         logger.info("Sending message to Service Bus queue...")
-        r = testutils.make_request_with_retry(
-            self.webhost, 'POST', 'put_message',
-            data=data,
-            expected_status=200
-        )
+        r = self.webhost.request('POST', 'put_message',
+                                data=data,
+                                max_retries=3,
+                                expected_status=200)
         self.assertEqual(r.text, 'OK')
 
         # Wait for Service Bus trigger to process the message with extended retry
         logger.info("Waiting for Service Bus trigger to process message...")
-        r = testutils.wait_and_retry_request(
-            self.webhost, 'GET', 'get_servicebus_triggered',
-            wait_time=3,
-            max_retries=10,  # Service Bus may need more retries
-            expected_status=200
-        )
+        r = self.webhost.wait_and_request('GET', 'get_servicebus_triggered',
+                                         wait_time=3,
+                                         max_retries=10,  # Service Bus may need more retries
+                                         expected_status=200)
         
         msg = r.json()
         self.assertEqual(msg['body'], data)
