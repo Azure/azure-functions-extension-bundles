@@ -19,6 +19,21 @@ jobs:
     name: ${{ parameters.poolName }}
     image: 1es-ubuntu-22.04
     os: linux
+  # 1ES-compliant artifact publication via templateContext.outputs
+  templateContext:
+    outputs:
+      - output: pipelineArtifact
+        displayName: Publish bundle artifacts
+        path: $(Build.Repository.LocalPath)/artifacts
+        artifact: bundle-artifacts
+      - output: pipelineArtifact
+        displayName: Publish bundle bin
+        path: $(Build.Repository.LocalPath)/bin
+        artifact: bundle-bin
+      - output: pipelineArtifact
+        displayName: Publish templates artifacts
+        path: $(Build.Repository.LocalPath)/templatesArtifacts
+        artifact: templates-artifacts
 
   steps:
   # Download template artifacts for the build
@@ -68,28 +83,6 @@ jobs:
       fi
     displayName: 'Verify Build Artifacts'
 
-  # Publish artifacts for matrix jobs
-  - task: PublishPipelineArtifact@1
-    displayName: 'Publish bundle artifacts'
-    inputs:
-      targetPath: '$(Build.Repository.LocalPath)/artifacts'
-      artifact: 'bundle-artifacts'
-      publishLocation: 'pipeline'
-
-  - task: PublishPipelineArtifact@1
-    displayName: 'Publish bundle bin'
-    inputs:
-      targetPath: '$(Build.Repository.LocalPath)/bin'
-      artifact: 'bundle-bin'
-      publishLocation: 'pipeline'
-
-  - task: PublishPipelineArtifact@1
-    displayName: 'Publish templates artifacts'
-    inputs:
-      targetPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
-      artifact: 'templates-artifacts'
-      publishLocation: 'pipeline'
-
 # Matrix job now depends on the preparation job and reuses its artifacts
 - job: EmulatorTests
   displayName: Run Emulator Tests
@@ -130,10 +123,10 @@ jobs:
   templateContext:
     outputParentDirectory: $(Build.ArtifactStagingDirectory)
     outputs:
-    - output: pipelineArtifact
-      displayName: Publish emulator test artifacts for $(TEST_GROUP)
-      path: $(Build.ArtifactStagingDirectory)
-      artifact: emulator-test-results-$(TEST_GROUP)
+      - output: pipelineArtifact
+        displayName: Publish emulator test artifacts for $(TEST_GROUP)
+        path: $(Build.ArtifactStagingDirectory)
+        artifact: emulator-test-results-$(TEST_GROUP)
 
   steps:
   # Download prepared artifacts (instead of rebuilding)
@@ -188,8 +181,8 @@ jobs:
       python -m venv venv
       source venv/bin/activate
       pip install --upgrade pip
-      pip install -r requirements.txt
-    displayName: 'Install Python Dependencies'
+      pip install --cache-dir ~/.cache/pip -r requirements.txt
+    displayName: 'Install Python Dependencies (cached)'
 
   # Start base emulators (Azurite + EventHub) - Required for ALL test groups
   - script: |
