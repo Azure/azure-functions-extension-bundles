@@ -176,17 +176,6 @@ jobs:
       fi
     displayName: 'Verify Downloaded Artifacts'
 
-  # Cache pip downloads between matrix jobs
-  - task: Cache@2
-    displayName: 'Cache pip'
-    inputs:
-      key: 'pip | $(Agent.OS) | py312 | $(Build.Repository.LocalPath)/tests/requirements.txt'
-      restoreKeys: |
-        pip | $(Agent.OS) | py312
-        pip | $(Agent.OS)
-        pip
-      path: '~/.cache/pip'
-
   # Set up Python 3.12 and create virtual environment
   - task: UsePythonVersion@0
     inputs:
