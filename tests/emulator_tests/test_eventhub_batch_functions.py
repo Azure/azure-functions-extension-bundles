@@ -59,7 +59,6 @@ class TestEventHubBatchFunctions(testutils.WebHostTestCase):
 
         self.assertDictEqual(all_row_keys_seen, row_keys_seen)
 
-    @testutils.retryable_test(3, 5)
     def test_eventhub_multiple_with_metadata(self):
         # Generate a unique event body for EventHub event
         # Record the start_time and end_time for checking event enqueue time
