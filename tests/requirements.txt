@@ -10,5 +10,4 @@ azure-eventhub
 python-dateutil~=2.9.0
 
 # Additional utilities
-coverage
 python-dotenv

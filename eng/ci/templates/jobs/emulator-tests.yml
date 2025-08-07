@@ -12,8 +12,88 @@ parameters:
     type: string
 
 jobs:
+# New preparation job to build/publish once for all matrix runs
+- job: PrepareEmulatorTestAssets
+  displayName: Prepare Emulator Test Assets (build once)
+  pool:
+    name: ${{ parameters.poolName }}
+    image: 1es-ubuntu-22.04
+    os: linux
+
+  steps:
+  # Download template artifacts for the build
+  # Official templates
+  - task: DownloadBuildArtifacts@1
+    inputs:
+      buildType: 'specific'
+      project: '3f99e810-c336-441f-8892-84983093ad7f'
+      pipeline: '963'
+      buildVersionToDownload: 'latestFromBranch'
+      branchName: 'refs/heads/dev'
+      downloadType: 'single'
+      artifactName: 'drop'
+      downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
+    condition: ${{ parameters.official }}
+
+  # Public templates
+  - task: DownloadBuildArtifacts@1
+    inputs:
+      buildType: 'specific'
+      project: 'ae7e3bf3-d41a-4480-9ac0-b6cf9df9ac24'
+      pipeline: '976'
+      buildVersionToDownload: 'latestFromBranch'
+      branchName: 'refs/heads/dev'
+      downloadType: 'single'
+      artifactName: 'drop'
+      downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
+    condition: ${{ eq(parameters.official, false) }}
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build Linux Bundle (once)'
+    inputs:
+      command: 'run'
+      workingDirectory: './build'
+      arguments: 'PackageNetCoreV3BundlesLinux'
+    env:
+      BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
+      TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
+
+  - script: |
+      echo "Checking for build artifacts..."
+      if ls artifacts/*.zip 2>/dev/null || ls bin/*/*.zip 2>/dev/null; then
+        echo "✓ Extension bundle artifacts found"
+      else
+        echo "✗ No extension bundle zip files found anywhere"
+        exit 1
+      fi
+    displayName: 'Verify Build Artifacts'
+
+  # Publish artifacts for matrix jobs
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish bundle artifacts'
+    inputs:
+      targetPath: '$(Build.Repository.LocalPath)/artifacts'
+      artifact: 'bundle-artifacts'
+      publishLocation: 'pipeline'
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish bundle bin'
+    inputs:
+      targetPath: '$(Build.Repository.LocalPath)/bin'
+      artifact: 'bundle-bin'
+      publishLocation: 'pipeline'
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish templates artifacts'
+    inputs:
+      targetPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
+      artifact: 'templates-artifacts'
+      publishLocation: 'pipeline'
+
+# Matrix job now depends on the preparation job and reuses its artifacts
 - job: EmulatorTests
   displayName: Run Emulator Tests
+  dependsOn: PrepareEmulatorTestAssets
   pool:
     name: ${{ parameters.poolName }}
     image: 1es-ubuntu-22.04
@@ -56,59 +136,66 @@ jobs:
       artifact: emulator-test-results-$(TEST_GROUP)
 
   steps:
-  # Download template artifacts for the build
-  # Official templates
-  - task: DownloadBuildArtifacts@1
+  # Download prepared artifacts (instead of rebuilding)
+  - task: DownloadPipelineArtifact@2
+    displayName: 'Download bundle artifacts'
     inputs:
-      buildType: 'specific'
-      project: '3f99e810-c336-441f-8892-84983093ad7f'
-      pipeline: '963'
-      buildVersionToDownload: 'latestFromBranch'
-      branchName: 'refs/heads/dev'
-      downloadType: 'single'
-      artifactName: 'drop'
-      downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
-    condition: ${{ parameters.official }}
+      artifact: 'bundle-artifacts'
+      path: '$(Build.Repository.LocalPath)/artifacts'
 
-  # Public templates
-  - task: DownloadBuildArtifacts@1
+  - task: DownloadPipelineArtifact@2
+    displayName: 'Download bundle bin'
     inputs:
-      buildType: 'specific'
-      project: 'ae7e3bf3-d41a-4480-9ac0-b6cf9df9ac24'
-      pipeline: '976'
-      buildVersionToDownload: 'latestFromBranch'
-      branchName: 'refs/heads/dev'
-      downloadType: 'single'
-      artifactName: 'drop'
-      downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
-    condition: ${{ eq(parameters.official, false) }}
+      artifact: 'bundle-bin'
+      path: '$(Build.Repository.LocalPath)/bin'
 
-  # Build the Linux bundle first (shared by all matrix jobs)
-  - task: DotNetCoreCLI@2
-    displayName: 'Build Linux Bundle for $(DISPLAY_NAME)'
+  - task: DownloadPipelineArtifact@2
+    displayName: 'Download templates artifacts'
     inputs:
-      command: 'run'
-      workingDirectory: './build'
-      arguments: 'PackageNetCoreV3BundlesLinux'
-    env:
-      BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
-      TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
+      artifact: 'templates-artifacts'
+      path: '$(Build.Repository.LocalPath)/templatesArtifacts'
 
-  # Verify build artifacts exist
   - script: |
-      echo "Checking for build artifacts..."
+      echo "Checking for downloaded artifacts..."
       if ls artifacts/*.zip 2>/dev/null || ls bin/*/*.zip 2>/dev/null; then
-        echo "✓ Extension bundle artifacts found"
+        echo "✓ Extension bundle artifacts downloaded"
       else
-        echo "✗ No extension bundle zip files found anywhere"
+        echo "✗ No extension bundle zip files found"
+        ls -la artifacts || true
+        ls -la bin || true
         exit 1
       fi
-    displayName: 'Verify Build Artifacts'
+    displayName: 'Verify Downloaded Artifacts'
+
+  # Cache pip downloads between matrix jobs
+  - task: Cache@2
+    displayName: 'Cache pip'
+    inputs:
+      key: 'pip | "$(Agent.OS)" | 3.12 | $(Build.Repository.LocalPath)/tests/requirements.txt'
+      restoreKeys: 'pip | "$(Agent.OS)"'
+      path: '~/.cache/pip'
+
+  # Set up Python 3.12 and create virtual environment
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '3.12'
+      addToPath: true
+      architecture: 'x64'
+    displayName: 'Set up Python 3.12'
+
+  - script: |
+      cd tests
+      python -m venv venv
+      source venv/bin/activate
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    displayName: 'Install Python Dependencies'
 
   # Start base emulators (Azurite + EventHub) - Required for ALL test groups
   - script: |
       echo "Starting base emulators (Azurite + EventHub) for $(DISPLAY_NAME)..."
       cd tests/emulator_tests/utils/eventhub
+      docker compose pull
       docker compose up -d
       echo "Waiting for base emulator services to start..."
       sleep 30
@@ -153,22 +240,6 @@ jobs:
     displayName: 'Start Additional Emulators'
     env:
       AzureWebJobsSQLPassword: $(AzureWebJobsSQLPassword)
-
-  # Set up Python 3.12 and create virtual environment
-  - task: UsePythonVersion@0
-    inputs:
-      versionSpec: '3.12'
-      addToPath: true
-      architecture: 'x64'
-    displayName: 'Set up Python 3.12'
-
-  - script: |
-      cd tests
-      python -m venv venv
-      source venv/bin/activate
-      pip install --upgrade pip
-      pip install -r requirements.txt
-    displayName: 'Install Python Dependencies'
 
   # Start mock extension site in background
   - script: |
