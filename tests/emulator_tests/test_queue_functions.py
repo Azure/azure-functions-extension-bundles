@@ -71,9 +71,9 @@ class TestQueueFunctions(testutils.WebHostTestCase):
         self.assertEqual(r.text, 'test-message-object-return')
 
     def test_queue_untyped_return(self):
-        r = self.webhost.request('POST',
-            self.webhost, 'POST', 'put_queue_untyped_return',
+        r = self.webhost.request('POST','put_queue_untyped_return',
             data='test-untyped-return',
+            max_retries=10,
             expected_status=200
         )
 
