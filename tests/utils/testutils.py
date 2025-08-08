@@ -380,17 +380,121 @@ class _WebHostProxy:
             logging.debug(f"Unexpected error in health check: {e}")
             return False
 
-    def request(self, meth, funcname, *args, **kwargs):
-        """Make a request to a function in the host."""
+    def request(self, meth, funcname, *args, max_retries=0, retry_delay=1, expected_status=None, **kwargs):
+        """Make a request to a function in the host with optional retry functionality.
+        
+        Args:
+            meth: HTTP method ('GET', 'POST', etc.)
+            funcname: Function name to call
+            *args: Positional arguments passed to requests method
+            max_retries: Maximum number of retries (default: 0 for original behavior)
+            retry_delay: Delay between retries in seconds (default: 1)
+            expected_status: Expected status code for success (default: None for any 2xx)
+            **kwargs: Keyword arguments passed to requests method
+            
+        Returns:
+            requests.Response: Response object
+            
+        Raises:
+            requests.exceptions.RequestException: If retries are enabled and all attempts fail
+        """
         import requests  # Import here to avoid global import issues
         request_method = getattr(requests, meth.lower())
         params = dict(kwargs.pop('params', {}))
         no_prefix = kwargs.pop('no_prefix', False)
+        
+        # Remove retry parameters from kwargs to avoid passing them to requests
+        max_retries = kwargs.pop('max_retries', max_retries)
+        retry_delay = kwargs.pop('retry_delay', retry_delay) 
+        expected_status = kwargs.pop('expected_status', expected_status)
+        
         if 'code' not in params:
             params['code'] = 'testFunctionKey'
 
         url = self._addr + ('/' if no_prefix else '/api/') + funcname
-        return request_method(url, *args, params=params, **kwargs)
+        
+        # If no retries requested, use original behavior
+        if max_retries <= 0:
+            return request_method(url, *args, params=params, **kwargs)
+        
+        # Retry logic with detailed logging
+        last_response = None
+        last_error = None
+        
+        for attempt in range(max_retries + 1):
+            try:
+                logging.info(f"Making {meth.upper()} request to {funcname} (attempt {attempt + 1}/{max_retries + 1})")
+                response = request_method(url, *args, params=params, **kwargs)
+                
+                # Handle None response (shouldn't happen with requests, but safety check)
+                if response is None:
+                    last_error = f"Response is None for {meth.upper()} {funcname}"
+                    logging.warning(f"Attempt {attempt + 1}: {last_error}")
+                    if attempt < max_retries:
+                        time.sleep(retry_delay)
+                        continue
+                    else:
+                        break
+                
+                last_response = response
+                
+                # Log response details
+                logging.info(f"Response status: {response.status_code}")
+                logging.info(f"Response headers: {dict(response.headers)}")
+                logging.info(f"Response text (first 500 chars): {response.text[:500]}")
+                
+                # Success condition
+                if expected_status is not None:
+                    # Check for specific status code
+                    if response.status_code == expected_status:
+                        logging.info(f"Request successful on attempt {attempt + 1}")
+                        return response
+                    last_error = f"Unexpected status code {response.status_code} for {meth.upper()} {funcname}. Expected: {expected_status}. Response: {response.text[:500]}"
+                else:
+                    # Check for any 2xx status code
+                    if 200 <= response.status_code < 300:
+                        logging.info(f"Request successful on attempt {attempt + 1}")
+                        return response
+                    last_error = f"Unexpected status code {response.status_code} for {meth.upper()} {funcname}. Response: {response.text[:500]}"
+                
+                logging.warning(f"Attempt {attempt + 1}: {last_error}")
+                
+            except Exception as e:
+                last_error = f"Exception during {meth.upper()} {funcname}: {str(e)}"
+                logging.warning(f"Attempt {attempt + 1}: {last_error}")
+            
+            # Wait before retry (except on last attempt)
+            if attempt < max_retries:
+                logging.info(f"Waiting {retry_delay} seconds before retry...")
+                time.sleep(retry_delay)
+        
+        # All retries failed - raise exception
+        error_msg = f"Request failed after {max_retries + 1} attempts. Last error: {last_error}"
+        if last_response is not None:
+            error_msg += f"\nLast response status: {last_response.status_code}"
+            error_msg += f"\nLast response text: {last_response.text}"
+        
+        logging.error(error_msg)
+        raise requests.exceptions.RequestException(error_msg)
+
+    def request_with_retry(self, meth, funcname, *args, max_retries=3, retry_delay=1, expected_status=200, **kwargs):
+        """Convenience method for making requests with retry."""
+        return self.request(meth, funcname, *args, 
+                           max_retries=max_retries, 
+                           retry_delay=retry_delay, 
+                           expected_status=expected_status, 
+                           **kwargs)
+
+    def wait_and_request(self, meth, funcname, *args, wait_time=5, max_retries=3, retry_delay=1, expected_status=200, **kwargs):
+        """Wait for a period then make request with retry (for trigger waiting)."""
+        logging.info(f"Waiting {wait_time} seconds for trigger to execute...")
+        time.sleep(wait_time)
+        
+        return self.request(meth, funcname, *args,
+                           max_retries=max_retries,
+                           retry_delay=retry_delay, 
+                           expected_status=expected_status,
+                           **kwargs)
 
     def close(self):
         """Terminate the Function host process."""
