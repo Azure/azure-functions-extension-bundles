@@ -204,10 +204,10 @@ According to the emulator you want to run configure following.
 
 ```
 $env:AzureWebJobsEventHubConnectionString = "<Find the value on the official doc>"
-$env:AzureWebJobsCosmosDBConnectionString = "<Find the value on the official doc>"
+$env:AzureWebJobsCosmosDBConnectionString = "<Find the value on the official doc with replacing https to http>"
 $env:CosmosDBEmulatorUrl = "<Find the value on the official doc>"
 $env:CosmosDBEmulatorKey = "<Find the value on the official doc>"
-$env:AzureWebJobsServiceBusConnectionString = "<Find the value on the official doc with replacing https to http>"
+$env:AzureWebJobsServiceBusConnectionString = "<Find the value on the official doc>"
 $env:AzureWebJobsSQLPassword = "<AnyPassword is fine>"
 
 ```
