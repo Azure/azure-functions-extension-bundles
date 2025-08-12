@@ -244,5 +244,15 @@
       "MySql",
       "MySqlTrigger"
     ]
+  },
+  {
+    "id": "Microsoft.Azure.WebJobs.Extensions.Fabric",
+    "majorVersion": "1",
+    "name": "Startup",
+    "bindings": [
+      "FabricItem",
+      "UdfProperty",
+      "UserDataFunctionContext"
+    ]
   }
 ]
