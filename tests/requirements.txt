@@ -8,6 +8,7 @@ azure-functions
 azure-cosmos
 azure-eventhub
 python-dateutil~=2.9.0
+fabric-user-data-functions
 
 # Additional utilities
 python-dotenv
