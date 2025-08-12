@@ -279,7 +279,8 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         'FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI': os.environ.get('FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI', DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI),
         "MySqlConnectionString": os.environ.get('MySqlConnectionString', DEFAULT_MYSQL_CONNECTION_STRING),
         "PYTHON_ISOLATE_WORKER_DEPENDENCIES": os.environ.get('PYTHON_ISOLATE_WORKER_DEPENDENCIES', DEFAULT_PYTHON_ISOLATE_WORKER_DEPENDENCIES),
-        "WEBSITE_SITE_NAME": MYSQL_WEBSITE_SITE_NAME
+        "WEBSITE_SITE_NAME": MYSQL_WEBSITE_SITE_NAME,
+        "PYTHON_ENABLE_WORKER_EXTENSIONS": '1'
     }  # Add connection strings from config
     if testconfig and 'azure' in testconfig:
         for key in ['storage_key', 'cosmosdb_key', 'eventhub_key', 
