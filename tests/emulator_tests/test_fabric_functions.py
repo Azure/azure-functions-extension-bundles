@@ -12,7 +12,7 @@ class TestFabricFunctions(testutils.WebHostTestCase):
 
     @classmethod
     def get_script_dir(cls):
-        return testutils.EMULATOR_TESTS_FOLDER / 'fabric_functions' 
+        return testutils.EMULATOR_TESTS_FOLDER / 'fabric_functions'
 
     def test_fabric_hello_world(self):
         """
