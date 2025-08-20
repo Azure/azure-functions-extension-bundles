@@ -46,7 +46,7 @@ def _get_bundle_config():
         print(f"[DEBUG] Path exists: {bundle_config_path.exists()}")
         
     try:
-        with open(bundle_config_path, 'r') as f:
+        with open(bundle_config_path, 'r', encoding='utf-8-sig') as f:
             config = json.load(f)
             
             # Debug: Print the loaded config
