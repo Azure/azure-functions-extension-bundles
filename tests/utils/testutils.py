@@ -64,7 +64,7 @@ def _get_bundle_config():
         return {
             'bundleId': 'Microsoft.Azure.Functions.ExtensionBundle',
             'bundleVersion': '4.25.0',
-            'isPreviewBundle': False
+            'isExperimentalBundle': False
         }
 
 

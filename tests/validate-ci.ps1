@@ -76,7 +76,8 @@ try {
     Write-Host "Bundle ID: $($bundleConfig.bundleId)" -ForegroundColor White
     Write-Host "Bundle Version: $($bundleConfig.bundleVersion)" -ForegroundColor White
     Write-Host "Is Preview: $($bundleConfig.isPreviewBundle)" -ForegroundColor White
-    
+    Write-Host "Is Experimental: $($bundleConfig.isExperimentalBundle)" -ForegroundColor White
+
     $requiredKeys = @("bundleId", "bundleVersion")
     $missingKeys = $requiredKeys | Where-Object { -not $bundleConfig.PSObject.Properties.Name.Contains($_) }
     
@@ -133,6 +134,7 @@ Write-Host "The CI pipeline will run emulator tests automatically on:" -Foregrou
 Write-Host "- All pull requests" -ForegroundColor White
 Write-Host "- Main branch builds" -ForegroundColor White
 Write-Host "- Preview branch builds" -ForegroundColor White
+Write-Host "- Experimental branch builds" -ForegroundColor White
 Write-Host ""
 Write-Host "Key CI environment variables:" -ForegroundColor Cyan
 Write-Host "- FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI=http://localhost:8000" -ForegroundColor White

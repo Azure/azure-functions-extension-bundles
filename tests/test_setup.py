@@ -187,6 +187,12 @@ def _extract_version_from_filename(filename):
     if match:
         return match.group(1)
     
+    # Try experimental pattern
+    experimental_pattern = r'Microsoft\.Azure\.Functions\.ExtensionBundle\.Experimental\.(\d+\.\d+\.\d+)_.*\.zip'
+    match = re.match(experimental_pattern, filename)
+    if match:
+        return match.group(1)
+    
     # Try regular pattern
     regular_pattern = r'Microsoft\.Azure\.Functions\.ExtensionBundle\.(\d+\.\d+\.\d+)_.*\.zip'
     match = re.match(regular_pattern, filename)
@@ -200,11 +206,16 @@ def _is_preview_bundle(filename):
     """Check if the filename is a preview bundle."""
     return 'Preview' in filename
 
+def _is_experimental_bundle(filename):
+    """Check if the filename is an experimental bundle."""
+    return 'Experimental' in filename
 
 def _get_bundle_id(filename):
     """Get the bundle ID from filename."""
     if _is_preview_bundle(filename):
         return "Microsoft.Azure.Functions.ExtensionBundle.Preview"
+    elif _is_experimental_bundle(filename):
+        return "Microsoft.Azure.Functions.ExtensionBundle.Experimental"
     else:
         return "Microsoft.Azure.Functions.ExtensionBundle"
 
@@ -228,7 +239,8 @@ def _setup_extension_bundle_structure(temp_dir, artifacts_dir):
     # Group files by bundle type and version
     bundle_groups = {
         "Microsoft.Azure.Functions.ExtensionBundle": {},
-        "Microsoft.Azure.Functions.ExtensionBundle.Preview": {}
+        "Microsoft.Azure.Functions.ExtensionBundle.Preview": {},
+        "Microsoft.Azure.Functions.ExtensionBundle.Experimental": {}
     }
     
     for file_path in bundle_files:
@@ -355,8 +367,8 @@ def mock_extension_site(c, port=3000, artifacts_dir=None, keep_alive=False):
         print(f"Base URL: http://localhost:{server.server_port}")
         
         # Show index URLs and example download URLs for both bundle types
-        bundle_types = ["Microsoft.Azure.Functions.ExtensionBundle", "Microsoft.Azure.Functions.ExtensionBundle.Preview"]
-        
+        bundle_types = ["Microsoft.Azure.Functions.ExtensionBundle", "Microsoft.Azure.Functions.ExtensionBundle.Preview", "Microsoft.Azure.Functions.ExtensionBundle.Experimental"]
+
         for bundle_id in bundle_types:
             bundle_dir = mock_dir / "ExtensionBundles" / bundle_id
             index_file = bundle_dir / "index.json"
