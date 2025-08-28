@@ -19,10 +19,6 @@ pr:
       - main-experimental
       - main-v2
       - main-v3
-      - release/v2.x
-      - release/v3.x
-      - release/v4.x
-      - release/v4.x-preview
 
 schedules:
   # Ensure we build nightly to catch any new CVEs and report SDL often.
@@ -67,3 +63,11 @@ extends:
           - template: eng/ci/templates/jobs/build.yml@self
             parameters:
               official: false
+
+      - stage: EmulatorTests
+        dependsOn: []
+
+        jobs:
+          - template: eng/ci/templates/jobs/emulator-tests.yml@self
+            parameters:
+              poolName: 1es-pool-azfunc-public

@@ -9,7 +9,7 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
     {
         public Fixture()
         {
-            path = "../../../..";
+            path = "../../../../..";
 
             BuildSteps.Clean();
 
