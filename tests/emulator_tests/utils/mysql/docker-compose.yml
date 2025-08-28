@@ -1,0 +1,18 @@
+name: mysql-database
+services:
+  # Service for MySQL Database
+  mysql:
+    container_name: "mysql"
+    image: "mysql:8.0"
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: testdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    networks:
+      - mysql-network
+networks:
+  mysql-network:
+    driver: bridge
