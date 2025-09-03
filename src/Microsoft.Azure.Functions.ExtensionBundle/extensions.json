@@ -1,7 +1,7 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "majorVersion": "5",
+    "version": "5.3.2",
     "name": "AzureStorage",
     "bindings": [
       "blobtrigger",
@@ -12,7 +12,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
-    "majorVersion": "5",
+    "version": "5.3.3",
     "name": "AzureStorageQueues",
     "bindings": [
       "queue",
@@ -21,7 +21,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Tables",
-    "majorVersion": "1",
+    "version": "1.3.2",
     "name": "AzureTables",
     "bindings": [
       "table"
@@ -29,7 +29,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
-    "majorVersion": "5",
+    "version": "5.3.3",
     "name": "AzureStorageBlobs",
     "bindings": [
       "blobtrigger",
@@ -38,7 +38,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-    "majorVersion": "5",
+    "version": "5.16.4",
     "name": "ServiceBus",
     "bindings": [
       "servicebustrigger",
@@ -47,7 +47,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-    "majorVersion": "5",
+    "version": "5.5.0",
     "name": "EventHubs",
     "bindings": [
       "eventhubtrigger",
@@ -56,7 +56,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
-    "majorVersion": "3",
+    "version": "3.0.3",
     "name": "SendGrid",
     "bindings": [
       "sendgrid"
@@ -64,7 +64,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "majorVersion": "2",
+    "version": "2.13.7",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -88,7 +88,7 @@
   },
   {
     "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
-    "majorVersion": "1",
+    "version": "1.5.4",
     "name": "NetheriteProvider",
     "bindings": [
       "activitytrigger",
@@ -100,7 +100,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
-    "majorVersion": "3",
+    "version": "3.4.3",
     "name": "EventGrid",
     "bindings": [
       "eventgridtrigger",
@@ -109,7 +109,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "majorVersion": "4",
+    "version": "4.8.1",
     "name": "CosmosDB",
     "bindings": [
       "cosmosdbtrigger",
@@ -118,7 +118,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
-    "majorVersion": "3",
+    "version": "3.0.2",
     "name": "Twilio",
     "bindings": [
       "twiliosms"
@@ -126,7 +126,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
-    "majorVersion": "1",
+    "version": "1.14.1",
     "name": "SignalR",
     "bindings": [
       "signalr",
@@ -138,7 +138,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
-    "majorVersion": "2",
+    "version": "2.0.3",
     "name": "RabbitMQ",
     "bindings": [
       "rabbitmqtrigger",
@@ -147,7 +147,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Kafka",
-    "majorVersion": "3",
+    "version": "3.9.0",
     "name": "Kafka",
     "bindings": [
       "kafkatrigger",
@@ -156,7 +156,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Sql",
-    "majorVersion": "3",
+    "version": "3.1.284",
     "name": "SqlBinding",
     "bindings": [
       "Sql",
@@ -165,7 +165,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSub",
-    "majorVersion": "1",
+    "version": "1.8.0",
     "name": "WebPubSub",
     "bindings": [
       "webpubsub",
@@ -176,7 +176,7 @@
   },
   {
     "id": "Azure.Storage.Queues",
-    "majorVersion": "12",
+    "version": "12.21.0",
     "name": "AzureStorageQueues",
     "bindings": []
   },
@@ -206,7 +206,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
-    "majorVersion": "1",
+    "version": "1.0.1",
     "name": "Dapr",
     "bindings": [
       "daprBinding",
@@ -221,7 +221,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Redis",
-    "majorVersion": "1",
+    "version": "1.0.0",
     "name": "Redis",
     "bindings": [
       "redisPubSubTrigger",
