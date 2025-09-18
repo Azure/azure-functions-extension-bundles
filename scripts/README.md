@@ -1,4 +1,4 @@
-# Azure Function Apps Bundle Version Checker
+# List Extension Bundle versions for Function Apps in your subscription
 
 This repository contains scripts to check the Extension Bundle configuration and versions for all Azure Function Apps in your subscription.
 
