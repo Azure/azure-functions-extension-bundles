@@ -405,3 +405,13 @@ def mock_extension_site(c, port=3000, artifacts_dir=None, keep_alive=False):
         # Clean up temporary directory
         print(f"Cleaning up temporary directory: {temp_dir}")
         shutil.rmtree(temp_dir, ignore_errors=True)
+
+@task
+def dts_up(c, compose_path=str((ROOT_DIR / 'emulator_tests' / 'utils' / 'dts' / 'docker-compose.yml').resolve())):
+    """Start Durable Task Scheduler emulator via docker compose."""
+    c.run(f"docker compose -f {compose_path} up -d", pty=False)
+
+@task
+def dts_down(c, compose_path=str((ROOT_DIR / 'emulator_tests' / 'utils' / 'dts' / 'docker-compose.yml').resolve())):
+    """Stop Durable Task Scheduler emulator."""
+    c.run(f"docker compose -f {compose_path} down -v", pty=False)

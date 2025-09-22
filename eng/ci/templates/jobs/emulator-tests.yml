@@ -144,6 +144,10 @@ jobs:
           docker compose up -d
           echo "Waiting for mysql service to start..."
           sleep 30
+          cd ../dts
+          docker compose up -d
+          echo "Waiting for DTS emulator to start..."
+          sleep 10
           docker compose ps
         displayName: 'Start Emulator Services'
 
@@ -241,6 +245,8 @@ jobs:
 
           # Stop emulator services
           cd tests/emulator_tests/utils/eventhub
+          docker compose down -v
+          cd ../dts
           docker compose down -v
           echo "Cleanup completed"
         displayName: 'Cleanup Services'
