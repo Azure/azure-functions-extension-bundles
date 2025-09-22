@@ -16,7 +16,7 @@
           "Microsoft.Azure.WebJobs.Extensions.CosmosDB": "4.9.0",
           "Microsoft.Azure.WebJobs.Extensions.Dapr": "0.17.0-preview01",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.4.1",
-          "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged": "0.4.3-alpha",
+          "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged": "1.0.0",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "3.5.0",
           "Microsoft.Azure.WebJobs.Extensions.EventHubs": "6.5.2",
           "Microsoft.Azure.WebJobs.Extensions.Fabric": "1.0.32",
@@ -1324,7 +1324,7 @@
         }
       },
       "Microsoft.Azure.WebJobs.Extensions.DurableTask.Analyzers/0.5.0": {},
-      "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged/0.4.3-alpha": {
+      "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged/1.0.0": {
         "dependencies": {
           "Azure.Core": "1.47.1",
           "Azure.Identity": "1.14.2",
@@ -1334,14 +1334,14 @@
           "Microsoft.Azure.DurableTask.Core": "3.3.0",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.4.1",
           "Microsoft.Bcl.AsyncInterfaces": "10.0.0-preview.2.25163.2",
-          "Microsoft.DurableTask.AzureManagedBackend": "0.4.3-alpha",
+          "Microsoft.DurableTask.AzureManagedBackend": "1.0.0",
           "System.Text.Json": "8.0.6",
           "System.Threading.Channels": "8.0.0"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged.dll": {
-            "assemblyVersion": "0.4.0.0",
-            "fileVersion": "0.4.3.59892"
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.14626"
           }
         }
       },
@@ -1845,7 +1845,7 @@
           }
         }
       },
-      "Microsoft.DurableTask.AzureManagedBackend/0.4.3-alpha": {
+      "Microsoft.DurableTask.AzureManagedBackend/1.0.0": {
         "dependencies": {
           "Azure.Core": "1.47.1",
           "Azure.Identity": "1.14.2",
@@ -1858,8 +1858,8 @@
         },
         "runtime": {
           "lib/net8.0/Microsoft.DurableTask.AzureManagedBackend.dll": {
-            "assemblyVersion": "0.4.0.0",
-            "fileVersion": "0.4.3.59892"
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.14626"
           }
         }
       },
@@ -4507,12 +4507,12 @@
       "path": "microsoft.azure.webjobs.extensions.durabletask.analyzers/0.5.0",
       "hashPath": "microsoft.azure.webjobs.extensions.durabletask.analyzers.0.5.0.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged/0.4.3-alpha": {
+    "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged/1.0.0": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-nX7Tkzb0uv6QmZN0sr2qblFY1v/rAyaPVzk2kEKJVUE07EYZCgEmaP3RmMCqJenaU0AkMGpJtuREA5Cmt7eKBg==",
-      "path": "microsoft.azure.webjobs.extensions.durabletask.azuremanaged/0.4.3-alpha",
-      "hashPath": "microsoft.azure.webjobs.extensions.durabletask.azuremanaged.0.4.3-alpha.nupkg.sha512"
+      "path": "microsoft.azure.webjobs.extensions.durabletask.azuremanaged/1.0.0",
+      "hashPath": "microsoft.azure.webjobs.extensions.durabletask.azuremanaged.1.0.0.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.EventGrid/3.5.0": {
       "type": "package",
@@ -4759,7 +4759,7 @@
       "path": "microsoft.dotnet.platformabstractions/2.1.0",
       "hashPath": "microsoft.dotnet.platformabstractions.2.1.0.nupkg.sha512"
     },
-    "Microsoft.DurableTask.AzureManagedBackend/0.4.3-alpha": {
+    "Microsoft.DurableTask.AzureManagedBackend/1.0.0": {
       "type": "package",
       "serviceable": true,
       "sha512": "sha512-FgasCVSaeXqlkvpziFpdKCemSCg1UKqwPGG5DNjwJ+CnBgLl9rpfl+4dRUwU8HjHKirbt080HZURC1UWbnPxXQ==",
