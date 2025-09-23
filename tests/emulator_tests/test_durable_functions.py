@@ -1,8 +1,6 @@
 import json
-import os
 import time
 
-import pytest
 
 from tests.utils import testutils
 
@@ -82,5 +80,3 @@ class TestDurableFunctions(testutils.WebHostTestCase):
         _, data = self._start_and_wait('sub_parent_orchestrator')
         output = data.get('output')
         self.assertEqual(output, 'parent->child:ping')
-
-
