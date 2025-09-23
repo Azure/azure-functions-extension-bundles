@@ -25,7 +25,7 @@ class TestDurableFunctions(testutils.WebHostTestCase):
 
         # poll status
         import requests
-        for _ in range(10):
+        for _ in range(30):
             s = requests.get(status_query_uri)
             if s.status_code == 200:
                 data = json.loads(s.text)
@@ -64,5 +64,23 @@ class TestDurableFunctions(testutils.WebHostTestCase):
         _, data = self._start_and_wait('hello_orchestration_orchestrator')
         hist = data.get('history') or data.get('historyEvents') or []
         self.assertIsInstance(hist, list)
+
+    def test_fan_out_in(self):
+        """Fan-out/fan-in orchestrator returns aggregated squares"""
+        _, data = self._start_and_wait('fan_out_in_orchestrator')
+        output = data.get('output') or []
+        self.assertEqual(output, [1, 4, 9, 16, 25])
+
+    def test_chaining(self):
+        """Chaining orchestrator passes outputs correctly"""
+        _, data = self._start_and_wait('chaining_orchestrator')
+        output = data.get('output')
+        self.assertEqual(output, 'hello world')
+
+    def test_suborchestration(self):
+        """Sub-orchestration returns aggregated parent->child output"""
+        _, data = self._start_and_wait('sub_parent_orchestrator')
+        output = data.get('output')
+        self.assertEqual(output, 'parent->child:ping')
 
 
