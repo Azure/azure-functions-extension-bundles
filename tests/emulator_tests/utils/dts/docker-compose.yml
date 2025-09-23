@@ -1,5 +1,4 @@
-version: '3.8'
-
+name: dts
 services:
   dts-emulator:
     image: mcr.microsoft.com/dts/dts-emulator:latest
