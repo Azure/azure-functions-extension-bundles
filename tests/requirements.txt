@@ -3,4 +3,5 @@ invoke
 mysql-connector-python
 requests
 azure-functions
+azure-functions-durable
 fabric-user-data-functions
