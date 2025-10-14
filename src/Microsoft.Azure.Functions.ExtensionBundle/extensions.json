@@ -254,5 +254,14 @@
       "UdfProperty",
       "UserDataFunctionContext"
     ]
+  },
+  {
+    "id": "Microsoft.Azure.Functions.Extensions.Mcp",
+    "majorVersion": "1",
+    "name": "Mcp",
+    "bindings": [
+      "mcpToolTrigger",
+      "mcpToolProperty"
+    ]
   }
 ]
