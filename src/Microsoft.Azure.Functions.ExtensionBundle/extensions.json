@@ -205,6 +205,12 @@
     "bindings": []
   },
   {
+    "id": "Microsoft.AspNetCore.Server.Kestrel.Core",
+    "Version": "2.3.6",
+    "name": "MicrosoftAspNetCoreServerKestrelCore",
+    "bindings": []
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
     "majorVersion": "1",
     "name": "Dapr",
