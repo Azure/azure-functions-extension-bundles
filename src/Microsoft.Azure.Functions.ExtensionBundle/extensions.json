@@ -205,6 +205,12 @@
     "bindings": []
   },
   {
+    "id": "Microsoft.AspNetCore.Server.Kestrel.Core",
+    "Version": "2.3.6",
+    "name": "MicrosoftAspNetCoreServerKestrelCore",
+    "bindings": []
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
     "majorVersion": "1",
     "name": "Dapr",
@@ -253,6 +259,15 @@
       "FabricItem",
       "UdfProperty",
       "UserDataFunctionContext"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.Functions.Extensions.Mcp",
+    "majorVersion": "1",
+    "name": "Mcp",
+    "bindings": [
+      "mcpToolTrigger",
+      "mcpToolProperty"
     ]
   }
 ]
