@@ -1,70 +1,69 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "majorVersion": "5",
     "name": "AzureStorage",
     "bindings": [
       "blobtrigger",
       "blob",
       "queue",
       "queuetrigger"
-    ]
+    ],
+    "version": "5.3.6"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
-    "majorVersion": "5",
     "name": "AzureStorageQueues",
     "bindings": [
       "queue",
       "queuetrigger"
-    ]
+    ],
+    "version": "5.3.6"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Tables",
-    "majorVersion": "1",
     "name": "AzureTables",
     "bindings": [
       "table"
-    ]
+    ],
+    "version": "1.4.0"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
-    "majorVersion": "5",
     "name": "AzureStorageBlobs",
     "bindings": [
       "blobtrigger",
       "blob"
-    ]
+    ],
+    "version": "5.3.6"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-    "majorVersion": "5",
     "name": "ServiceBus",
     "bindings": [
       "servicebustrigger",
       "servicebus"
-    ]
+    ],
+    "version": "5.17.0"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-    "majorVersion": "6",
     "name": "EventHubs",
     "bindings": [
       "eventhubtrigger",
       "eventhub"
-    ]
+    ],
+    "version": "6.5.2"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
-    "majorVersion": "3",
     "name": "SendGrid",
     "bindings": [
       "sendgrid"
-    ]
+    ],
+    "version": "3.1.0"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "majorVersion": "3",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -72,11 +71,11 @@
       "entitytrigger",
       "durableclient",
       "orchestrationclient"
-    ]
+    ],
+    "version": "3.5.0"
   },
   {
     "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
-    "majorVersion": "1",
     "name": "SqlDurabilityProvider",
     "bindings": [
       "activitytrigger",
@@ -84,11 +83,11 @@
       "entitytrigger",
       "durableclient",
       "orchestrationclient"
-    ]
+    ],
+    "version": "1.5.1"
   },
   {
     "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
-    "majorVersion": "3",
     "name": "NetheriteProvider",
     "bindings": [
       "activitytrigger",
@@ -96,37 +95,37 @@
       "entitytrigger",
       "durableclient",
       "orchestrationclient"
-    ]
+    ],
+    "version": "3.1.0"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
-    "majorVersion": "3",
     "name": "EventGrid",
     "bindings": [
       "eventgridtrigger",
       "eventgrid"
-    ]
+    ],
+    "version": "3.5.0"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "majorVersion": "4",
     "name": "CosmosDB",
     "bindings": [
       "cosmosdbtrigger",
       "cosmosdb"
-    ]
+    ],
+    "version": "4.10.0"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
-    "majorVersion": "3",
     "name": "Twilio",
     "bindings": [
       "twiliosms"
-    ]
+    ],
+    "version": "3.0.2"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
-    "majorVersion": "2",
     "name": "SignalR",
     "bindings": [
       "signalr",
@@ -134,51 +133,52 @@
       "signalrtrigger",
       "signalrendpoints",
       "signalrnegotiation"
-    ]
+    ],
+    "version": "2.1.0"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
-    "majorVersion": "2",
     "name": "RabbitMQ",
     "bindings": [
       "rabbitmqtrigger",
       "rabbitmq"
-    ]
+    ],
+    "version": "2.1.0"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Kafka",
-    "majorVersion": "4",
     "name": "Kafka",
     "bindings": [
       "kafkatrigger",
       "kafka"
-    ]
+    ],
+    "version": "4.1.3"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Sql",
-    "majorVersion": "3",
     "name": "SqlBinding",
     "bindings": [
       "Sql",
       "SqlTrigger"
-    ]
+    ],
+    "version": "3.1.527"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSub",
-    "majorVersion": "1",
     "name": "WebPubSub",
     "bindings": [
       "webpubsub",
       "webpubsubconnection",
       "webpubsubrequest",
       "webpubsubtrigger"
-    ]
+    ],
+    "version": "1.9.0"
   },
   {
     "id": "Azure.Storage.Queues",
-    "majorVersion": "12",
     "name": "AzureStorageQueues",
-    "bindings": []
+    "bindings": [],
+    "version": "12.23.0"
   },
   {
     "id": "System.Private.Uri",
@@ -212,7 +212,6 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
-    "majorVersion": "1",
     "name": "Dapr",
     "bindings": [
       "daprBinding",
@@ -223,18 +222,19 @@
       "daprServiceInvocationTrigger",
       "daprState",
       "daprTopicTrigger"
-    ]
+    ],
+    "version": "1.0.1"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Redis",
-    "majorVersion": "1",
     "name": "Redis",
     "bindings": [
       "redisPubSubTrigger",
       "redisStreamTrigger",
       "redisListTrigger",
       "redis"
-    ]
+    ],
+    "version": "1.0.0"
   },
   {
     "id": " System.Formats.Asn1",
@@ -244,22 +244,22 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.MySql",
-    "majorVersion": "1",
     "name": "MySqlBinding",
     "bindings": [
       "MySql",
       "MySqlTrigger"
-    ]
+    ],
+    "version": "1.0.129"
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Fabric",
-    "majorVersion": "1",
     "name": "Startup",
     "bindings": [
       "FabricItem",
       "UdfProperty",
       "UserDataFunctionContext"
-    ]
+    ],
+    "version": "1.0.32"
   },
   {
     "id": "Microsoft.Azure.Functions.Extensions.Mcp",
