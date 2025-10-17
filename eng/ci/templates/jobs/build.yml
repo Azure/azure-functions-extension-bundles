@@ -16,6 +16,9 @@ jobs:
       artifact: zip
 
   steps:
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+
   - task: DownloadBuildArtifacts@1
     inputs:
       buildType: 'specific'

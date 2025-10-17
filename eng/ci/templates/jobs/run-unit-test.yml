@@ -3,6 +3,9 @@ jobs:
   displayName: Run Unit Tests
 
   steps:
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+    
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
