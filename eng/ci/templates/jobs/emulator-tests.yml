@@ -63,6 +63,9 @@ jobs:
       downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
     condition: ${{ eq(parameters.official, false) }}
 
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+    
   - task: DotNetCoreCLI@2
     displayName: 'Build Linux Bundle (once)'
     inputs:
