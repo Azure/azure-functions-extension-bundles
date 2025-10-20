@@ -12,6 +12,9 @@ jobs:
     os: windows
 
   steps:
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+    
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
@@ -28,4 +31,5 @@ jobs:
       command: 'test'
       arguments: '-c Release'
       projects: |
+
         **/*Tests.csproj
