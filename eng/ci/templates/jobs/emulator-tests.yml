@@ -65,7 +65,7 @@ jobs:
           downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
         condition: ${{ eq(parameters.official, false) }}
 
-      - task: NuGetAuthenticate@0
+      - task: NuGetAuthenticate@1
         displayName: 'NuGet Authenticate'
 
       # Build the Linux bundle first
