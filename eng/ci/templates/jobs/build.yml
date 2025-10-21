@@ -82,7 +82,7 @@ jobs:
       path: $(Build.ArtifactStagingDirectory)
       artifact: zip2
 
-  steps:    
+  steps:
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
@@ -108,7 +108,7 @@ jobs:
         downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
 
     - task: NuGetAuthenticate@1
-    displayName: 'NuGet Authenticate'
+      displayName: 'NuGet Authenticate'
     
   - ${{ if eq(parameters.official, false) }}:      
     - task: Bash@3
@@ -137,5 +137,6 @@ jobs:
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
         CleanTargetFolder: false
+
 
 
