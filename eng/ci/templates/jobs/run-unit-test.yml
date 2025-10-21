@@ -12,19 +12,21 @@ jobs:
     os: windows
 
   steps:
-  - task: NuGetAuthenticate@1
-    displayName: 'NuGet Authenticate'
-    
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
       version: '2.1.x'
       performMultiLevelLookup: true
+      
   - task: UseDotNet@2
     inputs:
       packageType: 'sdk'
       version: '3.1.x'
       performMultiLevelLookup: true
+      
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+    
   - task: DotNetCoreCLI@2
     displayName: 'Run tests'
     inputs:
@@ -33,3 +35,4 @@ jobs:
       projects: |
 
         **/*Tests.csproj
+
