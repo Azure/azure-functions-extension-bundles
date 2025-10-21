@@ -1,18 +1,14 @@
 trigger:
   branches:
     include:
-    - main
     - main-v3
-    - release/v4.x
-    - release/v4.x-preview
+    - release/v3.x
 
 pr:
   branches:
     include:
-    - main
     - main-v3
-    - release/v4.x
-    - release/v4.x-preview
+    - release/v3.x
 
 resources:
   repositories:
@@ -28,6 +24,9 @@ extends:
       name: 1es-pool-azfunc-public
       image: 1es-windows-2022
       os: windows
+      ${{ if eq( variables['Build.Reason'], 'Schedule' ) }}:
+        demands:
+        - Priority -equals Low
 
     stages:
     - stage: RunUnitTests
@@ -45,4 +44,3 @@ extends:
         parameters:
           official: false
           poolName: 1es-pool-azfunc-public
-
