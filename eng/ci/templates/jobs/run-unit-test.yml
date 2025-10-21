@@ -24,7 +24,7 @@ jobs:
       version: '3.1.x'
       performMultiLevelLookup: true
       
-  - task: NuGetAuthenticate@1
+  - task: NuGetAuthenticate@0
     displayName: 'NuGet Authenticate'
     
   - task: DotNetCoreCLI@2
@@ -35,4 +35,5 @@ jobs:
       projects: |
 
         **/*Tests.csproj
+
 
