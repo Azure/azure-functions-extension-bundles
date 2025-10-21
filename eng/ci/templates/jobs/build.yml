@@ -107,8 +107,8 @@ jobs:
         artifactName: 'drop'
         downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
 
-    - task: NuGetAuthenticate@1
-      displayName: 'NuGet Authenticate'
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
     
   - ${{ if eq(parameters.official, false) }}:      
     - task: Bash@3
@@ -137,6 +137,3 @@ jobs:
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
         CleanTargetFolder: false
-
-
-
