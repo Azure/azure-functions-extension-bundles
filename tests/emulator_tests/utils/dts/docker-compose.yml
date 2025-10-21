@@ -1,0 +1,12 @@
+name: dts
+services:
+  dts-emulator:
+    image: mcr.microsoft.com/dts/dts-emulator:latest
+    container_name: dts-emulator
+    restart: unless-stopped
+    environment:
+      - DTS_TASK_HUB_NAMES=default
+    ports:
+      - "8080:8080" # Durable Task Scheduler endpoint
+      - "8082:8082" # Dashboard
+
