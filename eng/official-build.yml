@@ -1,21 +1,18 @@
 trigger:
   branches:
     include:
-    - main
     - main-v3
-    - release/v4.x
-    - release/v4.x-preview
+    - release/v3.x
   tags:
     include:
     - 'v*'
 
 schedules:
 # Ensure we build nightly to catch any new CVEs and report SDL often.
-- cron: "0 0 * * *"
+- cron: "0 2 * * *"
   displayName: Nightly Build
   branches:
     include:
-    - main
     - main-v3
   always: true
 
@@ -44,6 +41,9 @@ extends:
         name: 1es-pool-azfunc
         image: 1es-windows-2022
         os: windows
+        ${{ if eq( variables['Build.Reason'], 'Schedule' ) }}:
+        demands:
+        - Priority -equals Low
 
     stages:
     - stage: RunUnitTests
@@ -61,3 +61,4 @@ extends:
         parameters:
           official: true
           poolName: 1es-pool-azfunc
+

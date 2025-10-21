@@ -46,6 +46,9 @@ jobs:
         downloadType: 'single'
         artifactName: 'drop'
         downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'
+        
+  - task: NuGetAuthenticate@0
+    displayName: 'NuGet Authenticate'    
 
   - task: DotNetCoreCLI@2
     inputs:
@@ -104,6 +107,9 @@ jobs:
         artifactName: 'drop'
         downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
 
+  - task: NuGetAuthenticate@0
+    displayName: 'NuGet Authenticate'
+    
   - ${{ if eq(parameters.official, false) }}:      
     - task: Bash@3
       inputs:
@@ -129,4 +135,6 @@ jobs:
         SourceFolder: '$(Build.Repository.LocalPath)/artifacts'
         Contents: '*.zip'
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
         CleanTargetFolder: false
+
