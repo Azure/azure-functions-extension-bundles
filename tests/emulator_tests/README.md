@@ -29,8 +29,8 @@ The test framework automatically references the `bundleVersion` from `src/Micros
 
 Emulator tests run automatically in the CI pipeline for:
 
-- **All pull requests** to main, preview, and release branches
-- **Main branch builds** and **preview branch builds**
+- **All pull requests** to main, experimental, and release branches
+- **Main branch builds** and **experimental branch builds**
 - **Manual builds** (emulator tests are skipped for nightly scheduled builds)
 
 The CI pipeline:
@@ -87,7 +87,7 @@ This will generate extension bundle packages in the `artifacts/` directory.
 
 **Note:** Ensure you have the required template artifacts in the `templatesArtifacts/` directory before building. See the main README.md for details on obtaining these files.
 
-### 2. **Start Docker Storage Emulator**
+### 2. **Start Docker Emulator**
 
 Start the Docker-based storage emulator using Docker Compose:
 
@@ -105,6 +105,14 @@ docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml ps
 docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml ps
 
 ```
+
+Start CosmosDB emulator
+
+```bash
+docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmosdb-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-experimental
+```
+
+**NOTE:** If you already run cosmos db emulator it will be blocked. Stop the emulator first.
 
 **To stop the services when done:**
 
@@ -188,6 +196,23 @@ $env:PYAZURE_WEBHOST_DEBUG = "true"
 $env:ARCHIVE_WEBHOST_LOGS = "true"
 ```
 
+According to the emulator you want to run configure following.
+
+```txt
+$env:AzureWebJobsEventHubConnectionString = "<Find the value on the official doc>"
+$env:AzureWebJobsCosmosDBConnectionString = "<Find the value on the official doc>"
+$env:CosmosDBEmulatorUrl = "<Find the value on the official doc>"
+$env:CosmosDBEmulatorKey = "<Find the value on the official doc>"
+$env:AzureWebJobsServiceBusConnectionString = "<Find the value on the official doc with replacing https to http>"
+$env:AzureWebJobsSQLPassword = "<AnyPassword is fine>"
+
+```
+
+- [EventHubs emulator authentication](https://learn.microsoft.com/en-us/azure/event-hubs/test-locally-with-event-hub-emulator?tabs=docker-linux-container%2Cusing-kafka#interact-with-the-emulator)
+- [Cosmos DB emulator authentication](https://learn.microsoft.com/en-us/azure/cosmos-db/emulator?context=%2Fazure%2Fcosmos-db%2Fnosql%2Fcontext%2Fcontext#authentication)
+- [ServiceBus emulator authentication](https://learn.microsoft.com/en-us/azure/service-bus-messaging/test-locally-with-service-bus-emulator?tabs=automated-script#interact-with-the-emulator)
+- [SQL edge](https://docs.azure.cn/en-us/azure-sql-edge/disconnected-deployment)
+
 ### 8. **Run Tests**
 
 Now you can run the emulator tests:
@@ -258,17 +283,17 @@ The test framework will automatically create configuration files to help with de
 
 ## Advanced Configuration
 
-### Preview Extension Bundle Testing
+### Experimental Extension Bundle Testing
 
-To test with Preview extension bundles:
+To test with Experimental extension bundles:
 
 1. **Update bundleConfig.json**:
 
    ```json
    {
-       "bundleId": "Microsoft.Azure.Functions.ExtensionBundle.Preview",
+       "bundleId": "Microsoft.Azure.Functions.ExtensionBundle.Experimental",
        "bundleVersion": "4.25.1",
-       "isPreviewBundle": true
+       "isExperimentalBundle": true
    }
    ```
 
@@ -281,11 +306,11 @@ To test with Preview extension bundles:
    python -m invoke -c test_setup mock-extension-site
    ```
 
-3. **Verify Preview bundle is being served**:
-   - Check the mock server output for: `Microsoft.Azure.Functions.ExtensionBundle.Preview`
-   - Verify the index URL: `http://localhost:3000/ExtensionBundles/Microsoft.Azure.Functions.ExtensionBundle.Preview/index.json`
+3. **Verify Experimental bundle is being served**:
+   - Check the mock server output for: `Microsoft.Azure.Functions.ExtensionBundle.Experimental`
+   - Verify the index URL: `http://localhost:3000/ExtensionBundles/Microsoft.Azure.Functions.ExtensionBundle.Experimental/index.json`
 
-**Note**: The test framework automatically detects whether you're using regular or Preview bundles based on the `bundleConfig.json` configuration and adjusts the host.json template accordingly.
+**Note**: The test framework automatically detects whether you're using regular or Experimental bundles based on the `bundleConfig.json` configuration and adjusts the host.json template accordingly.
 
 ### Custom Extension Bundle Versions
 
