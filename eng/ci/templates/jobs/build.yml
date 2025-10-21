@@ -28,6 +28,9 @@ jobs:
       downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'
     condition: ${{ parameters.official }}
 
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+
   - task: DotNetCoreCLI@2
     displayName: 'Build'
     inputs:
