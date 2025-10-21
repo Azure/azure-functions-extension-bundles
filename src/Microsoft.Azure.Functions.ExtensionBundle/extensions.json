@@ -311,5 +311,11 @@
       "mcpToolTrigger",
       "mcpToolProperty"
     ]
+  },
+  {
+    "id": "Microsoft.AspNetCore.Server.Kestrel.Core",
+    "version": "2.3.6",
+    "name": "KestrelCore",
+    "bindings": []
   }
 ]

@@ -8,6 +8,10 @@ jobs:
       packageType: 'sdk'
       version: '8.x'
       performMultiLevelLookup: true
+
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+
   - task: DotNetCoreCLI@2
     displayName: 'Run tests'
     inputs:
