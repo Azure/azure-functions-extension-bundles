@@ -122,6 +122,12 @@ jobs:
         ADDITIONAL_EMULATORS: 'servicebus'
         DISPLAY_NAME: 'Service Bus Tests'
         STOP_EVENTHUB: 'true'
+      DurableTaskScheduler:
+        TEST_GROUP: 'dts'
+        TEST_FILES: 'test_durable_functions.py'
+        ADDITIONAL_EMULATORS: 'dts'
+        DISPLAY_NAME: 'Durable Task Scheduler Tests'
+        STOP_EVENTHUB: 'false'
 
   templateContext:
     outputParentDirectory: $(Build.ArtifactStagingDirectory)
@@ -238,6 +244,13 @@ jobs:
         echo "Waiting for Service Bus emulator to start..."
         sleep 30
         docker compose ps
+      elif [ "$(ADDITIONAL_EMULATORS)" = "dts" ]; then
+        echo "Starting DTS Emulator for $(DISPLAY_NAME)..."
+        cd tests/emulator_tests/utils/dts
+        docker compose up -d
+        echo "Waiting for DTS emulator to start..."
+        sleep 30
+        docker compose ps
       else
         echo "No additional emulators required for $(DISPLAY_NAME)"
       fi
@@ -347,6 +360,10 @@ jobs:
       elif [ "$(ADDITIONAL_EMULATORS)" = "servicebus" ]; then
         echo "Stopping Service Bus emulator..."
         cd tests/emulator_tests/utils/servicebus
+        docker compose down -v
+      elif [ "$(ADDITIONAL_EMULATORS)" = "dts" ]; then
+        echo "Stopping DTS emulator..."
+        cd tests/emulator_tests/utils/dts
         docker compose down -v
       fi
       
