@@ -1,7 +1,7 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "majorVersion": "4",
+    "version": "4.0.5",
     "name": "AzureStorage",
     "bindings": [
       "blobtrigger",
@@ -13,7 +13,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-    "majorVersion": "4",
+    "version": "4.3.1",
     "name": "ServiceBus",
     "bindings": [
       "servicebustrigger",
@@ -22,7 +22,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-    "majorVersion": "4",
+    "version": "4.3.1",
     "name": "EventHubs",
     "bindings": [
       "eventhubtrigger",
@@ -31,7 +31,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
-    "majorVersion": "3",
+    "version": "3.1.0",
     "name": "SendGrid",
     "bindings": [
       "sendgrid"
@@ -39,7 +39,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "Version": "2.12.0",
+    "version": "2.12.0",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -51,7 +51,7 @@
   },
   {
     "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
-    "Version": "1.4.0",
+    "version": "1.4.0",
     "name": "NetheriteProvider",
     "bindings": [
       "activitytrigger",
@@ -63,7 +63,7 @@
   },
   {
     "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
-    "Version": "1.1.1",
+    "version": "1.1.1",
     "name": "SqlDurabilityProvider",
     "bindings": [
       "activitytrigger",
@@ -75,7 +75,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
-    "majorVersion": "2",
+    "version": "2.1.0",
     "name": "EventGrid",
     "bindings": [
       "eventgridtrigger",
@@ -84,7 +84,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "majorVersion": "3",
+    "version": "3.0.10",
     "name": "CosmosDB",
     "bindings": [
       "cosmosdbtrigger",
@@ -93,7 +93,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
-    "majorVersion": "3",
+    "version": "3.0.2",
     "name": "Twilio",
     "bindings": [
       "twiliosms"
@@ -113,7 +113,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
-    "majorVersion": "1",
+    "version": "1.1.0",
     "name": "RabbitMQ",
     "bindings": [
       "rabbitmqtrigger",
@@ -122,7 +122,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Kafka",
-    "majorVersion": "3",
+    "version": "3.9.0",
     "name": "Kafka",
     "bindings": [
       "kafkatrigger",
@@ -131,56 +131,68 @@
   },
   {
     "id": "Microsoft.AspNetCore.Http.Connections",
-    "Version": "1.0.15",
+    "version": "1.0.15",
     "name": "MicrosoftAspNetCoreHttpConnections",
     "bindings": []
   },
   {
     "id": "Microsoft.AspNetCore.WebSockets",
-    "Version": "2.2.1",
+    "version": "2.2.1",
     "name": "MicrosoftAspNetCoreWebSockets",
     "bindings": []
   },
   {
     "id": "System.Drawing.Common",
-    "Version": "4.7.2",
+    "version": "4.7.2",
     "name": "SystemDrawingCommon",
     "bindings": []
   },
   {
     "id": "System.Net.WebSockets.WebSocketProtocol",
-    "Version": "4.5.3",
+    "version": "4.5.3",
     "name": "SystemNetWebSocketsWebSocketProtocol",
     "bindings": []
   },
   {
     "id": "System.Private.Uri",
-    "Version": "4.3.2",
+    "version": "4.3.2",
     "name": "SystemPrivateUri",
     "bindings": []
   },
   {
     "id": "Azure.Identity",
-    "Version": "1.11.4",
+    "version": "1.11.4",
     "name": "AzureIdentity",
     "bindings": []
   },
   {
     "id": "Microsoft.Data.SqlClient",
-    "Version": "3.1.5",
+    "version": "3.1.5",
     "name": "MicrosoftDataSqlClient",
     "bindings": []
   },
   {
     "id": "Microsoft.IdentityModel.JsonWebTokens",
-    "Version": "6.34.0",
+    "version": "6.34.0",
     "name": "SystemIdentityModelTokensJwt",
     "bindings": []
   },
   {
     "id": "System.IdentityModel.Tokens.Jwt",
-    "Version": "6.34.0",
+    "version": "6.34.0",
     "name": "SystemIdentityModelTokensJwt",
+    "bindings": []
+  },
+  {
+    "id": "Microsoft.AspNetCore.Server.Kestrel.Core",
+    "version": "2.3.6",
+    "name": "KestrelCore",
+    "bindings": []
+  },
+  {
+    "id": "System.Formats.Asn1",
+    "version": "6.0.1",
+    "name": "SystemFormatsAsn1",
     "bindings": []
   }
 ]
