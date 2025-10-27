@@ -99,6 +99,18 @@
     ]
   },
   {
+    "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged",
+    "majorVersion": "1",
+    "name": "AzureManagedProvider",
+    "bindings": [
+      "activitytrigger",
+      "orchestrationtrigger",
+      "entitytrigger",
+      "durableclient",
+      "orchestrationclient"
+    ]
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
     "majorVersion": "3",
     "name": "EventGrid",
