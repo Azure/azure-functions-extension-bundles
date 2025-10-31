@@ -183,7 +183,7 @@ ls -la get-function-apps-bundle-version.sh
    ```powershell
    # Upload via Cloud Shell interface or clone repository
    git clone https://github.com/Azure/azure-functions-extension-bundles.git
-   cd azure-functions-extension-bundles/tools
+   cd azure-functions-extension-bundles/scripts
    ```
 
 4. **Run the script**:
@@ -201,7 +201,7 @@ ls -la get-function-apps-bundle-version.sh
    ```bash
    # Upload via Cloud Shell interface or clone repository
    git clone https://github.com/Azure/azure-functions-extension-bundles.git
-   cd azure-functions-extension-bundles/tools
+   cd azure-functions-extension-bundles/scripts
    ```
 
 4. **Make executable and run**:
