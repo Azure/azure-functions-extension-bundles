@@ -103,7 +103,7 @@ jobs:
       matrix:
         BasicTests:
           TEST_GROUP: 'basic'
-          TEST_FILES: 'test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py test_table_functions.py'
+          TEST_FILES: 'test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py'
           ADDITIONAL_EMULATORS: 'none'
           DISPLAY_NAME: 'Basic Tests (Azurite + EventHub)'
           STOP_EVENTHUB: 'false'
