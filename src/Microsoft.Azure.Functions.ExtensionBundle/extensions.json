@@ -295,7 +295,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO",
-    "majorVersion": "1",
+    "version": "1.0.0-beta.4",
     "name": "WebPubSubForSocketIO",
     "bindings": [
       "socketiotrigger",
