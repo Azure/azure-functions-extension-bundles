@@ -36,7 +36,7 @@
           "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs": "5.3.7",
           "Microsoft.Azure.WebJobs.Extensions.Storage.Queues": "5.3.7",
           "Microsoft.Azure.WebJobs.Extensions.Twilio": "3.0.2",
-          "Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO": "1.0.0",
+          "Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO": "1.0.0-beta.4",
           "Microsoft.DurableTask.SqlServer.AzureFunctions": "1.5.2",
           "Microsoft.NET.Sdk.Functions": "4.6.0",
           "System.Reactive.Reference": "4.4.0.0"
@@ -1538,19 +1538,20 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO/1.0.0": {
+      "Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO/1.0.0-beta.4": {
         "dependencies": {
-          "Azure.Identity": "1.17.0",
-          "Azure.Messaging.WebPubSub": "1.6.0",
-          "Microsoft.Azure.WebJobs": "3.0.42",
-          "Microsoft.Azure.WebPubSub.Common": "1.5.0",
+          "Azure.Identity": "1.14.2",
+          "Azure.Messaging.WebPubSub": "1.4.0",
+          "Microsoft.AspNetCore.Http": "2.3.0",
+          "Microsoft.Azure.WebJobs": "3.0.41",
+          "Microsoft.Azure.WebPubSub.Common": "1.4.0",
           "Microsoft.Extensions.Azure": "1.12.0",
-          "Microsoft.IdentityModel.Tokens": "8.14.0"
+          "Microsoft.IdentityModel.Tokens": "7.5.1"
         },
         "runtime": {
-          "lib/net8.0/Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO.dll": {
+          "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO.dll": {
             "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.25.56204"
+            "fileVersion": "1.0.24.47903"
           }
         }
       },
@@ -3572,12 +3573,12 @@
       "path": "microsoft.azure.webjobs.extensions.twilio/3.0.2",
       "hashPath": "microsoft.azure.webjobs.extensions.twilio.3.0.2.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO/1.0.0": {
+    "Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO/1.0.0-beta.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-p2GO4as8BA+bAPZL4Hz1ZEhDmW/QCuGdx3bNzSaZKfydHyx7ZqQwn6hfgiaNr1nQS90M+wII5ECxHOBI8fJymg==",
-      "path": "microsoft.azure.webjobs.extensions.webpubsubforsocketio/1.0.0",
-      "hashPath": "microsoft.azure.webjobs.extensions.webpubsubforsocketio.1.0.0.nupkg.sha512"
+      "sha512": "sha512-J5dRt7gSNkWfdN7kxnt+vP4ActPRYo2+/eLnXK1c/kgiKqqcwS+552EOm2B7dEpEP1d6/eMLeu5Kz3grXSkwjw==",
+      "path": "microsoft.azure.webjobs.extensions.webpubsubforsocketio/1.0.0-beta.4",
+      "hashPath": "microsoft.azure.webjobs.extensions.webpubsubforsocketio.1.0.0-beta.4.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Host.Storage/3.0.14": {
       "type": "package",
