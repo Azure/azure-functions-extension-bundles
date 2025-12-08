@@ -21,7 +21,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Tables",
-    "majorVersion": "1",
+    "version": "1.0.53",
     "name": "AzureTables",
     "bindings": [
       "table"
@@ -283,3 +283,4 @@
     ]
   }
 ]
+
