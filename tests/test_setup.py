@@ -15,6 +15,7 @@ To use these tasks, you can run the following commands:
 import os
 import pathlib
 import shutil
+import subprocess
 import sys
 import tempfile
 import urllib.request
@@ -89,54 +90,128 @@ def _download_file(url, file_path):
         return False
 
 
-def download_core_tools(version=None, func_runtime_version="4"):
-    """Downloads Azure Functions Core Tools zip package based on platform.
+def clone_and_build_core_tools(branch="main", configuration="Release"):
+    """Clones and builds Azure Functions Core Tools from source.
 
-    If version is specified, downloads that specific version.
-    Otherwise, fetches the latest version from GitHub releases API.
+    Args:
+        branch: Git branch to clone (default: main)
+        configuration: Build configuration - Debug or Release (default: Release)
+
+    Returns:
+        Path to the build output directory containing the compiled exe
     """
-    os_name, arch = _get_platform_info()
+    repo_url = "https://github.com/Azure/azure-functions-core-tools.git"
+    clone_dir = BUILD_DIR / "core-tools-source"
 
-    # If version is not specified, get the latest from GitHub API
-    if version is None:
-        version = _get_latest_version()
+    print(f"Cloning Azure Functions Core Tools from {repo_url}...")
 
-    # Construct GitHub release URL with the determined version
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".zip") as temp_file:
-        # Try URL with version in filename
-        zip_url = f"https://github.com/Azure/azure-functions-core-tools/releases/download/{version}/Azure.Functions.Cli.{os_name}-{arch}.{version}.zip"
-        if _download_file(zip_url, temp_file.name):
-            return temp_file.name
+    # Clone or update the repository
+    if clone_dir.exists():
+        print(f"Repository already exists at {clone_dir}, pulling latest changes...")
+        try:
+            subprocess.run(
+                ["git", "-C", str(clone_dir), "fetch", "origin"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            subprocess.run(
+                ["git", "-C", str(clone_dir), "checkout", branch],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            subprocess.run(
+                ["git", "-C", str(clone_dir), "pull", "origin", branch],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to update repository: {e.stderr}", file=sys.stderr)
+            print("Deleting and re-cloning...")
+            shutil.rmtree(clone_dir)
+            subprocess.run(
+                ["git", "clone", "--branch", branch, repo_url, str(clone_dir)],
+                check=True,
+            )
+    else:
+        subprocess.run(
+            ["git", "clone", "--branch", branch, repo_url, str(clone_dir)], check=True
+        )
 
-        # Try alternate URL format without version in filename
-        alternate_zip_url = f"https://github.com/Azure/azure-functions-core-tools/releases/download/{version}/Azure.Functions.Cli.{os_name}-{arch}.zip"
-        print(f"Trying alternate URL: {alternate_zip_url}")
+    print(f"Building Azure.Functions.Cli.csproj with {configuration} configuration...")
 
-        if _download_file(alternate_zip_url, temp_file.name):
-            return temp_file.name
-
-        print("Failed to download Azure Functions Core Tools", file=sys.stderr)
+    # Check if dotnet is available
+    try:
+        result = subprocess.run(
+            ["dotnet", "--version"], check=True, capture_output=True, text=True
+        )
+        print(f"Using .NET SDK version: {result.stdout.strip()}")
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print(
+            "ERROR: dotnet SDK not found. Please install .NET SDK from https://dotnet.microsoft.com/download",
+            file=sys.stderr,
+        )
         sys.exit(1)
 
+    # Build the project
+    project_path = clone_dir / "src" / "Cli" / "func" / "Azure.Functions.Cli.csproj"
+    if not project_path.exists():
+        print(f"ERROR: Project file not found at {project_path}", file=sys.stderr)
+        sys.exit(1)
 
-def extract_core_tools(src_zip, dest_folder):
-    """Extracts Azure Functions Core Tools to the specified folder."""
-    print(f"Extracting Core Tools from {src_zip}")
+    try:
+        subprocess.run(
+            ["dotnet", "build", str(project_path), "-c", configuration],
+            check=True,
+            cwd=str(clone_dir),
+        )
+    except subprocess.CalledProcessError as e:
+        print(f"Build failed: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    # Find the build output directory
+    build_output = clone_dir / "out" / "bin" / "Azure.Functions.Cli" / configuration
+
+    if build_output.exists():
+        print(f"Build completed successfully. Output: {build_output}")
+        return build_output
+
+    print(f"ERROR: Build output not found at {build_output}", file=sys.stderr)
+    sys.exit(1)
+
+
+def copy_core_tools_build(src_build_dir, dest_folder):
+    """Copies built Azure Functions Core Tools to the specified folder."""
+    print(f"Copying Core Tools build from {src_build_dir}")
 
     if dest_folder.exists():
         shutil.rmtree(dest_folder)
     os.makedirs(dest_folder, exist_ok=True)
 
-    with zipfile.ZipFile(src_zip, "r") as archive:
-        archive.extractall(dest_folder)
+    # Copy all files from build output to destination
+    for item in src_build_dir.iterdir():
+        if item.is_file():
+            shutil.copy2(item, dest_folder)
+        elif item.is_dir():
+            shutil.copytree(item, dest_folder / item.name, dirs_exist_ok=True)
+
     # Make func executable on Unix systems
     system = sys.platform.lower()
     if not system.startswith("win"):
         func_path = dest_folder / "func"
         if func_path.exists():
             os.chmod(func_path, 0o755)
+    else:
+        func_path = dest_folder / "func.exe"
 
-    print(f"Azure Functions Core Tools extracted to {dest_folder}")
+    if func_path.exists():
+        print(f"Azure Functions Core Tools copied to {dest_folder}")
+        print(f"Executable: {func_path}")
+    else:
+        print(f"WARNING: func executable not found at {func_path}", file=sys.stderr)
+
     return dest_folder
 
 
@@ -148,8 +223,18 @@ def webhost(
     webhost_dir=None,
     branch_name=None,
     func_runtime_version="4",
+    configuration="Release",
 ):
-    """Builds the webhost"""
+    """Builds the webhost by cloning and building Azure Functions Core Tools from source.
+
+    Args:
+        clean: If True, deletes the webhost directory and exits
+        webhost_version: Deprecated (kept for backward compatibility)
+        webhost_dir: Target directory for the built webhost (default: tests/build/webhost)
+        branch_name: Git branch to clone (default: main)
+        func_runtime_version: Deprecated (kept for backward compatibility)
+        configuration: Build configuration - Debug or Release (default: Release)
+    """
 
     if webhost_dir is None:
         webhost_dir = BUILD_DIR / "webhost"
@@ -162,12 +247,16 @@ def webhost(
         print("Deleted webhost dir")
         return
 
-    zip_path = download_core_tools(
-        version=webhost_version, func_runtime_version=func_runtime_version
-    )  # Download the latest Azure Functions Core Tools
+    if branch_name is None:
+        branch_name = "main"
+
+    # Clone and build Azure Functions Core Tools from source
+    build_output_dir = clone_and_build_core_tools(
+        branch=branch_name, configuration=configuration
+    )
 
     create_webhost_folder(webhost_dir)
-    extract_core_tools(zip_path, webhost_dir)
+    copy_core_tools_build(build_output_dir, webhost_dir)
 
 
 def create_webhost_folder(dest_folder):
