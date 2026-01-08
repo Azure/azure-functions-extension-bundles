@@ -40,6 +40,8 @@ jobs:
         artifact: core-tools-artifacts
 
   steps:
+  - checkout: coretools 
+  
   # Download template artifacts for the build
   # Official templates
   - task: DownloadBuildArtifacts@1
@@ -70,6 +72,14 @@ jobs:
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
     
+  - task: PowerShell@2
+    displayName: 'Build Azure Functions Core Tools'
+    inputs:
+      filePath: '$(Build.Repository.LocalPath)/eng/ci/scripts/build-core-tools.ps1'
+      arguments: '-Branch main -Configuration Release -CloneDir "$(Build.Repository.LocalPath)/coretools"'
+      pwsh: true
+      workingDirectory: '$(Build.Repository.LocalPath)'
+
   - task: DotNetCoreCLI@2
     displayName: 'Build Linux Bundle (once)'
     inputs:
@@ -79,14 +89,6 @@ jobs:
     env:
       BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
       TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
-
-  - task: PowerShell@2
-    displayName: 'Build Azure Functions Core Tools'
-    inputs:
-      filePath: '$(Build.Repository.LocalPath)/eng/ci/scripts/build-core-tools.ps1'
-      arguments: '-Branch main -Configuration Release'
-      pwsh: true
-      workingDirectory: '$(Build.Repository.LocalPath)'
 
   - script: |
       echo "Checking for build artifacts..."

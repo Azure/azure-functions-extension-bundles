@@ -16,9 +16,6 @@
 .PARAMETER Configuration
     Build configuration - Debug or Release (default: Release)
 
-.PARAMETER Runtime
-    Target runtime identifier (e.g., win-x64, linux-x64, osx-x64)
-
 .PARAMETER CloneDir
     Directory where the repository will be cloned (default: tests/build/core-tools-source)
 
@@ -29,12 +26,10 @@
 param(
     [string]$Branch = "main",
     [string]$Configuration = "Release"
+    [string]$CloneDir = "$(Build.Repository.LocalPath)/coretools"
 )
 
 $ErrorActionPreference = "Stop"
-
-
-$CloneDir = "$Agent.BuildDirectory/coretools"
 
 
 if ($IsWindows -or $env:OS -eq "Windows_NT") {
