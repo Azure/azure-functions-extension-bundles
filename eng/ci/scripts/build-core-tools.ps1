@@ -58,7 +58,7 @@ Write-Host "Runtime: $Runtime" -ForegroundColor Yellow
 Write-Host "==================================================" -ForegroundColor Cyan
 
 # Locate the project file
-$ProjectPath = Join-Path $CloneDir "src\Azure.Functions.Cli\Azure.Functions.Cli.csproj"
+$ProjectPath = Join-Path $CloneDir "src\Cli\func\Azure.Functions.Cli.csproj"
 
 if (-not (Test-Path $ProjectPath)) {
     Write-Error "Project file not found at $ProjectPath"
