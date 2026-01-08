@@ -34,6 +34,15 @@ jobs:
         displayName: Publish templates artifacts
         path: $(Build.Repository.LocalPath)/templatesArtifacts
         artifact: templates-artifacts
+      - output: pipelineArtifact
+        displayName: Publish core tools artifacts
+        path: $(Build.Repository.LocalPath)/tests/build/core-tools-source/artifacts
+        artifact: core-tools-artifacts
+  resources:
+    repositories:
+      - repository: coretools
+        type: github
+        name: Azure/azure-functions-core-tools
 
   steps:
   # Download template artifacts for the build
@@ -75,6 +84,14 @@ jobs:
     env:
       BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
       TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
+
+  - task: PowerShell@2
+    displayName: 'Build Azure Functions Core Tools'
+    inputs:
+      filePath: '$(Build.Repository.LocalPath)/eng/ci/scripts/build-core-tools.ps1'
+      arguments: '-Branch main -Configuration Release'
+      pwsh: true
+      workingDirectory: '$(Build.Repository.LocalPath)'
 
   - script: |
       echo "Checking for build artifacts..."
