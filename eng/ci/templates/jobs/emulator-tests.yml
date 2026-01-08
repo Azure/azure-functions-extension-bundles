@@ -93,10 +93,10 @@ jobs:
 
   - script: |
       echo "Checking for build artifacts..."
-      if ls artifacts/*.zip 2>/dev/null || ls bin/*/*.zip 2>/dev/null; then
-        echo "✓ Extension bundle artifacts found"
+      if ls azure-functions-core-tools/coretools/*.zip 2>/dev/null || ls azure-functions-extension-bundles/artifacts/*.zip 2>/dev/null || ls azure-functions-extension-bundles/bin/*/*.zip 2>/dev/null; then
+        echo "✓ Extension bundle and core tools artifacts found"
       else
-        echo "✗ No extension bundle zip files found anywhere"
+        echo "✗ No extension bundle or core tools zip files found anywhere"
         exit 1
       fi
     displayName: 'Verify Build Artifacts'
