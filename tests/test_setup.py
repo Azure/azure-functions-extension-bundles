@@ -29,6 +29,48 @@ ROOT_DIR = pathlib.Path(__file__).parent
 ARTIFACTS_DIR = ROOT_DIR / "artifacts"
 BUILD_DIR = ROOT_DIR / "build"
 
+def extract_core_tools(src_zip, dest_folder):
+    """Extracts Azure Functions Core Tools to the specified folder."""
+    print(f"Extracting Core Tools from {src_zip}")
+
+    if dest_folder.exists():
+        shutil.rmtree(dest_folder)
+    os.makedirs(dest_folder, exist_ok=True)
+
+    with zipfile.ZipFile(src_zip, 'r') as archive:
+        archive.extractall(dest_folder)
+      # Make func executable on Unix systems
+    system = sys.platform.lower()
+    if not system.startswith("win"):
+        func_path = dest_folder / "func"
+        if func_path.exists():
+            os.chmod(func_path, 0o755)
+
+    print(f"Azure Functions Core Tools extracted to {dest_folder}")
+    return dest_folder
+
+@task
+def webhost(c, clean=False, webhost_version=None, webhost_dir=None,
+            branch_name=None, func_runtime_version='4'):
+    """Builds the webhost"""
+
+    if webhost_dir is None:
+        webhost_dir = BUILD_DIR / "webhost"
+    else:
+        webhost_dir = pathlib.Path(webhost_dir)
+
+    if clean:
+        print("Deleting webhost dir")
+        shutil.rmtree(webhost_dir, ignore_errors=True)
+        print("Deleted webhost dir")
+        return
+
+    zip_path = "$(Build.Repository.LocalPath)/core-tools/*.zip"
+
+    create_webhost_folder(webhost_dir)
+    extract_core_tools(zip_path, webhost_dir)
+
+
 def create_webhost_folder(dest_folder):
     if dest_folder.exists():
         shutil.rmtree(dest_folder)

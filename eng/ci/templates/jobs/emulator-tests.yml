@@ -302,6 +302,13 @@ jobs:
         netstat -tlnp | grep :8000 || true
       fi
     displayName: 'Start Mock Extension Site'
+  
+  # Set up webhost
+  - script: |
+      cd tests
+      source venv/bin/activate
+      python -m invoke -c test_setup webhost
+    displayName: 'Setup WebHost'
 
   # Run tests for this specific test group
   - script: |
