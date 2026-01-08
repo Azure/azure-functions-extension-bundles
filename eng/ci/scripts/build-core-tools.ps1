@@ -26,7 +26,7 @@
 param(
     [string]$Branch = "main",
     [string]$Configuration = "Release"
-    [string]$CloneDir = "$(Build.Repository.LocalPath)/coretools"
+    [string]$CloneDir = "$(Build.Repository.LocalPath)/azure-functions-core-tools"
 )
 
 $ErrorActionPreference = "Stop"
