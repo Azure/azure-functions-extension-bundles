@@ -24,19 +24,19 @@ jobs:
     outputs:
       - output: pipelineArtifact
         displayName: Publish bundle artifacts
-        path: $(Build.Repository.LocalPath)/artifacts
+        path: $(Build.Repository.LocalPath)/azure-functions-extension-bundles/artifacts
         artifact: bundle-artifacts
       - output: pipelineArtifact
         displayName: Publish bundle bin
-        path: $(Build.Repository.LocalPath)/bin
+        path: $(Build.Repository.LocalPath)/azure-functions-extension-bundles/bin
         artifact: bundle-bin
       - output: pipelineArtifact
         displayName: Publish templates artifacts
-        path: $(Build.Repository.LocalPath)/templatesArtifacts
+        path: $(Build.Repository.LocalPath)/azure-functions-extension-bundles/templatesArtifacts
         artifact: templates-artifacts
       - output: pipelineArtifact
         displayName: Publish core tools artifacts
-        path: $(Build.Repository.LocalPath)/tests/build/core-tools-source/artifacts
+        path: $(Build.Repository.LocalPath)/coretools/artifacts-coretools-zip
         artifact: core-tools-artifacts
 
   steps:
@@ -54,7 +54,7 @@ jobs:
       branchName: 'refs/heads/dev'
       downloadType: 'single'
       artifactName: 'drop'
-      downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
+      downloadPath: '$(Build.Repository.LocalPath)/azure-functions-extension-bundles/templatesArtifacts'
     condition: ${{ parameters.official }}
 
   # Public templates
@@ -67,7 +67,7 @@ jobs:
       branchName: 'refs/heads/dev'
       downloadType: 'single'
       artifactName: 'drop'
-      downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
+      downloadPath: '$(Build.Repository.LocalPath)/azure-functions-extension-bundles/templatesArtifacts'
     condition: ${{ eq(parameters.official, false) }}
 
   - task: NuGetAuthenticate@1
@@ -76,10 +76,10 @@ jobs:
   - task: PowerShell@2
     displayName: 'Build Azure Functions Core Tools'
     inputs:
-      filePath: '$(Build.Repository.LocalPath)/eng/ci/scripts/build-core-tools.ps1'
+      filePath: '$(Build.Repository.LocalPath)/azure-functions-extension-bundles/eng/ci/scripts/build-core-tools.ps1'
       arguments: '-Branch main -Configuration Release -CloneDir "$(Build.Repository.LocalPath)/coretools"'
       pwsh: true
-      workingDirectory: '$(Build.Repository.LocalPath)'
+      workingDirectory: '$(Build.Repository.LocalPath)/coretools'
 
   - task: DotNetCoreCLI@2
     displayName: 'Build Linux Bundle (once)'
@@ -89,7 +89,7 @@ jobs:
       arguments: 'PackageNetCoreV3BundlesLinux'
     env:
       BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
-      TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
+      TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/azure-functions-extension-bundles/templatesArtifacts'
 
   - script: |
       echo "Checking for build artifacts..."
