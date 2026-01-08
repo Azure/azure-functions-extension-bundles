@@ -76,7 +76,7 @@ jobs:
   - task: PowerShell@2
     displayName: 'Build Azure Functions Core Tools'
     inputs:
-      filePath: '$(Build.Repository.LocalPath)/azure-functions-extension-bundles/eng/ci/scripts/build-core-tools.ps1'
+      filePath: '$(Build.Repository.LocalPath)/azure-functions-extension-bundles/eng/ci/scripts/build-multi-version-core-tools.ps1'
       arguments: '-Branch main -Configuration Release -CloneDir "$(Build.Repository.LocalPath)/azure-functions-core-tools"'
       pwsh: true
       workingDirectory: '$(Build.Repository.LocalPath)/azure-functions-core-tools'

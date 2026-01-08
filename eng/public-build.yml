@@ -1,3 +1,6 @@
+variables:
+  hostTagsCount: 2  # Number of latest host tags to fetch from azure-functions-host
+
 trigger:
   branches:
     include:

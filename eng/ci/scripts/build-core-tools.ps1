@@ -16,7 +16,7 @@
 .PARAMETER Configuration
     Build configuration - Debug or Release (default: Release)
 
-.PARAMETER CloneDir
+.PARAMETER CoreToolsDir
     Directory where the repository will be cloned (default: tests/build/core-tools-source)
 
 .EXAMPLE
@@ -26,7 +26,9 @@
 param(
     [string]$Branch = "main",
     [string]$Configuration = "Release",
-    [string]$CloneDir = "$(Build.Repository.LocalPath)/azure-functions-core-tools"
+    [string]$CoreToolsDir = "$(Build.Repository.LocalPath)/azure-functions-core-tools",
+    [string]$ZipOutputDir = "artifacts-coretools-zip"
+    
 )
 
 $ErrorActionPreference = "Stop"
@@ -58,7 +60,7 @@ Write-Host "Runtime: $Runtime" -ForegroundColor Yellow
 Write-Host "==================================================" -ForegroundColor Cyan
 
 # Locate the project file
-$ProjectPath = Join-Path $CloneDir "src\Cli\func\Azure.Functions.Cli.csproj"
+$ProjectPath = Join-Path $CoreToolsDir "src\Cli\func\Azure.Functions.Cli.csproj"
 
 if (-not (Test-Path $ProjectPath)) {
     Write-Error "Project file not found at $ProjectPath"
@@ -68,14 +70,14 @@ if (-not (Test-Path $ProjectPath)) {
 Write-Host "`nProject file found: $ProjectPath" -ForegroundColor Green
 
 # Set output directory
-$OutputDir = Join-Path $CloneDir "artifacts\$Runtime"
-$ZipOutputDir = Join-Path $CloneDir "artifacts-coretools-zip"
+$OutputDir = Join-Path $CoreToolsDir "artifacts\$Runtime"
+$ZipOutputDir = Join-Path $CoreToolsDir "artifacts-coretools-zip"
 
 # Build the project
 Write-Host "`nPublishing Azure.Functions.Cli with $Configuration configuration..." -ForegroundColor Yellow
 Write-Host "Output Directory: $OutputDir" -ForegroundColor Yellow
 
-Push-Location $CloneDir
+Push-Location $CoreToolsDir
 
 try {
     $publishArgs = @(
