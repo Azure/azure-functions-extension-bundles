@@ -108,7 +108,10 @@ jobs:
     name: ${{ parameters.poolName }}
     image: 1es-ubuntu-22.04
     os: linux
-  
+  sdl:
+    sourceRepositoriesToScan:
+      include:
+        - coretools
   # Matrix strategy for parallel execution by emulator group
   strategy:
     matrix:

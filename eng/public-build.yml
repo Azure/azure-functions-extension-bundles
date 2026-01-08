@@ -47,10 +47,6 @@ extends:
       ${{ if eq( variables['Build.Reason'], 'Schedule' ) }}:
         demands:
           - Priority -equals Low
-    sdl:
-      sourceRepositoriesToScan:
-        include:
-          - coretools
     settings:
       # PR's from forks do not have sufficient permissions to set tags.
       skipBuildTagsForGitHubPullRequests: ${{ variables['System.PullRequest.IsFork'] }}
