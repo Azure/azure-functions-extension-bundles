@@ -50,7 +50,11 @@ extends:
     settings:
       # PR's from forks do not have sufficient permissions to set tags.
       skipBuildTagsForGitHubPullRequests: ${{ variables['System.PullRequest.IsFork'] }}
-
+    sdl:
+      sourceRepositoriesToScan:
+        include:
+        - repository: coretools
+        runInSingleJob: true
     stages:
       - stage: RunUnitTests
         dependsOn: []
