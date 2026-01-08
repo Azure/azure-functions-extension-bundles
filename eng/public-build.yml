@@ -16,7 +16,7 @@ pr:
 
 schedules:
   # Ensure we build nightly to catch any new CVEs and report SDL often.
-  - cron: "0 1 * * *"
+  - cron: '0 1 * * *'
     displayName: Nightly Build
     branches:
       include:
@@ -31,6 +31,10 @@ resources:
       name: 1ESPipelineTemplates/1ESPipelineTemplates
       ref: refs/tags/release
 
+    - repository: coretools
+      type: github
+      name: Azure/azure-functions-core-tools
+
 extends:
   template: v1/1ES.Unofficial.PipelineTemplate.yml@1es
   parameters:
@@ -40,7 +44,7 @@ extends:
       os: windows
       ${{ if eq( variables['Build.Reason'], 'Schedule' ) }}:
         demands:
-        - Priority -equals Low
+          - Priority -equals Low
     settings:
       # PR's from forks do not have sufficient permissions to set tags.
       skipBuildTagsForGitHubPullRequests: ${{ variables['System.PullRequest.IsFork'] }}

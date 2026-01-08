@@ -38,11 +38,6 @@ jobs:
         displayName: Publish core tools artifacts
         path: $(Build.Repository.LocalPath)/tests/build/core-tools-source/artifacts
         artifact: core-tools-artifacts
-  resources:
-    repositories:
-      - repository: coretools
-        type: github
-        name: Azure/azure-functions-core-tools
 
   steps:
   # Download template artifacts for the build
