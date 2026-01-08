@@ -38,9 +38,9 @@ def extract_core_tools(src_zip, dest_folder):
         shutil.rmtree(dest_folder)
     os.makedirs(dest_folder, exist_ok=True)
 
-    with zipfile.ZipFile(src_zip, 'r') as archive:
+    with zipfile.ZipFile(src_zip, "r") as archive:
         archive.extractall(dest_folder)
-      # Make func executable on Unix systems
+    # Make func executable on Unix systems
     system = sys.platform.lower()
     if not system.startswith("win"):
         func_path = dest_folder / "func"
@@ -50,9 +50,13 @@ def extract_core_tools(src_zip, dest_folder):
     print(f"Azure Functions Core Tools extracted to {dest_folder}")
     return dest_folder
 
+
 @task
-def webhost(c, clean=False, webhost_version=None, webhost_dir=None,
-            branch_name=None, func_runtime_version='4'):
+def webhost(
+    c,
+    clean=False,
+    webhost_dir=None
+):
     """Builds the webhost"""
 
     if webhost_dir is None:
@@ -66,7 +70,18 @@ def webhost(c, clean=False, webhost_version=None, webhost_dir=None,
         print("Deleted webhost dir")
         return
 
-    zip_path = "$(Build.Repository.LocalPath)/core-tools/*.zip"
+    # Find the core tools zip file
+    repo_root = ROOT_DIR.parent
+    core_tools_dir = repo_root / "core-tools"
+
+    # Find the zip file
+    zip_files = list(core_tools_dir.glob("*.zip"))
+    if not zip_files:
+        raise FileNotFoundError(f"No zip files found in {core_tools_dir}")
+
+    # Use the first (or most recent) zip file
+    zip_path = zip_files[0]
+    print(f"Using Core Tools zip: {zip_path}")
 
     create_webhost_folder(webhost_dir)
     extract_core_tools(zip_path, webhost_dir)

@@ -31,7 +31,7 @@
 param(
     [int]$Count = 2,
     [string]$Configuration = "Release",
-    [string]$CloneDir = "tests/build/core-tools-source"
+    [string]$CloneDir = "$(Build.Repository.LocalPath)/azure-functions-core-tools"
 )
 
 $ErrorActionPreference = "Stop"
@@ -48,7 +48,7 @@ $ScriptDir = $PSScriptRoot
 $RepoRoot = Split-Path (Split-Path (Split-Path $ScriptDir -Parent) -Parent) -Parent
 
 # Resolve paths
-$CloneDir = Join-Path $RepoRoot $CloneDir | Resolve-Path
+$CloneDir = $CloneDir | Resolve-Path
 $PackagesPropsPath = Join-Path $CloneDir "eng/build/Packages.props"
 $UpdateVersionsScript = Join-Path $ScriptDir "update-core-tools-versions.ps1"
 $GetLatestTagsScript = Join-Path $ScriptDir "get-latest-host-tags.ps1"
