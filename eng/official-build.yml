@@ -46,11 +46,7 @@ extends:
       os: windows  
       ${{ if eq( variables['Build.Reason'], 'Schedule' ) }}:
         demands:
-        - Priority -equals Low
-    sdl:
-      sourceRepositoriesToScan:
-        include:
-          - coretools
+        - Priority -equals Low  
     stages:
     - stage: RunUnitTests
       dependsOn: []
