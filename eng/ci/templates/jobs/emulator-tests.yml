@@ -36,7 +36,7 @@ jobs:
         artifact: templates-artifacts
       - output: pipelineArtifact
         displayName: Publish core tools artifacts
-        path: $(Build.Repository.LocalPath)/azure-functions-core-tools/artifacts-coretools-zip
+        path: $(Build.Repository.LocalPath)/azure-functions-core-tools/coretools
         artifact: core-tools-artifacts
 
   steps:
@@ -85,7 +85,7 @@ jobs:
     displayName: 'Build Linux Bundle (once)'
     inputs:
       command: 'run'
-      workingDirectory: './build'
+      workingDirectory: '$(Build.Repository.LocalPath)/azure-functions-extension-bundles/build'
       arguments: 'PackageNetCoreV3BundlesLinux'
     env:
       BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
@@ -166,6 +166,12 @@ jobs:
   - task: DownloadPipelineArtifact@2
     displayName: 'Download bundle artifacts'
     inputs:
+      artifact: 'core-tools-artifacts'
+      path: '$(Build.Repository.LocalPath)/core-tools'
+
+  - task: DownloadPipelineArtifact@2
+    displayName: 'Download bundle artifacts'
+    inputs:
       artifact: 'bundle-artifacts'
       path: '$(Build.Repository.LocalPath)/artifacts'
 
@@ -186,12 +192,14 @@ jobs:
       ls -al artifacts || true
       ls -al bin || true
       ls -al templatesArtifacts || true
+      ls -al core-tools || true
       echo "Checking for downloaded artifacts..."
       if ls artifacts/*.zip 2>/dev/null || ls bin/*/*.zip 2>/dev/null; then
         echo "✓ Extension bundle artifacts downloaded"
         echo "Artifacts:"
         ls -1 artifacts/*.zip 2>/dev/null || true
         ls -1 bin/*/*.zip 2>/dev/null || true
+        ls -1 core-tools/*.zip 2>/dev/null || true
       else
         echo "✗ No extension bundle zip files found"
         find . -maxdepth 5 -type f -name '*.zip' -print || true
@@ -294,13 +302,6 @@ jobs:
         netstat -tlnp | grep :8000 || true
       fi
     displayName: 'Start Mock Extension Site'
-
-  # Set up webhost
-  - script: |
-      cd tests
-      source venv/bin/activate
-      python -m invoke -c test_setup webhost
-    displayName: 'Setup WebHost'
 
   # Run tests for this specific test group
   - script: |

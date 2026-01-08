@@ -210,19 +210,19 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
     coretools_exe = os.environ.get('CORE_TOOLS_EXE_PATH')
     if not coretools_exe:
         # Default to the webhost directory structure from test_setup.py
-        # BUILD_DIR / "webhost" is where test_setup.py extracts Core Tools
+        # BUILD_DIR / "core-tools" is where test_setup.py extracts Core Tools
         if ON_WINDOWS:
-            default_path = BUILD_DIR / "webhost" / "func.exe"
+            default_path = BUILD_DIR / "core-tools" / "func.exe"
         else:
-            default_path = BUILD_DIR / "webhost" / "func"
+            default_path = BUILD_DIR / "core-tools" / "func"
         
         if default_path.exists():
             coretools_exe = str(default_path)
         else:
             # Try to find Core Tools in the build directory (fallback)
             potential_paths = [
-                BUILD_DIR / "webhost" / "func.exe",
-                BUILD_DIR / "webhost" / "func"
+                BUILD_DIR / "core-tools" / "func.exe",
+                BUILD_DIR / "core-tools" / "func"
             ]
             for path in potential_paths:
                 if path.exists():
@@ -235,8 +235,6 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
             'Please do one of the following:',
             ' * run the following command from the root folder of',
             '   the project:',
-            '',
-            f'cd tests && python -m invoke -c test_setup webhost',
             '',
             ' * or set the CORE_TOOLS_EXE_PATH environment variable',
             '   to point to the func.exe or func binary.',

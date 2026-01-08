@@ -29,40 +29,6 @@ ROOT_DIR = pathlib.Path(__file__).parent
 ARTIFACTS_DIR = ROOT_DIR / "artifacts"
 BUILD_DIR = ROOT_DIR / "build"
 
-@task
-def webhost(
-    c,
-    clean=False,
-    webhost_version=None,
-    webhost_dir=None,
-    branch_name=None,
-    func_runtime_version="4"
-):
-    """Sets up the webhost by calling build-core-tools.ps1 script or using pre-built tools.
-
-    Args:
-        clean: If True, deletes the webhost directory and exits
-        webhost_version: Deprecated (kept for backward compatibility)
-        webhost_dir: Target directory for the built webhost (default: tests/build/webhost)
-        branch_name: Git branch to clone (default: main)
-        func_runtime_version: Deprecated (kept for backward compatibility)
-    """
-
-    if webhost_dir is None:
-        webhost_dir = BUILD_DIR / "webhost"
-    else:
-        webhost_dir = pathlib.Path(webhost_dir)
-
-    if clean:
-        print("Deleting webhost dir")
-        shutil.rmtree(webhost_dir, ignore_errors=True)
-        print("Deleted webhost dir")
-        return
-
-    if branch_name is None:
-        branch_name = "main"
-
-
 def create_webhost_folder(dest_folder):
     if dest_folder.exists():
         shutil.rmtree(dest_folder)
