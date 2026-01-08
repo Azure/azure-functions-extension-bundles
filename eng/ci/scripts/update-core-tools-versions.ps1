@@ -72,7 +72,16 @@ function Get-WorkerVersionFromHost {
     try {
         $content = (Invoke-WebRequest -Uri $uri -ErrorAction Stop).Content
         [xml]$workerXml = $content
+
+        # Check for PackageVersion elements (used in Directory.Packages.props)
+        $node = Select-Xml -Xml $workerXml -XPath "//PackageVersion[@Include='$PackageName']" | 
+                Select-Object -ExpandProperty Node
         
+        if ($node -and $node.Version) {
+            return $node.Version
+        }
+        
+        # Check for PackageReference elements (used in worker props)
         $node = Select-Xml -Xml $workerXml -XPath "//PackageReference[@Include='$PackageName']" | 
                 Select-Object -ExpandProperty Node
         
@@ -118,6 +127,11 @@ $workers = @{
     "Microsoft.Azure.Functions.PowerShellWorker.PS7.4" = "eng/build/Workers.Powershell.props"
 }
 
+# Define additional packages to sync from host repo
+$additionalPackages = @{
+    "Azure.Storage.Blobs" = "Directory.Packages.props"
+}
+
 # Update worker versions
 Write-Host "`nUpdating worker versions from host repo..." -ForegroundColor Yellow
 
@@ -150,6 +164,41 @@ foreach ($packageName in $workers.Keys) {
         Write-Host "    $packageName`: $oldWorkerVersion -> $hostWorkerVersion" -ForegroundColor Green
     } else {
         Write-Host "    $packageName`: $oldWorkerVersion (no change)" -ForegroundColor Gray
+    }
+}
+
+# Update additional packages
+Write-Host "`nUpdating additional packages from host repo..." -ForegroundColor Yellow
+
+foreach ($packageName in $additionalPackages.Keys) {
+    $sourceFile = $additionalPackages[$packageName]
+    
+    Write-Host "  Processing $packageName..." -ForegroundColor Gray
+    
+    # Get version from host repo
+    $hostPackageVersion = Get-WorkerVersionFromHost -WorkerPropsFile $sourceFile -PackageName $packageName
+    
+    if (-not $hostPackageVersion) {
+        Write-Warning "    Skipping $packageName - could not determine version from host"
+        continue
+    }
+    
+    # Find and update in Packages.props
+    $packageNode = Select-Xml -Xml $packagesXml -XPath "//PackageVersion[@Include='$packageName']" | 
+                  Select-Object -ExpandProperty Node
+    
+    if (-not $packageNode) {
+        Write-Warning "    $packageName not found in Packages.props"
+        continue
+    }
+    
+    $oldPackageVersion = $packageNode.Version
+    
+    if ($oldPackageVersion -ne $hostPackageVersion) {
+        $packageNode.Version = $hostPackageVersion
+        Write-Host "    $packageName`: $oldPackageVersion -> $hostPackageVersion" -ForegroundColor Green
+    } else {
+        Write-Host "    $packageName`: $oldPackageVersion (no change)" -ForegroundColor Gray
     }
 }
 

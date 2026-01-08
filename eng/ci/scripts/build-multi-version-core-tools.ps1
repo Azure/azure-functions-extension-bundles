@@ -31,7 +31,7 @@
 param(
     [int]$Count = 2,
     [string]$Configuration = "Release",
-    [string]$CloneDir = "$(Build.Repository.LocalPath)/azure-functions-core-tools"
+    [string]$CloneDir = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -47,8 +47,18 @@ Write-Host "===========================================================" -Foregr
 $ScriptDir = $PSScriptRoot
 $RepoRoot = Split-Path (Split-Path (Split-Path $ScriptDir -Parent) -Parent) -Parent
 
+# Set default CloneDir if not provided
+if ([string]::IsNullOrEmpty($CloneDir)) {
+    $CloneDir = Join-Path $RepoRoot "tests\build\core-tools-source"
+}
+
 # Resolve paths
-$CloneDir = $CloneDir | Resolve-Path
+if (Test-Path $CloneDir) {
+    $CloneDir = Resolve-Path $CloneDir
+} else {
+    Write-Error "Clone directory does not exist: $CloneDir"
+    exit 1
+}
 $PackagesPropsPath = Join-Path $CloneDir "eng/build/Packages.props"
 $UpdateVersionsScript = Join-Path $ScriptDir "update-core-tools-versions.ps1"
 $GetLatestTagsScript = Join-Path $ScriptDir "get-latest-host-tags.ps1"
