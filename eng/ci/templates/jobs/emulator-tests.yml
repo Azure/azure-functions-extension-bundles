@@ -40,6 +40,7 @@ jobs:
         artifact: core-tools-artifacts
 
   steps:
+  - checkout: self
   - checkout: coretools 
   
   # Download template artifacts for the build
