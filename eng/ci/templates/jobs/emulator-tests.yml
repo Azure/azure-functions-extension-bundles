@@ -36,7 +36,7 @@ jobs:
         artifact: templates-artifacts
       - output: pipelineArtifact
         displayName: Publish core tools artifacts
-        path: $(Build.Repository.LocalPath)/azure-functions-core-tools/coretools
+        path: $(Build.Repository.LocalPath)/azure-functions-core-tools/artifacts-coretools-zip
         artifact: core-tools-artifacts
 
   steps:
@@ -93,7 +93,7 @@ jobs:
 
   - script: |
       echo "Checking for build artifacts..."
-      if ls azure-functions-core-tools/coretools/*.zip 2>/dev/null || ls azure-functions-extension-bundles/artifacts/*.zip 2>/dev/null || ls azure-functions-extension-bundles/bin/*/*.zip 2>/dev/null; then
+      if ls azure-functions-core-tools/artifacts-coretools-zip/*.zip 2>/dev/null || ls azure-functions-extension-bundles/artifacts/*.zip 2>/dev/null || ls azure-functions-extension-bundles/bin/*/*.zip 2>/dev/null; then
         echo "✓ Extension bundle and core tools artifacts found"
       else
         echo "✗ No extension bundle or core tools zip files found anywhere"
@@ -164,7 +164,7 @@ jobs:
 
   # Download prepared artifacts (instead of rebuilding)
   - task: DownloadPipelineArtifact@2
-    displayName: 'Download bundle artifacts'
+    displayName: 'Download core tools artifacts'
     inputs:
       artifact: 'core-tools-artifacts'
       path: '$(Build.Repository.LocalPath)/core-tools'
