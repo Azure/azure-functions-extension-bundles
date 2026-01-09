@@ -177,6 +177,24 @@ try {
             Remove-Item -Path $tempZipDir -Recurse -Force
         }
         
+        # Step 2d: Clean up intermediate build artifacts to save disk space
+        Write-Host "`nStep 2.$versionIndex.d: Cleaning up intermediate build artifacts..." -ForegroundColor Yellow
+        
+        $artifactsDir = Join-Path $CloneDir "artifacts"
+        if (Test-Path $artifactsDir) {
+            Remove-Item -Path $artifactsDir -Recurse -Force
+            Write-Host "  ✓ Removed artifacts directory" -ForegroundColor Green
+        }
+        
+        # Clean up obj/bin directories in source
+        $srcDir = Join-Path $CloneDir "src"
+        if (Test-Path $srcDir) {
+            Get-ChildItem -Path $srcDir -Include "obj","bin" -Recurse -Directory -Force | ForEach-Object {
+                Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
+            }
+            Write-Host "  ✓ Cleaned obj/bin directories" -ForegroundColor Green
+        }
+        
         # Store result
         $buildResults += [PSCustomObject]@{
             HostVersion = $hostVersion

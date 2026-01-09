@@ -42,9 +42,11 @@ jobs:
   steps:
   - checkout: self
     path: bundle
+    fetchDepth: 1
     
   - checkout: coretools
     path: core-tools
+    fetchDepth: 1
   
   # Download template artifacts for the build
   # Official templates
@@ -126,15 +128,40 @@ jobs:
       BUILD_REPOSITORY_LOCALPATH: '$(Agent.BuildDirectory)'
       TEMPLATES_ARTIFACTS_DIRECTORY: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
 
-  # - script: |
-  #     echo "Checking for build artifacts..."
-  #     if ls core-tools/artifacts-coretools-zip/*.zip 2>/dev/null || ls bundle/artifacts/*.zip 2>/dev/null || ls bundle/bin/*/*.zip 2>/dev/null; then
-  #       echo "✓ Extension bundle and core tools artifacts found"
-  #     else
-  #       echo "✗ No extension bundle or core tools zip files found anywhere"
-  #       exit 1
-  #     fi
-  #   displayName: 'Verify Build Artifacts'
+  # Optimize disk space by cleaning up intermediate artifacts
+  - script: |
+      echo "Optimizing disk space..."
+      
+      # Clean up Core Tools build intermediates (keep only zip files)
+      if [ -d "$(Agent.BuildDirectory)/core-tools/artifacts" ]; then
+        echo "Removing Core Tools build artifacts directory..."
+        rm -rf "$(Agent.BuildDirectory)/core-tools/artifacts"
+      fi
+      
+      # Clean up Core Tools source (keep only the zip files)
+      echo "Removing Core Tools source files..."
+      find "$(Agent.BuildDirectory)/core-tools" -type f ! -name '*.zip' -delete 2>/dev/null || true
+      find "$(Agent.BuildDirectory)/core-tools" -type d -empty -delete 2>/dev/null || true
+      
+      # Clean up bundle build intermediates
+      if [ -d "$(Agent.BuildDirectory)/bundle/build_temp" ]; then
+        echo "Removing bundle build_temp directory..."
+        rm -rf "$(Agent.BuildDirectory)/bundle/build_temp"
+      fi
+      
+      # Clean up NuGet cache
+      if [ -d "$HOME/.nuget/packages" ]; then
+        echo "Cleaning NuGet cache..."
+        rm -rf "$HOME/.nuget/packages"
+      fi
+      
+      # Show disk usage summary
+      echo ""
+      echo "Disk usage after cleanup:"
+      du -sh "$(Agent.BuildDirectory)/core-tools" 2>/dev/null || echo "core-tools: N/A"
+      du -sh "$(Agent.BuildDirectory)/bundle/artifacts" 2>/dev/null || echo "bundle/artifacts: N/A"
+      du -sh "$(Agent.BuildDirectory)/bundle/bin" 2>/dev/null || echo "bundle/bin: N/A"
+    displayName: 'Cleanup Build Artifacts (Optimize Disk Space)'
 
 # Matrix job now depends on the preparation job and reuses its artifacts
 - job: EmulatorTests
