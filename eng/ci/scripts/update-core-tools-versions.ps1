@@ -98,6 +98,10 @@ function Get-WorkerVersionFromHost {
         Write-Warning "Could not find version for $PackageName in $WorkerPropsFile"
         return $null
     } catch {
+        # For Directory.Packages.props, file might not exist in older tags - this is OK
+        if ($WorkerPropsFile -eq "Directory.Packages.props" -and $_.Exception.Message -match "404") {
+            return $null
+        }
         Write-Warning "Failed to fetch $WorkerPropsFile from host repo: $_"
         return $null
     }
@@ -224,6 +228,28 @@ foreach ($packageName in $additionalPackages.Keys) {
 Write-Host "`nSaving updated Packages.props..." -ForegroundColor Yellow
 $packagesXml.Save($PackagesPropsPath)
 Write-Host "✓ Successfully updated Packages.props" -ForegroundColor Green
+
+# Disable UpdateBuildNumber in Directory.Version.props to prevent build output from updating Azure DevOps build number
+Write-Host "`nDisabling UpdateBuildNumber in Directory.Version.props..." -ForegroundColor Yellow
+$coreToolsRoot = Split-Path (Split-Path (Split-Path $PackagesPropsPath -Parent) -Parent) -Parent
+$versionPropsPath = Join-Path $coreToolsRoot "src\Cli\func\Directory.Version.props"
+
+if (Test-Path $versionPropsPath) {
+    [xml]$versionPropsXml = Get-Content $versionPropsPath
+    $updateBuildNumberNode = Select-Xml -Xml $versionPropsXml -XPath "//UpdateBuildNumber" | 
+                            Select-Object -ExpandProperty Node
+    
+    if ($updateBuildNumberNode) {
+        $oldValue = $updateBuildNumberNode.'#text'
+        $updateBuildNumberNode.'#text' = 'false'
+        $versionPropsXml.Save($versionPropsPath)
+        Write-Host "  UpdateBuildNumber: $oldValue -> false" -ForegroundColor Green
+    } else {
+        Write-Host "  UpdateBuildNumber node not found (already disabled)" -ForegroundColor Gray
+    }
+} else {
+    Write-Warning "  Directory.Version.props not found at: $versionPropsPath"
+}
 
 Write-Host "`n===========================================================" -ForegroundColor Cyan
 Write-Host "Update Complete" -ForegroundColor Cyan

@@ -83,9 +83,6 @@ jobs:
       arguments: '-Branch main -Configuration Release -CloneDir "$(Agent.BuildDirectory)/core-tools"'
       pwsh: true
       workingDirectory: '$(Agent.BuildDirectory)/core-tools'
-      errorActionPreference: 'continue'
-    env:
-      SYSTEM_DEBUG: 'false'
 
   - task: DotNetCoreCLI@2
     displayName: 'Build Linux Bundle (once)'
