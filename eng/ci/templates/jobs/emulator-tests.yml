@@ -140,51 +140,44 @@ jobs:
 - job: EmulatorTests
   displayName: Run Emulator Tests
   dependsOn: PrepareEmulatorTestAssets
-  variables:
-    HostVersionsList: $[ dependencies.PrepareEmulatorTestAssets.outputs['HostVersions.HostVersionsList'] ]
   pool:
     name: ${{ parameters.poolName }}
     image: 1es-ubuntu-22.04
     os: linux
-  # Matrix strategy for parallel execution by emulator group AND host version
+  # Matrix strategy for parallel execution by emulator group ONLY
+  # Each job will test ALL host versions sequentially
   strategy:
     matrix:
-      ${{ each hostVersion in split(variables['HostVersionsList'], ',') }}:
-        BasicTests_${{ replace(hostVersion, '.', '_') }}:
-          TEST_GROUP: 'basic'
-          TEST_FILES: 'test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py test_table_functions.py'
-          ADDITIONAL_EMULATORS: 'none'
-          DISPLAY_NAME: 'Basic Tests (Azurite + EventHub)'
-          STOP_EVENTHUB: 'false'
-          HOST_VERSION: '${{ hostVersion }}'
-        CosmosDB_${{ replace(hostVersion, '.', '_') }}:
-          TEST_GROUP: 'cosmosdb'
-          TEST_FILES: 'test_cosmosdb_functions.py'
-          ADDITIONAL_EMULATORS: 'cosmosdb'
-          DISPLAY_NAME: 'CosmosDB Tests'
-          STOP_EVENTHUB: 'false'
-          HOST_VERSION: '${{ hostVersion }}'
-        MySQL_${{ replace(hostVersion, '.', '_') }}:
-          TEST_GROUP: 'mysql'
-          TEST_FILES: 'test_mysql_functions.py'
-          ADDITIONAL_EMULATORS: 'mysql'
-          DISPLAY_NAME: 'MySQL Tests'
-          STOP_EVENTHUB: 'false'
-          HOST_VERSION: '${{ hostVersion }}'
-        ServiceBus_${{ replace(hostVersion, '.', '_') }}:
-          TEST_GROUP: 'servicebus'
-          TEST_FILES: 'test_servicebus_functions.py'
-          ADDITIONAL_EMULATORS: 'servicebus'
-          DISPLAY_NAME: 'Service Bus Tests'
-          STOP_EVENTHUB: 'true'
-          HOST_VERSION: '${{ hostVersion }}'
-        DurableTaskScheduler_${{ replace(hostVersion, '.', '_') }}:
-          TEST_GROUP: 'dts'
-          TEST_FILES: 'test_durable_functions.py'
-          ADDITIONAL_EMULATORS: 'dts'
-          DISPLAY_NAME: 'Durable Task Scheduler Tests'
-          STOP_EVENTHUB: 'false'
-          HOST_VERSION: '${{ hostVersion }}'
+      BasicTests:
+        TEST_GROUP: 'basic'
+        TEST_FILES: 'test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py test_table_functions.py'
+        ADDITIONAL_EMULATORS: 'none'
+        DISPLAY_NAME: 'Basic Tests (Azurite + EventHub)'
+        STOP_EVENTHUB: 'false'
+      CosmosDB:
+        TEST_GROUP: 'cosmosdb'
+        TEST_FILES: 'test_cosmosdb_functions.py'
+        ADDITIONAL_EMULATORS: 'cosmosdb'
+        DISPLAY_NAME: 'CosmosDB Tests'
+        STOP_EVENTHUB: 'false'
+      MySQL:
+        TEST_GROUP: 'mysql'
+        TEST_FILES: 'test_mysql_functions.py'
+        ADDITIONAL_EMULATORS: 'mysql'
+        DISPLAY_NAME: 'MySQL Tests'
+        STOP_EVENTHUB: 'false'
+      ServiceBus:
+        TEST_GROUP: 'servicebus'
+        TEST_FILES: 'test_servicebus_functions.py'
+        ADDITIONAL_EMULATORS: 'servicebus'
+        DISPLAY_NAME: 'Service Bus Tests'
+        STOP_EVENTHUB: 'true'
+      DurableTaskScheduler:
+        TEST_GROUP: 'dts'
+        TEST_FILES: 'test_durable_functions.py'
+        ADDITIONAL_EMULATORS: 'dts'
+        DISPLAY_NAME: 'Durable Task Scheduler Tests'
+        STOP_EVENTHUB: 'false'
 
   templateContext:
     outputParentDirectory: $(Build.ArtifactStagingDirectory)
@@ -346,29 +339,78 @@ jobs:
       fi
     displayName: 'Start Mock Extension Site'
   
-  # Set up webhost
-  - script: |
-      cd tests
-      source venv/bin/activate
-      python -m invoke -c test_setup webhost
-    displayName: 'Setup WebHost'
-
-  # Run tests for this specific test group
+  # Run tests for each Core Tools version
   - script: |
       cd tests
       source venv/bin/activate
       cd ..
-      export PYAZURE_WEBHOST_DEBUG=1
-      export FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI="http://localhost:8000"
-      export MySqlConnectionString="Server=localhost;UserID=root;Password=password;Database=testdb;Port=3307"
-      IFS=' ' read -ra FILES <<< "$(TEST_FILES)"
-      TEST_PATHS=""
-      for file in "${FILES[@]}"; do
-        TEST_PATHS="$TEST_PATHS tests/emulator_tests/$file"
+      
+      echo "Finding available Core Tools versions..."
+      CORE_TOOLS_ZIPS=$(ls -1 core-tools/Cli.host-*.zip 2>/dev/null || echo "")
+      
+      if [ -z "$CORE_TOOLS_ZIPS" ]; then
+        echo "##[error]No Core Tools zip files found in core-tools directory"
+        exit 1
+      fi
+      
+      echo "Found Core Tools versions:"
+      echo "$CORE_TOOLS_ZIPS"
+      
+      # Overall test success tracker
+      ALL_TESTS_PASSED=true
+      
+      # Loop through each Core Tools zip
+      for ZIP_FILE in $CORE_TOOLS_ZIPS; do
+        # Extract version from filename (e.g., Cli.host-4.1046.100.zip -> 4.1046.100)
+        HOST_VERSION=$(basename "$ZIP_FILE" | sed 's/Cli\.host-\(.*\)\.zip/\1/')
+        
+        echo ""
+        echo "=========================================="
+        echo "Testing with Host Version: $HOST_VERSION"
+        echo "=========================================="
+        
+        # Set up webhost for this version
+        export HOST_VERSION="$HOST_VERSION"
+        cd tests
+        python -m invoke -c test_setup webhost
+        cd ..
+        
+        # Run tests
+        export PYAZURE_WEBHOST_DEBUG=1
+        export FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI="http://localhost:8000"
+        export MySqlConnectionString="Server=localhost;UserID=root;Password=password;Database=testdb;Port=3307"
+        
+        IFS=' ' read -ra FILES <<< "$(TEST_FILES)"
+        TEST_PATHS=""
+        for file in "${FILES[@]}"; do
+          TEST_PATHS="$TEST_PATHS tests/emulator_tests/$file"
+        done
+        
+        echo "Running pytest with paths: $TEST_PATHS"
+        
+        # Run tests with version-specific output file
+        if python -m pytest $TEST_PATHS -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results-$(TEST_GROUP)-${HOST_VERSION}.xml; then
+          echo "✓ Tests PASSED for host version $HOST_VERSION"
+        else
+          echo "✗ Tests FAILED for host version $HOST_VERSION"
+          ALL_TESTS_PASSED=false
+        fi
+        
+        # Clean up webhost directory for next iteration
+        rm -rf tests/build/webhost-${HOST_VERSION}
       done
-      echo "Running pytest with paths: $TEST_PATHS"
-      python -m pytest $TEST_PATHS -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results-$(TEST_GROUP).xml
-    displayName: 'Run $(DISPLAY_NAME) Tests'
+      
+      # Final status
+      echo ""
+      echo "=========================================="
+      if [ "$ALL_TESTS_PASSED" = true ]; then
+        echo "✓ All host versions passed tests"
+        exit 0
+      else
+        echo "✗ Some host versions failed tests"
+        exit 1
+      fi
+    displayName: 'Run $(DISPLAY_NAME) Tests (All Host Versions)'
     env:
       PYAZURE_WEBHOST_DEBUG: 1
       FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI: "http://localhost:8000"
@@ -394,9 +436,10 @@ jobs:
   # Publish test results
   - task: PublishTestResults@2
     inputs:
-      testResultsFiles: '$(Build.ArtifactStagingDirectory)/test-results-$(TEST_GROUP).xml'
+      testResultsFiles: '$(Build.ArtifactStagingDirectory)/test-results-$(TEST_GROUP)-*.xml'
       testRunTitle: '$(DISPLAY_NAME)'
       failTaskOnFailedTests: true
+      mergeTestResults: true
     condition: always()
     displayName: 'Publish $(DISPLAY_NAME) Test Results'
 
