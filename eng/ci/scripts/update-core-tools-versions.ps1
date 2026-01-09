@@ -130,6 +130,7 @@ $workers = @{
 # Define additional packages to sync from host repo
 $additionalPackages = @{
     "Azure.Storage.Blobs" = "Directory.Packages.props"
+    "System.Private.Uri" = "Directory.Packages.props"
 }
 
 # Update worker versions
@@ -188,17 +189,34 @@ foreach ($packageName in $additionalPackages.Keys) {
                   Select-Object -ExpandProperty Node
     
     if (-not $packageNode) {
-        Write-Warning "    $packageName not found in Packages.props"
-        continue
-    }
-    
-    $oldPackageVersion = $packageNode.Version
-    
-    if ($oldPackageVersion -ne $hostPackageVersion) {
-        $packageNode.Version = $hostPackageVersion
-        Write-Host "    $packageName`: $oldPackageVersion -> $hostPackageVersion" -ForegroundColor Green
+        # Package doesn't exist, add it
+        Write-Host "    Adding new package $packageName`: $hostPackageVersion" -ForegroundColor Cyan
+        
+        # Find the func ItemGroup (after the comment "<!-- func -->")
+        $funcItemGroup = $packagesXml.Project.ItemGroup | Where-Object { 
+            $_.PreviousSibling -and $_.PreviousSibling.Value -match "func"
+        } | Select-Object -First 1
+        
+        if ($funcItemGroup) {
+            # Create new PackageVersion element
+            $newPackage = $packagesXml.CreateElement("PackageVersion")
+            $newPackage.SetAttribute("Include", $packageName)
+            $newPackage.SetAttribute("Version", $hostPackageVersion)
+            $funcItemGroup.AppendChild($newPackage) | Out-Null
+        } else {
+            Write-Warning "    Could not find appropriate ItemGroup to add $packageName"
+            continue
+        }
     } else {
-        Write-Host "    $packageName`: $oldPackageVersion (no change)" -ForegroundColor Gray
+        # Package exists, update it
+        $oldPackageVersion = $packageNode.Version
+        
+        if ($oldPackageVersion -ne $hostPackageVersion) {
+            $packageNode.Version = $hostPackageVersion
+            Write-Host "    $packageName`: $oldPackageVersion -> $hostPackageVersion" -ForegroundColor Green
+        } else {
+            Write-Host "    $packageName`: $oldPackageVersion (no change)" -ForegroundColor Gray
+        }
     }
 }
 
