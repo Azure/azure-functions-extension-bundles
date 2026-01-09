@@ -117,6 +117,11 @@ try {
         Write-Host "`n===========================================================" -ForegroundColor Cyan
         Write-Host "Building Version $versionIndex of $($latestTags.Count): $hostVersion" -ForegroundColor Cyan
         Write-Host "===========================================================" -ForegroundColor Cyan
+        
+        # Restore Packages.props to original state before each build
+        Write-Host "`nRestoring Packages.props to original state..." -ForegroundColor Gray
+        Copy-Item $BackupPath $PackagesPropsPath -Force
+        Write-Host "  ✓ Restored Packages.props" -ForegroundColor Green
             
         # Step 2a: Update host and worker versions in Packages.props
         Write-Host "`nStep 2.$versionIndex.a: Updating host and worker versions to $hostVersion" -ForegroundColor Yellow
@@ -142,6 +147,24 @@ try {
         
         if ($LASTEXITCODE -ne 0) {
             throw "Core Tools build failed with exit code $LASTEXITCODE"
+        }
+        
+        # Step 2c: Rename zip files to include host version tag to prevent overwriting
+        Write-Host "`nStep 2.$versionIndex.c: Renaming zip files to include host version..." -ForegroundColor Yellow
+        
+        $zipDir = Join-Path $CloneDir "artifacts-coretools-zip"
+        if (Test-Path $zipDir) {
+            Get-ChildItem -Path $zipDir -Filter "*.zip" | ForEach-Object {
+                $oldName = $_.Name
+                # Use simple naming: Cli.host-{version}.zip
+                $newName = "Cli.host-$hostVersion.zip"
+                $newPath = Join-Path $zipDir $newName
+                
+                if ($_.FullName -ne $newPath) {
+                    Move-Item -Path $_.FullName -Destination $newPath -Force
+                    Write-Host "  Renamed: $oldName -> $newName" -ForegroundColor Green
+                }
+            }
         }
         
         # Store result

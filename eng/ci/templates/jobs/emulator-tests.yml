@@ -80,9 +80,27 @@ jobs:
     displayName: 'Build Azure Functions Core Tools'
     inputs:
       filePath: '$(Agent.BuildDirectory)/bundle/eng/ci/scripts/build-multi-version-core-tools.ps1'
-      arguments: '-Branch main -Configuration Release -CloneDir "$(Agent.BuildDirectory)/core-tools"'
+      arguments: '-Count $(hostTagsCount) -Configuration Release -CloneDir "$(Agent.BuildDirectory)/core-tools"'
       pwsh: true
       workingDirectory: '$(Agent.BuildDirectory)/core-tools'
+  
+  # Get list of built host versions for matrix
+  - task: PowerShell@2
+    displayName: 'Generate Host Versions List'
+    inputs:
+      targetType: 'inline'
+      script: |
+        $zipFiles = Get-ChildItem -Path "$(Agent.BuildDirectory)/core-tools/artifacts-coretools-zip" -Filter "Cli.host-*.zip"
+        $versions = $zipFiles | ForEach-Object { 
+          if ($_.Name -match 'Cli\.host-(.+)\.zip') { 
+            $matches[1] 
+          } 
+        }
+        $versionsList = $versions -join ','
+        Write-Host "Found host versions: $versionsList"
+        Write-Host "##vso[task.setvariable variable=HostVersionsList;isOutput=true]$versionsList"
+      pwsh: true
+    name: HostVersions
 
   - task: DotNetCoreCLI@2
     displayName: 'Build Linux Bundle (once)'
@@ -108,43 +126,51 @@ jobs:
 - job: EmulatorTests
   displayName: Run Emulator Tests
   dependsOn: PrepareEmulatorTestAssets
+  variables:
+    HostVersionsList: $[ dependencies.PrepareEmulatorTestAssets.outputs['HostVersions.HostVersionsList'] ]
   pool:
     name: ${{ parameters.poolName }}
     image: 1es-ubuntu-22.04
     os: linux
-  # Matrix strategy for parallel execution by emulator group
+  # Matrix strategy for parallel execution by emulator group AND host version
   strategy:
     matrix:
-      BasicTests:
-        TEST_GROUP: 'basic'
-        TEST_FILES: 'test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py test_table_functions.py'
-        ADDITIONAL_EMULATORS: 'none'
-        DISPLAY_NAME: 'Basic Tests (Azurite + EventHub)'
-        STOP_EVENTHUB: 'false'
-      CosmosDB:
-        TEST_GROUP: 'cosmosdb'
-        TEST_FILES: 'test_cosmosdb_functions.py'
-        ADDITIONAL_EMULATORS: 'cosmosdb'
-        DISPLAY_NAME: 'CosmosDB Tests'
-        STOP_EVENTHUB: 'false'
-      MySQL:
-        TEST_GROUP: 'mysql'
-        TEST_FILES: 'test_mysql_functions.py'
-        ADDITIONAL_EMULATORS: 'mysql'
-        DISPLAY_NAME: 'MySQL Tests'
-        STOP_EVENTHUB: 'false'
-      ServiceBus:
-        TEST_GROUP: 'servicebus'
-        TEST_FILES: 'test_servicebus_functions.py'
-        ADDITIONAL_EMULATORS: 'servicebus'
-        DISPLAY_NAME: 'Service Bus Tests'
-        STOP_EVENTHUB: 'true'
-      DurableTaskScheduler:
-        TEST_GROUP: 'dts'
-        TEST_FILES: 'test_durable_functions.py'
-        ADDITIONAL_EMULATORS: 'dts'
-        DISPLAY_NAME: 'Durable Task Scheduler Tests'
-        STOP_EVENTHUB: 'false'
+      ${{ each hostVersion in split(variables['HostVersionsList'], ',') }}:
+        BasicTests_${{ replace(hostVersion, '.', '_') }}:
+          TEST_GROUP: 'basic'
+          TEST_FILES: 'test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py test_table_functions.py'
+          ADDITIONAL_EMULATORS: 'none'
+          DISPLAY_NAME: 'Basic Tests (Azurite + EventHub)'
+          STOP_EVENTHUB: 'false'
+          HOST_VERSION: '${{ hostVersion }}'
+        CosmosDB_${{ replace(hostVersion, '.', '_') }}:
+          TEST_GROUP: 'cosmosdb'
+          TEST_FILES: 'test_cosmosdb_functions.py'
+          ADDITIONAL_EMULATORS: 'cosmosdb'
+          DISPLAY_NAME: 'CosmosDB Tests'
+          STOP_EVENTHUB: 'false'
+          HOST_VERSION: '${{ hostVersion }}'
+        MySQL_${{ replace(hostVersion, '.', '_') }}:
+          TEST_GROUP: 'mysql'
+          TEST_FILES: 'test_mysql_functions.py'
+          ADDITIONAL_EMULATORS: 'mysql'
+          DISPLAY_NAME: 'MySQL Tests'
+          STOP_EVENTHUB: 'false'
+          HOST_VERSION: '${{ hostVersion }}'
+        ServiceBus_${{ replace(hostVersion, '.', '_') }}:
+          TEST_GROUP: 'servicebus'
+          TEST_FILES: 'test_servicebus_functions.py'
+          ADDITIONAL_EMULATORS: 'servicebus'
+          DISPLAY_NAME: 'Service Bus Tests'
+          STOP_EVENTHUB: 'true'
+          HOST_VERSION: '${{ hostVersion }}'
+        DurableTaskScheduler_${{ replace(hostVersion, '.', '_') }}:
+          TEST_GROUP: 'dts'
+          TEST_FILES: 'test_durable_functions.py'
+          ADDITIONAL_EMULATORS: 'dts'
+          DISPLAY_NAME: 'Durable Task Scheduler Tests'
+          STOP_EVENTHUB: 'false'
+          HOST_VERSION: '${{ hostVersion }}'
 
   templateContext:
     outputParentDirectory: $(Build.ArtifactStagingDirectory)
