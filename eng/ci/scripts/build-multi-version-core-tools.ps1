@@ -138,7 +138,7 @@ try {
         Write-Host "`nStep 2.$versionIndex.b: Building Core Tools for version $hostVersion..." -ForegroundColor Yellow
         
         $buildScript = Join-Path $ScriptDir "build-core-tools.ps1"
-        $buildOutput = & $buildScript -Configuration $Configuration -CoreToolsDir $CloneDir -ZipOutputDir "$hostVersion-artifacts-coretools-zip"
+        $buildOutput = & $buildScript -Configuration $Configuration -CoreToolsDir $CloneDir -ZipOutputDir "artifacts-coretools-zip"
         
         if ($LASTEXITCODE -ne 0) {
             throw "Core Tools build failed with exit code $LASTEXITCODE"
