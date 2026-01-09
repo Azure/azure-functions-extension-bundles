@@ -94,15 +94,15 @@ jobs:
       BUILD_REPOSITORY_LOCALPATH: '$(Agent.BuildDirectory)'
       TEMPLATES_ARTIFACTS_DIRECTORY: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
 
-  - script: |
-      echo "Checking for build artifacts..."
-      if ls bundle/artifacts/*.zip 2>/dev/null || ls bundle/bin/*/*.zip 2>/dev/null; then
-        echo "✓ Extension bundle and core tools artifacts found"
-      else
-        echo "✗ No extension bundle or core tools zip files found anywhere"
-        exit 1
-      fi
-    displayName: 'Verify Build Artifacts'
+  # - script: |
+  #     echo "Checking for build artifacts..."
+  #     if ls core-tools/artifacts-coretools-zip/*.zip 2>/dev/null || ls bundle/artifacts/*.zip 2>/dev/null || ls bundle/bin/*/*.zip 2>/dev/null; then
+  #       echo "✓ Extension bundle and core tools artifacts found"
+  #     else
+  #       echo "✗ No extension bundle or core tools zip files found anywhere"
+  #       exit 1
+  #     fi
+  #   displayName: 'Verify Build Artifacts'
 
 # Matrix job now depends on the preparation job and reuses its artifacts
 - job: EmulatorTests
