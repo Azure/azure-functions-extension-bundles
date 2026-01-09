@@ -59,8 +59,15 @@ def webhost(
 ):
     """Builds the webhost"""
 
+    # Get HOST_VERSION to use version-specific directory
+    host_version = os.environ.get('HOST_VERSION')
+    
     if webhost_dir is None:
-        webhost_dir = BUILD_DIR / "webhost"
+        if host_version:
+            # Use version-specific directory to avoid conflicts in parallel execution
+            webhost_dir = BUILD_DIR / f"webhost-{host_version}"
+        else:
+            webhost_dir = BUILD_DIR / "webhost"
     else:
         webhost_dir = pathlib.Path(webhost_dir)
 
@@ -74,14 +81,31 @@ def webhost(
     repo_root = ROOT_DIR.parent
     core_tools_dir = repo_root / "core-tools"
 
-    # Find the zip file
-    zip_files = list(core_tools_dir.glob("*.zip"))
-    if not zip_files:
-        raise FileNotFoundError(f"No zip files found in {core_tools_dir}")
-
-    # Use the first (or most recent) zip file
-    zip_path = zip_files[0]
-    print(f"Using Core Tools zip: {zip_path}")
+    # Check for HOST_VERSION environment variable to select specific version
+    host_version = os.environ.get('HOST_VERSION')
+    
+    if host_version:
+        # Look for version-specific zip file (e.g., Cli.host-4.1046.100.zip)
+        zip_pattern = f"Cli.host-{host_version}.zip"
+        zip_path = core_tools_dir / zip_pattern
+        
+        if not zip_path.exists():
+            raise FileNotFoundError(
+                f"Core Tools zip for HOST_VERSION '{host_version}' not found: {zip_path}\n"
+                f"Available files in {core_tools_dir}:\n" +
+                "\n".join(f"  - {f.name}" for f in core_tools_dir.glob("*.zip"))
+            )
+        
+        print(f"Using Core Tools zip for HOST_VERSION '{host_version}': {zip_path}")
+    else:
+        # Fallback: Find any zip file (legacy behavior)
+        zip_files = list(core_tools_dir.glob("*.zip"))
+        if not zip_files:
+            raise FileNotFoundError(f"No zip files found in {core_tools_dir}")
+        
+        # Use the first zip file found
+        zip_path = zip_files[0]
+        print(f"No HOST_VERSION specified, using first available Core Tools zip: {zip_path}")
 
     create_webhost_folder(webhost_dir)
     extract_core_tools(zip_path, webhost_dir)

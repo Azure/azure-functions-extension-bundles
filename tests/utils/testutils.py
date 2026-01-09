@@ -209,20 +209,30 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         testconfig.read(WORKER_CONFIG)    # Get Core Tools executable path
     coretools_exe = os.environ.get('CORE_TOOLS_EXE_PATH')
     if not coretools_exe:
+        # Check for HOST_VERSION to use version-specific directory
+        host_version = os.environ.get('HOST_VERSION')
+        
         # Default to the webhost directory structure from test_setup.py
-        # BUILD_DIR / "webhost" is where test_setup.py extracts Core Tools
-        if ON_WINDOWS:
-            default_path = BUILD_DIR / "webhost" / "func.exe"
+        # BUILD_DIR / "webhost" or BUILD_DIR / "webhost-{version}" is where test_setup.py extracts Core Tools
+        if host_version:
+            webhost_subdir = f"webhost-{host_version}"
         else:
-            default_path = BUILD_DIR / "webhost" / "func"
+            webhost_subdir = "webhost"
+        
+        if ON_WINDOWS:
+            default_path = BUILD_DIR / webhost_subdir / "func.exe"
+        else:
+            default_path = BUILD_DIR / webhost_subdir / "func"
         
         if default_path.exists():
             coretools_exe = str(default_path)
         else:
             # Try to find Core Tools in the build directory (fallback)
             potential_paths = [
-                BUILD_DIR / "webhost" / "func.exe",
-                BUILD_DIR / "webhost" / "func"
+                BUILD_DIR / webhost_subdir / "func.exe",
+                BUILD_DIR / webhost_subdir / "func",
+                BUILD_DIR / "webhost" / "func.exe",  # Legacy fallback
+                BUILD_DIR / "webhost" / "func"        # Legacy fallback
             ]
             for path in potential_paths:
                 if path.exists():
@@ -246,6 +256,10 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         ]))
 
     coretools_exe = coretools_exe.strip()
+    
+    # Log the selected version for debugging
+    host_version = os.environ.get('HOST_VERSION', 'default')
+    logging.info(f"HOST_VERSION: {host_version}")
     logging.info(f"Using Azure Functions Core Tools at: {coretools_exe}")
     
     # Check if the Core Tools binary exists and is executable

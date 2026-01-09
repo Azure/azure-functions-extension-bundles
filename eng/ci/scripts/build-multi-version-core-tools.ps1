@@ -143,28 +143,38 @@ try {
         Write-Host "`nStep 2.$versionIndex.b: Building Core Tools for version $hostVersion..." -ForegroundColor Yellow
         
         $buildScript = Join-Path $ScriptDir "build-core-tools.ps1"
-        $buildOutput = & $buildScript -Configuration $Configuration -CoreToolsDir $CloneDir -ZipOutputDir "artifacts-coretools-zip"
+        # Use version-specific output directory to prevent overwriting
+        $versionZipDir = "artifacts-coretools-zip-$hostVersion"
+        $buildOutput = & $buildScript -Configuration $Configuration -CoreToolsDir $CloneDir -ZipOutputDir $versionZipDir
         
         if ($LASTEXITCODE -ne 0) {
             throw "Core Tools build failed with exit code $LASTEXITCODE"
         }
         
-        # Step 2c: Rename zip files to include host version tag to prevent overwriting
-        Write-Host "`nStep 2.$versionIndex.c: Renaming zip files to include host version..." -ForegroundColor Yellow
+        # Step 2c: Copy and rename zip files to consolidated artifacts directory
+        Write-Host "`nStep 2.$versionIndex.c: Consolidating artifacts for host version $hostVersion..." -ForegroundColor Yellow
         
-        $zipDir = Join-Path $CloneDir "artifacts-coretools-zip"
-        if (Test-Path $zipDir) {
-            Get-ChildItem -Path $zipDir -Filter "*.zip" | ForEach-Object {
+        $tempZipDir = Join-Path $CloneDir $versionZipDir
+        $finalZipDir = Join-Path $CloneDir "artifacts-coretools-zip"
+        
+        # Create final directory if it doesn't exist
+        if (-not (Test-Path $finalZipDir)) {
+            New-Item -ItemType Directory -Path $finalZipDir -Force | Out-Null
+        }
+        
+        if (Test-Path $tempZipDir) {
+            Get-ChildItem -Path $tempZipDir -Filter "*.zip" | ForEach-Object {
                 $oldName = $_.Name
                 # Use simple naming: Cli.host-{version}.zip
                 $newName = "Cli.host-$hostVersion.zip"
-                $newPath = Join-Path $zipDir $newName
+                $destPath = Join-Path $finalZipDir $newName
                 
-                if ($_.FullName -ne $newPath) {
-                    Move-Item -Path $_.FullName -Destination $newPath -Force
-                    Write-Host "  Renamed: $oldName -> $newName" -ForegroundColor Green
-                }
+                Copy-Item -Path $_.FullName -Destination $destPath -Force
+                Write-Host "  Copied and renamed: $oldName -> $newName" -ForegroundColor Green
             }
+            
+            # Clean up version-specific directory
+            Remove-Item -Path $tempZipDir -Recurse -Force
         }
         
         # Store result
