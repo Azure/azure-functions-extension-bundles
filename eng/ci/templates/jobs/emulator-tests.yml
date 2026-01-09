@@ -423,8 +423,22 @@ jobs:
           ALL_TESTS_PASSED=false
         fi
         
+        # CRITICAL: Kill all func processes to ensure clean state for next version
+        echo "Cleaning up WebHost processes for version $HOST_VERSION..."
+        pkill -f "func start" || true
+        pkill -f "func.dll" || true
+        pkill -f "Azure.Functions.Cli" || true
+        sleep 2
+        
+        # Force kill any remaining processes
+        pkill -9 -f "func start" || true
+        pkill -9 -f "func.dll" || true
+        sleep 1
+        
         # Clean up webhost directory for next iteration
         rm -rf tests/build/webhost-${HOST_VERSION}
+        
+        echo "✓ Cleanup complete for version $HOST_VERSION"
       done
       
       # Final status
