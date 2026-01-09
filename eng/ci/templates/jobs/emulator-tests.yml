@@ -24,19 +24,19 @@ jobs:
     outputs:
       - output: pipelineArtifact
         displayName: Publish bundle artifacts
-        path: $(Build.Repository.LocalPath)/bundle/artifacts
+        path: $(Agent.BuildDirectory)/bundle/artifacts
         artifact: bundle-artifacts
       - output: pipelineArtifact
         displayName: Publish bundle bin
-        path: $(Build.Repository.LocalPath)/bundle/bin
+        path: $(Agent.BuildDirectory)/bundle/bin
         artifact: bundle-bin
       - output: pipelineArtifact
         displayName: Publish templates artifacts
-        path: $(Build.Repository.LocalPath)/bundle/templatesArtifacts
+        path: $(Agent.BuildDirectory)/bundle/templatesArtifacts
         artifact: templates-artifacts
       - output: pipelineArtifact
         displayName: Publish core tools artifacts
-        path: $(Build.Repository.LocalPath)/core-tools/artifacts-coretools-zip
+        path: $(Agent.BuildDirectory)/core-tools/artifacts-coretools-zip
         artifact: core-tools-artifacts
 
   steps:
@@ -57,7 +57,7 @@ jobs:
       branchName: 'refs/heads/dev'
       downloadType: 'single'
       artifactName: 'drop'
-      downloadPath: '$(Build.Repository.LocalPath)/bundle/templatesArtifacts'
+      downloadPath: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
     condition: ${{ parameters.official }}
 
   # Public templates
@@ -70,7 +70,7 @@ jobs:
       branchName: 'refs/heads/dev'
       downloadType: 'single'
       artifactName: 'drop'
-      downloadPath: '$(Build.Repository.LocalPath)/bundle/templatesArtifacts'
+      downloadPath: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
     condition: ${{ eq(parameters.official, false) }}
 
   - task: NuGetAuthenticate@1
@@ -79,20 +79,20 @@ jobs:
   - task: PowerShell@2
     displayName: 'Build Azure Functions Core Tools'
     inputs:
-      filePath: '$(Build.SourcesDirectory)/bundle/eng/ci/scripts/build-multi-version-core-tools.ps1'
-      arguments: '-Branch main -Configuration Release -CloneDir "$(Build.SourcesDirectory)/core-tools"'
+      filePath: '$(Agent.BuildDirectory)/bundle/eng/ci/scripts/build-multi-version-core-tools.ps1'
+      arguments: '-Branch main -Configuration Release -CloneDir "$(Agent.BuildDirectory)/core-tools"'
       pwsh: true
-      workingDirectory: '$(Build.SourcesDirectory)/core-tools'
+      workingDirectory: '$(Agent.BuildDirectory)/core-tools'
 
   - task: DotNetCoreCLI@2
     displayName: 'Build Linux Bundle (once)'
     inputs:
       command: 'run'
-      workingDirectory: '$(Build.Repository.LocalPath)/bundle/build'
+      workingDirectory: '$(Agent.BuildDirectory)/bundle/build'
       arguments: 'PackageNetCoreV3BundlesLinux'
     env:
-      BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
-      TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/bundle/templatesArtifacts'
+      BUILD_REPOSITORY_LOCALPATH: '$(Agent.BuildDirectory)'
+      TEMPLATES_ARTIFACTS_DIRECTORY: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
 
   - script: |
       echo "Checking for build artifacts..."
