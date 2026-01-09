@@ -96,7 +96,7 @@ jobs:
 
   - script: |
       echo "Checking for build artifacts..."
-      if ls core-tools/artifacts-coretools-zip/*.zip 2>/dev/null || ls bundle/artifacts/*.zip 2>/dev/null || ls bundle/bin/*/*.zip 2>/dev/null; then
+      if ls bundle/artifacts/*.zip 2>/dev/null || ls bundle/bin/*/*.zip 2>/dev/null; then
         echo "✓ Extension bundle and core tools artifacts found"
       else
         echo "✗ No extension bundle or core tools zip files found anywhere"
