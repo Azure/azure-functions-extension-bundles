@@ -86,6 +86,36 @@ jobs:
       pwsh: true
       workingDirectory: '$(Agent.BuildDirectory)/core-tools'
   
+  # CRITICAL: Immediately clean up Core Tools source to free space for bundle build
+  - script: |
+      echo "=== Aggressive Cleanup: Core Tools Source ==="
+      df -h
+      
+      # Keep only the artifacts-coretools-zip directory with the zip files
+      cd "$(Agent.BuildDirectory)/core-tools"
+      
+      # List what we have before cleanup
+      echo "Before cleanup:"
+      du -sh * 2>/dev/null || true
+      
+      # Remove everything except artifacts-coretools-zip directory
+      find . -mindepth 1 -maxdepth 1 ! -name 'artifacts-coretools-zip' -exec rm -rf {} + 2>/dev/null || true
+      
+      echo "After cleanup:"
+      du -sh * 2>/dev/null || true
+      
+      # Verify zip files are intact
+      if [ -d "artifacts-coretools-zip" ]; then
+        echo "Core Tools zip files:"
+        ls -lh artifacts-coretools-zip/*.zip
+      else
+        echo "##[error]artifacts-coretools-zip directory missing!"
+        exit 1
+      fi
+      
+      df -h
+    displayName: 'Cleanup Core Tools Source (Free Space)'
+  
   # Get list of built host versions for matrix
   - task: PowerShell@2
     displayName: 'Generate Host Versions List'
@@ -118,6 +148,20 @@ jobs:
       pwsh: true
     name: HostVersions
 
+  # Check disk space before bundle build
+  - script: |
+      echo "=== Pre-Bundle Build Disk Check ==="
+      df -h
+      AVAILABLE_GB=$(df -BG "$(Agent.BuildDirectory)" | tail -1 | awk '{print $4}' | sed 's/G//')
+      echo "Available space: ${AVAILABLE_GB}GB"
+      if [ "$AVAILABLE_GB" -lt 5 ]; then
+        echo "##[error]Low disk space: ${AVAILABLE_GB}GB available (minimum 5GB recommended)"
+        echo "Current directory sizes:"
+        du -sh "$(Agent.BuildDirectory)"/* 2>/dev/null || true
+        exit 1
+      fi
+    displayName: 'Check Disk Space Before Bundle Build'
+
   - task: DotNetCoreCLI@2
     displayName: 'Build Linux Bundle (once)'
     inputs:
@@ -128,40 +172,40 @@ jobs:
       BUILD_REPOSITORY_LOCALPATH: '$(Agent.BuildDirectory)'
       TEMPLATES_ARTIFACTS_DIRECTORY: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
 
-  # Optimize disk space by cleaning up intermediate artifacts
+  # Final cleanup after bundle build
   - script: |
-      echo "Optimizing disk space..."
-      
-      # Clean up Core Tools build intermediates (keep only zip files)
-      if [ -d "$(Agent.BuildDirectory)/core-tools/artifacts" ]; then
-        echo "Removing Core Tools build artifacts directory..."
-        rm -rf "$(Agent.BuildDirectory)/core-tools/artifacts"
-      fi
-      
-      # Clean up Core Tools source (keep only the zip files)
-      echo "Removing Core Tools source files..."
-      find "$(Agent.BuildDirectory)/core-tools" -type f ! -name '*.zip' -delete 2>/dev/null || true
-      find "$(Agent.BuildDirectory)/core-tools" -type d -empty -delete 2>/dev/null || true
+      echo "=== Final Cleanup After Bundle Build ==="
+      df -h
       
       # Clean up bundle build intermediates
-      if [ -d "$(Agent.BuildDirectory)/bundle/build_temp" ]; then
-        echo "Removing bundle build_temp directory..."
-        rm -rf "$(Agent.BuildDirectory)/bundle/build_temp"
-      fi
+      echo "Cleaning bundle build intermediates..."
+      rm -rf "$(Agent.BuildDirectory)/bundle/build_temp" 2>/dev/null || true
+      rm -rf "$(Agent.BuildDirectory)/bundle/obj" 2>/dev/null || true
       
-      # Clean up NuGet cache
-      if [ -d "$HOME/.nuget/packages" ]; then
-        echo "Cleaning NuGet cache..."
-        rm -rf "$HOME/.nuget/packages"
-      fi
+      # Clean up template artifacts (no longer needed)
+      echo "Removing template artifacts..."
+      rm -rf "$(Agent.BuildDirectory)/bundle/templatesArtifacts" 2>/dev/null || true
       
-      # Show disk usage summary
+      # Clean up .NET build caches
+      echo "Cleaning .NET caches..."
+      rm -rf "$HOME/.nuget/packages" 2>/dev/null || true
+      rm -rf "$HOME/.dotnet" 2>/dev/null || true
+      
+      # Clean up bundle source files (keep only artifacts and bin)
+      echo "Removing bundle source files..."
+      cd "$(Agent.BuildDirectory)/bundle"
+      find . -mindepth 1 -maxdepth 1 ! -name 'artifacts' ! -name 'bin' ! -name 'eng' -exec rm -rf {} + 2>/dev/null || true
+      
+      # Final disk usage
       echo ""
-      echo "Disk usage after cleanup:"
-      du -sh "$(Agent.BuildDirectory)/core-tools" 2>/dev/null || echo "core-tools: N/A"
+      echo "=== Final Disk Usage ==="
+      df -h
+      echo ""
+      echo "Artifacts to publish:"
+      du -sh "$(Agent.BuildDirectory)/core-tools/artifacts-coretools-zip" 2>/dev/null || echo "core-tools: N/A"
       du -sh "$(Agent.BuildDirectory)/bundle/artifacts" 2>/dev/null || echo "bundle/artifacts: N/A"
       du -sh "$(Agent.BuildDirectory)/bundle/bin" 2>/dev/null || echo "bundle/bin: N/A"
-    displayName: 'Cleanup Build Artifacts (Optimize Disk Space)'
+    displayName: 'Final Cleanup (Optimize Disk Space)'
 
 # Matrix job now depends on the preparation job and reuses its artifacts
 - job: EmulatorTests
