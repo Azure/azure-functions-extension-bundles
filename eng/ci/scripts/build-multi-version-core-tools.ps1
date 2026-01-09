@@ -202,6 +202,20 @@ try {
         Write-Host "    Output: $($_.BuildOutput)" -ForegroundColor White
     }
     
+    # Verify artifacts directory
+    $finalZipDir = Join-Path $CloneDir "artifacts-coretools-zip"
+    Write-Host "`nVerifying artifacts in: $finalZipDir" -ForegroundColor Cyan
+    if (Test-Path $finalZipDir) {
+        $zipFiles = Get-ChildItem -Path $finalZipDir -Filter "*.zip"
+        Write-Host "Found $($zipFiles.Count) zip file(s):" -ForegroundColor Green
+        $zipFiles | ForEach-Object {
+            $sizeKB = [math]::Round($_.Length / 1KB, 2)
+            Write-Host "  - $($_.Name) (${sizeKB} KB)" -ForegroundColor White
+        }
+    } else {
+        Write-Host "##[error]Artifacts directory not found: $finalZipDir" -ForegroundColor Red
+    }
+    
     Write-Host "`n===========================================================" -ForegroundColor Cyan
     
     # Return build results

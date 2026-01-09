@@ -90,14 +90,28 @@ jobs:
     inputs:
       targetType: 'inline'
       script: |
-        $zipFiles = Get-ChildItem -Path "$(Agent.BuildDirectory)/core-tools/artifacts-coretools-zip" -Filter "Cli.host-*.zip"
+        Write-Host "Checking for Core Tools artifacts..."
+        $artifactsPath = "$(Agent.BuildDirectory)/core-tools/artifacts-coretools-zip"
+        Write-Host "Looking in: $artifactsPath"
+        
+        if (-not (Test-Path $artifactsPath)) {
+          Write-Host "##[error]Directory does not exist: $artifactsPath"
+          Write-Host "Listing core-tools directory:"
+          Get-ChildItem -Path "$(Agent.BuildDirectory)/core-tools" -Recurse | Select-Object FullName
+          exit 1
+        }
+        
+        $zipFiles = Get-ChildItem -Path $artifactsPath -Filter "Cli.host-*.zip" -ErrorAction SilentlyContinue
+        Write-Host "Found $($zipFiles.Count) zip file(s):"
+        $zipFiles | ForEach-Object { Write-Host "  - $($_.Name)" }
+        
         $versions = $zipFiles | ForEach-Object { 
           if ($_.Name -match 'Cli\.host-(.+)\.zip') { 
             $matches[1] 
           } 
         }
         $versionsList = $versions -join ','
-        Write-Host "Found host versions: $versionsList"
+        Write-Host "Host versions list: $versionsList"
         Write-Host "##vso[task.setvariable variable=HostVersionsList;isOutput=true]$versionsList"
       pwsh: true
     name: HostVersions
