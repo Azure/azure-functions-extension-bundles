@@ -71,7 +71,14 @@ Write-Host "`nProject file found: $ProjectPath" -ForegroundColor Green
 
 # Set output directory
 $OutputDir = Join-Path $CoreToolsDir "artifacts\$Runtime"
-$ZipOutputDir = Join-Path $CoreToolsDir "artifacts-coretools-zip"
+
+# Use the provided ZipOutputDir parameter, or default to artifacts-coretools-zip
+# Make it an absolute path if it's relative
+if (-not [System.IO.Path]::IsPathRooted($ZipOutputDir)) {
+    $ZipOutputDir = Join-Path $CoreToolsDir $ZipOutputDir
+}
+
+Write-Host "Zip Output Directory: $ZipOutputDir" -ForegroundColor Yellow
 
 # Build the project
 Write-Host "`nPublishing Azure.Functions.Cli with $Configuration configuration..." -ForegroundColor Yellow
