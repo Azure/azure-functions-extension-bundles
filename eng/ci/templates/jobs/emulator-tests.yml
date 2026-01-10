@@ -430,34 +430,36 @@ jobs:
         # CRITICAL: Kill all func processes to ensure clean state for next version
         echo "Cleaning up WebHost processes for version $HOST_VERSION..."
         
-        # Find and kill all func-related processes
-        echo "Finding all func-related processes..."
-        ps aux | grep -E "(func|dotnet.*Azure.Functions.Cli)" | grep -v grep || true
+        # Find and kill Azure Functions host and worker processes
+        echo "Finding Azure Functions Core Tools processes..."
+        ps aux | grep -E "Azure\.Functions\.Cli|func start|func\.dll" | grep -v grep || true
         
-        # Kill by process name patterns (more comprehensive)
+        # Kill the func host process
+        pkill -9 -f "Azure.Functions.Cli" || true
         pkill -9 -f "func start" || true
         pkill -9 -f "func.dll" || true
-        pkill -9 -f "Azure.Functions.Cli" || true
-        pkill -9 -f "dotnet.*func" || true
-        pkill -9 func || true
+        
+        # Kill Python workers spawned by func host (in webhost directory)
+        echo "Killing Python workers from webhost-${HOST_VERSION}..."
+        pkill -9 -f "webhost-${HOST_VERSION}/workers/python" || true
         
         # Kill any process using the default func ports (7071, 7072)
-        echo "Checking for processes using func ports..."
+        echo "Freeing up func ports..."
         fuser -k 7071/tcp 2>/dev/null || true
         fuser -k 7072/tcp 2>/dev/null || true
         
         sleep 2
         
-        # Verify all processes are killed
-        REMAINING=$(ps aux | grep -E "(func|dotnet.*Azure.Functions.Cli)" | grep -v grep | wc -l)
+        # Verify cleanup (check for actual func host, not just word "func" in args)
+        REMAINING=$(ps aux | grep -E "Azure\.Functions\.Cli|func start|func\.dll" | grep -v grep | wc -l)
         if [ "$REMAINING" -gt 0 ]; then
-          echo "⚠ Warning: $REMAINING func processes still running"
-          ps aux | grep -E "(func|dotnet.*Azure.Functions.Cli)" | grep -v grep || true
-          # Force kill only func-specific dotnet processes by PID
-          ps aux | grep -E "dotnet.*Azure.Functions.Cli" | grep -v grep | awk '{print $2}' | xargs -r kill -9 2>/dev/null || true
+          echo "⚠ Warning: $REMAINING func host processes still running"
+          ps aux | grep -E "Azure\.Functions\.Cli|func start|func\.dll" | grep -v grep || true
+          # Extract and force kill by PID
+          ps aux | grep -E "Azure\.Functions\.Cli|func start|func\.dll" | grep -v grep | awk '{print $2}' | xargs -r kill -9 2>/dev/null || true
           sleep 1
         else
-          echo "✓ All func processes terminated"
+          echo "✓ All func host processes terminated"
         fi
         
         # Clean up webhost directory for next iteration
