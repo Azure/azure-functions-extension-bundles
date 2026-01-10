@@ -282,8 +282,6 @@ jobs:
       NUGET_XMLDOC_MODE: 'skip'
       # Use temp directory for NuGet operations
       TMPDIR: '/tmp'
-      # Reduce parallel build jobs to save memory/disk
-      MSBuildSDKsPath: ''
 
   # Final cleanup after bundle build
   - script: |
