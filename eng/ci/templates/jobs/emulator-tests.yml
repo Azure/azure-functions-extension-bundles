@@ -239,7 +239,7 @@ jobs:
       echo "=== Initial workspace listing ==="
       pwd
       ls -al .
-      for d in artifacts bin templatesArtifacts tests; do
+      for d in artifacts tests; do
         echo "--- $d ---";
         ls -al "$d" 2>/dev/null || echo "(missing)"; done
     displayName: 'Initial Workspace Listing'
@@ -256,12 +256,6 @@ jobs:
     inputs:
       artifact: 'bundle-artifacts'
       path: '$(Build.Repository.LocalPath)/artifacts'
-
-  - task: DownloadPipelineArtifact@2
-    displayName: 'Download bundle bin'
-    inputs:
-      artifact: 'bundle-bin'
-      path: '$(Build.Repository.LocalPath)/bin'
 
   - script: |
       echo "Listing downloaded directories..."
@@ -435,15 +429,36 @@ jobs:
         
         # CRITICAL: Kill all func processes to ensure clean state for next version
         echo "Cleaning up WebHost processes for version $HOST_VERSION..."
-        pkill -f "func start" || true
-        pkill -f "func.dll" || true
-        pkill -f "Azure.Functions.Cli" || true
-        sleep 2
         
-        # Force kill any remaining processes
+        # Find and kill all func-related processes
+        echo "Finding all func-related processes..."
+        ps aux | grep -E "(func|dotnet.*Azure.Functions.Cli)" | grep -v grep || true
+        
+        # Kill by process name patterns (more comprehensive)
         pkill -9 -f "func start" || true
         pkill -9 -f "func.dll" || true
-        sleep 1
+        pkill -9 -f "Azure.Functions.Cli" || true
+        pkill -9 -f "dotnet.*func" || true
+        pkill -9 func || true
+        
+        # Kill any process using the default func ports (7071, 7072)
+        echo "Checking for processes using func ports..."
+        fuser -k 7071/tcp 2>/dev/null || true
+        fuser -k 7072/tcp 2>/dev/null || true
+        
+        sleep 2
+        
+        # Verify all processes are killed
+        REMAINING=$(ps aux | grep -E "(func|dotnet.*Azure.Functions.Cli)" | grep -v grep | wc -l)
+        if [ "$REMAINING" -gt 0 ]; then
+          echo "⚠ Warning: $REMAINING func processes still running"
+          ps aux | grep -E "(func|dotnet.*Azure.Functions.Cli)" | grep -v grep || true
+          # Force kill only func-specific dotnet processes by PID
+          ps aux | grep -E "dotnet.*Azure.Functions.Cli" | grep -v grep | awk '{print $2}' | xargs -r kill -9 2>/dev/null || true
+          sleep 1
+        else
+          echo "✓ All func processes terminated"
+        fi
         
         # Clean up webhost directory for next iteration
         rm -rf tests/build/webhost-${HOST_VERSION}
