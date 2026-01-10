@@ -31,8 +31,12 @@ jobs:
   - checkout: self
     path: bundle
     fetchDepth: 1
-    sparseCheckout:
-      - eng
+    
+  - script: |
+      cd $(Agent.BuildDirectory)/bundle
+      git sparse-checkout init --cone
+      git sparse-checkout set eng
+    displayName: 'Configure sparse checkout for eng folder only'
     
   - checkout: coretools
     path: core-tools
