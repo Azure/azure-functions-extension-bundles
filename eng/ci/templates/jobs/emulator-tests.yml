@@ -42,6 +42,11 @@ jobs:
     path: core-tools
     fetchDepth: 1
 
+  - script: |
+      echo "Disk space before build:"
+      df -h
+    displayName: 'Check Initial Disk Space'
+  
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
     
@@ -52,6 +57,27 @@ jobs:
       arguments: '-Count $(hostTagsCount) -Configuration Release -CloneDir "$(Agent.BuildDirectory)/core-tools"'
       pwsh: true
       workingDirectory: '$(Agent.BuildDirectory)/core-tools'
+  
+  - script: |
+      echo "Cleaning up build artifacts to free disk space..."
+      
+      # Remove source code (keep only artifacts)
+      echo "Removing Core Tools source files..."
+      find $(Agent.BuildDirectory)/core-tools -type f -name "*.cs" -delete 2>/dev/null || true
+      find $(Agent.BuildDirectory)/core-tools -type d -name "obj" -exec rm -rf {} + 2>/dev/null || true
+      find $(Agent.BuildDirectory)/core-tools -type d -name "bin" ! -path "*/artifacts-coretools-zip/*" -exec rm -rf {} + 2>/dev/null || true
+      
+      # Clean NuGet cache
+      echo "Clearing NuGet cache..."
+      rm -rf ~/.nuget/packages/* 2>/dev/null || true
+      
+      # Remove git history from core-tools to save space
+      echo "Removing git history..."
+      rm -rf $(Agent.BuildDirectory)/core-tools/.git 2>/dev/null || true
+      
+      echo "Disk space after cleanup:"
+      df -h
+    displayName: 'Cleanup After Core Tools Build'
   
   - task: PowerShell@2
     displayName: 'Generate Host Versions List'
@@ -91,26 +117,23 @@ jobs:
     name: ${{ parameters.poolName }}
     image: 1es-ubuntu-22.04
     os: linux
+  # 1ES-compliant artifact publication via templateContext.outputs
   templateContext:
     outputs:
       - output: pipelineArtifact
         displayName: Publish bundle artifacts
-        path: $(Agent.BuildDirectory)/bundle/artifacts
+        path: $(Build.Repository.LocalPath)/artifacts
         artifact: bundle-artifacts
       - output: pipelineArtifact
         displayName: Publish bundle bin
-        path: $(Agent.BuildDirectory)/bundle/bin
+        path: $(Build.Repository.LocalPath)/bin
         artifact: bundle-bin
       - output: pipelineArtifact
         displayName: Publish templates artifacts
-        path: $(Agent.BuildDirectory)/bundle/templatesArtifacts
+        path: $(Build.Repository.LocalPath)/templatesArtifacts
         artifact: templates-artifacts
 
   steps:
-  - checkout: self
-    path: bundle
-    fetchDepth: 1
-  
   # Download template artifacts for the build
   # Official templates
   - task: DownloadBuildArtifacts@1
@@ -122,7 +145,7 @@ jobs:
       branchName: 'refs/heads/dev'
       downloadType: 'single'
       artifactName: 'drop'
-      downloadPath: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
+      downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
     condition: ${{ parameters.official }}
 
   # Public templates
@@ -135,18 +158,31 @@ jobs:
       branchName: 'refs/heads/dev'
       downloadType: 'single'
       artifactName: 'drop'
-      downloadPath: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
+      downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
     condition: ${{ eq(parameters.official, false) }}
 
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+    
   - task: DotNetCoreCLI@2
-    displayName: 'Build Linux Bundle'
+    displayName: 'Build Linux Bundle (once)'
     inputs:
       command: 'run'
-      workingDirectory: '$(Agent.BuildDirectory)/bundle/build'
+      workingDirectory: './build'
       arguments: 'PackageNetCoreV3BundlesLinux'
     env:
-      BUILD_REPOSITORY_LOCALPATH: '$(Agent.BuildDirectory)'
-      TEMPLATES_ARTIFACTS_DIRECTORY: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
+      BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
+      TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
+
+  - script: |
+      echo "Checking for build artifacts..."
+      if ls artifacts/*.zip 2>/dev/null || ls bin/*/*.zip 2>/dev/null; then
+        echo "✓ Extension bundle artifacts found"
+      else
+        echo "✗ No extension bundle zip files found anywhere"
+        exit 1
+      fi
+    displayName: 'Verify Build Artifacts'
 
 # Matrix job now depends on both preparation jobs and reuses their artifacts
 - job: EmulatorTests
