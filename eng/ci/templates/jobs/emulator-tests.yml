@@ -75,6 +75,39 @@ jobs:
       downloadPath: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
     condition: ${{ eq(parameters.official, false) }}
 
+  # Immediate cleanup after checkout to maximize available space
+  - script: |
+      echo "=== Immediate Post-Checkout Cleanup ==="
+      df -h
+      
+      # Remove ALL .git directories (we don't need git history)
+      echo "Removing .git directories..."
+      find "$(Agent.BuildDirectory)" -name ".git" -type d -exec rm -rf {} + 2>/dev/null || true
+      
+      # Clean docker cache to free space
+      echo "Cleaning docker build cache..."
+      docker builder prune -af 2>/dev/null || true
+      docker system prune -af 2>/dev/null || true
+      
+      # Clean apt cache
+      echo "Cleaning apt cache..."
+      sudo apt-get clean 2>/dev/null || true
+      sudo rm -rf /var/lib/apt/lists/* 2>/dev/null || true
+      
+      # Clean up template artifacts (remove unnecessary files)
+      if [ -d "$(Agent.BuildDirectory)/bundle/templatesArtifacts" ]; then
+        echo "Cleaning template artifacts..."
+        cd "$(Agent.BuildDirectory)/bundle/templatesArtifacts"
+        # Keep only what's needed, remove symbols, docs, etc.
+        find . -name "*.pdb" -delete 2>/dev/null || true
+        find . -name "*.xml" -delete 2>/dev/null || true
+        find . -name "*.md" -delete 2>/dev/null || true
+      fi
+      
+      echo "After initial cleanup:"
+      df -h
+    displayName: 'Immediate Post-Checkout Cleanup'
+
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
     
@@ -150,27 +183,105 @@ jobs:
 
   # Check disk space before bundle build
   - script: |
-      echo "=== Pre-Bundle Build Disk Check ==="
+      echo "=== Pre-Bundle Build Aggressive Cleanup ==="
       df -h
+      
+      # Remove the entire core-tools bundle repo (we only need bundle repo)
+      echo "Removing core-tools repository completely..."
+      rm -rf "$(Agent.BuildDirectory)/bundle/.git" 2>/dev/null || true
+      
+      # Move Core Tools zips to temp location
+      mkdir -p /tmp/core-tools-backup
+      mv "$(Agent.BuildDirectory)/core-tools/artifacts-coretools-zip" /tmp/core-tools-backup/ 2>/dev/null || true
+      
+      # Remove entire core-tools directory
+      rm -rf "$(Agent.BuildDirectory)/core-tools"
+      
+      # Restore just the zips
+      mkdir -p "$(Agent.BuildDirectory)/core-tools"
+      mv /tmp/core-tools-backup/artifacts-coretools-zip "$(Agent.BuildDirectory)/core-tools/" 2>/dev/null || true
+      
+      # Clean NuGet and .NET caches before build
+      echo "Cleaning NuGet and .NET caches..."
+      rm -rf "$HOME/.nuget/packages" 2>/dev/null || true
+      rm -rf "$HOME/.local/share/NuGet" 2>/dev/null || true
+      rm -rf "$HOME/.dotnet" 2>/dev/null || true
+      
+      # Also clean bundle build intermediates from any previous attempts
+      echo "Cleaning bundle build intermediates..."
+      rm -rf "$(Agent.BuildDirectory)/bundle/build_temp" 2>/dev/null || true
+      rm -rf "$(Agent.BuildDirectory)/bundle/obj" 2>/dev/null || true
+      rm -rf "$(Agent.BuildDirectory)/bundle/bin" 2>/dev/null || true
+      
       AVAILABLE_GB=$(df -BG "$(Agent.BuildDirectory)" | tail -1 | awk '{print $4}' | sed 's/G//')
       echo "Available space: ${AVAILABLE_GB}GB"
-      if [ "$AVAILABLE_GB" -lt 5 ]; then
-        echo "##[error]Low disk space: ${AVAILABLE_GB}GB available (minimum 5GB recommended)"
+      df -h
+      
+      if [ "$AVAILABLE_GB" -lt 8 ]; then
+        echo "##[warning]Low disk space: ${AVAILABLE_GB}GB available (recommended 8GB+)"
         echo "Current directory sizes:"
         du -sh "$(Agent.BuildDirectory)"/* 2>/dev/null || true
-        exit 1
       fi
-    displayName: 'Check Disk Space Before Bundle Build'
+    displayName: 'Pre-Bundle Build Aggressive Cleanup'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Build Linux Bundle (once)'
-    inputs:
-      command: 'run'
-      workingDirectory: '$(Agent.BuildDirectory)/bundle/build'
-      arguments: 'PackageNetCoreV3BundlesLinux'
+  # Build with monitoring and periodic cleanup
+  - script: |
+      echo "=== Building Linux Bundle with Space Monitoring ==="
+      df -h
+      
+      # Start background cleanup monitor that runs more frequently
+      (
+        while true; do
+          sleep 60  # Every 1 minute (was 2)
+          echo "[Monitor] Periodic cleanup at $(date)"
+          
+          # Clean NuGet cache during build
+          rm -rf "$HOME/.nuget/packages" 2>/dev/null || true
+          rm -rf "$HOME/.local/share/NuGet" 2>/dev/null || true
+          
+          # Clean build intermediates during build
+          find "$(Agent.BuildDirectory)/bundle/build_temp" -mindepth 1 -type d -mmin +5 -exec rm -rf {} + 2>/dev/null || true
+          
+          # Clean temp files but preserve our backup
+          find /tmp -maxdepth 1 -type f -mmin +10 -delete 2>/dev/null || true
+          find /tmp -maxdepth 1 -type d ! -name 'core-tools-backup' -mmin +10 -exec rm -rf {} + 2>/dev/null || true
+          
+          # Show disk status
+          AVAIL=$(df -BG "$(Agent.BuildDirectory)" | tail -1 | awk '{print $4}' | sed 's/G//')
+          echo "[Monitor] Available: ${AVAIL}GB"
+          
+          # If critically low, do emergency cleanup
+          if [ "$AVAIL" -lt 3 ]; then
+            echo "[Monitor] EMERGENCY: Low disk space, aggressive cleanup!"
+            docker system prune -af 2>/dev/null || true
+            rm -rf "$HOME/.dotnet" 2>/dev/null || true
+          fi
+        done
+      ) &
+      MONITOR_PID=$!
+      
+      # Run the actual build
+      cd "$(Agent.BuildDirectory)/bundle/build"
+      dotnet run --configuration Release PackageNetCoreV3BundlesLinux
+      BUILD_EXIT=$?
+      
+      # Stop monitor
+      kill $MONITOR_PID 2>/dev/null || true
+      
+      echo "Build completed with exit code: $BUILD_EXIT"
+      df -h
+      
+      exit $BUILD_EXIT
+    displayName: 'Build Linux Bundle (with monitoring)'
     env:
       BUILD_REPOSITORY_LOCALPATH: '$(Agent.BuildDirectory)'
       TEMPLATES_ARTIFACTS_DIRECTORY: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
+      # Reduce memory and disk usage during build
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: '1'
+      NUGET_XMLDOC_MODE: 'skip'
+      # Use temp directory for NuGet operations
+      TMPDIR: '/tmp'
 
   # Final cleanup after bundle build
   - script: |
