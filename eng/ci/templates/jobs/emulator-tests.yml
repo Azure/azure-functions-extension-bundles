@@ -12,28 +12,16 @@ parameters:
     type: string
 
 jobs:
-# New preparation job to build/publish once for all matrix runs
-- job: PrepareEmulatorTestAssets
-  displayName: Prepare Emulator Test Assets (build once)
+# Parallel preparation jobs for better performance
+# Job 1: Build Core Tools (independent of template artifacts)
+- job: PrepareCoreTools
+  displayName: Build Core Tools
   pool:
     name: ${{ parameters.poolName }}
     image: 1es-ubuntu-22.04
     os: linux
-  # 1ES-compliant artifact publication via templateContext.outputs
   templateContext:
     outputs:
-      - output: pipelineArtifact
-        displayName: Publish bundle artifacts
-        path: $(Agent.BuildDirectory)/bundle/artifacts
-        artifact: bundle-artifacts
-      - output: pipelineArtifact
-        displayName: Publish bundle bin
-        path: $(Agent.BuildDirectory)/bundle/bin
-        artifact: bundle-bin
-      - output: pipelineArtifact
-        displayName: Publish templates artifacts
-        path: $(Agent.BuildDirectory)/bundle/templatesArtifacts
-        artifact: templates-artifacts
       - output: pipelineArtifact
         displayName: Publish core tools artifacts
         path: $(Agent.BuildDirectory)/core-tools/artifacts-coretools-zip
@@ -43,37 +31,12 @@ jobs:
   - checkout: self
     path: bundle
     fetchDepth: 1
+    sparseCheckout:
+      - eng
     
   - checkout: coretools
     path: core-tools
     fetchDepth: 1
-  
-  # Download template artifacts for the build
-  # Official templates
-  - task: DownloadBuildArtifacts@1
-    inputs:
-      buildType: 'specific'
-      project: '3f99e810-c336-441f-8892-84983093ad7f'
-      pipeline: '963'
-      buildVersionToDownload: 'latestFromBranch'
-      branchName: 'refs/heads/dev'
-      downloadType: 'single'
-      artifactName: 'drop'
-      downloadPath: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
-    condition: ${{ parameters.official }}
-
-  # Public templates
-  - task: DownloadBuildArtifacts@1
-    inputs:
-      buildType: 'specific'
-      project: 'ae7e3bf3-d41a-4480-9ac0-b6cf9df9ac24'
-      pipeline: '976'
-      buildVersionToDownload: 'latestFromBranch'
-      branchName: 'refs/heads/dev'
-      downloadType: 'single'
-      artifactName: 'drop'
-      downloadPath: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
-    condition: ${{ eq(parameters.official, false) }}
 
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
@@ -86,7 +49,6 @@ jobs:
       pwsh: true
       workingDirectory: '$(Agent.BuildDirectory)/core-tools'
   
-  # Get list of built host versions for matrix
   - task: PowerShell@2
     displayName: 'Generate Host Versions List'
     inputs:
@@ -118,8 +80,62 @@ jobs:
       pwsh: true
     name: HostVersions
 
+# Job 2: Build Extension Bundle (downloads template artifacts)
+- job: PrepareBundle
+  displayName: Build Extension Bundle
+  pool:
+    name: ${{ parameters.poolName }}
+    image: 1es-ubuntu-22.04
+    os: linux
+  templateContext:
+    outputs:
+      - output: pipelineArtifact
+        displayName: Publish bundle artifacts
+        path: $(Agent.BuildDirectory)/bundle/artifacts
+        artifact: bundle-artifacts
+      - output: pipelineArtifact
+        displayName: Publish bundle bin
+        path: $(Agent.BuildDirectory)/bundle/bin
+        artifact: bundle-bin
+      - output: pipelineArtifact
+        displayName: Publish templates artifacts
+        path: $(Agent.BuildDirectory)/bundle/templatesArtifacts
+        artifact: templates-artifacts
+
+  steps:
+  - checkout: self
+    path: bundle
+    fetchDepth: 1
+  
+  # Download template artifacts for the build
+  # Official templates
+  - task: DownloadBuildArtifacts@1
+    inputs:
+      buildType: 'specific'
+      project: '3f99e810-c336-441f-8892-84983093ad7f'
+      pipeline: '963'
+      buildVersionToDownload: 'latestFromBranch'
+      branchName: 'refs/heads/dev'
+      downloadType: 'single'
+      artifactName: 'drop'
+      downloadPath: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
+    condition: ${{ parameters.official }}
+
+  # Public templates
+  - task: DownloadBuildArtifacts@1
+    inputs:
+      buildType: 'specific'
+      project: 'ae7e3bf3-d41a-4480-9ac0-b6cf9df9ac24'
+      pipeline: '976'
+      buildVersionToDownload: 'latestFromBranch'
+      branchName: 'refs/heads/dev'
+      downloadType: 'single'
+      artifactName: 'drop'
+      downloadPath: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
+    condition: ${{ eq(parameters.official, false) }}
+
   - task: DotNetCoreCLI@2
-    displayName: 'Build Linux Bundle (once)'
+    displayName: 'Build Linux Bundle'
     inputs:
       command: 'run'
       workingDirectory: '$(Agent.BuildDirectory)/bundle/build'
@@ -128,10 +144,12 @@ jobs:
       BUILD_REPOSITORY_LOCALPATH: '$(Agent.BuildDirectory)'
       TEMPLATES_ARTIFACTS_DIRECTORY: '$(Agent.BuildDirectory)/bundle/templatesArtifacts'
 
-# Matrix job now depends on the preparation job and reuses its artifacts
+# Matrix job now depends on both preparation jobs and reuses their artifacts
 - job: EmulatorTests
   displayName: Run Emulator Tests
-  dependsOn: PrepareEmulatorTestAssets
+  dependsOn:
+    - PrepareCoreTools
+    - PrepareBundle
   pool:
     name: ${{ parameters.poolName }}
     image: 1es-ubuntu-22.04
