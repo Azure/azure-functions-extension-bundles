@@ -46,14 +46,29 @@ Write-Host "Packages.props: $PackagesPropsPath" -ForegroundColor Yellow
 # Verify the host tag exists
 $tagUri = "https://api.github.com/repos/Azure/azure-functions-host/git/refs/tags/v$HostVersion"
 try {
-    $tagCheck = Invoke-WebRequest -Uri $tagUri -ErrorAction Stop
-    if ($tagCheck.StatusCode -ne 200) {
-        Write-Error "Host tag v$HostVersion does not exist in azure-functions-host repository"
-        exit 1
+    Write-Host "Verifying host tag v$HostVersion..." -ForegroundColor Gray
+    $response = Invoke-WebRequest -Uri $tagUri -ErrorAction Stop
+    
+    # Check if we got HTML instead of JSON (GitHub error page)
+    $contentType = $response.Headers['Content-Type']
+    if ($contentType -like '*text/html*') {
+        Write-Warning "Received HTML response instead of JSON - tag verification failed"
+        Write-Host "Response preview: $($response.Content.Substring(0, [Math]::Min(200, $response.Content.Length)))" -ForegroundColor Yellow
+        throw "GitHub returned an error page for tag v$HostVersion"
     }
+    
+    if ($response.StatusCode -ne 200) {
+        throw "Host tag v$HostVersion does not exist (HTTP $($response.StatusCode))"
+    }
+    
     Write-Host "✓ Verified host tag v$HostVersion exists" -ForegroundColor Green
 } catch {
-    Write-Error "Failed to verify host tag v$HostVersion : $_"
+    $errorMsg = $_.Exception.Message
+    if ($_.Exception.Response) {
+        $statusCode = $_.Exception.Response.StatusCode.value__
+        Write-Host "GitHub API returned status code: $statusCode" -ForegroundColor Yellow
+    }
+    Write-Error "Failed to verify host tag v$HostVersion : $errorMsg"
     exit 1
 }
 
