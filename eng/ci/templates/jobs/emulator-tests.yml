@@ -125,10 +125,6 @@ jobs:
         path: $(Build.Repository.LocalPath)/artifacts
         artifact: bundle-artifacts
       - output: pipelineArtifact
-        displayName: Publish bundle bin
-        path: $(Build.Repository.LocalPath)/bin
-        artifact: bundle-bin
-      - output: pipelineArtifact
         displayName: Publish templates artifacts
         path: $(Build.Repository.LocalPath)/templatesArtifacts
         artifact: templates-artifacts
@@ -267,24 +263,15 @@ jobs:
       artifact: 'bundle-bin'
       path: '$(Build.Repository.LocalPath)/bin'
 
-  - task: DownloadPipelineArtifact@2
-    displayName: 'Download templates artifacts'
-    inputs:
-      artifact: 'templates-artifacts'
-      path: '$(Build.Repository.LocalPath)/templatesArtifacts'
-
   - script: |
       echo "Listing downloaded directories..."
       ls -al artifacts || true
-      ls -al bin || true
-      ls -al templatesArtifacts || true
       ls -al core-tools || true
       echo "Checking for downloaded artifacts..."
-      if ls artifacts/*.zip 2>/dev/null || ls bin/*/*.zip 2>/dev/null; then
+      if ls artifacts/*.zip 2>/dev/null; then
         echo "✓ Extension bundle artifacts downloaded"
         echo "Artifacts:"
         ls -1 artifacts/*.zip 2>/dev/null || true
-        ls -1 bin/*/*.zip 2>/dev/null || true
         ls -1 core-tools/*.zip 2>/dev/null || true
       else
         echo "✗ No extension bundle zip files found"
