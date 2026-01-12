@@ -269,29 +269,6 @@ if (Test-Path $versionPropsPath) {
     Write-Warning "  Directory.Version.props not found at: $versionPropsPath"
 }
 
-# Fix until core tool can sync with new host changes - 
-# Update Startup.cs to remove obsolete IApplicationLifetime code
-Write-Host "`nUpdating Startup.cs to remove obsolete IApplicationLifetime..." -ForegroundColor Yellow
-$startupCsPath = Join-Path $coreToolsRoot "src\Cli\func\Actions\HostActions\Startup.cs"
-
-if (Test-Path $startupCsPath) {
-    $startupContent = Get-Content $startupCsPath -Raw
-    
-    # Pattern to match the obsolete code block
-    $pattern = '(?s)#pragma warning disable CS0618[^\r\n]*\r?\n\s+IApplicationLifetime applicationLifetime = app\.ApplicationServices\s+\.GetRequiredService<IApplicationLifetime>\(\);\s+app\.UseWebJobsScriptHost\(applicationLifetime\);\s+#pragma warning restore CS0618[^\r\n]*\r?\n'
-    
-    if ($startupContent -match $pattern) {
-        # Replace with the new simplified call
-        $newContent = $startupContent -replace $pattern, "            app.UseWebJobsScriptHost();`r`n"
-        Set-Content -Path $startupCsPath -Value $newContent -NoNewline
-        Write-Host "  ✓ Removed obsolete IApplicationLifetime code from Startup.cs" -ForegroundColor Green
-    } else {
-        Write-Host "  Startup.cs already updated (obsolete code not found)" -ForegroundColor Gray
-    }
-} else {
-    Write-Warning "  Startup.cs not found at: $startupCsPath"
-}
-
 Write-Host "`n===========================================================" -ForegroundColor Cyan
 Write-Host "Update Complete" -ForegroundColor Cyan
 Write-Host "===========================================================" -ForegroundColor Cyan
