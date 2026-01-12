@@ -12,9 +12,76 @@ parameters:
     type: string
 
 jobs:
-# New preparation job to build/publish once for all matrix runs
-- job: PrepareEmulatorTestAssets
-  displayName: Prepare Emulator Test Assets (build once)
+# Parallel preparation jobs for better performance
+# Job 1: Build Core Tools
+- job: PrepareCoreTools
+  displayName: Build Core Tools
+  pool:
+    name: ${{ parameters.poolName }}
+    image: 1es-ubuntu-22.04
+    os: linux
+  templateContext:
+    outputs:
+      - output: pipelineArtifact
+        displayName: Publish core tools artifacts
+        path: $(Agent.BuildDirectory)/core-tools/artifacts-coretools-zip
+        artifact: core-tools-artifacts
+
+  steps:
+  - checkout: self
+    path: bundle
+    fetchDepth: 1
+    
+  - script: |
+      cd $(Agent.BuildDirectory)/bundle
+      git sparse-checkout init --cone
+      git sparse-checkout set eng
+    displayName: 'Configure sparse checkout for eng folder only'
+    
+  - checkout: coretools
+    path: core-tools
+    fetchDepth: 1
+
+  - script: |
+      echo "Disk space before build:"
+      df -h
+    displayName: 'Check Initial Disk Space'
+  
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+    
+  - task: PowerShell@2
+    displayName: 'Build Azure Functions Core Tools'
+    inputs:
+      filePath: '$(Agent.BuildDirectory)/bundle/eng/ci/scripts/build-multi-version-core-tools.ps1'
+      arguments: '-Count $(hostTagsCount) -Pattern "$(hostTagPattern)" -Configuration Release -CloneDir "$(Agent.BuildDirectory)/core-tools"'
+      pwsh: true
+      workingDirectory: '$(Agent.BuildDirectory)/core-tools'
+  
+  - script: |
+      echo "Cleaning up build artifacts to free disk space..."
+      
+      # Remove source code (keep only artifacts)
+      echo "Removing Core Tools source files..."
+      find $(Agent.BuildDirectory)/core-tools -type f -name "*.cs" -delete 2>/dev/null || true
+      find $(Agent.BuildDirectory)/core-tools -type d -name "obj" -exec rm -rf {} + 2>/dev/null || true
+      find $(Agent.BuildDirectory)/core-tools -type d -name "bin" ! -path "*/artifacts-coretools-zip/*" -exec rm -rf {} + 2>/dev/null || true
+      
+      # Clean NuGet cache
+      echo "Clearing NuGet cache..."
+      rm -rf ~/.nuget/packages/* 2>/dev/null || true
+      
+      # Remove git history from core-tools to save space
+      echo "Removing git history..."
+      rm -rf $(Agent.BuildDirectory)/core-tools/.git 2>/dev/null || true
+      
+      echo "Disk space after cleanup:"
+      df -h
+    displayName: 'Cleanup After Core Tools Build'
+  
+# Job 2: Build Extension Bundle (downloads template artifacts)
+- job: PrepareBundle
+  displayName: Build Extension Bundle
   pool:
     name: ${{ parameters.poolName }}
     image: 1es-ubuntu-22.04
@@ -26,14 +93,6 @@ jobs:
         displayName: Publish bundle artifacts
         path: $(Build.Repository.LocalPath)/artifacts
         artifact: bundle-artifacts
-      - output: pipelineArtifact
-        displayName: Publish bundle bin
-        path: $(Build.Repository.LocalPath)/bin
-        artifact: bundle-bin
-      - output: pipelineArtifact
-        displayName: Publish templates artifacts
-        path: $(Build.Repository.LocalPath)/templatesArtifacts
-        artifact: templates-artifacts
 
   steps:
   # Download template artifacts for the build
@@ -86,104 +145,145 @@ jobs:
       fi
     displayName: 'Verify Build Artifacts'
 
-# Matrix job now depends on the preparation job and reuses its artifacts
-- job: EmulatorTests
-  displayName: Run Emulator Tests
-  dependsOn: PrepareEmulatorTestAssets
+# Job 3: Generate dynamic matrix for all Core Tools versions × Test Groups
+- job: GenerateTestMatrix
+  displayName: Generate Test Matrix
+  dependsOn: PrepareCoreTools
   pool:
     name: ${{ parameters.poolName }}
     image: 1es-ubuntu-22.04
     os: linux
   
-  # Matrix strategy for parallel execution by emulator group
+  steps:
+  - task: PowerShell@2
+    displayName: 'Generate Dynamic Matrix'
+    inputs:
+      targetType: 'inline'
+      script: |
+        # Validate required pipeline variables
+        if ([string]::IsNullOrEmpty("$(hostTagsCount)")) {
+          Write-Error "hostTagsCount pipeline variable is not set"
+          exit 1
+        }
+        
+        try {
+          $hostTagsCount = [int]"$(hostTagsCount)"
+        } catch {
+          Write-Error "hostTagsCount must be a valid integer. Got: $(hostTagsCount)"
+          exit 1
+        }
+        
+        if ($hostTagsCount -lt 1) {
+          Write-Error "hostTagsCount must be at least 1. Got: $hostTagsCount"
+          exit 1
+        }
+        
+        Write-Host "Generating matrix for $hostTagsCount host version(s)"
+        
+        # Test group definitions
+        $testGroups = @(
+          @{Name='BasicTests'; Group='basic'; Files='test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py test_table_functions.py'; Emulators='none'; Display='Basic Tests'; StopEventHub='false'},
+          @{Name='CosmosDB'; Group='cosmosdb'; Files='test_cosmosdb_functions.py'; Emulators='cosmosdb'; Display='CosmosDB Tests'; StopEventHub='false'},
+          @{Name='MySQL'; Group='mysql'; Files='test_mysql_functions.py'; Emulators='mysql'; Display='MySQL Tests'; StopEventHub='false'},
+          @{Name='ServiceBus'; Group='servicebus'; Files='test_servicebus_functions.py'; Emulators='servicebus'; Display='Service Bus Tests'; StopEventHub='true'},
+          @{Name='DTS'; Group='dts'; Files='test_durable_functions.py'; Emulators='dts'; Display='Durable Task Scheduler Tests'; StopEventHub='false'}
+        )
+        
+        # Generate matrix: version index X test group (e.g., 1_CosmosDB, 1_MySQL, 2_CosmosDB, 2_MySQL)
+        $matrix = @{}
+        for ($versionIndex = 1; $versionIndex -le $hostTagsCount; $versionIndex++) {
+          foreach ($group in $testGroups) {
+            # Create job key like "1_CosmosDB", "2_MySQL", etc.
+            $key = "${versionIndex}_$($group.Name)"
+            $matrix[$key] = @{
+              HOST_INDEX = $versionIndex
+              TEST_GROUP = $group.Group
+              TEST_FILES = $group.Files
+              ADDITIONAL_EMULATORS = $group.Emulators
+              DISPLAY_NAME = "${versionIndex}-$($group.Display)"
+              STOP_EVENTHUB = $group.StopEventHub
+            }
+          }
+        }
+        
+        if ($matrix.Count -eq 0) {
+          Write-Error "Failed to generate test matrix - no jobs created"
+          exit 1
+        }
+        
+        $matrixJson = $matrix | ConvertTo-Json -Compress -Depth 10
+        Write-Host "Generated matrix with $($matrix.Count) job(s):"
+        $matrix.Keys | Sort-Object | ForEach-Object {
+          Write-Host "  - $_ : $($matrix[$_].DISPLAY_NAME)"
+        }
+        
+        if ([string]::IsNullOrEmpty($matrixJson)) {
+          Write-Error "Matrix JSON serialization failed"
+          exit 1
+        }
+        
+        Write-Host "##vso[task.setvariable variable=TestMatrix;isOutput=true]$matrixJson"
+      pwsh: true
+    name: MatrixGen
+
+- job: EmulatorTests
+  displayName: Run Emulator Tests
+  dependsOn:
+    - PrepareCoreTools
+    - PrepareBundle
+    - GenerateTestMatrix
+  pool:
+    name: ${{ parameters.poolName }}
+    image: 1es-ubuntu-22.04
+    os: linux
   strategy:
-    matrix:
-      BasicTests:
-        TEST_GROUP: 'basic'
-        TEST_FILES: 'test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py test_table_functions.py'
-        ADDITIONAL_EMULATORS: 'none'
-        DISPLAY_NAME: 'Basic Tests (Azurite + EventHub)'
-        STOP_EVENTHUB: 'false'
-      CosmosDB:
-        TEST_GROUP: 'cosmosdb'
-        TEST_FILES: 'test_cosmosdb_functions.py'
-        ADDITIONAL_EMULATORS: 'cosmosdb'
-        DISPLAY_NAME: 'CosmosDB Tests'
-        STOP_EVENTHUB: 'false'
-      MySQL:
-        TEST_GROUP: 'mysql'
-        TEST_FILES: 'test_mysql_functions.py'
-        ADDITIONAL_EMULATORS: 'mysql'
-        DISPLAY_NAME: 'MySQL Tests'
-        STOP_EVENTHUB: 'false'
-      ServiceBus:
-        TEST_GROUP: 'servicebus'
-        TEST_FILES: 'test_servicebus_functions.py'
-        ADDITIONAL_EMULATORS: 'servicebus'
-        DISPLAY_NAME: 'Service Bus Tests'
-        STOP_EVENTHUB: 'true'
-      DurableTaskScheduler:
-        TEST_GROUP: 'dts'
-        TEST_FILES: 'test_durable_functions.py'
-        ADDITIONAL_EMULATORS: 'dts'
-        DISPLAY_NAME: 'Durable Task Scheduler Tests'
-        STOP_EVENTHUB: 'false'
+    maxParallel: 5
+    matrix: $[ dependencies.GenerateTestMatrix.outputs['MatrixGen.TestMatrix'] ]
 
   templateContext:
     outputParentDirectory: $(Build.ArtifactStagingDirectory)
     outputs:
       - output: pipelineArtifact
-        displayName: Publish emulator test artifacts for $(TEST_GROUP)
+        displayName: Publish emulator test artifacts for $(DISPLAY_NAME)
         path: $(Build.ArtifactStagingDirectory)
-        artifact: emulator-test-results-$(TEST_GROUP)
+        artifact: emulator-test-results-$(HOST_INDEX)-$(TEST_GROUP)
 
   steps:
-  # Initial listing for debugging (added)
-  - script: |
-      echo "=== Initial workspace listing ==="
-      pwd
-      ls -al .
-      for d in artifacts bin templatesArtifacts tests; do
-        echo "--- $d ---";
-        ls -al "$d" 2>/dev/null || echo "(missing)"; done
-    displayName: 'Initial Workspace Listing'
+  # Download prepared artifacts
+  - task: DownloadPipelineArtifact@2
+    displayName: 'Download core tools artifacts'
+    inputs:
+      artifact: 'core-tools-artifacts'
+      path: '$(Build.Repository.LocalPath)/core-tools'
 
-  # Download prepared artifacts (instead of rebuilding)
   - task: DownloadPipelineArtifact@2
     displayName: 'Download bundle artifacts'
     inputs:
       artifact: 'bundle-artifacts'
       path: '$(Build.Repository.LocalPath)/artifacts'
 
-  - task: DownloadPipelineArtifact@2
-    displayName: 'Download bundle bin'
-    inputs:
-      artifact: 'bundle-bin'
-      path: '$(Build.Repository.LocalPath)/bin'
-
-  - task: DownloadPipelineArtifact@2
-    displayName: 'Download templates artifacts'
-    inputs:
-      artifact: 'templates-artifacts'
-      path: '$(Build.Repository.LocalPath)/templatesArtifacts'
-
   - script: |
-      echo "Listing downloaded directories..."
-      ls -al artifacts || true
-      ls -al bin || true
-      ls -al templatesArtifacts || true
-      echo "Checking for downloaded artifacts..."
-      if ls artifacts/*.zip 2>/dev/null || ls bin/*/*.zip 2>/dev/null; then
-        echo "✓ Extension bundle artifacts downloaded"
-        echo "Artifacts:"
-        ls -1 artifacts/*.zip 2>/dev/null || true
-        ls -1 bin/*/*.zip 2>/dev/null || true
+      echo "Testing: $(DISPLAY_NAME)"
+      echo "Host Index: $(HOST_INDEX)"
+      echo "Test Group: $(TEST_GROUP)"
+      echo "Verifying Core Tools artifact for index $(HOST_INDEX)..."
+      
+      # Find the zip file matching this index (e.g., 1-cli-host-*.zip)
+      CORE_TOOLS_ZIP=$(ls core-tools/$(HOST_INDEX)-cli-host-*.zip 2>/dev/null | head -n1)
+      
+      if [ -n "$CORE_TOOLS_ZIP" ]; then
+        echo "✓ Found Core Tools zip: $CORE_TOOLS_ZIP"
+        # Extract version from filename for HOST_VERSION env var
+        HOST_VERSION=$(basename "$CORE_TOOLS_ZIP" | sed -E 's/[0-9]+-cli-host-(.+)\.zip/\1/')
+        echo "##vso[task.setvariable variable=HOST_VERSION]$HOST_VERSION"
+        echo "Extracted version: $HOST_VERSION"
       else
-        echo "✗ No extension bundle zip files found"
-        find . -maxdepth 5 -type f -name '*.zip' -print || true
+        echo "✗ Missing Core Tools zip for index $(HOST_INDEX)"
+        echo "Available Core Tools zips:"
+        ls -1 core-tools/*.zip 2>/dev/null || true
         exit 1
       fi
-    displayName: 'Verify Downloaded Artifacts'
+    displayName: 'Verify Core Tools Artifact'
 
   # Set up Python 3.12 and create virtual environment
   - task: UsePythonVersion@0
@@ -280,30 +380,37 @@ jobs:
         netstat -tlnp | grep :8000 || true
       fi
     displayName: 'Start Mock Extension Site'
-
-  # Set up webhost
-  - script: |
-      cd tests
-      source venv/bin/activate
-      python -m invoke -c test_setup webhost
-    displayName: 'Setup WebHost'
-
-  # Run tests for this specific test group
+  
+  # Run tests for the specific Core Tools version assigned to this job
   - script: |
       cd tests
       source venv/bin/activate
       cd ..
-      export PYAZURE_WEBHOST_DEBUG=1
-      export FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI="http://localhost:8000"
+      
+      echo "=========================================="
+      echo "Testing: $(DISPLAY_NAME)"
+      echo "Host Version: $(HOST_VERSION)"
+      echo "=========================================="
+      
+      # Set up webhost for this specific version
+      cd tests
+      python -m invoke -c test_setup webhost
+      cd ..
+      
+      # Run tests
       export MySqlConnectionString="Server=localhost;UserID=root;Password=password;Database=testdb;Port=3307"
+      
       IFS=' ' read -ra FILES <<< "$(TEST_FILES)"
       TEST_PATHS=""
       for file in "${FILES[@]}"; do
         TEST_PATHS="$TEST_PATHS tests/emulator_tests/$file"
       done
+      
       echo "Running pytest with paths: $TEST_PATHS"
-      python -m pytest $TEST_PATHS -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results-$(TEST_GROUP).xml
-    displayName: 'Run $(DISPLAY_NAME) Tests'
+      
+      # Run tests - only one version per job now, so no loop needed
+      python -m pytest $TEST_PATHS -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results-$(HOST_INDEX)-$(TEST_GROUP).xml
+    displayName: 'Run $(DISPLAY_NAME)'
     env:
       PYAZURE_WEBHOST_DEBUG: 1
       FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI: "http://localhost:8000"
@@ -329,11 +436,11 @@ jobs:
   # Publish test results
   - task: PublishTestResults@2
     inputs:
-      testResultsFiles: '$(Build.ArtifactStagingDirectory)/test-results-$(TEST_GROUP).xml'
+      testResultsFiles: '$(Build.ArtifactStagingDirectory)/test-results-$(HOST_INDEX)-$(TEST_GROUP).xml'
       testRunTitle: '$(DISPLAY_NAME)'
       failTaskOnFailedTests: true
     condition: always()
-    displayName: 'Publish $(DISPLAY_NAME) Test Results'
+    displayName: 'Publish Test Results'
 
   # Cleanup: stop emulator services and mock site
   - script: |
