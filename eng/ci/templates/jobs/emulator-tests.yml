@@ -93,10 +93,6 @@ jobs:
         displayName: Publish bundle artifacts
         path: $(Build.Repository.LocalPath)/artifacts
         artifact: bundle-artifacts
-      - output: pipelineArtifact
-        displayName: Publish templates artifacts
-        path: $(Build.Repository.LocalPath)/templatesArtifacts
-        artifact: templates-artifacts
 
   steps:
   # Download template artifacts for the build

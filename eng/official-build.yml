@@ -36,6 +36,7 @@ resources:
 
 variables:
   - template: /ci/variables/cfs.yml@eng
+  - hostTagsCount: 2  # Number of latest host tags to fetch from azure-functions-host
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1es
