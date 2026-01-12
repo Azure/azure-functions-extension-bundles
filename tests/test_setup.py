@@ -84,9 +84,9 @@ def webhost(c, clean=False, webhost_dir=None):
     if host_version:
         # Look for version-specific zip file with indexed naming pattern (e.g., 1-cli-host-4.1046.100.zip)
         zip_pattern_indexed = f"*-cli-host-{host_version}.zip"
-        zip_path = core_tools_dir / zip_pattern_indexed
         zip_files = list(core_tools_dir.glob(zip_pattern_indexed))
-        if not zip_path.exists():
+
+        if not zip_files:
             raise FileNotFoundError(
                 f"Core Tools zip for HOST_VERSION '{host_version}' not found.\n"
                 f"Expected pattern: {zip_pattern_indexed}\n"
@@ -94,6 +94,7 @@ def webhost(c, clean=False, webhost_dir=None):
                 + "\n".join(f"  - {f.name}" for f in core_tools_dir.glob("*.zip"))
             )
 
+        zip_path = zip_files[0]
         print(f"Using Core Tools zip for HOST_VERSION '{host_version}': {zip_path}")
     else:
         # Fallback: Find any zip file (legacy behavior)
