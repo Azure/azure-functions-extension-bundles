@@ -199,7 +199,7 @@ jobs:
       pwsh: true
     name: MatrixGen
 
-# Matrix job now runs one job per Core Tools version × Test Group combination
+# Matrix job - runs with max 5 parallel jobs to avoid port conflicts
 - job: EmulatorTests
   displayName: Run Emulator Tests
   dependsOn:
@@ -210,8 +210,8 @@ jobs:
     name: ${{ parameters.poolName }}
     image: 1es-ubuntu-22.04
     os: linux
-  # Dynamic matrix strategy - one job per version × test group
   strategy:
+    maxParallel: 5
     matrix: $[ dependencies.GenerateTestMatrix.outputs['MatrixGen.TestMatrix'] ]
 
   templateContext:
