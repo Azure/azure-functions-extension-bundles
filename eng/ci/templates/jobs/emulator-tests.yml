@@ -79,37 +79,6 @@ jobs:
       df -h
     displayName: 'Cleanup After Core Tools Build'
   
-  - task: PowerShell@2
-    displayName: 'Generate Host Versions List'
-    inputs:
-      targetType: 'inline'
-      script: |
-        Write-Host "Checking for Core Tools artifacts..."
-        $artifactsPath = "$(Agent.BuildDirectory)/core-tools/artifacts-coretools-zip"
-        Write-Host "Looking in: $artifactsPath"
-        
-        if (-not (Test-Path $artifactsPath)) {
-          Write-Host "##[error]Directory does not exist: $artifactsPath"
-          Write-Host "Listing core-tools directory:"
-          Get-ChildItem -Path "$(Agent.BuildDirectory)/core-tools" -Recurse | Select-Object FullName
-          exit 1
-        }
-        
-        $zipFiles = Get-ChildItem -Path $artifactsPath -Filter "Cli.host-*.zip" -ErrorAction SilentlyContinue
-        Write-Host "Found $($zipFiles.Count) zip file(s):"
-        $zipFiles | ForEach-Object { Write-Host "  - $($_.Name)" }
-        
-        $versions = $zipFiles | ForEach-Object { 
-          if ($_.Name -match 'Cli\.host-(.+)\.zip') { 
-            $matches[1] 
-          } 
-        }
-        $versionsList = $versions -join ','
-        Write-Host "Host versions list: $versionsList"
-        Write-Host "##vso[task.setvariable variable=HostVersionsList;isOutput=true]$versionsList"
-      pwsh: true
-    name: HostVersions
-
 # Job 2: Build Extension Bundle (downloads template artifacts)
 - job: PrepareBundle
   displayName: Build Extension Bundle
@@ -195,10 +164,6 @@ jobs:
     inputs:
       targetType: 'inline'
       script: |
-        # Host versions from PrepareCoreTools job
-        $hostVersions = "$(dependencies.PrepareCoreTools.outputs['HostVersions.HostVersionsList'])".Split(',')
-        Write-Host "Host versions: $($hostVersions -join ', ')"
-        
         # Test group definitions
         $testGroups = @(
           @{Name='BasicTests'; Group='basic'; Files='test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py test_table_functions.py'; Emulators='none'; Display='Basic Tests'; StopEventHub='false'},
@@ -211,7 +176,7 @@ jobs:
         # Generate matrix: index × test group (e.g., 1-cosmos, 1-mysql, 2-cosmos, 2-mysql)
         $matrix = @{}
         $versionIndex = 1
-        foreach ($version in $hostVersions) {
+        while ($versionIndex -le $hostTagsCount) {
           foreach ($group in $testGroups) {
             # Create job key like "1_CosmosDB", "2_MySQL", etc.
             $key = "${versionIndex}_$($group.Name)"
@@ -240,7 +205,7 @@ jobs:
 
 # Matrix job now runs one job per Core Tools version × Test Group combination
 - job: EmulatorTests
-  displayName: Run $(DISPLAY_NAME)
+  displayName: Run Emulator Tests
   dependsOn:
     - PrepareCoreTools
     - PrepareBundle
