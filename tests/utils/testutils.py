@@ -227,12 +227,10 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         if default_path.exists():
             coretools_exe = str(default_path)
         else:
-            # Try to find Core Tools in the build directory (fallback)
+            # Try to find Core Tools in the build directory
             potential_paths = [
                 BUILD_DIR / webhost_subdir / "func.exe",
-                BUILD_DIR / webhost_subdir / "func",
-                BUILD_DIR / "webhost" / "func.exe",  # Legacy fallback
-                BUILD_DIR / "webhost" / "func"        # Legacy fallback
+                BUILD_DIR / webhost_subdir / "func"
             ]
             for path in potential_paths:
                 if path.exists():

@@ -97,7 +97,7 @@ def webhost(c, clean=False, webhost_dir=None):
         zip_path = zip_files[0]
         print(f"Using Core Tools zip for HOST_VERSION '{host_version}': {zip_path}")
     else:
-        # Fallback: Find any zip file (legacy behavior)
+        # Fallback: Find any zip file
         zip_files = list(core_tools_dir.glob("*.zip"))
         if not zip_files:
             raise FileNotFoundError(f"No zip files found in {core_tools_dir}")
