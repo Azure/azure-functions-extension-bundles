@@ -30,6 +30,7 @@ ROOT_DIR = pathlib.Path(__file__).parent
 ARTIFACTS_DIR = ROOT_DIR / "artifacts"
 BUILD_DIR = ROOT_DIR / "build"
 
+
 def extract_core_tools(src_zip, dest_folder):
     """Extracts Azure Functions Core Tools to the specified folder."""
     print(f"Extracting Core Tools from {src_zip}")
@@ -52,16 +53,12 @@ def extract_core_tools(src_zip, dest_folder):
 
 
 @task
-def webhost(
-    c,
-    clean=False,
-    webhost_dir=None
-):
+def webhost(c, clean=False, webhost_dir=None):
     """Builds the webhost"""
 
     # Get HOST_VERSION to use version-specific directory
-    host_version = os.environ.get('HOST_VERSION')
-    
+    host_version = os.environ.get("HOST_VERSION")
+
     if webhost_dir is None:
         if host_version:
             # Use version-specific directory to avoid conflicts in parallel execution
@@ -82,30 +79,33 @@ def webhost(
     core_tools_dir = repo_root / "core-tools"
 
     # Check for HOST_VERSION environment variable to select specific version
-    host_version = os.environ.get('HOST_VERSION')
-    
+    host_version = os.environ.get("HOST_VERSION")
+
     if host_version:
-        # Look for version-specific zip file (e.g., Cli.host-4.1046.100.zip)
-        zip_pattern = f"Cli.host-{host_version}.zip"
-        zip_path = core_tools_dir / zip_pattern
-        
+        # Look for version-specific zip file with indexed naming pattern (e.g., 1-cli-host-4.1046.100.zip)
+        zip_pattern_indexed = f"*-cli-host-{host_version}.zip"
+        zip_path = core_tools_dir / zip_pattern_indexed
+        zip_files = list(core_tools_dir.glob(zip_pattern_indexed))
         if not zip_path.exists():
             raise FileNotFoundError(
-                f"Core Tools zip for HOST_VERSION '{host_version}' not found: {zip_path}\n"
-                f"Available files in {core_tools_dir}:\n" +
-                "\n".join(f"  - {f.name}" for f in core_tools_dir.glob("*.zip"))
+                f"Core Tools zip for HOST_VERSION '{host_version}' not found.\n"
+                f"Expected pattern: {zip_pattern_indexed}\n"
+                f"Available files in {core_tools_dir}:\n"
+                + "\n".join(f"  - {f.name}" for f in core_tools_dir.glob("*.zip"))
             )
-        
+
         print(f"Using Core Tools zip for HOST_VERSION '{host_version}': {zip_path}")
     else:
         # Fallback: Find any zip file (legacy behavior)
         zip_files = list(core_tools_dir.glob("*.zip"))
         if not zip_files:
             raise FileNotFoundError(f"No zip files found in {core_tools_dir}")
-        
+
         # Use the first zip file found
         zip_path = zip_files[0]
-        print(f"No HOST_VERSION specified, using first available Core Tools zip: {zip_path}")
+        print(
+            f"No HOST_VERSION specified, using first available Core Tools zip: {zip_path}"
+        )
 
     create_webhost_folder(webhost_dir)
     extract_core_tools(zip_path, webhost_dir)
