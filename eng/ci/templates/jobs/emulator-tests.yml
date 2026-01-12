@@ -164,6 +164,10 @@ jobs:
     inputs:
       targetType: 'inline'
       script: |
+        # Use hostTagsCount from pipeline variable
+        $hostTagsCount = [int]"$(hostTagsCount)"
+        Write-Host "Generating matrix for $hostTagsCount host version(s)"
+        
         # Test group definitions
         $testGroups = @(
           @{Name='BasicTests'; Group='basic'; Files='test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py test_table_functions.py'; Emulators='none'; Display='Basic Tests'; StopEventHub='false'},
@@ -173,31 +177,27 @@ jobs:
           @{Name='DTS'; Group='dts'; Files='test_durable_functions.py'; Emulators='dts'; Display='Durable Task Scheduler Tests'; StopEventHub='false'}
         )
         
-        # Generate matrix: index × test group (e.g., 1-cosmos, 1-mysql, 2-cosmos, 2-mysql)
+        # Generate matrix: version index X test group (e.g., 1_CosmosDB, 1_MySQL, 2_CosmosDB, 2_MySQL)
         $matrix = @{}
-        $versionIndex = 1
-        while ($versionIndex -le $hostTagsCount) {
+        for ($versionIndex = 1; $versionIndex -le $hostTagsCount; $versionIndex++) {
           foreach ($group in $testGroups) {
             # Create job key like "1_CosmosDB", "2_MySQL", etc.
             $key = "${versionIndex}_$($group.Name)"
             $matrix[$key] = @{
-              HOST_VERSION = $version
               HOST_INDEX = $versionIndex
               TEST_GROUP = $group.Group
               TEST_FILES = $group.Files
               ADDITIONAL_EMULATORS = $group.Emulators
-              DISPLAY_NAME = "${versionIndex}-$($group.Display) (Host $version)"
+              DISPLAY_NAME = "${versionIndex}-$($group.Display)"
               STOP_EVENTHUB = $group.StopEventHub
-              CORE_TOOLS_ZIP = "${versionIndex}-cli-host-${version}.zip"
             }
           }
-          $versionIndex++
         }
         
         $matrixJson = $matrix | ConvertTo-Json -Compress -Depth 10
         Write-Host "Generated matrix with $($matrix.Count) job(s):"
         $matrix.Keys | Sort-Object | ForEach-Object {
-          Write-Host "  - $_ : $($matrix[$_].DISPLAY_NAME) using $($matrix[$_].CORE_TOOLS_ZIP)"
+          Write-Host "  - $_ : $($matrix[$_].DISPLAY_NAME)"
         }
         Write-Host "##vso[task.setvariable variable=TestMatrix;isOutput=true]$matrixJson"
       pwsh: true
@@ -243,14 +243,21 @@ jobs:
   - script: |
       echo "Testing: $(DISPLAY_NAME)"
       echo "Host Index: $(HOST_INDEX)"
-      echo "Host Version: $(HOST_VERSION)"
       echo "Test Group: $(TEST_GROUP)"
-      echo "Core Tools Zip: $(CORE_TOOLS_ZIP)"
-      echo "Verifying Core Tools artifact..."
-      if [ -f "core-tools/$(CORE_TOOLS_ZIP)" ]; then
-        echo "✓ Found Core Tools zip: $(CORE_TOOLS_ZIP)"
+      echo "Verifying Core Tools artifact for index $(HOST_INDEX)..."
+      
+      # Find the zip file matching this index (e.g., 1-cli-host-*.zip)
+      CORE_TOOLS_ZIP=$(ls core-tools/$(HOST_INDEX)-cli-host-*.zip 2>/dev/null | head -n1)
+      
+      if [ -n "$CORE_TOOLS_ZIP" ]; then
+        echo "✓ Found Core Tools zip: $CORE_TOOLS_ZIP"
+        # Extract version from filename for HOST_VERSION env var
+        HOST_VERSION=$(basename "$CORE_TOOLS_ZIP" | sed -E 's/[0-9]+-cli-host-(.+)\.zip/\1/')
+        echo "##vso[task.setvariable variable=HOST_VERSION]$HOST_VERSION"
+        echo "##vso[task.setvariable variable=CORE_TOOLS_ZIP]$(basename "$CORE_TOOLS_ZIP")"
+        echo "Extracted version: $HOST_VERSION"
       else
-        echo "✗ Missing Core Tools zip: $(CORE_TOOLS_ZIP)"
+        echo "✗ Missing Core Tools zip for index $(HOST_INDEX)"
         echo "Available Core Tools zips:"
         ls -1 core-tools/*.zip 2>/dev/null || true
         exit 1
@@ -383,7 +390,7 @@ jobs:
       echo "Running pytest with paths: $TEST_PATHS"
       
       # Run tests - only one version per job now, so no loop needed
-      python -m pytest $TEST_PATHS -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results-$(TEST_GROUP)-$(HOST_VERSION).xml
+      python -m pytest $TEST_PATHS -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results-$(HOST_INDEX)-$(TEST_GROUP).xml
     displayName: 'Run $(DISPLAY_NAME)'
     env:
       HOST_VERSION: $(HOST_VERSION)
@@ -411,7 +418,7 @@ jobs:
   # Publish test results
   - task: PublishTestResults@2
     inputs:
-      testResultsFiles: '$(Build.ArtifactStagingDirectory)/test-results-$(TEST_GROUP)-$(HOST_VERSION).xml'
+      testResultsFiles: '$(Build.ArtifactStagingDirectory)/test-results-$(HOST_INDEX)-$(TEST_GROUP).xml'
       testRunTitle: '$(DISPLAY_NAME)'
       failTaskOnFailedTests: true
     condition: always()
