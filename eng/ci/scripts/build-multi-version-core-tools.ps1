@@ -165,8 +165,8 @@ try {
         if (Test-Path $tempZipDir) {
             Get-ChildItem -Path $tempZipDir -Filter "*.zip" | ForEach-Object {
                 $oldName = $_.Name
-                # Use simple naming: Cli.host-{version}.zip
-                $newName = "Cli.host-$hostVersion.zip"
+                # Use iteration-prefixed naming: {iteration}-cli-host-{version}.zip
+                $newName = "$versionIndex-cli-host-$hostVersion.zip"
                 $destPath = Join-Path $finalZipDir $newName
                 
                 Copy-Item -Path $_.FullName -Destination $destPath -Force
