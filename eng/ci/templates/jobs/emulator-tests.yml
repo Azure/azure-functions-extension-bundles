@@ -208,24 +208,32 @@ jobs:
           @{Name='DTS'; Group='dts'; Files='test_durable_functions.py'; Emulators='dts'; Display='Durable Task Scheduler Tests'; StopEventHub='false'}
         )
         
-        # Generate matrix: version × test group
+        # Generate matrix: index × test group (e.g., 1-cosmos, 1-mysql, 2-cosmos, 2-mysql)
         $matrix = @{}
+        $versionIndex = 1
         foreach ($version in $hostVersions) {
           foreach ($group in $testGroups) {
-            $key = "$($group.Name)_v$($version -replace '\.', '_')"
+            # Create job key like "1_CosmosDB", "2_MySQL", etc.
+            $key = "${versionIndex}_$($group.Name)"
             $matrix[$key] = @{
               HOST_VERSION = $version
+              HOST_INDEX = $versionIndex
               TEST_GROUP = $group.Group
               TEST_FILES = $group.Files
               ADDITIONAL_EMULATORS = $group.Emulators
-              DISPLAY_NAME = "$($group.Display) (Host $version)"
+              DISPLAY_NAME = "${versionIndex}-$($group.Display) (Host $version)"
               STOP_EVENTHUB = $group.StopEventHub
+              CORE_TOOLS_ZIP = "${versionIndex}-cli-host-${version}.zip"
             }
           }
+          $versionIndex++
         }
         
         $matrixJson = $matrix | ConvertTo-Json -Compress -Depth 10
-        Write-Host "Generated matrix: $matrixJson"
+        Write-Host "Generated matrix with $($matrix.Count) job(s):"
+        $matrix.Keys | Sort-Object | ForEach-Object {
+          Write-Host "  - $_ : $($matrix[$_].DISPLAY_NAME) using $($matrix[$_].CORE_TOOLS_ZIP)"
+        }
         Write-Host "##vso[task.setvariable variable=TestMatrix;isOutput=true]$matrixJson"
       pwsh: true
     name: MatrixGen
@@ -251,7 +259,7 @@ jobs:
       - output: pipelineArtifact
         displayName: Publish emulator test artifacts for $(DISPLAY_NAME)
         path: $(Build.ArtifactStagingDirectory)
-        artifact: emulator-test-results-$(TEST_GROUP)-$(HOST_VERSION)
+        artifact: emulator-test-results-$(HOST_INDEX)-$(TEST_GROUP)
 
   steps:
   # Download prepared artifacts
@@ -269,17 +277,20 @@ jobs:
 
   - script: |
       echo "Testing: $(DISPLAY_NAME)"
+      echo "Host Index: $(HOST_INDEX)"
       echo "Host Version: $(HOST_VERSION)"
       echo "Test Group: $(TEST_GROUP)"
-      echo "Verifying Core Tools version..."
-      if [ -f "core-tools/Cli.host-$(HOST_VERSION).zip" ]; then
-        echo "✓ Found Core Tools zip for version $(HOST_VERSION)"
+      echo "Core Tools Zip: $(CORE_TOOLS_ZIP)"
+      echo "Verifying Core Tools artifact..."
+      if [ -f "core-tools/$(CORE_TOOLS_ZIP)" ]; then
+        echo "✓ Found Core Tools zip: $(CORE_TOOLS_ZIP)"
       else
-        echo "✗ Missing Core Tools zip for version $(HOST_VERSION)"
+        echo "✗ Missing Core Tools zip: $(CORE_TOOLS_ZIP)"
+        echo "Available Core Tools zips:"
         ls -1 core-tools/*.zip 2>/dev/null || true
         exit 1
       fi
-    displayName: 'Verify Core Tools Version'
+    displayName: 'Verify Core Tools Artifact'
 
   # Set up Python 3.12 and create virtual environment
   - task: UsePythonVersion@0
