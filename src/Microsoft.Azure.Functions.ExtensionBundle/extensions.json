@@ -64,7 +64,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "majorVersion": "3",
+    "version": "3.8.0",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -121,7 +121,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "majorVersion": "4",
+    "version": "4.13.0",
     "name": "CosmosDB",
     "bindings": [
       "cosmosdbtrigger",
@@ -185,12 +185,6 @@
       "webpubsubrequest",
       "webpubsubtrigger"
     ]
-  },
-  {
-    "id": "Azure.Storage.Queues",
-    "majorVersion": "12",
-    "name": "AzureStorageQueues",
-    "bindings": []
   },
   {
     "id": "System.Private.Uri",
@@ -283,4 +277,3 @@
     ]
   }
 ]
-
