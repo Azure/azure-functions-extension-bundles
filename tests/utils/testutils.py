@@ -209,20 +209,36 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         testconfig.read(WORKER_CONFIG)    # Get Core Tools executable path
     coretools_exe = os.environ.get('CORE_TOOLS_EXE_PATH')
     if not coretools_exe:
+        # Check for HOST_VERSION to use version-specific directory
+        host_version = os.environ.get('HOST_VERSION')
+        
+        if not host_version:
+            raise RuntimeError('\n'.join([
+                'HOST_VERSION environment variable is required.',
+                'This should be set automatically in CI pipelines.',
+                'For local testing, set it manually:',
+                '  export HOST_VERSION=4.1046.100  # Linux/Mac',
+                '  $env:HOST_VERSION="4.1046.100"  # PowerShell',
+                '',
+                'Or set CORE_TOOLS_EXE_PATH to point directly to func binary.'
+            ]))
+        
         # Default to the webhost directory structure from test_setup.py
-        # BUILD_DIR / "webhost" is where test_setup.py extracts Core Tools
+        # BUILD_DIR / "webhost-{version}" is where test_setup.py extracts Core Tools
+        webhost_subdir = f"webhost-{host_version}"
+        
         if ON_WINDOWS:
-            default_path = BUILD_DIR / "webhost" / "func.exe"
+            default_path = BUILD_DIR / webhost_subdir / "func.exe"
         else:
-            default_path = BUILD_DIR / "webhost" / "func"
+            default_path = BUILD_DIR / webhost_subdir / "func"
         
         if default_path.exists():
             coretools_exe = str(default_path)
         else:
-            # Try to find Core Tools in the build directory (fallback)
+            # Try to find Core Tools in the build directory
             potential_paths = [
-                BUILD_DIR / "webhost" / "func.exe",
-                BUILD_DIR / "webhost" / "func"
+                BUILD_DIR / webhost_subdir / "func.exe",
+                BUILD_DIR / webhost_subdir / "func"
             ]
             for path in potential_paths:
                 if path.exists():
@@ -246,6 +262,10 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         ]))
 
     coretools_exe = coretools_exe.strip()
+    
+    # Log the selected version for debugging
+    host_version = os.environ.get('HOST_VERSION', 'default')
+    logging.info(f"HOST_VERSION: {host_version}")
     logging.info(f"Using Azure Functions Core Tools at: {coretools_exe}")
     
     # Check if the Core Tools binary exists and is executable
