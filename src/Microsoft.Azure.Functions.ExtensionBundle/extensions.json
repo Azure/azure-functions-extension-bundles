@@ -187,12 +187,6 @@
     ]
   },
   {
-    "id": "Azure.Storage.Queues",
-    "majorVersion": "12",
-    "name": "AzureStorageQueues",
-    "bindings": []
-  },
-  {
     "id": "System.Private.Uri",
     "Version": "4.3.2",
     "name": "SystemPrivateUri",
