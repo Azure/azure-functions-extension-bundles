@@ -726,14 +726,72 @@ class TestYourFunctions(WebHostTestCase):
 
 **Reference**: See `tests/emulator_tests/test_blob_functions.py` for comprehensive examples of testing various Azure Functions scenarios.
 
-### 4. **Important Notes**
+### 4. **Configure CI Test Groups**
+
+Tests are organized into groups for parallel CI execution. To add tests to CI, update the test groups configuration file:
+
+**File**: `eng/ci/config/test-groups.json`
+
+```json
+{
+  "testGroups": [
+    {
+      "name": "BasicTests",
+      "group": "basic",
+      "files": "test_blob_functions.py test_queue_functions.py",
+      "emulators": "none",
+      "display": "Basic Tests",
+      "stopEventHub": "false"
+    },
+    {
+      "name": "YourNewTests",
+      "group": "yourgroup",
+      "files": "test_your_functions.py",
+      "emulators": "your_emulator",
+      "display": "Your New Tests",
+      "stopEventHub": "false"
+    }
+  ]
+}
+```
+
+**Configuration Fields**:
+
+| Field | Description |
+| ------- | ------------- |
+| `name` | Unique identifier for the test group (used in matrix job names) |
+| `group` | Short identifier (used in artifact names) |
+| `files` | Space-separated list of test files to run |
+| `emulators` | Emulator to start: `none`, `cosmosdb`, `mysql`, `servicebus`, or `dts` |
+| `display` | Human-readable name shown in CI pipeline |
+| `stopEventHub` | Set to `"true"` if your emulator conflicts with EventHub ports |
+
+**Adding Tests to Existing Groups**:
+
+To add a new test file to an existing group, simply append it to the `files` field:
+
+```json
+{
+  "name": "BasicTests",
+  "files": "test_blob_functions.py test_queue_functions.py test_your_new_file.py",
+  ...
+}
+```
+
+**Creating a New Test Group**:
+
+1. Add a new entry to the `testGroups` array in `test-groups.json`
+2. If your tests require a new emulator, add the startup logic in `eng/ci/templates/jobs/emulator-tests.yml` under the "Start Additional Emulators" step
+3. Create Docker Compose configuration in `tests/emulator_tests/utils/your_emulator/docker-compose.yml`
+
+### 5. **Important Notes**
 
 - **No host.json required**: The host.json file is automatically generated during test execution with the correct extension bundle configuration
 - **Function metadata**: Use `function.json` files to define triggers, inputs, and outputs for each function
 - **Test isolation**: Each test class gets its own Function Host instance for isolation
 - **Emulator dependencies**: Ensure required emulators (Azurite, Event Hubs, etc.) are running before tests
 
-### 5. **Test Structure Best Practices**
+### 6. **Test Structure Best Practices**
 
 - Group related functions in the same directory (e.g., `blob_functions/`, `http_functions/`)
 - Use descriptive test method names that indicate what scenario is being tested

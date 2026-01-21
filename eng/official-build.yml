@@ -40,8 +40,10 @@ resources:
 
 variables:
   - template: /ci/variables/cfs.yml@eng
-  - hostTagsCount: 2
-  - hostTagPattern: 'v4.10'
+  - name: hostTagsCount
+    value: 2
+  - name: hostTagPattern
+    value: 'v4.10'
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1es

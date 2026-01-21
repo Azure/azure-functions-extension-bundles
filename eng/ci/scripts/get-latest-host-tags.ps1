@@ -73,9 +73,14 @@ if (-not $tags) {
 
 Write-Host "Found $($tags.Count) tags matching pattern" -ForegroundColor Green
 
+# Build dynamic regex pattern from the input Pattern parameter
+# Pattern like "v4.10" should match "v4.10xx.yy" format tags
+$dynamicRegex = "^$([regex]::Escape($Pattern))(\d+)\.(\d+)$"
+Write-Host "Using regex pattern: $dynamicRegex" -ForegroundColor Gray
+
 # Parse and group tags
 $parsedTags = $tags | ForEach-Object {
-    if ($_ -match '^v4\.(\d+)\.(\d+)$') {
+    if ($_ -match $dynamicRegex) {
         [PSCustomObject]@{
             Tag = $_
             MiddleVersion = [int]$matches[1]

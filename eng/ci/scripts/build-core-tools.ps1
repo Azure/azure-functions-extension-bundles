@@ -4,27 +4,23 @@
 
 <#
 .SYNOPSIS
-    Clones and builds Azure Functions Core Tools from source.
+    Builds Azure Functions Core Tools from an existing local clone.
 
 .DESCRIPTION
-    This script clones the Azure Functions Core Tools repository from GitHub,
-    builds the Azure.Functions.Cli.csproj project, and outputs the build location.
-
-.PARAMETER Branch
-    Git branch to clone (default: main)
+    This script builds the Azure Functions Core Tools from an existing local repository clone,
+    compiles the Azure.Functions.Cli.csproj project, and outputs the build artifacts.
 
 .PARAMETER Configuration
     Build configuration - Debug or Release (default: Release)
 
 .PARAMETER CoreToolsDir
-    Directory where the repository will be cloned (default: tests/build/core-tools-source)
+    Directory containing an existing Azure Functions Core Tools repository clone
 
 .EXAMPLE
-    .\build-core-tools.ps1 -Branch main -Configuration Release -Runtime win-x64
+    .\build-core-tools.ps1 -Configuration Release -CoreToolsDir "path/to/core-tools"
 #>
 
 param(
-    [string]$Branch = "main",
     [string]$Configuration = "Release",
     [string]$CoreToolsDir = "$(Build.Repository.LocalPath)/azure-functions-core-tools",
     [string]$ZipOutputDir = "artifacts-coretools-zip"
@@ -54,7 +50,6 @@ Write-Host "Auto-detected runtime: $Runtime" -ForegroundColor Yellow
 Write-Host "==================================================" -ForegroundColor Cyan
 Write-Host "Azure Functions Core Tools Build Script" -ForegroundColor Cyan
 Write-Host "==================================================" -ForegroundColor Cyan
-Write-Host "Branch: $Branch" -ForegroundColor Yellow
 Write-Host "Configuration: $Configuration" -ForegroundColor Yellow
 Write-Host "Runtime: $Runtime" -ForegroundColor Yellow
 Write-Host "==================================================" -ForegroundColor Cyan

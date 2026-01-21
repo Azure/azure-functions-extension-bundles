@@ -43,11 +43,16 @@ if (-not (Test-Path $PackagesPropsPath)) {
 
 Write-Host "Packages.props: $PackagesPropsPath" -ForegroundColor Yellow
 
+# Set up GitHub API headers for compliance with GitHub API requirements
+$script:GitHubHeaders = @{
+    "User-Agent" = "azure-functions-extension-bundles-emulator-tests"
+}
+
 # Verify the host tag exists
 $tagUri = "https://api.github.com/repos/Azure/azure-functions-host/git/refs/tags/v$HostVersion"
 try {
     Write-Host "Verifying host tag v$HostVersion..." -ForegroundColor Gray
-    $response = Invoke-WebRequest -Uri $tagUri -ErrorAction Stop
+    $response = Invoke-WebRequest -Uri $tagUri -Headers $script:GitHubHeaders -ErrorAction Stop
     
     # Check if we got HTML instead of JSON (GitHub error page)
     $contentType = $response.Headers['Content-Type']
@@ -85,7 +90,7 @@ function Get-WorkerVersionFromHost {
     $uri = "https://raw.githubusercontent.com/Azure/azure-functions-host/refs/tags/v$HostVersion/$WorkerPropsFile"
     
     try {
-        $content = (Invoke-WebRequest -Uri $uri -ErrorAction Stop).Content
+        $content = (Invoke-WebRequest -Uri $uri -Headers $script:GitHubHeaders -ErrorAction Stop).Content
         [xml]$workerXml = $content
 
         # Check for PackageVersion elements (used in Directory.Packages.props)

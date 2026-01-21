@@ -31,12 +31,7 @@ jobs:
   - checkout: self
     path: bundle
     fetchDepth: 1
-    
-  - script: |
-      cd $(Agent.BuildDirectory)/bundle
-      git sparse-checkout init --cone
-      git sparse-checkout set eng
-    displayName: 'Configure sparse checkout for eng folder only'
+    sparseCheckoutDirectories: eng
     
   - checkout: coretools
     path: core-tools
@@ -180,14 +175,24 @@ jobs:
         
         Write-Host "Generating matrix for $hostTagsCount host version(s)"
         
-        # Test group definitions
-        $testGroups = @(
-          @{Name='BasicTests'; Group='basic'; Files='test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py test_table_functions.py'; Emulators='none'; Display='Basic Tests'; StopEventHub='false'},
-          @{Name='CosmosDB'; Group='cosmosdb'; Files='test_cosmosdb_functions.py'; Emulators='cosmosdb'; Display='CosmosDB Tests'; StopEventHub='false'},
-          @{Name='MySQL'; Group='mysql'; Files='test_mysql_functions.py'; Emulators='mysql'; Display='MySQL Tests'; StopEventHub='false'},
-          @{Name='ServiceBus'; Group='servicebus'; Files='test_servicebus_functions.py'; Emulators='servicebus'; Display='Service Bus Tests'; StopEventHub='true'},
-          @{Name='DTS'; Group='dts'; Files='test_durable_functions.py'; Emulators='dts'; Display='Durable Task Scheduler Tests'; StopEventHub='false'}
-        )
+        # Load test group definitions from external config file
+        $configPath = "$(Build.SourcesDirectory)/eng/ci/config/test-groups.json"
+        if (-not (Test-Path $configPath)) {
+          Write-Error "Test groups config file not found: $configPath"
+          exit 1
+        }
+        
+        $config = Get-Content $configPath -Raw | ConvertFrom-Json
+        $testGroups = $config.testGroups | ForEach-Object {
+          @{
+            Name = $_.name
+            Group = $_.group
+            Files = $_.files
+            Emulators = $_.emulators
+            Display = $_.display
+            StopEventHub = $_.stopEventHub
+          }
+        }
         
         # Generate matrix: version index X test group (e.g., 1_CosmosDB, 1_MySQL, 2_CosmosDB, 2_MySQL)
         $matrix = @{}
@@ -268,13 +273,14 @@ jobs:
       echo "Test Group: $(TEST_GROUP)"
       echo "Verifying Core Tools artifact for index $(HOST_INDEX)..."
       
-      # Find the zip file matching this index (e.g., 1-cli-host-*.zip)
-      CORE_TOOLS_ZIP=$(ls core-tools/$(HOST_INDEX)-cli-host-*.zip 2>/dev/null | head -n1)
+      # Find the zip file matching this exact index using regex.
+      CORE_TOOLS_ZIP=$(ls core-tools/ | grep -E "^$(HOST_INDEX)-cli-host-.+\.zip$" | head -n1)
       
       if [ -n "$CORE_TOOLS_ZIP" ]; then
+        CORE_TOOLS_ZIP="core-tools/$CORE_TOOLS_ZIP"
         echo "✓ Found Core Tools zip: $CORE_TOOLS_ZIP"
         # Extract version from filename for HOST_VERSION env var
-        HOST_VERSION=$(basename "$CORE_TOOLS_ZIP" | sed -E 's/[0-9]+-cli-host-(.+)\.zip/\1/')
+        HOST_VERSION=$(basename "$CORE_TOOLS_ZIP" | sed -E 's/^[0-9]+-cli-host-(.+)\.zip$/\1/')
         echo "##vso[task.setvariable variable=HOST_VERSION]$HOST_VERSION"
         echo "##vso[task.setvariable variable=CORE_TOOLS_ZIP]$(basename "$CORE_TOOLS_ZIP")"
         echo "Extracted version: $HOST_VERSION"
