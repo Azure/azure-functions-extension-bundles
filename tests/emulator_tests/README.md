@@ -4,7 +4,7 @@ This guide covers the complete setup and execution of emulator tests for Azure F
 
 ## About This Testing Framework
 
-The original emulator test code is taken from https://github.com/Azure/azure-functions-python-worker and unchanged the test code. We use it for testing extension bundle scenario.
+The original emulator test code is taken from [Python worker](https://github.com/Azure/azure-functions-python-worker). We use it for testing extension bundle scenarios.
 
 **We modified the following:**
 
@@ -28,11 +28,13 @@ The test framework automatically references the `bundleVersion` from `src/Micros
 ### Automated Testing in Azure DevOps
 
 Emulator tests run automatically in the CI pipeline for:
+
 - **All pull requests** to main, preview, and release branches
 - **Main branch builds** and **preview branch builds**
 - **Manual builds** (emulator tests are skipped for nightly scheduled builds)
 
 The CI pipeline:
+
 1. **Builds Linux extension bundles** as prerequisites
 2. **Starts emulator services** using Docker Compose (Event Hubs, Storage, etc.)
 3. **Sets up Python 3.12** environment with test dependencies
@@ -42,9 +44,51 @@ The CI pipeline:
 7. **Publishes test results** and debug artifacts to Azure DevOps
 
 **CI Configuration Files:**
+
 - [`eng/ci/templates/jobs/emulator-tests.yml`](../../eng/ci/templates/jobs/emulator-tests.yml) - Emulator test job template
 - [`eng/public-build.yml`](../../eng/public-build.yml) - Public CI pipeline
 - [`eng/official-build.yml`](../../eng/official-build.yml) - Official release pipeline
+
+### Multi-Version Core Tools Testing
+
+The CI pipeline tests extension bundles against **multiple versions** of Azure Functions Core Tools to ensure compatibility across host versions.
+
+**How It Works:**
+
+1. **PrepareCoreTools Job**: Builds N versions of Core Tools (based on latest host tags)
+2. **GenerateTestMatrix Job**: Creates a dynamic test matrix (Core Tools versions × Test Groups)
+3. **EmulatorTests Job**: Runs each combination in parallel
+
+**Configuration Variables** (in pipeline YAML files):
+
+```yaml
+hostTagsCount: 2              # Number of host versions to test (default: 2)
+hostTagPattern: 'v4.10'       # Version pattern to match (e.g., v4.1046.100, v4.1047.200)
+```
+
+**To Update Host Version Pattern:**
+When Azure Functions Host moves to a new version (e.g., v4.11 or v5.0), update `hostTagPattern` in:
+
+- [`eng/official-build.yml`](../../eng/official-build.yml)
+- [`eng/public-build.yml`](../../eng/public-build.yml)
+
+**To Add New Test Groups:**
+Edit the test group definitions in [`eng/ci/templates/jobs/emulator-tests.yml`](../../eng/ci/templates/jobs/emulator-tests.yml):
+
+```powershell
+$testGroups = @(
+  @{Name='YourTestGroup'; Group='yourgroup'; Files='test_your_functions.py'; 
+    Emulators='none'; Display='Your Tests'; StopEventHub='false'}
+)
+```
+
+**Local Testing with Specific Host Version:**
+
+```powershell
+$env:HOST_VERSION = "4.1046.100"  # Set specific version
+python -m invoke -c test_setup webhost
+python -m pytest tests/emulator_tests -v
+```
 
 ### Validating CI Setup Locally
 
@@ -59,6 +103,7 @@ Before pushing changes, validate your setup:
 ```
 
 These scripts check:
+
 - Required files and dependencies
 - Docker and Python availability
 - bundleConfig.json validity
@@ -89,7 +134,7 @@ This will generate extension bundle packages in the `artifacts/` directory.
 
 **Note:** Ensure you have the required template artifacts in the `templatesArtifacts/` directory before building. See the main README.md for details on obtaining these files.
 
-### 2. **Start Docker Emulator**
+### 2. Start Docker Emulator
 
 Start the Docker-based storage emulator using Docker Compose:
 
@@ -108,16 +153,16 @@ docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml ps
 
 ```
 
-Start CosmosDB emulator
+Start CosmosDB emulator:
 
-```
+```bash
 docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmosdb-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
 ```
 
 **NOTE:** If you already run cosmos db emulator it will be blocked. Stop the emulator first.
 
-
 **To stop the services when done:**
+
 ```powershell
 docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml down
 docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml down
@@ -200,27 +245,29 @@ $env:PYAZURE_WEBHOST_DEBUG = "true"
 $env:ARCHIVE_WEBHOST_LOGS = "true"
 ```
 
-According to the emulator you want to run configure following.
+According to the emulator you want to run, configure the following:
 
-```
+```powershell
 $env:AzureWebJobsEventHubConnectionString = "<Find the value on the official doc>"
 $env:AzureWebJobsCosmosDBConnectionString = "<Find the value on the official doc with replacing https to http>"
 $env:CosmosDBEmulatorUrl = "<Find the value on the official doc>"
 $env:CosmosDBEmulatorKey = "<Find the value on the official doc>"
 $env:AzureWebJobsServiceBusConnectionString = "<Find the value on the official doc>"
 $env:AzureWebJobsSQLPassword = "<AnyPassword is fine>"
-
 ```
-* [EventHubs emulator authentication](https://learn.microsoft.com/en-us/azure/event-hubs/test-locally-with-event-hub-emulator?tabs=docker-linux-container%2Cusing-kafka#interact-with-the-emulator)
-* [Cosmos DB emulator authentication](https://learn.microsoft.com/en-us/azure/cosmos-db/emulator?context=%2Fazure%2Fcosmos-db%2Fnosql%2Fcontext%2Fcontext#authentication)
-* [ServiceBus emulator authentication](https://learn.microsoft.com/en-us/azure/service-bus-messaging/test-locally-with-service-bus-emulator?tabs=automated-script#interact-with-the-emulator)
-* [SQL edge](https://docs.azure.cn/en-us/azure-sql-edge/disconnected-deployment)
+
+- [EventHubs emulator authentication](https://learn.microsoft.com/en-us/azure/event-hubs/test-locally-with-event-hub-emulator?tabs=docker-linux-container%2Cusing-kafka#interact-with-the-emulator)
+- [Cosmos DB emulator authentication](https://learn.microsoft.com/en-us/azure/cosmos-db/emulator?context=%2Fazure%2Fcosmos-db%2Fnosql%2Fcontext%2Fcontext#authentication)
+- [ServiceBus emulator authentication](https://learn.microsoft.com/en-us/azure/service-bus-messaging/test-locally-with-service-bus-emulator?tabs=automated-script#interact-with-the-emulator)
+- [SQL edge](https://docs.azure.cn/en-us/azure-sql-edge/disconnected-deployment)
 
 ### 8. **Run Tests**
 
-Now you can run the emulator tests:```powershell
+Now you can run the emulator tests:
+
+```powershell
 # Run all emulator tests
-cd .. 
+cd ..
 python -m pytest tests/emulator_tests -v
 
 # Run a specific test file
@@ -281,6 +328,7 @@ The test framework will automatically create configuration files to help with de
 To test with Preview extension bundles:
 
 1. **Update bundleConfig.json**:
+
    ```json
    {
        "bundleId": "Microsoft.Azure.Functions.ExtensionBundle.Preview",
@@ -291,6 +339,7 @@ To test with Preview extension bundles:
    ```
 
 2. **Stop and restart the mock server**:
+
    ```powershell
    # Stop the current mock extension site (Ctrl+C in the terminal running it)
    
@@ -339,14 +388,14 @@ $env:FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI = "http://localhost:3001"
 
 The `testutils.py` module provides a comprehensive testing framework for Azure Functions Extension Bundles.
 
-### Key Features:
+### Key Features
 
 1. **Automatic Host Management**: Automatically starts and stops Azure Functions Core Tools
 2. **Health Check Retries**: Implements intelligent health checks with retries
 3. **Extension Bundle Integration**: Automatically configures extension bundle download from mock site
 4. **Configuration Logging**: Writes detailed configuration to `webhost_config.txt` for debugging
 
-### Example Test Class:
+### Example Test Class
 
 ```python
 from utils.testutils import WebHostTestCase, retryable_test
@@ -369,7 +418,7 @@ class MyFunctionTest(WebHostTestCase):
         pass
 ```
 
-### Test Framework Features:
+### Test Framework Features
 
 - **`WebHostTestCase`**: Base class that automatically manages Function Host lifecycle
 - **`@retryable_test`**: Decorator for tests that may need multiple attempts
@@ -420,16 +469,18 @@ The project includes a debug configuration in `.vscode/launch.json`:
 1. **Prerequisites**: Ensure you've completed the setup steps (Docker services, virtual environment, Core Tools, etc.)
 
 2. **Set Python Interpreter in VS Code**:
-   ```
+
+   ```text
    - Open Command Palette (Ctrl+Shift+P)
    - Type "Python: Select Interpreter"
    - Select the interpreter from your virtual environment: 
      `c:\repo\azure-functions-extension-bundles\tests\venv\Scripts\python.exe`
    ```
-   
+
    **Note**: This step is crucial for VS Code to use the correct Python environment with all installed dependencies.
 
 3. **Start Required Services**:
+
    ```powershell
    # Start Docker services (Azurite + Event Hubs emulator)
    docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml up -d
@@ -479,7 +530,7 @@ You can create additional debug configurations for different test files:
 ### Debug Configuration Options
 
 | Option | Purpose |
-|--------|---------|
+| -------- | --------- |
 | `"purpose": ["debug-test"]` | Enables VS Code test discovery integration |
 | `"python": "${workspaceFolder}\\venv\\Scripts\\python.exe"` | Uses the project's virtual environment |
 | `"justMyCode": false` | Allows debugging into library code (azure-functions, etc.) |
@@ -507,7 +558,8 @@ You can create additional debug configurations for different test files:
    - The virtual environment is activated
    - VS Code is using the correct Python interpreter
    - All dependencies are installed with `cd tests && pip install -r requirements.txt`
-```
+
+```text
 
 ## Troubleshooting
 
@@ -525,7 +577,8 @@ You can create additional debug configurations for different test files:
    $env:CORE_TOOLS_EXE_PATH = "C:\repo\azure-functions-extension-bundles\tests\build\webhost\func.exe"
    ```
 
-2. **Mock Extension Site Connection Issues**:
+1. **Mock Extension Site Connection Issues**:
+
    ```powershell
    # Check if mock site is running
    curl http://localhost:3000/ExtensionBundles/Microsoft.Azure.Functions.ExtensionBundle/index.json
@@ -534,7 +587,8 @@ You can create additional debug configurations for different test files:
    python -m invoke -c test_setup mock-extension-site
    ```
 
-3. **Storage Connection Issues**:
+2. **Storage Connection Issues**:
+
    ```powershell
    # Ensure Docker services are running
    docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml ps
@@ -546,7 +600,8 @@ You can create additional debug configurations for different test files:
    $env:AzureWebJobsStorage = "UseDevelopmentStorage=true"
    ```
 
-4. **Extension Bundle Download Failures**:
+3. **Extension Bundle Download Failures**:
+
    ```powershell
    # Verify extension bundles exist in artifacts
    Get-ChildItem C:\repo\azure-functions-extension-bundles\artifacts\Microsoft.Azure.Functions.ExtensionBundle*.zip
@@ -555,7 +610,8 @@ You can create additional debug configurations for different test files:
    curl http://localhost:3000/ExtensionBundles/Microsoft.Azure.Functions.ExtensionBundle/4.24.1/Microsoft.Azure.Functions.ExtensionBundle.4.24.1_any-any.zip
    ```
 
-5. **Python Virtual Environment Issues**:
+4. **Python Virtual Environment Issues**:
+
    ```powershell
    # Verify virtual environment is activated
    which python  # Should point to venv/Scripts/python.exe
@@ -564,7 +620,8 @@ You can create additional debug configurations for different test files:
    pip install -r requirements.txt --force-reinstall
    ```
 
-6. **Port Conflicts**:
+5. **Port Conflicts**:
+
    ```powershell
    # Check what's using ports 3000 and 7071
    netstat -ano | findstr ":3000\|:7071"
@@ -585,7 +642,7 @@ When tests fail, check these files for detailed information:
 ### Environment Variable Reference
 
 | Variable | Purpose | Default Value |
-|----------|---------|---------------|
+| ---------- | --------- | --------------- |
 | `CORE_TOOLS_EXE_PATH` | Path to func.exe | Auto-detected in build/webhost |
 | `AzureWebJobsStorage` | Storage connection | `UseDevelopmentStorage=true` |
 | `FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI` | Extension bundle source | `http://localhost:3000` |
@@ -595,12 +652,14 @@ When tests fail, check these files for detailed information:
 ### Performance Tips
 
 1. **Parallel Test Execution**:
+
    ```powershell
    # Run tests in parallel (be careful with shared resources)
    python -m pytest tests/emulator_tests -n auto
    ```
 
 2. **Test Selection**:
+
    ```powershell
    # Run only fast tests
    python -m pytest tests/emulator_tests -m "not slow"
@@ -635,7 +694,7 @@ services:
 
 Create function apps with target trigger/input/output bindings:
 
-```
+```text
 tests/emulator_tests/your_functions/
 ├── your_function_name/
 │   ├── __init__.py          # Function implementation
@@ -667,14 +726,72 @@ class TestYourFunctions(WebHostTestCase):
 
 **Reference**: See `tests/emulator_tests/test_blob_functions.py` for comprehensive examples of testing various Azure Functions scenarios.
 
-### 4. **Important Notes**
+### 4. **Configure CI Test Groups**
+
+Tests are organized into groups for parallel CI execution. To add tests to CI, update the test groups configuration file:
+
+**File**: `eng/ci/config/test-groups.json`
+
+```json
+{
+  "testGroups": [
+    {
+      "name": "BasicTests",
+      "group": "basic",
+      "files": "test_blob_functions.py test_queue_functions.py",
+      "emulators": "none",
+      "display": "Basic Tests",
+      "stopEventHub": "false"
+    },
+    {
+      "name": "YourNewTests",
+      "group": "yourgroup",
+      "files": "test_your_functions.py",
+      "emulators": "your_emulator",
+      "display": "Your New Tests",
+      "stopEventHub": "false"
+    }
+  ]
+}
+```
+
+**Configuration Fields**:
+
+| Field | Description |
+| ------- | ------------- |
+| `name` | Unique identifier for the test group (used in matrix job names) |
+| `group` | Short identifier (used in artifact names) |
+| `files` | Space-separated list of test files to run |
+| `emulators` | Emulator to start: `none`, `cosmosdb`, `mysql`, `servicebus`, or `dts` |
+| `display` | Human-readable name shown in CI pipeline |
+| `stopEventHub` | Set to `"true"` if your emulator conflicts with EventHub ports |
+
+**Adding Tests to Existing Groups**:
+
+To add a new test file to an existing group, simply append it to the `files` field:
+
+```json
+{
+  "name": "BasicTests",
+  "files": "test_blob_functions.py test_queue_functions.py test_your_new_file.py",
+  ...
+}
+```
+
+**Creating a New Test Group**:
+
+1. Add a new entry to the `testGroups` array in `test-groups.json`
+2. If your tests require a new emulator, add the startup logic in `eng/ci/templates/jobs/emulator-tests.yml` under the "Start Additional Emulators" step
+3. Create Docker Compose configuration in `tests/emulator_tests/utils/your_emulator/docker-compose.yml`
+
+### 5. **Important Notes**
 
 - **No host.json required**: The host.json file is automatically generated during test execution with the correct extension bundle configuration
 - **Function metadata**: Use `function.json` files to define triggers, inputs, and outputs for each function
 - **Test isolation**: Each test class gets its own Function Host instance for isolation
 - **Emulator dependencies**: Ensure required emulators (Azurite, Event Hubs, etc.) are running before tests
 
-### 5. **Test Structure Best Practices**
+### 6. **Test Structure Best Practices**
 
 - Group related functions in the same directory (e.g., `blob_functions/`, `http_functions/`)
 - Use descriptive test method names that indicate what scenario is being tested
@@ -685,6 +802,6 @@ class TestYourFunctions(WebHostTestCase):
 ## Additional Resources
 
 - **Main README.md**: For building and packaging extension bundles
-- **Core Tools Documentation**: https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local
-- **Azurite Documentation**: https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite
-- **pytest Documentation**: https://docs.pytest.org/
+- **Core Tools Documentation**: <https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local>
+- **Azurite Documentation**: <https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite>
+- **pytest Documentation**: <https://docs.pytest.org/>
