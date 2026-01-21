@@ -14,7 +14,7 @@
     Build configuration - Debug or Release (default: Release)
 
 .PARAMETER CoreToolsDir
-    Directory containing an existing Azure Functions Core Tools repository clone
+    Directory containing an existing Azure Functions Core Tools repository clone (required)
 
 .EXAMPLE
     .\build-core-tools.ps1 -Configuration Release -CoreToolsDir "path/to/core-tools"
@@ -22,7 +22,8 @@
 
 param(
     [string]$Configuration = "Release",
-    [string]$CoreToolsDir = "$(Build.Repository.LocalPath)/azure-functions-core-tools",
+    [Parameter(Mandatory=$true)]
+    [string]$CoreToolsDir,
     [string]$ZipOutputDir = "artifacts-coretools-zip"
     
 )

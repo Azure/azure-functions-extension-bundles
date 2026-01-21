@@ -78,9 +78,7 @@ def webhost(c, clean=False, webhost_dir=None):
     repo_root = ROOT_DIR.parent
     core_tools_dir = repo_root / "core-tools"
 
-    # Check for HOST_VERSION environment variable to select specific version
-    host_version = os.environ.get("HOST_VERSION")
-
+    # host_version already retrieved above
     if host_version:
         # Look for version-specific zip file with indexed naming pattern (e.g., 1-cli-host-4.1046.100.zip)
         zip_pattern_indexed = f"*-cli-host-{host_version}.zip"

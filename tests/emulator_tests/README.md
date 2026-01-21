@@ -470,7 +470,7 @@ The project includes a debug configuration in `.vscode/launch.json`:
 
 2. **Set Python Interpreter in VS Code**:
 
-   ```
+   ```text
    - Open Command Palette (Ctrl+Shift+P)
    - Type "Python: Select Interpreter"
    - Select the interpreter from your virtual environment: 
@@ -530,7 +530,7 @@ You can create additional debug configurations for different test files:
 ### Debug Configuration Options
 
 | Option | Purpose |
-|--------|---------|
+| -------- | --------- |
 | `"purpose": ["debug-test"]` | Enables VS Code test discovery integration |
 | `"python": "${workspaceFolder}\\venv\\Scripts\\python.exe"` | Uses the project's virtual environment |
 | `"justMyCode": false` | Allows debugging into library code (azure-functions, etc.) |
@@ -559,7 +559,7 @@ You can create additional debug configurations for different test files:
    - VS Code is using the correct Python interpreter
    - All dependencies are installed with `cd tests && pip install -r requirements.txt`
 
-```
+```text
 
 ## Troubleshooting
 
@@ -642,7 +642,7 @@ When tests fail, check these files for detailed information:
 ### Environment Variable Reference
 
 | Variable | Purpose | Default Value |
-|----------|---------|---------------|
+| ---------- | --------- | --------------- |
 | `CORE_TOOLS_EXE_PATH` | Path to func.exe | Auto-detected in build/webhost |
 | `AzureWebJobsStorage` | Storage connection | `UseDevelopmentStorage=true` |
 | `FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI` | Extension bundle source | `http://localhost:3000` |
@@ -694,7 +694,7 @@ services:
 
 Create function apps with target trigger/input/output bindings:
 
-```
+```text
 tests/emulator_tests/your_functions/
 ├── your_function_name/
 │   ├── __init__.py          # Function implementation

@@ -169,14 +169,19 @@ try {
         }
         
         if (Test-Path $tempZipDir) {
-            Get-ChildItem -Path $tempZipDir -Filter "*.zip" | ForEach-Object {
-                $oldName = $_.Name
+            # Get only the first zip file to avoid overwrites if multiple exist
+            $zipFile = Get-ChildItem -Path $tempZipDir -Filter "*.zip" | Select-Object -First 1
+            
+            if ($zipFile) {
+                $oldName = $zipFile.Name
                 # Use iteration-prefixed naming: {iteration}-cli-host-{version}.zip
                 $newName = "$versionIndex-cli-host-$hostVersion.zip"
                 $destPath = Join-Path $finalZipDir $newName
                 
-                Copy-Item -Path $_.FullName -Destination $destPath -Force
+                Copy-Item -Path $zipFile.FullName -Destination $destPath -Force
                 Write-Host "  Copied and renamed: $oldName -> $newName" -ForegroundColor Green
+            } else {
+                Write-Warning "  No zip files found in $tempZipDir"
             }
             
             # Clean up version-specific directory
