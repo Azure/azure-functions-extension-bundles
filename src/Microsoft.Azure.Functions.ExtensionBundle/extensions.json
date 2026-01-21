@@ -177,7 +177,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSub",
-    "majorVersion": "1",
+    "version": "1.9.0",
     "name": "WebPubSub",
     "bindings": [
       "webpubsub",
@@ -277,3 +277,4 @@
     ]
   }
 ]
+
