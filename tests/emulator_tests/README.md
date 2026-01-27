@@ -142,14 +142,18 @@ Start the Docker-based storage emulator using Docker Compose:
 # Start Azurite storage emulator using Docker Compose
 docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml up -d
 docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml up -d
+docker compose -f tests/emulator_tests/utils/sql/docker-compose.yml up -d
 
 # This will start:
 # - Azurite storage emulator on ports 10000, 10001, 10002
 # - Event Hubs emulator (if needed for testing)
+# - MySQL emulator on port 3307
+# - SQL Server emulator on port 1433
 
 # To verify services are running
 docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml ps
 docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml ps
+docker compose -f tests/emulator_tests/utils/sql/docker-compose.yml ps
 
 ```
 
@@ -166,6 +170,7 @@ docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmosdb-emul
 ```powershell
 docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml down
 docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml down
+docker compose -f tests/emulator_tests/utils/sql/docker-compose.yml down
 
 ```
 
@@ -254,6 +259,7 @@ $env:CosmosDBEmulatorUrl = "<Find the value on the official doc>"
 $env:CosmosDBEmulatorKey = "<Find the value on the official doc>"
 $env:AzureWebJobsServiceBusConnectionString = "<Find the value on the official doc>"
 $env:AzureWebJobsSQLPassword = "<AnyPassword is fine>"
+$env:SqlConnectionString = "Driver={ODBC Driver 18 for SQL Server};Server=localhost,1433;Database=testdb;UID=sa;PWD=;TrustServerCertificate=yes"
 ```
 
 - [EventHubs emulator authentication](https://learn.microsoft.com/en-us/azure/event-hubs/test-locally-with-event-hub-emulator?tabs=docker-linux-container%2Cusing-kafka#interact-with-the-emulator)
