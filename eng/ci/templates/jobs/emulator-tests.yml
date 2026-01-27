@@ -308,6 +308,22 @@ jobs:
       pip install --cache-dir ~/.cache/pip -r requirements.txt
     displayName: 'Install Python Dependencies (cached)'
 
+  # Install Microsoft ODBC Driver 18 for SQL Server (required for SQL tests)
+  - script: |
+      if [ "$(ADDITIONAL_EMULATORS)" = "sql" ]; then
+        echo "Installing Microsoft ODBC Driver 18 for SQL Server..."
+        curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
+        curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+        sudo apt-get update
+        sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+        echo "ODBC Driver 18 installed successfully"
+        odbcinst -q -d
+      else
+        echo "Skipping ODBC driver installation - not required for $(TEST_GROUP) tests"
+      fi
+    displayName: 'Install ODBC Driver 18 (SQL tests only)'
+    condition: eq(variables['ADDITIONAL_EMULATORS'], 'sql')
+
   # Start base emulators (Azurite + EventHub) - Required for ALL test groups
   - script: |
       echo "Starting base emulators (Azurite + EventHub) for $(DISPLAY_NAME)..."
