@@ -259,7 +259,7 @@ $env:CosmosDBEmulatorUrl = "<Find the value on the official doc>"
 $env:CosmosDBEmulatorKey = "<Find the value on the official doc>"
 $env:AzureWebJobsServiceBusConnectionString = "<Find the value on the official doc>"
 $env:AzureWebJobsSQLPassword = "<AnyPassword is fine>"
-$env:SqlConnectionString = "Driver={ODBC Driver 18 for SQL Server};Server=localhost,1433;Database=testdb;UID=sa;PWD=;TrustServerCertificate=yes"
+$env:SqlConnectionString = "Server=localhost,1433;Database=testdb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
 ```
 
 - [EventHubs emulator authentication](https://learn.microsoft.com/en-us/azure/event-hubs/test-locally-with-event-hub-emulator?tabs=docker-linux-container%2Cusing-kafka#interact-with-the-emulator)

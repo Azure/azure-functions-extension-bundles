@@ -336,6 +336,16 @@ jobs:
         echo "Waiting for MySQL service to start..."
         sleep 30
         docker compose ps
+      elif [ "$(ADDITIONAL_EMULATORS)" = "sql" ]; then
+        echo "Starting SQL Server Emulator for $(DISPLAY_NAME)..."
+        cd tests/emulator_tests/utils/sql
+        docker compose up -d
+        echo "Waiting for SQL Server to start and initialize..."
+        sleep 60
+        docker compose ps
+        # Initialize the database with the init script
+        echo "Running SQL initialization script..."
+        docker exec sql-emulator /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "YourStrong@Passw0rd" -C -i /docker-entrypoint-initdb.d/init-db.sql || echo "Init script may have already run"
       elif [ "$(ADDITIONAL_EMULATORS)" = "servicebus" ]; then
         # Stop EventHub first to avoid port conflicts
         if [ "$(STOP_EVENTHUB)" = "true" ]; then
@@ -408,6 +418,7 @@ jobs:
       export PYAZURE_WEBHOST_DEBUG=1
       export FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI="http://localhost:8000"
       export MySqlConnectionString="Server=localhost;UserID=root;Password=password;Database=testdb;Port=3307"
+      export SqlConnectionString="Server=localhost,1433;Database=testdb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
       
       IFS=' ' read -ra FILES <<< "$(TEST_FILES)"
       TEST_PATHS=""
@@ -429,6 +440,7 @@ jobs:
       AzureWebJobsCosmosDBConnectionString: $(EmulatorCosmosDBConnectionString)
       AzureWebJobsServiceBusConnectionString: $(EmulatorServiceBusConnectionString)
       AzureWebJobsSQLPassword: $(AzureWebJobsSQLPassword)
+      SqlConnectionString: "Server=localhost,1433;Database=testdb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
       CosmosDBEmulatorUrl: $(CosmosDBEmulatorUrl)
       CosmosDBEmulatorKey: $(CosmosDBEmulatorKey)
 
@@ -473,6 +485,10 @@ jobs:
       elif [ "$(ADDITIONAL_EMULATORS)" = "mysql" ]; then
         echo "Stopping MySQL emulator..."
         cd tests/emulator_tests/utils/mysql
+        docker compose down -v
+      elif [ "$(ADDITIONAL_EMULATORS)" = "sql" ]; then
+        echo "Stopping SQL Server emulator..."
+        cd tests/emulator_tests/utils/sql
         docker compose down -v
       elif [ "$(ADDITIONAL_EMULATORS)" = "servicebus" ]; then
         echo "Stopping Service Bus emulator..."
