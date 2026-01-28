@@ -3,7 +3,6 @@
 import json
 import time
 
-from requests import JSONDecodeError
 from tests.utils import testutils
 import logging
 
@@ -15,6 +14,28 @@ class TestMcpFunctions(testutils.WebHostTestCase):
     @classmethod
     def get_script_dir(cls):
         return testutils.EMULATOR_TESTS_FOLDER / 'mcp_functions'
+
+    def _parse_sse_response(self, response_text):
+        """
+        Parse Server-Sent Events (SSE) response and extract JSON data.
+        SSE format: 
+            event: message
+            data: {"jsonrpc": "2.0", ...}
+        """
+        data_lines = []
+        for line in response_text.split('\n'):
+            line = line.strip()
+            if line.startswith('data:'):
+                # Extract the JSON data after 'data:'
+                json_str = line[5:].strip()
+                if json_str:
+                    data_lines.append(json_str)
+        
+        if not data_lines:
+            raise ValueError(f"No data found in SSE response: {response_text}")
+        
+        # Parse the last data line (the final response)
+        return json.loads(data_lines[-1])
 
     def test_tools_list(self):
         """
@@ -36,7 +57,12 @@ class TestMcpFunctions(testutils.WebHostTestCase):
         self.assertEqual(response.status_code, 200)
 
         try:
-            data = response.json()
+            # Try parsing as JSON first, then fall back to SSE
+            try:
+                data = response.json()
+            except json.JSONDecodeError:
+                data = self._parse_sse_response(response.text)
+            
             # Verify JSON-RPC response structure
             self.assertEqual(data.get("jsonrpc"), "2.0")
             self.assertEqual(data.get("id"), "test-list-1")
@@ -55,8 +81,8 @@ class TestMcpFunctions(testutils.WebHostTestCase):
             # Verify hello_mcp tool has expected properties
             hello_mcp_tool = next(t for t in tools if t.get("name") == "hello_mcp")
             self.assertEqual(hello_mcp_tool.get("description"), "Hello world.")
-        except JSONDecodeError:
-            self.fail(f"Response is not valid JSON: {response.text}")
+        except (json.JSONDecodeError, ValueError) as e:
+            self.fail(f"Failed to parse response: {e}\nResponse text: {response.text}")
 
     def test_tools_call(self):
         """
@@ -82,7 +108,12 @@ class TestMcpFunctions(testutils.WebHostTestCase):
         self.assertEqual(response.status_code, 200)
 
         try:
-            data = response.json()
+            # Try parsing as JSON first, then fall back to SSE
+            try:
+                data = response.json()
+            except json.JSONDecodeError:
+                data = self._parse_sse_response(response.text)
+            
             # Verify JSON-RPC response structure
             self.assertEqual(data.get("jsonrpc"), "2.0")
             self.assertEqual(data.get("id"), "test-call-1")
@@ -99,5 +130,5 @@ class TestMcpFunctions(testutils.WebHostTestCase):
             text_content = next((c for c in content if c.get("type") == "text"), None)
             self.assertIsNotNone(text_content, "Expected text content in response")
             self.assertEqual(text_content.get("text"), "Hello I am MCPTool!")
-        except JSONDecodeError:
-            self.fail(f"Response is not valid JSON: {response.text}")
+        except (json.JSONDecodeError, ValueError) as e:
+            self.fail(f"Failed to parse response: {e}\nResponse text: {response.text}")
