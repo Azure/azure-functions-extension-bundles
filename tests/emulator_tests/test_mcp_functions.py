@@ -132,3 +132,103 @@ class TestMcpFunctions(testutils.WebHostTestCase):
             self.assertEqual(text_content.get("text"), "Hello I am MCPTool!")
         except (json.JSONDecodeError, ValueError) as e:
             self.fail(f"Failed to parse response: {e}\nResponse text: {response.text}")
+
+    def test_resources_list(self):
+        """
+        Test the resources/list MCP API to verify it returns available resources.
+        """
+        payload = {
+            "jsonrpc": "2.0",
+            "id": "test-resources-list-1",
+            "method": "resources/list"
+        }
+
+        response = self.webhost.request(
+            'POST',
+            self.MCP_WEBHOOK_PATH,
+            json=payload,
+            no_prefix=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        try:
+            # Try parsing as JSON first, then fall back to SSE
+            try:
+                data = response.json()
+            except json.JSONDecodeError:
+                data = self._parse_sse_response(response.text)
+            
+            # Verify JSON-RPC response structure
+            self.assertEqual(data.get("jsonrpc"), "2.0")
+            self.assertEqual(data.get("id"), "test-resources-list-1")
+            self.assertIn("result", data)
+            
+            # Verify resources are returned
+            result = data["result"]
+            self.assertIn("resources", result)
+            resources = result["resources"]
+            self.assertIsInstance(resources, list)
+            
+            # Verify readme resource is in the list
+            resource_uris = [r.get("uri") for r in resources]
+            self.assertIn("file://readme.md", resource_uris)
+            
+            # Verify readme resource has expected properties
+            readme_resource = next(r for r in resources if r.get("uri") == "file://readme.md")
+            self.assertEqual(readme_resource.get("name"), "readme")
+            self.assertEqual(readme_resource.get("description"), "Application readme file")
+            self.assertEqual(readme_resource.get("mimeType"), "text/plain")
+        except (json.JSONDecodeError, ValueError) as e:
+            self.fail(f"Failed to parse response: {e}\nResponse text: {response.text}")
+
+    def test_resources_read(self):
+        """
+        Test the resources/read MCP API to read the readme resource.
+        """
+        payload = {
+            "jsonrpc": "2.0",
+            "id": "test-resources-read-1",
+            "method": "resources/read",
+            "params": {
+                "uri": "file://readme.md"
+            }
+        }
+
+        response = self.webhost.request(
+            'POST',
+            self.MCP_WEBHOOK_PATH,
+            json=payload,
+            no_prefix=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        try:
+            # Try parsing as JSON first, then fall back to SSE
+            try:
+                data = response.json()
+            except json.JSONDecodeError:
+                data = self._parse_sse_response(response.text)
+            
+            # Verify JSON-RPC response structure
+            self.assertEqual(data.get("jsonrpc"), "2.0")
+            self.assertEqual(data.get("id"), "test-resources-read-1")
+            self.assertIn("result", data)
+            
+            # Verify the resource read result
+            result = data["result"]
+            self.assertIn("contents", result)
+            contents = result["contents"]
+            self.assertIsInstance(contents, list)
+            self.assertTrue(len(contents) > 0)
+            
+            # Verify the text content from the readme resource
+            text_content = next((c for c in contents if c.get("uri") == "file://readme.md"), None)
+            self.assertIsNotNone(text_content, "Expected content with uri in response")
+            self.assertEqual(
+                text_content.get("text"),
+                "# Sample Readme\nThis is a sample readme file for testing MCP Resource Trigger."
+            )
+        except (json.JSONDecodeError, ValueError) as e:
+            self.fail(f"Failed to parse response: {e}\nResponse text: {response.text}")
