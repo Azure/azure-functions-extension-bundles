@@ -309,7 +309,8 @@
     "name": "Mcp",
     "bindings": [
       "mcpToolTrigger",
-      "mcpToolProperty"
+      "mcpToolProperty",
+      "mcpResourceTrigger"
     ]
   }
 ]
