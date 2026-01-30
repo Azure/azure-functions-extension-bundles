@@ -252,9 +252,58 @@ Write-Host "`nSaving updated Packages.props..." -ForegroundColor Yellow
 $packagesXml.Save($PackagesPropsPath)
 Write-Host "✓ Successfully updated Packages.props" -ForegroundColor Green
 
+# Get core tools root path for subsequent file modifications until core tools adopt the new host changes in v4.1047.100
+$coreToolsRoot = Split-Path (Split-Path (Split-Path $PackagesPropsPath -Parent) -Parent) -Parent
+
+# Update Startup.cs to remove deprecated IApplicationLifetime usage (for host version >= 4.1047.100)
+Write-Host "`nChecking for Startup.cs updates..." -ForegroundColor Yellow
+
+# Parse version to compare
+$versionParts = $HostVersion -split '\.'
+$majorVersion = [int]$versionParts[0]
+$minorVersion = [int]$versionParts[1]
+$patchVersion = [int]$versionParts[2]
+
+# Check if version >= 4.1047.100
+$shouldUpdateStartup = ($majorVersion -gt 4) -or 
+                       ($majorVersion -eq 4 -and $minorVersion -gt 1047) -or 
+                       ($majorVersion -eq 4 -and $minorVersion -eq 1047 -and $patchVersion -ge 100)
+
+if ($shouldUpdateStartup) {
+    $startupPath = Join-Path $coreToolsRoot "src\Cli\func\Actions\HostActions\Startup.cs"
+    
+    if (Test-Path $startupPath) {
+        $startupContent = Get-Content $startupPath -Raw
+        
+        # Define the old code pattern to replace
+        $oldCode = @"
+#pragma warning disable CS0618 // IApplicationLifetime is obsolete
+            IApplicationLifetime applicationLifetime = app.ApplicationServices
+                .GetRequiredService<IApplicationLifetime>();
+
+            app.UseWebJobsScriptHost(applicationLifetime);
+#pragma warning restore CS0618 // Type is obsolete
+"@
+        
+        # Define the new simplified code
+        $newCode = "            app.UseWebJobsScriptHost();"
+        
+        if ($startupContent.Contains($oldCode)) {
+            $startupContent = $startupContent.Replace($oldCode, $newCode)
+            Set-Content -Path $startupPath -Value $startupContent -NoNewline
+            Write-Host "  ✓ Updated Startup.cs - removed deprecated IApplicationLifetime usage" -ForegroundColor Green
+        } else {
+            Write-Host "  Startup.cs already updated or pattern not found (no change needed)" -ForegroundColor Gray
+        }
+    } else {
+        Write-Warning "  Startup.cs not found at: $startupPath"
+    }
+} else {
+    Write-Host "  Skipping Startup.cs update (host version $HostVersion < 4.1047.100)" -ForegroundColor Gray
+}
+
 # Disable UpdateBuildNumber in Directory.Version.props to prevent build output from updating Azure DevOps build number
 Write-Host "`nDisabling UpdateBuildNumber in Directory.Version.props..." -ForegroundColor Yellow
-$coreToolsRoot = Split-Path (Split-Path (Split-Path $PackagesPropsPath -Parent) -Parent) -Parent
 $versionPropsPath = Join-Path $coreToolsRoot "src\Cli\func\Directory.Version.props"
 
 if (Test-Path $versionPropsPath) {
