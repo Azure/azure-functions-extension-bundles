@@ -312,16 +312,23 @@ if ($shouldUpdateStartup) {
         
         # Define the old code pattern to replace
         $oldCode = @"
+            }
 #pragma warning disable CS0618 // IApplicationLifetime is obsolete
             IApplicationLifetime applicationLifetime = app.ApplicationServices
                 .GetRequiredService<IApplicationLifetime>();
 
             app.UseWebJobsScriptHost(applicationLifetime);
 #pragma warning restore CS0618 // Type is obsolete
+        }
 "@
         
         # Define the new simplified code
-        $newCode = "            app.UseWebJobsScriptHost();"
+        $newCode = @"
+            }
+
+            app.UseWebJobsScriptHost();
+        }
+"@
         
         if ($startupContent.Contains($oldCode)) {
             $startupContent = $startupContent.Replace($oldCode, $newCode)
