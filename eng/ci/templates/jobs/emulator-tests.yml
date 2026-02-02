@@ -125,7 +125,7 @@ jobs:
     inputs:
       command: 'run'
       workingDirectory: './build'
-      arguments: 'skip:BuildBundleBinariesForWindows,GenerateVulnerabilityReport,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows'
+      arguments: 'skip:GenerateVulnerabilityReport,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows'
     env:
       BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
       TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
