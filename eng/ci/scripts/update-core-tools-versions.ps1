@@ -190,9 +190,13 @@ $additionalPackages = @{
     "Azure.Core" = "Directory.Packages.props"
     "Azure.Storage.Blobs" = "Directory.Packages.props"
     "Azure.Identity" = "Directory.Packages.props"
-    "Microsoft.Identity.Client" = "Directory.Packages.props"
     "System.Private.Uri" = "Directory.Packages.props"
     "Microsoft.ApplicationInsights" = "Directory.Packages.props"
+}
+
+# Define packages with hardcoded versions (not in Directory.Packages.props directly but need updates)
+$hardcodedPackages = @{
+    "Microsoft.Identity.Client" = "4.78.0"
 }
 
 # Update worker versions
@@ -279,6 +283,33 @@ foreach ($packageName in $additionalPackages.Keys) {
         } else {
             Write-Host "    $packageName`: $oldPackageVersion (no change)" -ForegroundColor Gray
         }
+    }
+}
+
+# Update hardcoded packages
+Write-Host "`nUpdating hardcoded package versions..." -ForegroundColor Yellow
+
+foreach ($packageName in $hardcodedPackages.Keys) {
+    $targetVersion = $hardcodedPackages[$packageName]
+    
+    Write-Host "  Processing $packageName..." -ForegroundColor Gray
+    
+    # Find and update in Packages.props
+    $packageNode = Select-Xml -Xml $packagesXml -XPath "//PackageVersion[@Include='$packageName']" | 
+                  Select-Object -ExpandProperty Node
+    
+    if (-not $packageNode) {
+        Write-Warning "    $packageName not found in Packages.props"
+        continue
+    }
+    
+    $oldPackageVersion = $packageNode.Version
+    
+    if ($oldPackageVersion -ne $targetVersion) {
+        $packageNode.Version = $targetVersion
+        Write-Host "    $packageName`: $oldPackageVersion -> $targetVersion" -ForegroundColor Green
+    } else {
+        Write-Host "    $packageName`: $oldPackageVersion (no change)" -ForegroundColor Gray
     }
 }
 
