@@ -43,6 +43,39 @@ if (-not (Test-Path $PackagesPropsPath)) {
 
 Write-Host "Packages.props: $PackagesPropsPath" -ForegroundColor Yellow
 
+# Get core tools root path for global.json update
+$coreToolsRootForGlobal = Split-Path (Split-Path (Split-Path $PackagesPropsPath -Parent) -Parent) -Parent
+
+# Sync global.json with host repo
+$GlobalJsonPath = Join-Path $coreToolsRootForGlobal "global.json"
+if (Test-Path $GlobalJsonPath) {
+    Write-Host "`nSyncing global.json with host repo..." -ForegroundColor Yellow
+    
+    $hostGlobalJsonUri = "https://raw.githubusercontent.com/Azure/azure-functions-host/refs/tags/v$HostVersion/global.json"
+    
+    try {
+        $hostGlobalJsonContent = (Invoke-WebRequest -Uri $hostGlobalJsonUri -Headers @{"User-Agent" = "azure-functions-extension-bundles-emulator-tests"} -ErrorAction Stop).Content
+        $hostGlobalJson = $hostGlobalJsonContent | ConvertFrom-Json
+        $hostSdkVersion = $hostGlobalJson.sdk.version
+        
+        $localGlobalJson = Get-Content $GlobalJsonPath -Raw | ConvertFrom-Json
+        $localSdkVersion = $localGlobalJson.sdk.version
+        
+        if ($localSdkVersion -ne $hostSdkVersion) {
+            # Update SDK version from host repo
+            $localGlobalJson.sdk.version = $hostSdkVersion
+            $localGlobalJson.sdk.rollForward = "latestMajor"
+            $localGlobalJson | ConvertTo-Json -Depth 10 | Set-Content $GlobalJsonPath
+            Write-Host "  ✓ Updated global.json SDK: $localSdkVersion -> $hostSdkVersion (from host repo)" -ForegroundColor Green
+        } else {
+            Write-Host "  global.json SDK version: $localSdkVersion (no change)" -ForegroundColor Gray
+        }
+    } catch {
+        Write-Warning "  Could not fetch global.json from host repo: $_"
+        Write-Host "  Keeping existing global.json" -ForegroundColor Gray
+    }
+}
+
 # Set up GitHub API headers for compliance with GitHub API requirements
 $script:GitHubHeaders = @{
     "User-Agent" = "azure-functions-extension-bundles-emulator-tests"
@@ -156,8 +189,14 @@ $workers = @{
 $additionalPackages = @{
     "Azure.Core" = "Directory.Packages.props"
     "Azure.Storage.Blobs" = "Directory.Packages.props"
+    "Azure.Identity" = "Directory.Packages.props"
     "System.Private.Uri" = "Directory.Packages.props"
     "Microsoft.ApplicationInsights" = "Directory.Packages.props"
+}
+
+# Define packages with hardcoded versions (not in Directory.Packages.props directly but need updates)
+$hardcodedPackages = @{
+    "Microsoft.Identity.Client" = "4.78.0"
 }
 
 # Update worker versions
@@ -247,14 +286,101 @@ foreach ($packageName in $additionalPackages.Keys) {
     }
 }
 
+# Parse version to compare for conditional updates
+$versionParts = $HostVersion -split '\.'
+$majorVersion = [int]$versionParts[0]
+$minorVersion = [int]$versionParts[1]
+$patchVersion = [int]$versionParts[2]
+
+# Check if version >= 4.1047.100
+$shouldApplyHostFixes = ($majorVersion -gt 4) -or 
+                        ($majorVersion -eq 4 -and $minorVersion -gt 1047) -or 
+                        ($majorVersion -eq 4 -and $minorVersion -eq 1047 -and $patchVersion -ge 100)
+
+# Update hardcoded packages (only for host version >= 4.1047.100)
+if ($shouldApplyHostFixes) {
+    Write-Host "`nUpdating hardcoded package versions..." -ForegroundColor Yellow
+
+    foreach ($packageName in $hardcodedPackages.Keys) {
+        $targetVersion = $hardcodedPackages[$packageName]
+        
+        Write-Host "  Processing $packageName..." -ForegroundColor Gray
+        
+        # Find and update in Packages.props
+        $packageNode = Select-Xml -Xml $packagesXml -XPath "//PackageVersion[@Include='$packageName']" | 
+                      Select-Object -ExpandProperty Node
+        
+        if (-not $packageNode) {
+            Write-Warning "    $packageName not found in Packages.props"
+            continue
+        }
+        
+        $oldPackageVersion = $packageNode.Version
+        
+        if ($oldPackageVersion -ne $targetVersion) {
+            $packageNode.Version = $targetVersion
+            Write-Host "    $packageName`: $oldPackageVersion -> $targetVersion" -ForegroundColor Green
+        } else {
+            Write-Host "    $packageName`: $oldPackageVersion (no change)" -ForegroundColor Gray
+        }
+    }
+} else {
+    Write-Host "`nSkipping hardcoded package updates (host version $HostVersion < 4.1047.100)" -ForegroundColor Gray
+}
+
 # Save the updated Packages.props
 Write-Host "`nSaving updated Packages.props..." -ForegroundColor Yellow
 $packagesXml.Save($PackagesPropsPath)
 Write-Host "✓ Successfully updated Packages.props" -ForegroundColor Green
 
+# Get core tools root path for subsequent file modifications until core tools adopt the new host changes in v4.1047.100
+$coreToolsRoot = Split-Path (Split-Path (Split-Path $PackagesPropsPath -Parent) -Parent) -Parent
+
+# Update Startup.cs to remove deprecated IApplicationLifetime usage (for host version >= 4.1047.100)
+Write-Host "`nChecking for Startup.cs updates..." -ForegroundColor Yellow
+
+if ($shouldApplyHostFixes) {
+    $startupPath = Join-Path $coreToolsRoot "src\Cli\func\Actions\HostActions\Startup.cs"
+    
+    if (Test-Path $startupPath) {
+        $startupContent = Get-Content $startupPath -Raw
+        
+        # Define the old code pattern to replace
+        $oldCode = @"
+            }
+#pragma warning disable CS0618 // IApplicationLifetime is obsolete
+            IApplicationLifetime applicationLifetime = app.ApplicationServices
+                .GetRequiredService<IApplicationLifetime>();
+
+            app.UseWebJobsScriptHost(applicationLifetime);
+#pragma warning restore CS0618 // Type is obsolete
+        }
+"@
+        
+        # Define the new simplified code
+        $newCode = @"
+            }
+
+            app.UseWebJobsScriptHost();
+        }
+"@
+        
+        if ($startupContent.Contains($oldCode)) {
+            $startupContent = $startupContent.Replace($oldCode, $newCode)
+            Set-Content -Path $startupPath -Value $startupContent -NoNewline
+            Write-Host "  ✓ Updated Startup.cs - removed deprecated IApplicationLifetime usage" -ForegroundColor Green
+        } else {
+            Write-Host "  Startup.cs already updated or pattern not found (no change needed)" -ForegroundColor Gray
+        }
+    } else {
+        Write-Warning "  Startup.cs not found at: $startupPath"
+    }
+} else {
+    Write-Host "  Skipping Startup.cs update (host version $HostVersion < 4.1047.100)" -ForegroundColor Gray
+}
+
 # Disable UpdateBuildNumber in Directory.Version.props to prevent build output from updating Azure DevOps build number
 Write-Host "`nDisabling UpdateBuildNumber in Directory.Version.props..." -ForegroundColor Yellow
-$coreToolsRoot = Split-Path (Split-Path (Split-Path $PackagesPropsPath -Parent) -Parent) -Parent
 $versionPropsPath = Join-Path $coreToolsRoot "src\Cli\func\Directory.Version.props"
 
 if (Test-Path $versionPropsPath) {
