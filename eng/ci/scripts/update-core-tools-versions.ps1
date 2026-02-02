@@ -190,9 +190,13 @@ $additionalPackages = @{
     "Azure.Core" = "Directory.Packages.props"
     "Azure.Storage.Blobs" = "Directory.Packages.props"
     "Azure.Identity" = "Directory.Packages.props"
-    "Microsoft.Identity.Client" = "Directory.Packages.props"
     "System.Private.Uri" = "Directory.Packages.props"
     "Microsoft.ApplicationInsights" = "Directory.Packages.props"
+}
+
+# Define packages with hardcoded versions (not in Directory.Packages.props directly but need updates)
+$hardcodedPackages = @{
+    "Microsoft.Identity.Client" = "4.78.0"
 }
 
 # Update worker versions
@@ -282,6 +286,48 @@ foreach ($packageName in $additionalPackages.Keys) {
     }
 }
 
+# Parse version to compare for conditional updates
+$versionParts = $HostVersion -split '\.'
+$majorVersion = [int]$versionParts[0]
+$minorVersion = [int]$versionParts[1]
+$patchVersion = [int]$versionParts[2]
+
+# Check if version >= 4.1047.100
+$shouldApplyHostFixes = ($majorVersion -gt 4) -or 
+                        ($majorVersion -eq 4 -and $minorVersion -gt 1047) -or 
+                        ($majorVersion -eq 4 -and $minorVersion -eq 1047 -and $patchVersion -ge 100)
+
+# Update hardcoded packages (only for host version >= 4.1047.100)
+if ($shouldApplyHostFixes) {
+    Write-Host "`nUpdating hardcoded package versions..." -ForegroundColor Yellow
+
+    foreach ($packageName in $hardcodedPackages.Keys) {
+        $targetVersion = $hardcodedPackages[$packageName]
+        
+        Write-Host "  Processing $packageName..." -ForegroundColor Gray
+        
+        # Find and update in Packages.props
+        $packageNode = Select-Xml -Xml $packagesXml -XPath "//PackageVersion[@Include='$packageName']" | 
+                      Select-Object -ExpandProperty Node
+        
+        if (-not $packageNode) {
+            Write-Warning "    $packageName not found in Packages.props"
+            continue
+        }
+        
+        $oldPackageVersion = $packageNode.Version
+        
+        if ($oldPackageVersion -ne $targetVersion) {
+            $packageNode.Version = $targetVersion
+            Write-Host "    $packageName`: $oldPackageVersion -> $targetVersion" -ForegroundColor Green
+        } else {
+            Write-Host "    $packageName`: $oldPackageVersion (no change)" -ForegroundColor Gray
+        }
+    }
+} else {
+    Write-Host "`nSkipping hardcoded package updates (host version $HostVersion < 4.1047.100)" -ForegroundColor Gray
+}
+
 # Save the updated Packages.props
 Write-Host "`nSaving updated Packages.props..." -ForegroundColor Yellow
 $packagesXml.Save($PackagesPropsPath)
@@ -293,18 +339,7 @@ $coreToolsRoot = Split-Path (Split-Path (Split-Path $PackagesPropsPath -Parent) 
 # Update Startup.cs to remove deprecated IApplicationLifetime usage (for host version >= 4.1047.100)
 Write-Host "`nChecking for Startup.cs updates..." -ForegroundColor Yellow
 
-# Parse version to compare
-$versionParts = $HostVersion -split '\.'
-$majorVersion = [int]$versionParts[0]
-$minorVersion = [int]$versionParts[1]
-$patchVersion = [int]$versionParts[2]
-
-# Check if version >= 4.1047.100
-$shouldUpdateStartup = ($majorVersion -gt 4) -or 
-                       ($majorVersion -eq 4 -and $minorVersion -gt 1047) -or 
-                       ($majorVersion -eq 4 -and $minorVersion -eq 1047 -and $patchVersion -ge 100)
-
-if ($shouldUpdateStartup) {
+if ($shouldApplyHostFixes) {
     $startupPath = Join-Path $coreToolsRoot "src\Cli\func\Actions\HostActions\Startup.cs"
     
     if (Test-Path $startupPath) {
