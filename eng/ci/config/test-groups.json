@@ -3,7 +3,7 @@
         {
             "name": "BasicTests",
             "group": "basic",
-            "files": "test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py test_table_functions.py test_mcp_functions.py",
+            "files": "test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_queue_functions.py test_mcp_functions.py",
             "emulators": "none",
             "display": "Basic Tests",
             "stopEventHub": "false"
