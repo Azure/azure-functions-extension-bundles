@@ -23,6 +23,12 @@ The test framework automatically references the `bundleVersion` from `src/Micros
 
 **Example**: If `bundleConfig.json` contains `"bundleVersion": "4.25.0"`, the test framework will automatically configure functions to use extension bundle version `"4.25.0"`.
 
+## Sample Pull Requests
+
+For reference, here are example PRs that demonstrate how to add new emulator tests:
+
+- **[PR #662: Add test for MCP resource trigger](https://github.com/Azure/azure-functions-extension-bundles/pull/662)** - Shows how to add new test cases for MCP Functions, including function app setup and test implementation.
+
 ## CI/CD Integration
 
 ### Automated Testing in Azure DevOps
