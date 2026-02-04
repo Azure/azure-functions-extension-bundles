@@ -1,3 +1,7 @@
+variables:
+  hostTagsCount: 2
+  hostTagPattern: 'v4.10'
+
 trigger:
   branches:
     include:
@@ -16,7 +20,7 @@ pr:
 
 schedules:
   # Ensure we build nightly to catch any new CVEs and report SDL often.
-  - cron: '0 0 * * *'
+  - cron: '0 1 * * *'
     displayName: Nightly Build
     branches:
       include:
@@ -31,6 +35,12 @@ resources:
       name: 1ESPipelineTemplates/1ESPipelineTemplates
       ref: refs/tags/release
 
+    - repository: coretools
+      type: github
+      name: Azure/azure-functions-core-tools
+      ref: refs/heads/main
+      endpoint: Azure-public
+
 extends:
   template: v1/1ES.Unofficial.PipelineTemplate.yml@1es
   parameters:
@@ -38,10 +48,17 @@ extends:
       name: 1es-pool-azfunc-public
       image: 1es-windows-2022
       os: windows
+      ${{ if eq( variables['Build.Reason'], 'Schedule' ) }}:
+        demands:
+          - Priority -equals Low
     settings:
       # PR's from forks do not have sufficient permissions to set tags.
       skipBuildTagsForGitHubPullRequests: ${{ variables['System.PullRequest.IsFork'] }}
-
+    sdl:
+      sourceRepositoriesToScan:
+        include:
+          - repository: coretools
+        runInSingleJob: true
     stages:
       - stage: RunUnitTests
         dependsOn: []
