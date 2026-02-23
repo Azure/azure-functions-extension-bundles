@@ -64,7 +64,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "version": "3.8.0",
+    "majorVersion": "3",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -100,7 +100,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged",
-    "version": "1.0.1",
+    "majorVersion": "1",
     "name": "AzureManagedProvider",
     "bindings": [
       "activitytrigger",
@@ -121,7 +121,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "version": "4.13.0",
+    "majorVersion": "4",
     "name": "CosmosDB",
     "bindings": [
       "cosmosdbtrigger",
@@ -177,7 +177,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSub",
-    "version": "1.9.0",
+    "majorVersion": "1",
     "name": "WebPubSub",
     "bindings": [
       "webpubsub",
@@ -194,25 +194,25 @@
   },
   {
     "id": "Microsoft.IdentityModel.JsonWebTokens",
-    "Version": "6.35.0",
+    "version": "8.14.0",
     "name": "SystemIdentityModelTokensJwt",
     "bindings": []
   },
   {
     "id": "System.IdentityModel.Tokens.Jwt",
-    "Version": "6.35.0",
+    "version": "8.14.0",
     "name": "SystemIdentityModelTokensJwt",
     "bindings": []
   },
   {
     "id": "Microsoft.Data.SqlClient",
-    "Version": "5.2.2",
+    "version": "5.2.2",
     "name": "MicrosoftDataSqlClient",
     "bindings": []
   },
   {
     "id": "Microsoft.AspNetCore.Server.Kestrel.Core",
-    "Version": "2.3.6",
+    "version": "2.3.6",
     "name": "MicrosoftAspNetCoreServerKestrelCore",
     "bindings": []
   },
@@ -244,7 +244,7 @@
   },
   {
     "id": " System.Formats.Asn1",
-    "Version": "6.0.1",
+    "version": "6.0.1",
     "name": "SystemFormatsAsn1",
     "bindings": []
   },
@@ -259,7 +259,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Fabric",
-    "version": "1.0.53",
+    "majorVersion": "1",
     "name": "Startup",
     "bindings": [
       "FabricItem",
