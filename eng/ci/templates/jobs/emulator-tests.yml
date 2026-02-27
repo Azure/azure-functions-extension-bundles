@@ -358,6 +358,14 @@ jobs:
         echo "Waiting for DTS emulator to start..."
         sleep 30
         docker compose ps
+      elif [ "$(ADDITIONAL_EMULATORS)" = "kafka" ]; then
+        echo "Starting Kafka Emulator for $(DISPLAY_NAME)..."
+        cd tests/emulator_tests/utils/kafka
+        docker compose pull
+        docker compose up -d
+        echo "Waiting for Kafka broker to start..."
+        sleep 30
+        docker compose ps
       else
         echo "No additional emulators required for $(DISPLAY_NAME)"
       fi
@@ -431,6 +439,7 @@ jobs:
       AzureWebJobsSQLPassword: $(AzureWebJobsSQLPassword)
       CosmosDBEmulatorUrl: $(CosmosDBEmulatorUrl)
       CosmosDBEmulatorKey: $(CosmosDBEmulatorKey)
+      BrokerList: "localhost:9092"
 
   # Copy webhost config for debugging
   - script: |
@@ -481,6 +490,10 @@ jobs:
       elif [ "$(ADDITIONAL_EMULATORS)" = "dts" ]; then
         echo "Stopping DTS emulator..."
         cd tests/emulator_tests/utils/dts
+        docker compose down -v
+      elif [ "$(ADDITIONAL_EMULATORS)" = "kafka" ]; then
+        echo "Stopping Kafka emulator..."
+        cd tests/emulator_tests/utils/kafka
         docker compose down -v
       fi
       
