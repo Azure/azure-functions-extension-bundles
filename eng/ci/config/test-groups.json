@@ -39,6 +39,14 @@
             "emulators": "dts",
             "display": "Durable Task Scheduler Tests",
             "stopEventHub": "false"
+        },
+        {
+            "name": "Kafka",
+            "group": "kafka",
+            "files": "test_kafka_functions.py",
+            "emulators": "kafka",
+            "display": "Kafka Tests",
+            "stopEventHub": "false"
         }
     ]
 }

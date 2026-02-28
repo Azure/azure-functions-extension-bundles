@@ -7,6 +7,7 @@ azure-functions
 # Azure SDK packages for emulator tests
 azure-cosmos
 azure-eventhub
+confluent-kafka
 python-dateutil~=2.9.0
 fabric-user-data-functions
 
