@@ -100,14 +100,18 @@ def kafka_metadata_trigger(event: func.KafkaEvent):
 @app.function_name(name="get_kafka_metadata_triggered")
 @app.route(route="get_kafka_metadata_triggered")
 def get_kafka_metadata_triggered(req: func.HttpRequest) -> func.HttpResponse:
+    global _kafka_metadata_result
     if not _kafka_metadata_result:
         return func.HttpResponse(
             body='{}',
             mimetype="application/json",
             status_code=404,
         )
+    # Capture and clear to avoid returning stale data on test retries
+    result = _kafka_metadata_result
+    _kafka_metadata_result = {}
     return func.HttpResponse(
-        body=json.dumps(_kafka_metadata_result),
+        body=json.dumps(result),
         mimetype="application/json",
         status_code=200,
     )
