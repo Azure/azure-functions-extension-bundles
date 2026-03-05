@@ -106,10 +106,37 @@ $latestTags | ForEach-Object {
     Write-Host "  - $($_.Tag) -> $($_.VersionNoPrefix)" -ForegroundColor White
 }
 
-# Backup original Packages.props
-$BackupPath = "$PackagesPropsPath.backup"
-Copy-Item $PackagesPropsPath $BackupPath -Force
-Write-Host "`nBacked up Packages.props to: $BackupPath" -ForegroundColor Gray
+# Backup all files that update-core-tools-versions.ps1 modifies
+# This ensures clean state for each version build
+$BackupFiles = @{
+    PackagesProps = @{
+        Path = $PackagesPropsPath
+        Backup = "$PackagesPropsPath.backup"
+    }
+    GlobalJson = @{
+        Path = Join-Path $CloneDir "global.json"
+        Backup = Join-Path $CloneDir "global.json.backup"
+    }
+    StartupCs = @{
+        Path = Join-Path $CloneDir "src\Cli\func\Actions\HostActions\Startup.cs"
+        Backup = Join-Path $CloneDir "src\Cli\func\Actions\HostActions\Startup.cs.backup"
+    }
+    DirectoryVersionProps = @{
+        Path = Join-Path $CloneDir "src\Cli\func\Directory.Version.props"
+        Backup = Join-Path $CloneDir "src\Cli\func\Directory.Version.props.backup"
+    }
+}
+
+Write-Host "`nBacking up files that will be modified..." -ForegroundColor Gray
+foreach ($fileKey in $BackupFiles.Keys) {
+    $fileInfo = $BackupFiles[$fileKey]
+    if (Test-Path $fileInfo.Path) {
+        Copy-Item $fileInfo.Path $fileInfo.Backup -Force
+        Write-Host "  ✓ Backed up: $($fileInfo.Path)" -ForegroundColor Green
+    } else {
+        Write-Host "  - Skipped (not found): $($fileInfo.Path)" -ForegroundColor Gray
+    }
+}
 
 # Array to store build results
 $buildResults = @()
@@ -124,10 +151,15 @@ try {
         Write-Host "Building Version $versionIndex of $($latestTags.Count): $hostVersion" -ForegroundColor Cyan
         Write-Host "===========================================================" -ForegroundColor Cyan
         
-        # Restore Packages.props to original state before each build
-        Write-Host "`nRestoring Packages.props to original state..." -ForegroundColor Gray
-        Copy-Item $BackupPath $PackagesPropsPath -Force
-        Write-Host "  ✓ Restored Packages.props" -ForegroundColor Green
+        # Restore all modified files to original state before each build
+        Write-Host "`nRestoring files to original state..." -ForegroundColor Gray
+        foreach ($fileKey in $BackupFiles.Keys) {
+            $fileInfo = $BackupFiles[$fileKey]
+            if (Test-Path $fileInfo.Backup) {
+                Copy-Item $fileInfo.Backup $fileInfo.Path -Force
+                Write-Host "  ✓ Restored: $($fileInfo.Path)" -ForegroundColor Green
+            }
+        }
             
         # Step 2a: Update host and worker versions in Packages.props
         Write-Host "`nStep 2.$versionIndex.a: Updating host and worker versions to $hostVersion" -ForegroundColor Yellow
@@ -254,11 +286,14 @@ try {
     Write-Error "Build failed: $_"
     exit 1
 } finally {
-    # Restore original Packages.props
-    if (Test-Path $BackupPath) {
-        Write-Host "`nRestoring original Packages.props..." -ForegroundColor Gray
-        Copy-Item $BackupPath $PackagesPropsPath -Force
-        Remove-Item $BackupPath -Force
-        Write-Host "  ✓ Restored Packages.props" -ForegroundColor Green
+    # Restore all original files and clean up backups
+    Write-Host "`nRestoring original files and cleaning up backups..." -ForegroundColor Gray
+    foreach ($fileKey in $BackupFiles.Keys) {
+        $fileInfo = $BackupFiles[$fileKey]
+        if (Test-Path $fileInfo.Backup) {
+            Copy-Item $fileInfo.Backup $fileInfo.Path -Force
+            Remove-Item $fileInfo.Backup -Force
+            Write-Host "  ✓ Restored and cleaned up: $($fileInfo.Path)" -ForegroundColor Green
+        }
     }
 }

@@ -100,10 +100,16 @@ try {
     
     Write-Host "Running: dotnet $($publishArgs -join ' ')" -ForegroundColor Cyan
     
-    & dotnet $publishArgs
+    # Run dotnet publish and capture output for better error diagnostics
+    $publishOutput = & dotnet $publishArgs 2>&1 | Tee-Object -Variable publishLogs
+    $exitCode = $LASTEXITCODE
     
-    if ($LASTEXITCODE -ne 0) {
-        throw "Publish failed with exit code $LASTEXITCODE"
+    if ($exitCode -ne 0) {
+        Write-Host "`n##[error]dotnet publish failed with exit code $exitCode" -ForegroundColor Red
+        Write-Host "##[error]===== Build Output =====" -ForegroundColor Red
+        $publishLogs | ForEach-Object { Write-Host $_ }
+        Write-Host "##[error]===== End Build Output =====" -ForegroundColor Red
+        throw "Publish failed with exit code $exitCode"
     }
     
     Write-Host "✓ Publish completed successfully" -ForegroundColor Green
