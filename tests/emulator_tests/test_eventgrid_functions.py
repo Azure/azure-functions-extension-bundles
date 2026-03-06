@@ -129,10 +129,12 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         event_id = f"cloud-event-{uuid.uuid4()}"
         test_data = {'message': f'cloud-test-{int(time.time())}'}
         
-        # Create mock CloudEvent payload (CloudEvents 1.0 spec)
+        # Create mock CloudEvent payload
+        # Note: Python SDK's EventGridEvent uses 'eventType' attribute name,
+        # not the CloudEvents spec 'type' field. The runtime maps this internally.
         event = {
             'specversion': '1.0',
-            'type': 'com.example.test',
+            'eventType': 'com.example.test',  # SDK uses eventType, not type
             'source': '/test/cloudevents',
             'id': event_id,
             'time': '2026-03-06T07:00:00Z',
