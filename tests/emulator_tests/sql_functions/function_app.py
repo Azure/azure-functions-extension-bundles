@@ -2,6 +2,7 @@
 # Licensed under the MIT License.
 import json
 import logging
+from typing import Optional
 import azure.functions as func
 import pyodbc
 import os
@@ -42,7 +43,7 @@ def _convert_to_odbc(ado_connection_string: str) -> str:
     return odbc_string
 
 
-def _get_odbc_connection_string() -> str:
+def _get_odbc_connection_string() -> Optional[str]:
     """Get ODBC-formatted connection string from environment variable."""
     connection_string = os.environ.get("SqlConnectionString")
     if connection_string:
@@ -183,6 +184,8 @@ def products_trigger(changes: str) -> None:
     """
     logging.info(f"SQL Changes: {changes}")
     
+    conn = None
+    cursor = None
     try:
         # Parse the changes
         change_list = json.loads(changes)
@@ -211,10 +214,13 @@ def products_trigger(changes: str) -> None:
                 """
                 cursor.execute(insert_query, (product_id, operation_str, product_name, product_cost))
                 logging.info(f"Recorded trigger: ProductId={product_id}, Operation={operation_str}")
-            
-            conn.close()
     except Exception as e:
         logging.error(f"Error processing SQL trigger: {e}")
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conn is not None:
+            conn.close()
 
 
 # ============================================================================
@@ -237,46 +243,58 @@ def get_tracked_changes(req: func.HttpRequest) -> func.HttpResponse:
             )
         
         conn = pyodbc.connect(odbc_connection_string, autocommit=True)
-        cursor = conn.cursor()
-        
-        # Get optional query parameters for filtering
-        product_id = req.params.get('productId')
-        operation = req.params.get('operation')
-        
-        query = "SELECT Id, ProductId, Operation, ProductName, ProductCost, RecordedAt FROM TriggerTracking WHERE 1=1"
-        params = []
-        
-        if product_id:
-            query += " AND ProductId = ?"
-            params.append(int(product_id))
-        
-        if operation:
-            query += " AND Operation = ?"
-            params.append(operation)
-        
-        query += " ORDER BY RecordedAt DESC"
-        
-        cursor.execute(query, params)
-        rows = cursor.fetchall()
-        
-        results = []
-        for row in rows:
-            results.append({
-                "Id": row[0],
-                "ProductId": row[1],
-                "Operation": row[2],
-                "ProductName": row[3],
-                "ProductCost": row[4],
-                "RecordedAt": str(row[5])
-            })
-        
-        conn.close()
-        
-        return func.HttpResponse(
-            json.dumps(results),
-            status_code=200,
-            mimetype="application/json"
-        )
+        cursor = None
+        try:
+            cursor = conn.cursor()
+            
+            # Get optional query parameters for filtering
+            product_id = req.params.get('productId')
+            operation = req.params.get('operation')
+            
+            query = "SELECT Id, ProductId, Operation, ProductName, ProductCost, RecordedAt FROM TriggerTracking WHERE 1=1"
+            params = []
+            
+            if product_id:
+                try:
+                    product_id_int = int(product_id)
+                except ValueError:
+                    return func.HttpResponse(
+                        json.dumps({"error": "Invalid productId; must be an integer"}),
+                        status_code=400,
+                        mimetype="application/json"
+                    )
+                query += " AND ProductId = ?"
+                params.append(product_id_int)
+            
+            if operation:
+                query += " AND Operation = ?"
+                params.append(operation)
+            
+            query += " ORDER BY RecordedAt DESC"
+            
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            
+            results = []
+            for row in rows:
+                results.append({
+                    "Id": row[0],
+                    "ProductId": row[1],
+                    "Operation": row[2],
+                    "ProductName": row[3],
+                    "ProductCost": row[4],
+                    "RecordedAt": str(row[5])
+                })
+            
+            return func.HttpResponse(
+                json.dumps(results),
+                status_code=200,
+                mimetype="application/json"
+            )
+        finally:
+            if cursor is not None:
+                cursor.close()
+            conn.close()
     except Exception as e:
         logging.error(f"Error getting tracked changes: {e}")
         return func.HttpResponse(
@@ -306,15 +324,20 @@ def clear_tracked_changes(req: func.HttpRequest) -> func.HttpResponse:
             )
         
         conn = pyodbc.connect(odbc_connection_string, autocommit=True)
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM TriggerTracking")
-        conn.close()
-        
-        return func.HttpResponse(
-            json.dumps({"message": "Tracked changes cleared"}),
-            status_code=200,
-            mimetype="application/json"
-        )
+        cursor = None
+        try:
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM TriggerTracking")
+            
+            return func.HttpResponse(
+                json.dumps({"message": "Tracked changes cleared"}),
+                status_code=200,
+                mimetype="application/json"
+            )
+        finally:
+            if cursor is not None:
+                cursor.close()
+            conn.close()
     except Exception as e:
         logging.error(f"Error clearing tracked changes: {e}")
         return func.HttpResponse(

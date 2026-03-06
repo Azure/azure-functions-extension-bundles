@@ -18,7 +18,7 @@ class SqlTestHelper:
         connection_string = os.environ.get("SqlConnectionString")
         self.connection = None
 
-        logger.debug(f"Connection String: {connection_string}")
+        logger.debug("Connection string retrieved from environment variable 'SqlConnectionString'.")
         
         # If connection string is provided, convert from ADO.NET to ODBC format
         if connection_string:
@@ -106,6 +106,7 @@ class ProductDAO(SqlTestHelper):
 
     def create_table(self):
         """Create the Products table if it doesn't exist"""
+        cursor = None
         try:
             self.connect()
             cursor = self.connection.cursor()
@@ -151,9 +152,13 @@ class ProductDAO(SqlTestHelper):
         except pyodbc.Error as err:
             logger.error(f"Error creating Products table: {err}")
             raise
+        finally:
+            if cursor is not None:
+                cursor.close()
 
     def insert_product(self, product_id, name, cost):
         """Insert a new product into the database using MERGE (upsert)"""
+        cursor = None
         try:
             self.connect()
             cursor = self.connection.cursor()
@@ -176,9 +181,13 @@ class ProductDAO(SqlTestHelper):
         except pyodbc.Error as err:
             logger.error(f"Error inserting product: {err}")
             raise
+        finally:
+            if cursor is not None:
+                cursor.close()
 
     def get_product_by_id(self, product_id):
         """Get a product by its ID"""
+        cursor = None
         try:
             self.connect()
             cursor = self.connection.cursor()
@@ -190,9 +199,13 @@ class ProductDAO(SqlTestHelper):
         except pyodbc.Error as err:
             logger.error(f"Error getting product: {err}")
             raise
+        finally:
+            if cursor is not None:
+                cursor.close()
 
     def get_products_by_cost(self, cost):
         """Get products by cost"""
+        cursor = None
         try:
             self.connect()
             cursor = self.connection.cursor()
@@ -204,9 +217,13 @@ class ProductDAO(SqlTestHelper):
         except pyodbc.Error as err:
             logger.error(f"Error getting products by cost: {err}")
             raise
+        finally:
+            if cursor is not None:
+                cursor.close()
 
     def update_product_name(self, product_id, new_name):
         """Update a product's name"""
+        cursor = None
         try:
             self.connect()
             cursor = self.connection.cursor()
@@ -218,9 +235,13 @@ class ProductDAO(SqlTestHelper):
         except pyodbc.Error as err:
             logger.error(f"Error updating product: {err}")
             raise
+        finally:
+            if cursor is not None:
+                cursor.close()
 
     def delete_product(self, product_id):
         """Delete a product by its ID"""
+        cursor = None
         try:
             self.connect()
             cursor = self.connection.cursor()
@@ -232,9 +253,13 @@ class ProductDAO(SqlTestHelper):
         except pyodbc.Error as err:
             logger.error(f"Error deleting product: {err}")
             raise
+        finally:
+            if cursor is not None:
+                cursor.close()
 
     def clear_all_products(self):
         """Delete all products from the table"""
+        cursor = None
         try:
             self.connect()
             cursor = self.connection.cursor()
@@ -246,9 +271,13 @@ class ProductDAO(SqlTestHelper):
         except pyodbc.Error as err:
             logger.error(f"Error clearing products: {err}")
             raise
+        finally:
+            if cursor is not None:
+                cursor.close()
 
     def get_all_products(self):
         """Get all products from the table"""
+        cursor = None
         try:
             self.connect()
             cursor = self.connection.cursor()
@@ -260,6 +289,9 @@ class ProductDAO(SqlTestHelper):
         except pyodbc.Error as err:
             logger.error(f"Error getting all products: {err}")
             raise
+        finally:
+            if cursor is not None:
+                cursor.close()
 
 
 class TriggerTrackingDAO(SqlTestHelper):
@@ -282,6 +314,7 @@ class TriggerTrackingDAO(SqlTestHelper):
 
     def create_table(self):
         """Create the TriggerTracking table if it doesn't exist"""
+        cursor = None
         try:
             self.connect()
             cursor = self.connection.cursor()
@@ -306,9 +339,13 @@ class TriggerTrackingDAO(SqlTestHelper):
         except pyodbc.Error as err:
             logger.error(f"Error creating TriggerTracking table: {err}")
             raise
+        finally:
+            if cursor is not None:
+                cursor.close()
 
     def get_tracked_changes(self, product_id=None, operation=None):
         """Get tracked changes, optionally filtered by product_id and/or operation"""
+        cursor = None
         try:
             self.connect()
             cursor = self.connection.cursor()
@@ -333,9 +370,13 @@ class TriggerTrackingDAO(SqlTestHelper):
         except pyodbc.Error as err:
             logger.error(f"Error getting tracked changes: {err}")
             raise
+        finally:
+            if cursor is not None:
+                cursor.close()
 
     def clear_tracked_changes(self):
         """Clear all tracked changes"""
+        cursor = None
         try:
             self.connect()
             cursor = self.connection.cursor()
@@ -347,3 +388,6 @@ class TriggerTrackingDAO(SqlTestHelper):
         except pyodbc.Error as err:
             logger.error(f"Error clearing tracked changes: {err}")
             raise
+        finally:
+            if cursor is not None:
+                cursor.close()
