@@ -30,14 +30,50 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
     """Test Event Grid Trigger and Output Bindings.
 
     Each test case follows this pattern:
-    1. POST mock event data to trigger/output function
+    1. POST mock event to Event Grid webhook endpoint
     2. Wait for function to process and write to blob storage
     3. Retrieve result via HTTP trigger and verify
     """
 
+    # Event Grid webhook endpoint for local testing
+    EVENTGRID_WEBHOOK_PATH = 'runtime/webhooks/EventGrid'
+
     @classmethod
     def get_script_dir(cls):
         return testutils.EMULATOR_TESTS_FOLDER / 'eventgrid_functions'
+
+    def _send_eventgrid_event(self, function_name: str, event: dict,
+                               is_cloudevent: bool = False) -> None:
+        """Send an event to an Event Grid trigger function via the local webhook.
+        
+        Args:
+            function_name: Name of the Event Grid trigger function
+            event: The event payload (will be wrapped in array)
+            is_cloudevent: If True, use CloudEvent content type
+        """
+        # Event Grid webhook requires events in an array
+        events = [event]
+        
+        headers = {
+            'aeg-event-type': 'Notification'
+        }
+        
+        if is_cloudevent:
+            headers['Content-Type'] = 'application/cloudevents-batch+json'
+        else:
+            headers['Content-Type'] = 'application/json'
+        
+        path = f"{self.EVENTGRID_WEBHOOK_PATH}?functionName={function_name}"
+        
+        r = self.webhost.request(
+            'POST', path,
+            data=json.dumps(events),
+            headers=headers,
+            no_prefix=True,
+            max_retries=3,
+            expected_status=202  # Event Grid webhook returns 202 Accepted
+        )
+        self.assertIsNotNone(r)
 
     # =========================================================================
     # EventGridEvent Trigger Tests
@@ -63,12 +99,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Sending EventGrid event: {event_id}")
-        r = self.webhost.request('POST', 'eventgrid_trigger',
-                                 data=json.dumps(event),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('eventgrid_trigger', event)
 
         # Wait for trigger to process and write to blob
         logger.info("Waiting for EventGrid trigger to execute...")
@@ -111,18 +142,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Sending CloudEvent: {event_id}")
-        r = self.webhost.request('POST', 'cloudevent_trigger',
-                                 data=json.dumps(event),
-                                 headers={
-                                     'Content-Type': 'application/cloudevents+json',
-                                     'ce-specversion': '1.0',
-                                     'ce-type': 'com.example.test',
-                                     'ce-source': '/test/cloudevents',
-                                     'ce-id': event_id
-                                 },
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('cloudevent_trigger', event, is_cloudevent=True)
 
         # Wait for trigger to process and write to blob
         logger.info("Waiting for CloudEvent trigger to execute...")
@@ -259,12 +279,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Testing EventGrid trigger with string data: {event_id}")
-        r = self.webhost.request('POST', 'eventgrid_trigger_string_data',
-                                 data=json.dumps(event),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('eventgrid_trigger_string_data', event)
 
         r = self.webhost.wait_and_request('GET', 'get_eventgrid_stringdata_triggered',
                                           wait_time=2,
@@ -293,12 +308,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Testing EventGrid trigger with array data: {event_id}")
-        r = self.webhost.request('POST', 'eventgrid_trigger_array_data',
-                                 data=json.dumps(event),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('eventgrid_trigger_array_data', event)
 
         r = self.webhost.wait_and_request('GET', 'get_eventgrid_arraydata_triggered',
                                           wait_time=2,
@@ -327,12 +337,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Testing EventGrid trigger with primitive data: {event_id}")
-        r = self.webhost.request('POST', 'eventgrid_trigger_primitive_data',
-                                 data=json.dumps(event),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('eventgrid_trigger_primitive_data', event)
 
         r = self.webhost.wait_and_request('GET', 'get_eventgrid_primitivedata_triggered',
                                           wait_time=2,
@@ -367,12 +372,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Testing EventGrid trigger with nested data: {event_id}")
-        r = self.webhost.request('POST', 'eventgrid_trigger_nested_data',
-                                 data=json.dumps(event),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('eventgrid_trigger_nested_data', event)
 
         r = self.webhost.wait_and_request('GET', 'get_eventgrid_nesteddata_triggered',
                                           wait_time=2,
@@ -406,12 +406,8 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Testing CloudEvent backcompat: {event_id}")
-        r = self.webhost.request('POST', 'cloudevent_backcompat_trigger',
-                                 data=json.dumps(legacy_event),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('cloudevent_backcompat_trigger', legacy_event, 
+                                   is_cloudevent=True)
 
         r = self.webhost.wait_and_request('GET', 'get_cloudevent_backcompat_triggered',
                                           wait_time=2,
@@ -441,12 +437,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Testing EventGrid trigger with missing data: {event_id}")
-        r = self.webhost.request('POST', 'eventgrid_trigger_missing_data',
-                                 data=json.dumps(event),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('eventgrid_trigger_missing_data', event)
 
         r = self.webhost.wait_and_request('GET', 'get_eventgrid_missingdata_triggered',
                                           wait_time=2,
@@ -475,12 +466,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Testing EventGrid trigger with null data: {event_id}")
-        r = self.webhost.request('POST', 'eventgrid_trigger_null_data',
-                                 data=json.dumps(event),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('eventgrid_trigger_null_data', event)
 
         r = self.webhost.wait_and_request('GET', 'get_eventgrid_nulldata_triggered',
                                           wait_time=2,
@@ -508,12 +494,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Testing EventGrid trigger with empty data: {event_id}")
-        r = self.webhost.request('POST', 'eventgrid_trigger_empty_data',
-                                 data=json.dumps(event),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('eventgrid_trigger_empty_data', event)
 
         r = self.webhost.wait_and_request('GET', 'get_eventgrid_emptydata_triggered',
                                           wait_time=2,
@@ -546,12 +527,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Testing EventGrid trigger with special chars: {event_id}")
-        r = self.webhost.request('POST', 'eventgrid_trigger_special_chars',
-                                 data=json.dumps(event, ensure_ascii=False),
-                                 headers={'Content-Type': 'application/json; charset=utf-8'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('eventgrid_trigger_special_chars', event)
 
         r = self.webhost.wait_and_request('GET', 'get_eventgrid_specialchars_triggered',
                                           wait_time=2,
@@ -587,13 +563,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
 
         payload_size = len(json.dumps(event))
         logger.info(f"Testing EventGrid trigger with large payload ({payload_size} bytes): {event_id}")
-        
-        r = self.webhost.request('POST', 'eventgrid_trigger_large_payload',
-                                 data=json.dumps(event),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('eventgrid_trigger_large_payload', event)
 
         r = self.webhost.wait_and_request('GET', 'get_eventgrid_largepayload_triggered',
                                           wait_time=2,
@@ -627,12 +597,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Testing duplicate event ID (first): {duplicate_id}")
-        r = self.webhost.request('POST', 'eventgrid_trigger_duplicate_id',
-                                 data=json.dumps(event1),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('eventgrid_trigger_duplicate_id', event1)
 
         # Wait and verify first event processed
         r = self.webhost.wait_and_request('GET', 'get_eventgrid_duplicateid_triggered',
@@ -654,12 +619,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         }
 
         logger.info(f"Testing duplicate event ID (second): {duplicate_id}")
-        r = self.webhost.request('POST', 'eventgrid_trigger_duplicate_id',
-                                 data=json.dumps(event2),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
+        self._send_eventgrid_event('eventgrid_trigger_duplicate_id', event2)
 
         # Verify second event also processed (overwrites blob)
         r = self.webhost.wait_and_request('GET', 'get_eventgrid_duplicateid_triggered',
