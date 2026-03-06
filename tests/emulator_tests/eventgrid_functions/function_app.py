@@ -7,11 +7,11 @@ using mock HTTP POST events (no Azure Event Grid connection required).
 
 Test scenarios covered (based on .NET SDK samples):
 1. EventGridEvent single trigger
-2. EventGridEvent batch trigger
-3. CloudEvent single trigger
-4. CloudEvent batch trigger
-5. EventGrid output binding (mock verification)
-6. CloudEvent output binding (mock verification)
+2. CloudEvent single trigger
+3. EventGrid output binding (mock verification)
+4. CloudEvent output binding (mock verification)
+5. Data shape variations - String, array, primitive, nested payloads
+6. Edge cases - Missing/null/empty data, special characters, large payloads
 """
 import json
 import logging

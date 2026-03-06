@@ -10,11 +10,11 @@ https://github.com/Azure/azure-sdk-for-net/tree/main/sdk/eventgrid/Microsoft.Azu
 
 Scenarios covered:
 1. EventGridEventTriggerFunction - Single EventGridEvent trigger
-2. EventGridEventBatchTriggerFunction - Batch EventGridEvent[] trigger
-3. CloudEventTriggerFunction - Single CloudEvent trigger
-4. CloudEventBatchTriggerFunction - Batch CloudEvent[] trigger
-5. EventGridEventBindingFunction - EventGrid output binding
-6. CloudEventBindingFunction - CloudEvent output binding
+2. CloudEventTriggerFunction - Single CloudEvent trigger
+3. EventGridEventBindingFunction - EventGrid output binding
+4. CloudEventBindingFunction - CloudEvent output binding
+5. Data shape variations - String, array, primitive, nested payloads
+6. Edge cases - Missing/null/empty data, special characters, large payloads
 """
 import json
 import logging
