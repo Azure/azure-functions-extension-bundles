@@ -7,9 +7,9 @@ using mock HTTP POST events (no Azure Event Grid connection required).
 
 Test scenarios covered (based on .NET SDK samples):
 1. EventGridEvent single trigger
-2. CloudEvent single trigger
-3. EventGrid output binding (mock verification)
-4. CloudEvent output binding (mock verification)
+2. CloudEvent single trigger (using azure.core.messaging.CloudEvent)
+3. EventGrid event construction verification (mock - not actual output binding)
+4. CloudEvent construction verification (mock - not actual output binding)
 5. Data shape variations - String, array, primitive, nested payloads
 6. Edge cases - Missing/null/empty data, special characters, large payloads
 """
@@ -17,6 +17,7 @@ import json
 import logging
 
 import azure.functions as func
+from azure.core.messaging import CloudEvent
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -63,20 +64,19 @@ def get_eventgrid_triggered(req: func.HttpRequest,
 @app.blob_output(arg_name="$return",
                  path="python-worker-tests/test-cloudevent-triggered.txt",
                  connection="AzureWebJobsStorage")
-def cloudevent_trigger(event: func.EventGridEvent) -> str:
+def cloudevent_trigger(event: CloudEvent) -> str:
     """Process a single CloudEvent and write result to blob storage.
     
-    Note: CloudEvents are received as EventGridEvent in Python SDK,
-    the schema determines how the event is parsed.
+    Uses CloudEvent type from azure.core.messaging for proper CloudEvents 1.0 support.
     """
     logging.info(f"CloudEvent trigger received event: {event.id}")
     result = {
         'id': event.id,
-        'type': event.event_type,
-        'source': event.topic,
+        'type': event.type,
+        'source': event.source,
         'subject': event.subject,
-        'time': str(event.event_time) if event.event_time else None,
-        'data': event.get_json()
+        'time': str(event.time) if event.time else None,
+        'data': event.data
     }
     return json.dumps(result)
 
@@ -93,22 +93,22 @@ def get_cloudevent_triggered(req: func.HttpRequest,
 
 
 # =============================================================================
-# EventGrid Output Binding - Mock Verification
-# Since we can't connect to real Event Grid, we verify the binding works
-# by capturing the event data before it would be sent.
+# EventGrid Event Construction - Mock Verification
+# Since we can't connect to real Event Grid without Azure subscription,
+# we verify event construction and structure via HTTP trigger + blob storage.
+# Note: This does NOT test the actual Event Grid output binding plumbing.
 # =============================================================================
-@app.function_name(name="eventgrid_output")
-@app.route(route="eventgrid_output")
+@app.function_name(name="eventgrid_event_construction")
+@app.route(route="eventgrid_event_construction")
 @app.blob_output(arg_name="outputblob",
                  path="python-worker-tests/test-eventgrid-output.txt",
                  connection="AzureWebJobsStorage")
-def eventgrid_output(req: func.HttpRequest,
-                     outputblob: func.Out[str]) -> func.HttpResponse:
-    """HTTP trigger that simulates EventGrid output binding behavior.
+def eventgrid_event_construction(req: func.HttpRequest,
+                                 outputblob: func.Out[str]) -> func.HttpResponse:
+    """HTTP trigger that constructs and validates EventGridEvent structure.
     
-    Since we can't send to real Event Grid without Azure connection,
-    we capture what would be sent and store it in blob for verification.
-    This tests that the output binding decorator and event construction work.
+    This tests event construction logic, not the actual Event Grid output binding.
+    The constructed event is stored in blob for verification.
     """
     try:
         body = req.get_body().decode('utf-8')
@@ -141,31 +141,32 @@ def eventgrid_output(req: func.HttpRequest,
         )
 
 
-@app.function_name(name="get_eventgrid_output")
-@app.route(route="get_eventgrid_output")
+@app.function_name(name="get_eventgrid_event_construction")
+@app.route(route="get_eventgrid_event_construction")
 @app.blob_input(arg_name="file",
                 path="python-worker-tests/test-eventgrid-output.txt",
                 connection="AzureWebJobsStorage")
-def get_eventgrid_output(req: func.HttpRequest,
-                         file: func.InputStream) -> str:
-    """Retrieve the EventGrid output binding result from blob storage."""
+def get_eventgrid_event_construction(req: func.HttpRequest,
+                                     file: func.InputStream) -> str:
+    """Retrieve the EventGrid event construction result from blob storage."""
     return file.read().decode('utf-8')
 
 
 # =============================================================================
-# CloudEvent Output Binding - Mock Verification
+# CloudEvent Construction - Mock Verification
+# Note: This does NOT test the actual Event Grid output binding plumbing.
 # =============================================================================
-@app.function_name(name="cloudevent_output")
-@app.route(route="cloudevent_output")
+@app.function_name(name="cloudevent_construction")
+@app.route(route="cloudevent_construction")
 @app.blob_output(arg_name="outputblob",
                  path="python-worker-tests/test-cloudevent-output.txt",
                  connection="AzureWebJobsStorage")
-def cloudevent_output(req: func.HttpRequest,
-                      outputblob: func.Out[str]) -> func.HttpResponse:
-    """HTTP trigger that simulates CloudEvent output binding behavior.
+def cloudevent_construction(req: func.HttpRequest,
+                            outputblob: func.Out[str]) -> func.HttpResponse:
+    """HTTP trigger that constructs and validates CloudEvent structure.
     
-    Since we can't send to real Event Grid without Azure connection,
-    we capture what would be sent and store it in blob for verification.
+    This tests event construction logic, not the actual Event Grid output binding.
+    The constructed event is stored in blob for verification.
     """
     try:
         body = req.get_body().decode('utf-8')
@@ -192,7 +193,7 @@ def cloudevent_output(req: func.HttpRequest,
             status_code=200
         )
     except Exception as e:
-        logging.error(f"Error in cloudevent_output: {e}")
+        logging.error(f"Error in cloudevent_construction: {e}")
         return func.HttpResponse(
             json.dumps({'status': 'error', 'message': str(e)}),
             mimetype='application/json',
@@ -200,14 +201,14 @@ def cloudevent_output(req: func.HttpRequest,
         )
 
 
-@app.function_name(name="get_cloudevent_output")
-@app.route(route="get_cloudevent_output")
+@app.function_name(name="get_cloudevent_construction")
+@app.route(route="get_cloudevent_construction")
 @app.blob_input(arg_name="file",
                 path="python-worker-tests/test-cloudevent-output.txt",
                 connection="AzureWebJobsStorage")
-def get_cloudevent_output(req: func.HttpRequest,
-                          file: func.InputStream) -> str:
-    """Retrieve the CloudEvent output binding result from blob storage."""
+def get_cloudevent_construction(req: func.HttpRequest,
+                                file: func.InputStream) -> str:
+    """Retrieve the CloudEvent construction result from blob storage."""
     return file.read().decode('utf-8')
 
 

@@ -1,6 +1,6 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
-"""Tests for Event Grid trigger and output bindings.
+"""Tests for Event Grid triggers and event construction.
 
 These tests verify Event Grid extension functionality using mock HTTP POST
 events. No Azure Event Grid connection is required - tests are self-sufficient.
@@ -10,9 +10,9 @@ https://github.com/Azure/azure-sdk-for-net/tree/main/sdk/eventgrid/Microsoft.Azu
 
 Scenarios covered:
 1. EventGridEventTriggerFunction - Single EventGridEvent trigger
-2. CloudEventTriggerFunction - Single CloudEvent trigger
-3. EventGridEventBindingFunction - EventGrid output binding
-4. CloudEventBindingFunction - CloudEvent output binding
+2. CloudEventTriggerFunction - Single CloudEvent trigger (azure.core.messaging.CloudEvent)
+3. EventGrid event construction - Validates event structure (mock, not actual output binding)
+4. CloudEvent construction - Validates event structure (mock, not actual output binding)
 5. Data shape variations - String, array, primitive, nested payloads
 6. Edge cases - Missing/null/empty data, special characters, large payloads
 """
@@ -129,12 +129,12 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         event_id = f"cloud-event-{uuid.uuid4()}"
         test_data = {'message': f'cloud-test-{int(time.time())}'}
         
-        # Create mock CloudEvent payload
-        # Note: Python SDK's EventGridEvent uses 'eventType' attribute name,
-        # not the CloudEvents spec 'type' field. The runtime maps this internally.
+        # Create mock CloudEvent payload (CloudEvents 1.0 spec)
+        # Using 'type' per CloudEvents spec - the CloudEvent type annotation
+        # from azure.core.messaging properly maps this field.
         event = {
             'specversion': '1.0',
-            'eventType': 'com.example.test',  # SDK uses eventType, not type
+            'type': 'com.example.test',
             'source': '/test/cloudevents',
             'id': event_id,
             'time': '2026-03-06T07:00:00Z',
@@ -158,21 +158,21 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         # Verify the CloudEvent was processed correctly
         self.assertEqual(result['id'], event_id)
         self.assertEqual(result['type'], 'com.example.test')
+        self.assertEqual(result['source'], '/test/cloudevents')
         self.assertEqual(result['subject'], 'test/subject')
         self.assertEqual(result['data'], test_data)
 
     # =========================================================================
-    # Output Binding Tests (Mock Verification)
+    # Event Construction Tests (Mock Verification)
+    # Note: These test event structure construction, NOT actual Event Grid
+    # output bindings (which require Azure subscription).
     # =========================================================================
-    def test_eventgrid_output_binding(self):
-        """Test EventGrid output binding with mock verification.
+    def test_eventgrid_event_construction(self):
+        """Test EventGridEvent structure construction.
         
-        Equivalent to C# sample: EventGridEventBindingFunction
-        
-        Since we can't connect to real Event Grid, we verify that:
-        1. The output binding function executes without error
-        2. The event structure is correctly constructed
-        3. The event data is properly captured
+        This verifies that EventGridEvent structure can be correctly
+        constructed and validated. Note: This does NOT test the actual
+        Event Grid output binding, just event construction logic.
         """
         # Generate unique test data
         test_id = f"output-test-{uuid.uuid4()}"
@@ -182,8 +182,8 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
             'timestamp': int(time.time())
         }
 
-        logger.info(f"Testing EventGrid output binding: {test_id}")
-        r = self.webhost.request('POST', 'eventgrid_output',
+        logger.info(f"Testing EventGrid event construction: {test_id}")
+        r = self.webhost.request('POST', 'eventgrid_event_construction',
                                  data=json.dumps(input_data),
                                  headers={'Content-Type': 'application/json'},
                                  max_retries=3,
@@ -201,7 +201,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         self.assertEqual(event['data'], input_data)
 
         # Also verify via blob storage
-        r = self.webhost.request('GET', 'get_eventgrid_output',
+        r = self.webhost.request('GET', 'get_eventgrid_event_construction',
                                  max_retries=3,
                                  expected_status=200)
         
@@ -209,15 +209,12 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         self.assertEqual(stored_event['id'], test_id)
         self.assertEqual(stored_event['data'], input_data)
 
-    def test_cloudevent_output_binding(self):
-        """Test CloudEvent output binding with mock verification.
+    def test_cloudevent_construction(self):
+        """Test CloudEvent structure construction.
         
-        Equivalent to C# sample: CloudEventBindingFunction
-        
-        Since we can't connect to real Event Grid, we verify that:
-        1. The output binding function executes without error
-        2. The CloudEvent structure is correctly constructed
-        3. The event data is properly captured
+        This verifies that CloudEvent structure can be correctly
+        constructed and validated. Note: This does NOT test the actual
+        Event Grid output binding, just event construction logic.
         """
         # Generate unique test data
         test_id = f"cloud-output-test-{uuid.uuid4()}"
@@ -227,8 +224,8 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
             'timestamp': int(time.time())
         }
 
-        logger.info(f"Testing CloudEvent output binding: {test_id}")
-        r = self.webhost.request('POST', 'cloudevent_output',
+        logger.info(f"Testing CloudEvent construction: {test_id}")
+        r = self.webhost.request('POST', 'cloudevent_construction',
                                  data=json.dumps(input_data),
                                  headers={'Content-Type': 'application/json'},
                                  max_retries=3,
@@ -247,7 +244,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         self.assertEqual(event['data'], input_data)
 
         # Also verify via blob storage
-        r = self.webhost.request('GET', 'get_cloudevent_output',
+        r = self.webhost.request('GET', 'get_cloudevent_construction',
                                  max_retries=3,
                                  expected_status=200)
         
