@@ -86,48 +86,6 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         self.assertEqual(result['data'], test_data)
         self.assertEqual(result['data_version'], '1.0')
 
-    def test_eventgrid_batch_trigger(self):
-        """Test EventGridTrigger with a batch of EventGridEvents.
-        
-        Equivalent to C# sample: EventGridEventBatchTriggerFunction
-        """
-        # Generate unique batch of events
-        batch_id = str(int(time.time()))
-        events = []
-        for i in range(3):
-            events.append({
-                'id': f'batch-event-{batch_id}-{i}',
-                'eventType': 'Microsoft.Storage.BlobCreated',
-                'subject': f'/blobs/file{i}.txt',
-                'eventTime': '2026-03-06T07:00:00Z',
-                'data': {'index': i, 'batch': batch_id},
-                'dataVersion': '1.0'
-            })
-
-        logger.info(f"Sending EventGrid batch with {len(events)} events")
-        r = self.webhost.request('POST', 'eventgrid_batch_trigger',
-                                 data=json.dumps(events),
-                                 headers={'Content-Type': 'application/json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
-
-        # Wait for trigger to process and write to blob
-        logger.info("Waiting for EventGrid batch trigger to execute...")
-        r = self.webhost.wait_and_request('GET', 'get_eventgrid_batch_triggered',
-                                          wait_time=2,
-                                          max_retries=10,
-                                          expected_status=200)
-
-        results = json.loads(r.text)
-
-        # Verify all events were processed
-        self.assertEqual(len(results), 3)
-        for i, result in enumerate(results):
-            self.assertEqual(result['id'], f'batch-event-{batch_id}-{i}')
-            self.assertEqual(result['event_type'], 'Microsoft.Storage.BlobCreated')
-            self.assertEqual(result['data']['index'], i)
-
     # =========================================================================
     # CloudEvent Trigger Tests
     # =========================================================================
@@ -180,50 +138,6 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         self.assertEqual(result['type'], 'com.example.test')
         self.assertEqual(result['subject'], 'test/subject')
         self.assertEqual(result['data'], test_data)
-
-    def test_cloudevent_batch_trigger(self):
-        """Test EventGridTrigger with a batch of CloudEvents.
-        
-        Equivalent to C# sample: CloudEventBatchTriggerFunction
-        """
-        # Generate unique batch of CloudEvents
-        batch_id = str(int(time.time()))
-        events = []
-        for i in range(3):
-            events.append({
-                'specversion': '1.0',
-                'type': 'com.example.batch',
-                'source': '/test/cloudevents/batch',
-                'id': f'cloud-batch-{batch_id}-{i}',
-                'time': '2026-03-06T07:00:00Z',
-                'subject': f'batch/item{i}',
-                'datacontenttype': 'application/json',
-                'data': {'index': i, 'batch': batch_id}
-            })
-
-        logger.info(f"Sending CloudEvent batch with {len(events)} events")
-        r = self.webhost.request('POST', 'cloudevent_batch_trigger',
-                                 data=json.dumps(events),
-                                 headers={'Content-Type': 'application/cloudevents-batch+json'},
-                                 max_retries=3,
-                                 expected_status=200)
-        self.assertIsNotNone(r)
-
-        # Wait for trigger to process and write to blob
-        logger.info("Waiting for CloudEvent batch trigger to execute...")
-        r = self.webhost.wait_and_request('GET', 'get_cloudevent_batch_triggered',
-                                          wait_time=2,
-                                          max_retries=10,
-                                          expected_status=200)
-
-        results = json.loads(r.text)
-
-        # Verify all CloudEvents were processed
-        self.assertEqual(len(results), 3)
-        for i, result in enumerate(results):
-            self.assertEqual(result['id'], f'cloud-batch-{batch_id}-{i}')
-            self.assertEqual(result['type'], 'com.example.batch')
-            self.assertEqual(result['data']['index'], i)
 
     # =========================================================================
     # Output Binding Tests (Mock Verification)

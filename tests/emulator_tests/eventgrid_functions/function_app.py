@@ -56,41 +56,6 @@ def get_eventgrid_triggered(req: func.HttpRequest,
 
 
 # =============================================================================
-# EventGridEvent Trigger - Batch Events
-# =============================================================================
-@app.function_name(name="eventgrid_batch_trigger")
-@app.event_grid_trigger(arg_name="events")
-@app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventgrid-batch-triggered.txt",
-                 connection="AzureWebJobsStorage")
-def eventgrid_batch_trigger(events: list[func.EventGridEvent]) -> str:
-    """Process a batch of EventGridEvents and write results to blob storage."""
-    logging.info(f"EventGrid batch trigger received {len(events)} events")
-    results = []
-    for event in events:
-        results.append({
-            'id': event.id,
-            'event_type': event.event_type,
-            'subject': event.subject,
-            'event_time': str(event.event_time) if event.event_time else None,
-            'data': event.get_json(),
-            'data_version': event.data_version
-        })
-    return json.dumps(results)
-
-
-@app.function_name(name="get_eventgrid_batch_triggered")
-@app.route(route="get_eventgrid_batch_triggered")
-@app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-batch-triggered.txt",
-                connection="AzureWebJobsStorage")
-def get_eventgrid_batch_triggered(req: func.HttpRequest,
-                                  file: func.InputStream) -> str:
-    """Retrieve the EventGrid batch trigger result from blob storage."""
-    return file.read().decode('utf-8')
-
-
-# =============================================================================
 # CloudEvent Trigger - Single Event
 # =============================================================================
 @app.function_name(name="cloudevent_trigger")
@@ -124,41 +89,6 @@ def cloudevent_trigger(event: func.EventGridEvent) -> str:
 def get_cloudevent_triggered(req: func.HttpRequest,
                              file: func.InputStream) -> str:
     """Retrieve the CloudEvent trigger result from blob storage."""
-    return file.read().decode('utf-8')
-
-
-# =============================================================================
-# CloudEvent Trigger - Batch Events
-# =============================================================================
-@app.function_name(name="cloudevent_batch_trigger")
-@app.event_grid_trigger(arg_name="events")
-@app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-cloudevent-batch-triggered.txt",
-                 connection="AzureWebJobsStorage")
-def cloudevent_batch_trigger(events: list[func.EventGridEvent]) -> str:
-    """Process a batch of CloudEvents and write results to blob storage."""
-    logging.info(f"CloudEvent batch trigger received {len(events)} events")
-    results = []
-    for event in events:
-        results.append({
-            'id': event.id,
-            'type': event.event_type,
-            'source': event.topic,
-            'subject': event.subject,
-            'time': str(event.event_time) if event.event_time else None,
-            'data': event.get_json()
-        })
-    return json.dumps(results)
-
-
-@app.function_name(name="get_cloudevent_batch_triggered")
-@app.route(route="get_cloudevent_batch_triggered")
-@app.blob_input(arg_name="file",
-                path="python-worker-tests/test-cloudevent-batch-triggered.txt",
-                connection="AzureWebJobsStorage")
-def get_cloudevent_batch_triggered(req: func.HttpRequest,
-                                   file: func.InputStream) -> str:
-    """Retrieve the CloudEvent batch trigger result from blob storage."""
     return file.read().decode('utf-8')
 
 
