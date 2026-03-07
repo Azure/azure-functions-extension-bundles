@@ -2,8 +2,7 @@
 # Licensed under the MIT License.
 import pyodbc
 import logging
-
-from connection_utils import convert_ado_to_odbc, get_odbc_connection_string
+import connection_utils
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +18,7 @@ class SqlTestHelper:
         logger.debug("Connection string retrieved from environment variable 'SqlConnectionString'.")
         
         # If connection string is provided, use shared utility to convert from ADO.NET to ODBC format
-        odbc_string = get_odbc_connection_string()
+        odbc_string = connection_utils.get_odbc_connection_string()
         if odbc_string:
             self.connection_string = odbc_string
             logger.info("Using SqlConnectionString environment variable (converted to ODBC)")

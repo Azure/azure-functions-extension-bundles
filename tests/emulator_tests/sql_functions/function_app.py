@@ -4,8 +4,7 @@ import json
 import logging
 import azure.functions as func
 import pyodbc
-
-from connection_utils import get_odbc_connection_string
+import connection_utils
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -150,7 +149,7 @@ def products_trigger(changes: str) -> None:
         change_list = json.loads(changes)
         
         # Get ODBC-formatted connection string and record changes to tracking table
-        odbc_connection_string = get_odbc_connection_string()
+        odbc_connection_string = connection_utils.get_odbc_connection_string()
         if odbc_connection_string:
             conn = pyodbc.connect(odbc_connection_string, autocommit=True)
             cursor = conn.cursor()
@@ -193,7 +192,7 @@ def get_tracked_changes(req: func.HttpRequest) -> func.HttpResponse:
     Used for verifying that SQL triggers are firing correctly.
     """
     try:
-        odbc_connection_string = get_odbc_connection_string()
+        odbc_connection_string = connection_utils.get_odbc_connection_string()
         if not odbc_connection_string:
             return func.HttpResponse(
                 json.dumps({"error": "SqlConnectionString not configured"}),
@@ -274,7 +273,7 @@ def clear_tracked_changes(req: func.HttpRequest) -> func.HttpResponse:
     Used for test cleanup.
     """
     try:
-        odbc_connection_string = get_odbc_connection_string()
+        odbc_connection_string = connection_utils.get_odbc_connection_string()
         if not odbc_connection_string:
             return func.HttpResponse(
                 json.dumps({"error": "SqlConnectionString not configured"}),
