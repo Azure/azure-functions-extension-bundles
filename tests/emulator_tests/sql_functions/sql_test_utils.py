@@ -1,8 +1,9 @@
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
 import pyodbc
-import os
 import logging
+
+from connection_utils import convert_ado_to_odbc, get_odbc_connection_string
 
 logger = logging.getLogger(__name__)
 
@@ -13,16 +14,14 @@ class SqlTestHelper:
     def __init__(self, server='localhost', port=1433, database='testdb', 
                  user='sa', password='YourStrong@Passw0rd'):
         """Initialize SQL Server connection parameters"""
-        
-        # Get the connection string from environment variable
-        connection_string = os.environ.get("SqlConnectionString")
         self.connection = None
 
         logger.debug("Connection string retrieved from environment variable 'SqlConnectionString'.")
         
-        # If connection string is provided, convert from ADO.NET to ODBC format
-        if connection_string:
-            self.connection_string = self._convert_to_odbc(connection_string)
+        # If connection string is provided, use shared utility to convert from ADO.NET to ODBC format
+        odbc_string = get_odbc_connection_string()
+        if odbc_string:
+            self.connection_string = odbc_string
             logger.info("Using SqlConnectionString environment variable (converted to ODBC)")
         else:
             logger.info("SqlConnectionString environment variable not set. Using default parameters.")
@@ -35,38 +34,6 @@ class SqlTestHelper:
                 f"PWD={password};"
                 f"TrustServerCertificate=yes;"
             )
-
-    def _convert_to_odbc(self, ado_connection_string):
-        """Convert ADO.NET connection string to ODBC format for pyodbc.
-        
-        ADO.NET format: Server=localhost,1433;Database=testdb;User Id=sa;Password=xxx;TrustServerCertificate=True
-        ODBC format: Driver={ODBC Driver 18 for SQL Server};Server=localhost,1433;Database=testdb;UID=sa;PWD=xxx;TrustServerCertificate=yes
-        """
-        # Parse the connection string
-        params = {}
-        for part in ado_connection_string.split(';'):
-            if '=' in part:
-                key, value = part.split('=', 1)
-                params[key.strip().lower()] = value.strip()
-        
-        # Map ADO.NET keys to ODBC keys
-        server = params.get('server', 'localhost,1433')
-        database = params.get('database', 'testdb')
-        user = params.get('user id', params.get('uid', 'sa'))
-        password = params.get('password', params.get('pwd', ''))
-        trust_cert = params.get('trustservercertificate', 'True').lower() in ('true', 'yes', '1')
-        
-        # Build ODBC connection string
-        odbc_string = (
-            f"Driver={{ODBC Driver 18 for SQL Server}};"
-            f"Server={server};"
-            f"Database={database};"
-            f"UID={user};"
-            f"PWD={password};"
-            f"TrustServerCertificate={'yes' if trust_cert else 'no'};"
-        )
-        
-        return odbc_string
 
     def connect(self):
         """Establish connection to SQL Server database"""

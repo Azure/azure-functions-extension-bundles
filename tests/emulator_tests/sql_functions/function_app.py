@@ -2,53 +2,12 @@
 # Licensed under the MIT License.
 import json
 import logging
-from typing import Optional
 import azure.functions as func
 import pyodbc
-import os
+
+from connection_utils import get_odbc_connection_string
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
-
-
-def _convert_to_odbc(ado_connection_string: str) -> str:
-    """Convert ADO.NET connection string to ODBC format for pyodbc.
-
-    ADO.NET format: Server=localhost,1433;Database=testdb;User Id=sa;Password=xxx;TrustServerCertificate=True
-    ODBC format: Driver={ODBC Driver 18 for SQL Server};Server=localhost,1433;Database=testdb;UID=sa;PWD=xxx;TrustServerCertificate=yes
-    """
-    # Parse the connection string
-    params = {}
-    for part in ado_connection_string.split(';'):
-        if '=' in part:
-            key, value = part.split('=', 1)
-            params[key.strip().lower()] = value.strip()
-
-    # Map ADO.NET keys to ODBC keys
-    server = params.get('server', 'localhost,1433')
-    database = params.get('database', 'testdb')
-    user = params.get('user id', params.get('uid', 'sa'))
-    password = params.get('password', params.get('pwd', ''))
-    trust_cert = params.get('trustservercertificate', 'True').lower() in ('true', 'yes', '1')
-
-    # Build ODBC connection string
-    odbc_string = (
-        f"Driver={{ODBC Driver 18 for SQL Server}};"
-        f"Server={server};"
-        f"Database={database};"
-        f"UID={user};"
-        f"PWD={password};"
-        f"TrustServerCertificate={'yes' if trust_cert else 'no'};"
-    )
-
-    return odbc_string
-
-
-def _get_odbc_connection_string() -> Optional[str]:
-    """Get ODBC-formatted connection string from environment variable."""
-    connection_string = os.environ.get("SqlConnectionString")
-    if connection_string:
-        return _convert_to_odbc(connection_string)
-    return None
 
 
 # ============================================================================
@@ -191,7 +150,7 @@ def products_trigger(changes: str) -> None:
         change_list = json.loads(changes)
         
         # Get ODBC-formatted connection string and record changes to tracking table
-        odbc_connection_string = _get_odbc_connection_string()
+        odbc_connection_string = get_odbc_connection_string()
         if odbc_connection_string:
             conn = pyodbc.connect(odbc_connection_string, autocommit=True)
             cursor = conn.cursor()
@@ -234,7 +193,7 @@ def get_tracked_changes(req: func.HttpRequest) -> func.HttpResponse:
     Used for verifying that SQL triggers are firing correctly.
     """
     try:
-        odbc_connection_string = _get_odbc_connection_string()
+        odbc_connection_string = get_odbc_connection_string()
         if not odbc_connection_string:
             return func.HttpResponse(
                 json.dumps({"error": "SqlConnectionString not configured"}),
@@ -315,7 +274,7 @@ def clear_tracked_changes(req: func.HttpRequest) -> func.HttpResponse:
     Used for test cleanup.
     """
     try:
-        odbc_connection_string = _get_odbc_connection_string()
+        odbc_connection_string = get_odbc_connection_string()
         if not odbc_connection_string:
             return func.HttpResponse(
                 json.dumps({"error": "SqlConnectionString not configured"}),
