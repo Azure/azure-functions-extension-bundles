@@ -119,19 +119,21 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
 
     # =========================================================================
     # CloudEvent Trigger Tests
+    # Note: Python SDK only supports func.EventGridEvent type annotation.
+    # CloudEvents are mapped to EventGridEvent by the runtime.
     # =========================================================================
     def test_cloudevent_trigger(self):
         """Test EventGridTrigger with a single CloudEvent.
         
         Equivalent to C# sample: CloudEventTriggerFunction
+        Note: Python only supports func.EventGridEvent - CloudEvents format
+        is mapped to EventGridEvent fields by the extension runtime.
         """
         # Generate unique CloudEvent data
         event_id = f"cloud-event-{uuid.uuid4()}"
         test_data = {'message': f'cloud-test-{int(time.time())}'}
         
         # Create mock CloudEvent payload (CloudEvents 1.0 spec)
-        # Using 'type' per CloudEvents spec - the CloudEvent type annotation
-        # from azure.core.messaging properly maps this field.
         event = {
             'specversion': '1.0',
             'type': 'com.example.test',
@@ -156,8 +158,11 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         result = json.loads(r.text)
 
         # Verify the CloudEvent was processed correctly
+        # Note: CloudEvent fields are mapped to EventGridEvent fields:
+        #   - 'type' -> event_type
+        #   - 'source' -> topic
         self.assertEqual(result['id'], event_id)
-        self.assertEqual(result['type'], 'com.example.test')
+        self.assertEqual(result['event_type'], 'com.example.test')
         self.assertEqual(result['source'], '/test/cloudevents')
         self.assertEqual(result['subject'], 'test/subject')
         self.assertEqual(result['data'], test_data)

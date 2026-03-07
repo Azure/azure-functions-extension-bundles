@@ -7,17 +7,19 @@ using mock HTTP POST events (no Azure Event Grid connection required).
 
 Test scenarios covered (based on .NET SDK samples):
 1. EventGridEvent single trigger
-2. CloudEvent single trigger (using azure.core.messaging.CloudEvent)
+2. CloudEvent single trigger (CloudEvents mapped to func.EventGridEvent)
 3. EventGrid event construction verification (mock - not actual output binding)
 4. CloudEvent construction verification (mock - not actual output binding)
 5. Data shape variations - String, array, primitive, nested payloads
 6. Edge cases - Missing/null/empty data, special characters, large payloads
+
+Note: Python Event Grid triggers only support func.EventGridEvent type annotation.
+CloudEvents format is automatically mapped to EventGridEvent by the runtime.
 """
 import json
 import logging
 
 import azure.functions as func
-from azure.core.messaging import CloudEvent
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -58,25 +60,28 @@ def get_eventgrid_triggered(req: func.HttpRequest,
 
 # =============================================================================
 # CloudEvent Trigger - Single Event
+# Note: Python Event Grid triggers only support func.EventGridEvent type.
+# CloudEvents format is mapped to EventGridEvent by the extension runtime.
 # =============================================================================
 @app.function_name(name="cloudevent_trigger")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
                  path="python-worker-tests/test-cloudevent-triggered.txt",
                  connection="AzureWebJobsStorage")
-def cloudevent_trigger(event: CloudEvent) -> str:
+def cloudevent_trigger(event: func.EventGridEvent) -> str:
     """Process a single CloudEvent and write result to blob storage.
     
-    Uses CloudEvent type from azure.core.messaging for proper CloudEvents 1.0 support.
+    Note: Python SDK only supports func.EventGridEvent type annotation.
+    CloudEvents are mapped to EventGridEvent by the extension runtime.
     """
     logging.info(f"CloudEvent trigger received event: {event.id}")
     result = {
         'id': event.id,
-        'type': event.type,
-        'source': event.source,
+        'event_type': event.event_type,  # CloudEvent 'type' is mapped here
         'subject': event.subject,
-        'time': str(event.time) if event.time else None,
-        'data': event.data
+        'event_time': str(event.event_time) if event.event_time else None,
+        'data': event.get_json(),
+        'source': event.topic  # CloudEvent 'source' is mapped to topic
     }
     return json.dumps(result)
 
