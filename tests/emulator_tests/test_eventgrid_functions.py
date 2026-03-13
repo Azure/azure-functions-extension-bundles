@@ -138,12 +138,14 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         event_id = f"cloud-event-{uuid.uuid4()}"
         test_data = {'message': f'cloud-test-{int(time.time())}'}
         
-        # Create CloudEvent payload - use eventType for local emulator compatibility
-        # The local webhook doesn't map pure CloudEvents 'type' field correctly
+        # Create CloudEvent payload - use EventGrid field names for local emulator
+        # The local webhook doesn't map pure CloudEvents field names correctly:
+        #   - 'type' must be 'eventType'
+        #   - 'source' must be 'topic'
         event = {
             'specversion': '1.0',
-            'eventType': 'com.example.test',  # Use eventType (not 'type') for local
-            'source': '/test/cloudevents',
+            'eventType': 'com.example.test',  # Use eventType (not 'type')
+            'topic': '/test/cloudevents',     # Use topic (not 'source')
             'id': event_id,
             'time': '2026-03-06T07:00:00Z',
             'subject': 'test/subject',
@@ -164,8 +166,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         result = json.loads(r.text)
 
         # Verify the CloudEvent was processed correctly
-        # CloudEvent 'source' is mapped to EventGridEvent 'topic'
-        # eventType is mapped to event_type
+        # Local emulator uses EventGrid field names: eventType->event_type, topic->source
         self.assertEqual(result['id'], event_id)
         self.assertEqual(result['event_type'], 'com.example.test')
         self.assertEqual(result['source'], '/test/cloudevents')
@@ -397,17 +398,18 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
     # Edge Case Tests - These catch production issues!
     # =========================================================================
     def test_cloudevent_backcompat_legacy_format(self):
-        """Test CloudEvent backward compatibility with legacy 'eventType' field.
+        """Test CloudEvent backward compatibility with EventGrid field names.
         
         Equivalent to C# CloudEventParamsBackCompat tests.
-        Older CloudEvent implementations used 'eventType' instead of 'type'.
+        The local emulator requires EventGrid-style field names (eventType, topic)
+        even when using CloudEvents content-type header.
         """
         event_id = f"backcompat-{uuid.uuid4()}"
-        # Legacy CloudEvent format with 'eventType' field
+        # CloudEvent with EventGrid field names for local emulator compatibility
         legacy_event = {
             'specversion': '1.0',
-            'eventType': 'com.legacy.format',  # Legacy field name
-            'source': '/test/backcompat',
+            'eventType': 'com.legacy.format',  # EventGrid field name
+            'topic': '/test/backcompat',       # EventGrid field name (not 'source')
             'id': event_id,
             'time': '2026-03-06T07:00:00Z',
             'subject': 'backcompat/test',
