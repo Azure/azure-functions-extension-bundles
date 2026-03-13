@@ -405,9 +405,15 @@ jobs:
         SIGNALR_PID=$!
         echo "##vso[task.setvariable variable=SIGNALR_PID]$SIGNALR_PID"
         
+        # Set the default SignalR emulator connection string
+        # The emulator runs on port 8888 by default
+        SIGNALR_CONN="Endpoint=http://localhost;Port=8888;AccessKey=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGH;Version=1.0;"
+        echo "##vso[task.setvariable variable=EmulatorSignalRConnectionString]$SIGNALR_CONN"
+        
         echo "Waiting for SignalR emulator to start..."
         sleep 15
         echo "SignalR emulator started with PID: $SIGNALR_PID"
+        echo "SignalR connection string: $SIGNALR_CONN"
       else
         echo "No additional emulators required for $(DISPLAY_NAME)"
       fi
