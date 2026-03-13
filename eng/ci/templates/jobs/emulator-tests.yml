@@ -392,6 +392,22 @@ jobs:
         echo "Waiting for Kafka broker to start..."
         sleep 30
         docker compose ps
+      elif [ "$(ADDITIONAL_EMULATORS)" = "signalr" ]; then
+        echo "Starting SignalR Emulator for $(DISPLAY_NAME)..."
+        
+        # Install SignalR emulator .NET tool
+        dotnet tool install -g Microsoft.Azure.SignalR.Emulator || dotnet tool update -g Microsoft.Azure.SignalR.Emulator
+        export PATH="$PATH:$HOME/.dotnet/tools"
+        
+        # Start emulator in background with settings file
+        cd tests/emulator_tests/utils/signalr
+        asrs-emulator start -c settings.json &
+        SIGNALR_PID=$!
+        echo "##vso[task.setvariable variable=SIGNALR_PID]$SIGNALR_PID"
+        
+        echo "Waiting for SignalR emulator to start..."
+        sleep 15
+        echo "SignalR emulator started with PID: $SIGNALR_PID"
       else
         echo "No additional emulators required for $(DISPLAY_NAME)"
       fi
@@ -468,6 +484,7 @@ jobs:
       CosmosDBEmulatorUrl: $(CosmosDBEmulatorUrl)
       CosmosDBEmulatorKey: $(CosmosDBEmulatorKey)
       BrokerList: "localhost:9092"
+      AzureSignalRConnectionString: $(EmulatorSignalRConnectionString)
 
   # Copy webhost config for debugging
   - script: |
@@ -527,6 +544,12 @@ jobs:
         echo "Stopping Kafka emulator..."
         cd tests/emulator_tests/utils/kafka
         docker compose down -v
+      elif [ "$(ADDITIONAL_EMULATORS)" = "signalr" ]; then
+        echo "Stopping SignalR emulator..."
+        if [ ! -z "$SIGNALR_PID" ]; then
+          kill $SIGNALR_PID 2>/dev/null || true
+        fi
+        pkill -f asrs-emulator || true
       fi
       
       # Stop base emulators (EventHub/Azurite) - unless EventHub was stopped for Service Bus
