@@ -123,7 +123,7 @@ class TestSignalRFunctions(testutils.WebHostTestCase):
         payload = {'userId': 'user-456'}
 
         r = self.webhost.request('POST', 'send_to_user', json=payload,
-                                 max_retries=1)
+                                 max_retries=1, expected_status=400)
 
         self.assertEqual(r.status_code, 400)
         error_response = r.json()
@@ -202,7 +202,7 @@ class TestSignalRFunctions(testutils.WebHostTestCase):
         payload = {'userId': 'user-789'}
 
         r = self.webhost.request('POST', 'add_to_group', json=payload,
-                                 max_retries=1)
+                                 max_retries=1, expected_status=400)
 
         self.assertEqual(r.status_code, 400)
         error_response = r.json()
@@ -287,7 +287,7 @@ class TestSignalRFunctions(testutils.WebHostTestCase):
             'POST', 'send_to_user',
             data='not valid json',
             headers={'Content-Type': 'application/json'},
-            max_retries=1)
+            max_retries=1, expected_status=400)
 
         self.assertEqual(r.status_code, 400)
         error_response = r.json()
@@ -315,7 +315,8 @@ class TestSignalRFunctions(testutils.WebHostTestCase):
         endpoints = ['get_connected_event', 'get_disconnected_event',
                      'get_message_event']
         for endpoint in endpoints:
-            r = self.webhost.request('GET', endpoint, max_retries=1)
+            # Use max_retries=0 to get the raw response without retry logic
+            r = self.webhost.request('GET', endpoint, max_retries=0)
             # Either 200 (event found) or 404 (no event yet) is acceptable
             self.assertIn(r.status_code, [200, 404],
                           "Endpoint %s should return 200 or 404" % endpoint)
