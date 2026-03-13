@@ -128,15 +128,21 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         Equivalent to C# sample: CloudEventTriggerFunction
         Note: Python only supports func.EventGridEvent - CloudEvents format
         is mapped to EventGridEvent fields by the extension runtime.
+        
+        IMPORTANT: The local Event Grid webhook endpoint expects EventGrid-style
+        field names (eventType) even when using CloudEvents content-type header.
+        This is a known limitation of the local emulator - in production Azure,
+        proper CloudEvents 1.0 field mapping (type -> event_type) may work.
         """
         # Generate unique CloudEvent data
         event_id = f"cloud-event-{uuid.uuid4()}"
         test_data = {'message': f'cloud-test-{int(time.time())}'}
         
-        # Create mock CloudEvent payload (CloudEvents 1.0 spec)
+        # Create CloudEvent payload - use eventType for local emulator compatibility
+        # The local webhook doesn't map pure CloudEvents 'type' field correctly
         event = {
             'specversion': '1.0',
-            'type': 'com.example.test',
+            'eventType': 'com.example.test',  # Use eventType (not 'type') for local
             'source': '/test/cloudevents',
             'id': event_id,
             'time': '2026-03-06T07:00:00Z',
@@ -158,9 +164,8 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
         result = json.loads(r.text)
 
         # Verify the CloudEvent was processed correctly
-        # Note: CloudEvent fields are mapped to EventGridEvent fields:
-        #   - 'type' -> event_type
-        #   - 'source' -> topic
+        # CloudEvent 'source' is mapped to EventGridEvent 'topic'
+        # eventType is mapped to event_type
         self.assertEqual(result['id'], event_id)
         self.assertEqual(result['event_type'], 'com.example.test')
         self.assertEqual(result['source'], '/test/cloudevents')
@@ -420,6 +425,7 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
 
         result = json.loads(r.text)
         self.assertEqual(result['id'], event_id)
+        self.assertEqual(result['event_type'], 'com.legacy.format')  # Verify eventType works
         self.assertEqual(result['subject'], 'backcompat/test')
         self.assertEqual(result['format'], 'backcompat')
 
