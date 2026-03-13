@@ -25,6 +25,14 @@
             "stopEventHub": "false"
         },
         {
+            "name": "SQL",
+            "group": "sql",
+            "files": "test_sql_functions.py",
+            "emulators": "sql",
+            "display": "SQL Server Tests",
+            "stopEventHub": "false"
+        },
+        {
             "name": "ServiceBus",
             "group": "servicebus",
             "files": "test_servicebus_functions.py",

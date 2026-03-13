@@ -1,6 +1,7 @@
 pytest
 invoke
 mysql-connector-python
+pyodbc
 requests==2.*
 azure-functions
 
