@@ -258,14 +258,17 @@ $env:AzureWebJobsCosmosDBConnectionString = "<Find the value on the official doc
 $env:CosmosDBEmulatorUrl = "<Find the value on the official doc>"
 $env:CosmosDBEmulatorKey = "<Find the value on the official doc>"
 $env:AzureWebJobsServiceBusConnectionString = "<Find the value on the official doc>"
-$env:AzureWebJobsSQLPassword = "<AnyPassword is fine>"
-$env:SqlConnectionString = "Server=localhost,1433;Database=testdb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
+$env:AzureWebJobsSQLPassword = "<Your SQL password>"
+$env:SqlConnectionString = "Server=localhost,1433;Database=testdb;User Id=sa;Password=<Your SQL password>;TrustServerCertificate=True"
+# SignalR emulator (default connection string used automatically if not set)
+$env:AzureSignalRConnectionString = "Endpoint=http://localhost;Port=8888;AccessKey=<Your access key>;Version=1.0;"
 ```
 
 - [EventHubs emulator authentication](https://learn.microsoft.com/en-us/azure/event-hubs/test-locally-with-event-hub-emulator?tabs=docker-linux-container%2Cusing-kafka#interact-with-the-emulator)
 - [Cosmos DB emulator authentication](https://learn.microsoft.com/en-us/azure/cosmos-db/emulator?context=%2Fazure%2Fcosmos-db%2Fnosql%2Fcontext%2Fcontext#authentication)
 - [ServiceBus emulator authentication](https://learn.microsoft.com/en-us/azure/service-bus-messaging/test-locally-with-service-bus-emulator?tabs=automated-script#interact-with-the-emulator)
 - [SQL edge](https://docs.azure.cn/en-us/azure-sql-edge/disconnected-deployment)
+- [SignalR emulator](https://learn.microsoft.com/en-us/azure/azure-signalr/signalr-howto-emulator)
 
 ### 8. **Run Tests**
 

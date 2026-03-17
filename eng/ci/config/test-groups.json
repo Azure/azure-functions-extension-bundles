@@ -55,6 +55,14 @@
             "emulators": "kafka",
             "display": "Kafka Tests",
             "stopEventHub": "false"
+        },
+        {
+            "name": "SignalR",
+            "group": "signalr",
+            "files": "test_signalr_functions.py",
+            "emulators": "signalr",
+            "display": "SignalR Tests",
+            "stopEventHub": "false"
         }
     ]
 }
