@@ -17,6 +17,7 @@ Resolves #
 - [ ] Documentation update
 - [ ] Performance improvement
 - [ ] Refactoring
+- [ ] Testing
 
 ## Branch Propagation
 
@@ -30,7 +31,7 @@ Resolves #
 ## Checklist
 
 - [ ] I have performed a self-review of my code
-- [ ] I have added/updated tests that prove my fix or feature works
+- [ ] I have added/updated emulator tests that prove my fix or feature works
 - [ ] I have updated relevant documentation
 - [ ] I have verified my changes in a local environment or internal build artifact
 - [ ] I have added appropriate comments to complex code
