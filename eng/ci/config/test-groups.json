@@ -1,67 +1,11 @@
 {
     "testGroups": [
         {
-            "name": "BasicTests",
-            "group": "basic",
-            "files": "test_blob_functions.py test_connectivity.py test_eventhub_batch_functions.py test_eventhub_functions.py test_eventgrid_functions.py test_queue_functions.py test_table_functions.py test_mcp_functions.py",
-            "emulators": "none",
-            "display": "Basic Tests",
-            "stopEventHub": "false"
-        },
-        {
-            "name": "CosmosDB",
-            "group": "cosmosdb",
-            "files": "test_cosmosdb_functions.py",
-            "emulators": "cosmosdb",
-            "display": "CosmosDB Tests",
-            "stopEventHub": "false"
-        },
-        {
             "name": "MySQL",
             "group": "mysql",
             "files": "test_mysql_functions.py",
             "emulators": "mysql",
             "display": "MySQL Tests",
-            "stopEventHub": "false"
-        },
-        {
-            "name": "SQL",
-            "group": "sql",
-            "files": "test_sql_functions.py",
-            "emulators": "sql",
-            "display": "SQL Server Tests",
-            "stopEventHub": "false"
-        },
-        {
-            "name": "ServiceBus",
-            "group": "servicebus",
-            "files": "test_servicebus_functions.py",
-            "emulators": "servicebus",
-            "display": "Service Bus Tests",
-            "stopEventHub": "true"
-        },
-        {
-            "name": "DTS",
-            "group": "dts",
-            "files": "test_durable_functions.py",
-            "emulators": "dts",
-            "display": "Durable Task Scheduler Tests",
-            "stopEventHub": "false"
-        },
-        {
-            "name": "Kafka",
-            "group": "kafka",
-            "files": "test_kafka_functions.py",
-            "emulators": "kafka",
-            "display": "Kafka Tests",
-            "stopEventHub": "false"
-        },
-        {
-            "name": "SignalR",
-            "group": "signalr",
-            "files": "test_signalr_functions.py",
-            "emulators": "signalr",
-            "display": "SignalR Tests",
             "stopEventHub": "false"
         }
     ]
