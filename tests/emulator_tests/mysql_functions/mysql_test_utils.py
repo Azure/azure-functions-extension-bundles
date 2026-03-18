@@ -491,10 +491,11 @@ class TriggerTrackingDAO(MySqlTestHelper):
 class ProductsWithIdentityDAO(MySqlTestHelper):
     """Data Access Object for ProductsWithIdentity table operations
 
-    This table has an AUTO_INCREMENT primary key, testing identity column handling.
+    This table mirrors the Products table schema to support combined binding tests
+    where rows are copied from Products to ProductsWithIdentity.
 
        Schema:
-        ProductId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        ProductId INT NOT NULL PRIMARY KEY,
         Name VARCHAR(100),
         Cost INT
     """
@@ -512,7 +513,7 @@ class ProductsWithIdentityDAO(MySqlTestHelper):
 
             create_table_query = """
                 CREATE TABLE IF NOT EXISTS `ProductsWithIdentity` (
-                    `ProductId` int NOT NULL AUTO_INCREMENT,
+                    `ProductId` int NOT NULL,
                     `Name` varchar(100),
                     `Cost` int,
                     PRIMARY KEY (`ProductId`)
@@ -528,15 +529,18 @@ class ProductsWithIdentityDAO(MySqlTestHelper):
             if cursor:
                 cursor.close()
 
-    def insert_product(self, name, cost):
-        """Insert a product without specifying ProductId (auto-generated)"""
+    def insert_product(self, product_id, name, cost):
+        """Insert a product with explicit ProductId"""
         cursor = None
         try:
             self.connect()
             cursor = self.connection.cursor(buffered=True)
-            insert_query = "INSERT INTO `ProductsWithIdentity` (`Name`, `Cost`) VALUES (%s, %s)"
-            cursor.execute(insert_query, (name, cost))
-            return cursor.lastrowid
+            insert_query = (
+                "INSERT INTO `ProductsWithIdentity` (`ProductId`, `Name`, `Cost`) "
+                "VALUES (%s, %s, %s)"
+            )
+            cursor.execute(insert_query, (product_id, name, cost))
+            return product_id
         except Error as e:
             print(f"[ERROR] Error inserting product: {e}")
             raise
@@ -550,7 +554,10 @@ class ProductsWithIdentityDAO(MySqlTestHelper):
         try:
             self.connect()
             cursor = self.connection.cursor()
-            select_query = "SELECT ProductId, Name, Cost FROM ProductsWithIdentity WHERE ProductId = %s"
+            select_query = (
+                "SELECT ProductId, Name, Cost FROM ProductsWithIdentity "
+                "WHERE ProductId = %s"
+            )
             cursor.execute(select_query, (product_id,))
             return cursor.fetchone()
         except Error as e:
@@ -566,7 +573,10 @@ class ProductsWithIdentityDAO(MySqlTestHelper):
         try:
             self.connect()
             cursor = self.connection.cursor()
-            select_query = "SELECT ProductId, Name, Cost FROM ProductsWithIdentity ORDER BY ProductId"
+            select_query = (
+                "SELECT ProductId, Name, Cost FROM ProductsWithIdentity "
+                "ORDER BY ProductId"
+            )
             cursor.execute(select_query)
             return cursor.fetchall()
         except Error as e:
@@ -584,7 +594,6 @@ class ProductsWithIdentityDAO(MySqlTestHelper):
             cursor = self.connection.cursor()
             delete_query = "DELETE FROM ProductsWithIdentity"
             cursor.execute(delete_query)
-            cursor.execute("ALTER TABLE ProductsWithIdentity AUTO_INCREMENT = 1")
             print("[INFO] All products cleared from ProductsWithIdentity table")
         except Error as e:
             print(f"[ERROR] Error clearing products: {e}")
@@ -603,6 +612,139 @@ class ProductsWithIdentityDAO(MySqlTestHelper):
             drop_table_query = "DROP TABLE IF EXISTS ProductsWithIdentity"
             cursor.execute(drop_table_query)
             print("[INFO] Table 'ProductsWithIdentity' dropped")
+        except Error as e:
+            print(f"[ERROR] Error dropping table: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+
+
+class ProductsAutoIncrementDAO(MySqlTestHelper):
+    """Data Access Object for ProductsAutoIncrement table operations
+
+    This table has an AUTO_INCREMENT primary key for testing identity column handling.
+
+       Schema:
+        ProductId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        Name VARCHAR(100),
+        Cost INT
+    """
+
+    def __init__(self, host='localhost', port=3307, database='testdb',
+                 user='user', password='password'):
+        super().__init__(host, port, database, user, password)
+        self.connect()
+
+    def create_table(self):
+        """Create the ProductsAutoIncrement table if it does not exist"""
+        cursor = None
+        try:
+            self.connect()
+            cursor = self.connection.cursor()
+
+            create_table_query = """
+                CREATE TABLE IF NOT EXISTS `ProductsAutoIncrement` (
+                    `ProductId` int NOT NULL AUTO_INCREMENT,
+                    `Name` varchar(100),
+                    `Cost` int,
+                    PRIMARY KEY (`ProductId`)
+                ) ENGINE=InnoDB;
+            """
+            cursor.execute(create_table_query)
+            print("[INFO] Table 'ProductsAutoIncrement' created or already exists")
+
+        except Error as e:
+            print(f"[ERROR] Error creating table `ProductsAutoIncrement`: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+
+    def insert_product(self, name, cost):
+        """Insert a product without specifying ProductId (auto-generated)"""
+        cursor = None
+        try:
+            self.connect()
+            cursor = self.connection.cursor(buffered=True)
+            insert_query = (
+                "INSERT INTO `ProductsAutoIncrement` (`Name`, `Cost`) "
+                "VALUES (%s, %s)"
+            )
+            cursor.execute(insert_query, (name, cost))
+            return cursor.lastrowid
+        except Error as e:
+            print(f"[ERROR] Error inserting product: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+
+    def get_product_by_id(self, product_id):
+        """Retrieve a product by primary key ProductId"""
+        cursor = None
+        try:
+            self.connect()
+            cursor = self.connection.cursor()
+            select_query = (
+                "SELECT ProductId, Name, Cost FROM ProductsAutoIncrement "
+                "WHERE ProductId = %s"
+            )
+            cursor.execute(select_query, (product_id,))
+            return cursor.fetchone()
+        except Error as e:
+            print(f"[ERROR] Error retrieving product by id: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+
+    def get_all_products(self):
+        """Retrieve all products"""
+        cursor = None
+        try:
+            self.connect()
+            cursor = self.connection.cursor()
+            select_query = (
+                "SELECT ProductId, Name, Cost FROM ProductsAutoIncrement "
+                "ORDER BY ProductId"
+            )
+            cursor.execute(select_query)
+            return cursor.fetchall()
+        except Error as e:
+            print(f"[ERROR] Error retrieving all products: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+
+    def clear_all_products(self):
+        """Delete all products from the table"""
+        cursor = None
+        try:
+            self.connect()
+            cursor = self.connection.cursor()
+            delete_query = "DELETE FROM ProductsAutoIncrement"
+            cursor.execute(delete_query)
+            cursor.execute("ALTER TABLE ProductsAutoIncrement AUTO_INCREMENT = 1")
+            print("[INFO] All products cleared from ProductsAutoIncrement table")
+        except Error as e:
+            print(f"[ERROR] Error clearing products: {e}")
+            raise
+        finally:
+            if cursor:
+                cursor.close()
+
+    def drop_table(self):
+        """Drop the ProductsAutoIncrement table if it exists"""
+        cursor = None
+        try:
+            self.connect()
+            cursor = self.connection.cursor()
+
+            drop_table_query = "DROP TABLE IF EXISTS ProductsAutoIncrement"
+            cursor.execute(drop_table_query)
+            print("[INFO] Table 'ProductsAutoIncrement' dropped")
         except Error as e:
             print(f"[ERROR] Error dropping table: {e}")
             raise

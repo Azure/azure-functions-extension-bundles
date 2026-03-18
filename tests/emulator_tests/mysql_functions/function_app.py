@@ -259,7 +259,7 @@ def clear_tracked_changes(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="AddProductWithIdentity")
 @app.route(route="addproductwithidentity")
 @app.mysql_output(arg_name="product",
-                  command_text="ProductsWithIdentity",
+                  command_text="ProductsAutoIncrement",
                   connection_string_setting="MySqlConnectionString")
 def add_product_with_identity(req: func.HttpRequest, product: func.Out[func.MySqlRow]) -> func.HttpResponse:
     """
