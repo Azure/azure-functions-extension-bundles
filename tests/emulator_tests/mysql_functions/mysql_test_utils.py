@@ -505,7 +505,11 @@ class ProductsWithIdentityDAO(MySqlTestHelper):
         self.connect()
 
     def create_table(self):
-        """Create the ProductsWithIdentity table if it does not exist"""
+        """Create the ProductsWithIdentity table if it does not exist
+
+        The schema must match Products table (including az_func_updated_at)
+        because the combined binding test copies rows from Products to this table.
+        """
         cursor = None
         try:
             self.connect()
@@ -521,6 +525,27 @@ class ProductsWithIdentityDAO(MySqlTestHelper):
             """
             cursor.execute(create_table_query)
             print("[INFO] Table 'ProductsWithIdentity' created or already exists")
+
+            # Add az_func_updated_at column if it doesn't exist
+            # This is required to match the Products table schema when copying rows
+            check_column_query = """
+                SELECT COUNT(*) FROM information_schema.COLUMNS
+                WHERE TABLE_NAME = 'ProductsWithIdentity'
+                AND COLUMN_NAME = 'az_func_updated_at'
+                AND TABLE_SCHEMA = DATABASE();
+            """
+            cursor.execute(check_column_query)
+            column_exists = cursor.fetchone()[0] > 0
+
+            if not column_exists:
+                alter_table_query = """
+                ALTER TABLE ProductsWithIdentity
+                ADD az_func_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+                """
+                cursor.execute(alter_table_query)
+                print("[INFO] Table 'ProductsWithIdentity' altered to add 'az_func_updated_at' column")
+            else:
+                print("[INFO] Column 'az_func_updated_at' already exists in table 'ProductsWithIdentity'")
 
         except Error as e:
             print(f"[ERROR] Error creating table `ProductsWithIdentity`: {e}")
