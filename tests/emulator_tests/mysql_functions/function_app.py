@@ -292,7 +292,7 @@ def add_product_with_identity(req: func.HttpRequest, product: func.Out[func.MySq
 @app.function_name(name="GetAndAddProducts")
 @app.route(route="getandaddproducts/{cost}")
 @app.mysql_input(arg_name="products",
-                 command_text="SELECT * FROM Products WHERE Cost = @Cost",
+                 command_text="SELECT ProductId, Name, Cost FROM Products WHERE Cost = @Cost",
                  command_type="Text",
                  parameters="@Cost={cost}",
                  connection_string_setting="MySqlConnectionString")
@@ -305,6 +305,10 @@ def get_and_add_products(req: func.HttpRequest,
     """
     HTTP triggered function with combined MySQL input and output bindings.
     Gets products from Products table and upserts them to ProductsWithIdentity table.
+
+    Note: We explicitly select only ProductId, Name, Cost columns (not SELECT *)
+    to avoid including az_func_updated_at which has timestamp format issues
+    when passed through the MySQL output binding.
     """
     try:
         productsWithIdentity.set(products)
