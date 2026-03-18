@@ -7,7 +7,7 @@ import mysql.connector
 import azure.functions as func
 
 # Create a FunctionApp instance using the v2 programming model
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+app = func.FunctionApp()
 
 
 # ============================================================================
