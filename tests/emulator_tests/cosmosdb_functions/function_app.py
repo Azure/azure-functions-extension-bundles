@@ -22,14 +22,14 @@ def cosmosdb_input(req: func.HttpRequest, docs: func.DocumentList) -> str:
     connection="AzureWebJobsCosmosDBConnectionString",
     create_lease_container_if_not_exists=True)
 @app.blob_output(arg_name="$return", connection="AzureWebJobsStorage",
-                 path="python-worker-tests/test-cosmosdb-triggered.txt")
+                 path="bundle-tests/test-cosmosdb-triggered.txt")
 def cosmosdb_trigger(docs: func.DocumentList) -> str:
     return docs[0].to_json()
 
 
 @app.route()
 @app.blob_input(arg_name="file", connection="AzureWebJobsStorage",
-                path="python-worker-tests/test-cosmosdb-triggered.txt")
+                path="bundle-tests/test-cosmosdb-triggered.txt")
 def get_cosmosdb_triggered(req: func.HttpRequest,
                            file: func.InputStream) -> str:
     return file.read().decode('utf-8')

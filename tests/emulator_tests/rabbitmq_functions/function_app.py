@@ -24,7 +24,7 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 )
 @app.blob_output(
     arg_name="$return",
-    path="python-worker-tests/test-rabbitmq-triggered.txt",
+    path="bundle-tests/test-rabbitmq-triggered.txt",
     connection="AzureWebJobsStorage"
 )
 def rabbitmq_trigger(message: str) -> str:
@@ -37,7 +37,7 @@ def rabbitmq_trigger(message: str) -> str:
 @app.route(route="get_rabbitmq_triggered")
 @app.blob_input(
     arg_name="file",
-    path="python-worker-tests/test-rabbitmq-triggered.txt",
+    path="bundle-tests/test-rabbitmq-triggered.txt",
     connection="AzureWebJobsStorage"
 )
 def get_rabbitmq_triggered(req: func.HttpRequest,
@@ -73,7 +73,7 @@ def rabbitmq_output(req: func.HttpRequest,
 )
 @app.blob_output(
     arg_name="$return",
-    path="python-worker-tests/test-rabbitmq-output-triggered.txt",
+    path="bundle-tests/test-rabbitmq-output-triggered.txt",
     connection="AzureWebJobsStorage"
 )
 def rabbitmq_output_trigger(message: str) -> str:
@@ -86,7 +86,7 @@ def rabbitmq_output_trigger(message: str) -> str:
 @app.route(route="get_rabbitmq_output_triggered")
 @app.blob_input(
     arg_name="file",
-    path="python-worker-tests/test-rabbitmq-output-triggered.txt",
+    path="bundle-tests/test-rabbitmq-output-triggered.txt",
     connection="AzureWebJobsStorage"
 )
 def get_rabbitmq_output_triggered(req: func.HttpRequest,
