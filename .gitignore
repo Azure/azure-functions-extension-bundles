@@ -358,3 +358,6 @@ __azurite*
 AzuriteConfig
 __blobstorage__/
 __queuestorage__/
+
+# Agent plan files
+PLAN-*.md

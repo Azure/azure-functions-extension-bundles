@@ -15,3 +15,4 @@ fabric-user-data-functions
 # Additional utilities
 python-dotenv
 azure-functions-durable
+pika

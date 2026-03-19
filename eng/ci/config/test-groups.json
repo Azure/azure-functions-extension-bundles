@@ -63,6 +63,14 @@
             "emulators": "signalr",
             "display": "SignalR Tests",
             "stopEventHub": "false"
+        },
+        {
+            "name": "RabbitMQ",
+            "group": "rabbitmq",
+            "files": "test_rabbitmq_functions.py",
+            "emulators": "rabbitmq",
+            "display": "RabbitMQ Tests",
+            "stopEventHub": "true"
         }
     ]
 }
