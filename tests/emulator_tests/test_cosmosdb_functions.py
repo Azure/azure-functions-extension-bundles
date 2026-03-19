@@ -82,6 +82,44 @@ def query_by_id(cosmos_container, doc_id):
     ))
 
 
+def poll_until(condition_fn, max_retries=10, retry_delay=1, description="condition"):
+    """Poll until condition is met or timeout.
+
+    This is the recommended pattern for avoiding flaky tests. Instead of
+    fixed sleep times, we poll with retries until the expected condition
+    is met, returning early on success.
+
+    Args:
+        condition_fn: Callable that returns (success: bool, result: any)
+        max_retries: Maximum number of polling attempts
+        retry_delay: Delay in seconds between attempts
+        description: Description for logging
+
+    Returns:
+        The result from condition_fn when successful, or last result on timeout
+    """
+    result = None
+    for attempt in range(max_retries):
+        success, result = condition_fn()
+        if success:
+            logger.info(f"{description} succeeded on attempt {attempt + 1}")
+            return result
+        if attempt < max_retries - 1:
+            logger.info(f"Waiting for {description} "
+                        f"(attempt {attempt + 1}/{max_retries})...")
+            time.sleep(retry_delay)
+    logger.warning(f"{description} not met after {max_retries} attempts")
+    return result
+
+
+def poll_for_document(cosmos_container, doc_id, max_retries=10, retry_delay=1):
+    """Poll CosmosDB until document appears or timeout."""
+    def check():
+        items = query_by_id(cosmos_container, doc_id)
+        return (len(items) > 0, items)
+    return poll_until(check, max_retries, retry_delay, f"document {doc_id}")
+
+
 class TestCosmosDBFunctions(testutils.WebHostTestCase):
     """Test class for CosmosDB extension emulator tests"""
 
@@ -158,11 +196,15 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
                                      max_retries=3, expected_status=200)
             self.assertEqual(r.text, 'OK')
 
-        time.sleep(10)
+        # Poll for triggered documents using poll_until helper
+        def check_triggered():
+            r = self.webhost.request('GET', 'get_triggered_docs',
+                                     max_retries=3, expected_status=200)
+            triggered = r.json()
+            return (len(triggered) > 0, triggered)
 
-        r = self.webhost.request('GET', 'get_triggered_docs',
-                                 max_retries=3, expected_status=200)
-        triggered = r.json()
+        triggered = poll_until(check_triggered, max_retries=20,
+                               description="trigger fired")
 
         self.assertGreater(len(triggered), 0, "No documents were triggered")
         triggered_ids = [d.get('id') for d in triggered]
@@ -183,11 +225,15 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
                                      max_retries=3, expected_status=200)
             self.assertEqual(r.text, 'OK')
 
-        time.sleep(15)
+        # Poll for batch triggered docs using poll_until helper
+        def check_batch_triggered():
+            r = self.webhost.request('GET', 'get_batch_triggered_docs',
+                                     max_retries=3, expected_status=200)
+            batches = r.json()
+            return (len(batches) > 0, batches)
 
-        r = self.webhost.request('GET', 'get_batch_triggered_docs',
-                                 max_retries=3, expected_status=200)
-        batches = r.json()
+        batches = poll_until(check_batch_triggered, max_retries=20,
+                             description="batch trigger fired")
 
         if len(batches) > 0:
             for batch in batches:
@@ -211,8 +257,7 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         self.assertEqual(r.text, 'OK')
 
         if container:
-            time.sleep(1)
-            items = query_by_id(container, doc_id)
+            items = poll_for_document(container, doc_id)
             self.assertEqual(len(items), 1)
             self.assertEqual(items[0]['name'], 'Test Product')
             self.assertEqual(items[0]['price'], 29.99)
@@ -232,9 +277,8 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         self.assertEqual(response['inserted'], 5)
 
         if container:
-            time.sleep(1)
             for doc in docs:
-                items = query_by_id(container, doc['id'])
+                items = poll_for_document(container, doc['id'])
                 self.assertEqual(len(items), 1, f"Document {doc['id']} not found")
 
     def test_cosmosdb_output_upsert(self):
@@ -247,6 +291,10 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
                                  max_retries=3, expected_status=200)
         self.assertEqual(r.text, 'OK')
 
+        # Wait for first write before updating
+        if container:
+            poll_for_document(container, doc_id)
+
         doc_v2 = {'id': doc_id, 'version': 2, 'status': 'updated'}
         r = self.webhost.request('POST', 'put_document',
                                  data=json.dumps(doc_v2),
@@ -254,8 +302,13 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         self.assertEqual(r.text, 'OK')
 
         if container:
-            time.sleep(1)
-            items = query_by_id(container, doc_id)
+            # Poll until version 2 appears using poll_until helper
+            def check_version_2():
+                items = query_by_id(container, doc_id)
+                return (items and items[0].get('version') == 2, items)
+
+            items = poll_until(check_version_2, max_retries=10,
+                               description=f"document {doc_id} version 2")
             self.assertEqual(len(items), 1, "Should have only one document")
             self.assertEqual(items[0]['version'], 2)
             self.assertEqual(items[0]['status'], 'updated')
@@ -286,8 +339,7 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         self.assertEqual(r.text, 'OK')
 
         if container:
-            time.sleep(1)
-            items = query_by_id(container, doc_id)
+            items = poll_for_document(container, doc_id)
             self.assertEqual(len(items), 1)
             result = items[0]
             self.assertEqual(result['metadata']['author'], 'test-user')
@@ -321,8 +373,7 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         self.assertEqual(r.text, 'OK')
 
         if container:
-            time.sleep(1)
-            items = query_by_id(container, doc_id)
+            items = poll_for_document(container, doc_id)
             self.assertEqual(len(items), 1)
             result = items[0]
             self.assertEqual(result['unicode'], doc['unicode'])
@@ -349,8 +400,7 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         self.assertEqual(r.text, 'OK')
 
         if container:
-            time.sleep(1)
-            items = query_by_id(container, doc_id)
+            items = poll_for_document(container, doc_id)
             self.assertEqual(len(items), 1)
             result = items[0]
             self.assertEqual(result['empty_string'], '')
@@ -376,8 +426,7 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         self.assertEqual(r.text, 'OK')
 
         if container:
-            time.sleep(1)
-            items = query_by_id(container, doc_id)
+            items = poll_for_document(container, doc_id)
             self.assertEqual(len(items), 1)
             self.assertEqual(len(items[0]['data']), 10)
 
@@ -400,8 +449,7 @@ class TestCosmosDBFunctions(testutils.WebHostTestCase):
         self.assertEqual(r.text, 'OK')
 
         if container:
-            time.sleep(1)
-            items = query_by_id(container, doc_id)
+            items = poll_for_document(container, doc_id)
             self.assertEqual(len(items), 1)
             result = items[0]
             self.assertEqual(result['integer'], 42)

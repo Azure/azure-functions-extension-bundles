@@ -37,9 +37,16 @@ _batch_triggered_docs = []
                  path="bundle-tests/test-cosmosdb-triggered.txt")
 def cosmosdb_trigger(docs: func.DocumentList) -> str:
     """Change feed trigger - writes first document to blob"""
-    for doc in docs:
-        _triggered_docs.append(json.loads(doc.to_json()))
-    return docs[0].to_json() if docs else "{}"
+    if not docs:
+        logging.warning("Trigger received empty document list")
+        return "{}"
+    try:
+        for doc in docs:
+            _triggered_docs.append(json.loads(doc.to_json()))
+        return docs[0].to_json()
+    except (json.JSONDecodeError, IndexError) as e:
+        logging.error(f"Error processing trigger documents: {e}")
+        return json.dumps({"error": str(e)})
 
 
 @app.cosmos_db_trigger(
