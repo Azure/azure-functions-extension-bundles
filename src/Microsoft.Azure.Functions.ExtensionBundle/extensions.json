@@ -12,7 +12,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
-    "majorVersion": "5",
+    "version": "5.3.7",
     "name": "AzureStorageQueues",
     "bindings": [
       "queue",
