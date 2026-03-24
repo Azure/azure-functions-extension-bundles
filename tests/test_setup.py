@@ -22,6 +22,8 @@ import tempfile
 import zipfile
 import threading
 import time
+import urllib.request
+import urllib.error
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 from invoke import task
@@ -230,6 +232,63 @@ def _setup_extension_bundle_structure(temp_dir, artifacts_dir):
         return None
 
     return temp_dir
+
+
+def wait_for_server(url, timeout=60, interval=2):
+    """Poll a URL until it returns HTTP 2xx, or raise TimeoutError.
+
+    Args:
+        url: The URL to poll.
+        timeout: Maximum seconds to wait (default: 60).
+        interval: Seconds between retries (default: 2).
+
+    Returns:
+        True when the server responds with HTTP 2xx.
+
+    Raises:
+        TimeoutError: If the server does not respond within the timeout.
+    """
+    deadline = time.monotonic() + timeout
+    attempt = 0
+    while time.monotonic() < deadline:
+        attempt += 1
+        try:
+            req = urllib.request.Request(url, method="GET")
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                if 200 <= resp.status < 300:
+                    print(f"Server {url} is ready (attempt {attempt})")
+                    return True
+        except (urllib.error.URLError, urllib.error.HTTPError, OSError):
+            pass
+        remaining = deadline - time.monotonic()
+        if remaining > 0:
+            time.sleep(min(interval, remaining))
+    raise TimeoutError(
+        f"Server {url} did not become ready within {timeout}s "
+        f"({attempt} attempts)"
+    )
+
+
+@task
+def wait_for_mock_site(c, port=8000, timeout=60, interval=2):
+    """Wait for the mock extension site to become ready.
+
+    Polls http://localhost:<port>/ until it responds with HTTP 200,
+    or exits with code 1 if the timeout is reached.
+
+    Args:
+        port: Port the mock site is running on (default: 8000).
+        timeout: Maximum seconds to wait (default: 60).
+        interval: Seconds between retries (default: 2).
+    """
+    url = f"http://localhost:{port}/"
+    print(f"Waiting for mock extension site at {url} (timeout={timeout}s)...")
+    try:
+        wait_for_server(url, timeout=int(timeout), interval=int(interval))
+        print(f"Mock extension site is running on port {port}")
+    except TimeoutError as e:
+        print(f"ERROR: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 class ExtensionBundleHTTPHandler(SimpleHTTPRequestHandler):

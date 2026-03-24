@@ -462,16 +462,9 @@ jobs:
       MOCK_SITE_PID=$!
       echo "Mock site started with PID: $MOCK_SITE_PID"
       echo "##vso[task.setvariable variable=MOCK_SITE_PID]$MOCK_SITE_PID"
-      sleep 10
-      
-      # Verify mock site is running on port 8000
-      if curl -f http://localhost:8000/ 2>/dev/null; then
-        echo "✅ Mock extension site is running successfully on port 8000"
-        echo "Extension bundle source URI: http://localhost:8000"
-      else
-        echo "❌ Warning: Mock extension site may not be responding on port 8000"
-        netstat -tlnp | grep :8000 || true
-      fi
+
+      # Poll until the mock site is ready (timeout 60s, poll every 2s)
+      python -m invoke -c test_setup wait-for-mock-site --port 8000 --timeout 60 --interval 2
     displayName: 'Start Mock Extension Site'
   
   # Run tests for the specific Core Tools version assigned to this job
