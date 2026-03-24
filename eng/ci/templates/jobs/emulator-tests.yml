@@ -465,6 +465,15 @@ jobs:
 
       # Poll until the mock site is ready (timeout 60s, poll every 2s)
       python -m invoke -c test_setup wait-for-mock-site --port 8000 --timeout 60 --interval 2
+
+      # Verify mock site process is still alive after health check
+      if kill -0 $MOCK_SITE_PID 2>/dev/null; then
+        echo "##vso[task.setvariable variable=MOCK_SITE_READY]true"
+        echo "Mock extension site is running and ready on port 8000"
+      else
+        echo "##[error]Mock extension site process died after passing health check"
+        exit 1
+      fi
     displayName: 'Start Mock Extension Site'
   
   # Run tests for the specific Core Tools version assigned to this job
@@ -500,6 +509,7 @@ jobs:
       # Run tests - only one version per job now, so no loop needed
       python -m pytest $TEST_PATHS -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results-$(HOST_INDEX)-$(TEST_GROUP).xml
     displayName: 'Run $(DISPLAY_NAME)'
+    condition: and(succeeded(), eq(variables.MOCK_SITE_READY, 'true'))
     env:
       HOST_VERSION: $(HOST_VERSION)
       PYAZURE_WEBHOST_DEBUG: 1

@@ -13,6 +13,7 @@ To use these tasks, you can run the following commands:
 
 """
 import os
+import errno
 import pathlib
 import shutil
 import sys
@@ -258,7 +259,7 @@ def wait_for_server(url, timeout=60, interval=2):
                 if 200 <= resp.status < 300:
                     print(f"Server {url} is ready (attempt {attempt})")
                     return True
-        except (urllib.error.URLError, urllib.error.HTTPError, OSError):
+        except Exception:
             pass
         remaining = deadline - time.monotonic()
         if remaining > 0:
@@ -303,7 +304,7 @@ class ExtensionBundleHTTPHandler(SimpleHTTPRequestHandler):
         print(f"[MockServer] {self.address_string()} - {format % args}")
 
 
-def _start_mock_server(temp_dir, port=3000):
+def _start_mock_server(temp_dir, port=3000, _retries=0):
     """Start a mock HTTP server to serve ExtensionBundle files."""
     print(f"Starting mock server on port {port} serving {temp_dir}")
 
@@ -325,11 +326,10 @@ def _start_mock_server(temp_dir, port=3000):
 
         return server, server_thread
     except OSError as e:
-        if e.errno == 10048:  # Port already in use
-            print(f"Port {port} is already in use. Trying port {port + 1}")
-            return _start_mock_server(temp_dir, port + 1)
-        else:
+        if _retries >= 5:
             raise
+        print(f"Port {port} is unavailable ({e}). Trying port {port + 1}")
+        return _start_mock_server(temp_dir, port + 1, _retries + 1)
 
 
 @task
