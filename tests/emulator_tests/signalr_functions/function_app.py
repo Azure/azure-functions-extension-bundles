@@ -276,7 +276,7 @@ def remove_from_group(req: func.HttpRequest, signalRGroupActions: func.Out[str])
 )
 @app.blob_output(
     arg_name="$return",
-    path="python-worker-tests/signalr-connected.txt",
+    path="bundle-tests/signalr-connected.txt",
     connection="AzureWebJobsStorage"
 )
 def on_connected(invocation: str) -> str:
@@ -315,7 +315,7 @@ def on_connected(invocation: str) -> str:
 )
 @app.blob_output(
     arg_name="$return",
-    path="python-worker-tests/signalr-disconnected.txt",
+    path="bundle-tests/signalr-disconnected.txt",
     connection="AzureWebJobsStorage"
 )
 def on_disconnected(invocation: str) -> str:
@@ -355,7 +355,7 @@ def on_disconnected(invocation: str) -> str:
 )
 @app.blob_output(
     arg_name="$return",
-    path="python-worker-tests/signalr-message.txt",
+    path="bundle-tests/signalr-message.txt",
     connection="AzureWebJobsStorage"
 )
 def on_message(invocation: str) -> str:
@@ -391,7 +391,7 @@ def on_message(invocation: str) -> str:
 @app.route(route="get_connected_event")
 @app.blob_input(
     arg_name="file",
-    path="python-worker-tests/signalr-connected.txt",
+    path="bundle-tests/signalr-connected.txt",
     connection="AzureWebJobsStorage"
 )
 def get_connected_event(req: func.HttpRequest, file: func.InputStream) -> func.HttpResponse:
@@ -414,7 +414,7 @@ def get_connected_event(req: func.HttpRequest, file: func.InputStream) -> func.H
 @app.route(route="get_disconnected_event")
 @app.blob_input(
     arg_name="file",
-    path="python-worker-tests/signalr-disconnected.txt",
+    path="bundle-tests/signalr-disconnected.txt",
     connection="AzureWebJobsStorage"
 )
 def get_disconnected_event(req: func.HttpRequest, file: func.InputStream) -> func.HttpResponse:
@@ -437,7 +437,7 @@ def get_disconnected_event(req: func.HttpRequest, file: func.InputStream) -> fun
 @app.route(route="get_message_event")
 @app.blob_input(
     arg_name="file",
-    path="python-worker-tests/signalr-message.txt",
+    path="bundle-tests/signalr-message.txt",
     connection="AzureWebJobsStorage"
 )
 def get_message_event(req: func.HttpRequest, file: func.InputStream) -> func.HttpResponse:

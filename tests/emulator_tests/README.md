@@ -771,9 +771,9 @@ Tests are organized into groups for parallel CI execution. To add tests to CI, u
 | `name` | Unique identifier for the test group (used in matrix job names) |
 | `group` | Short identifier (used in artifact names) |
 | `files` | Space-separated list of test files to run |
-| `emulators` | Emulator to start: `none`, `cosmosdb`, `mysql`, `servicebus`, or `dts` |
+| `emulators` | Emulator to start: `none`, `cosmosdb`, `mysql`, `sql`, `servicebus`, `dts`, `kafka`, `rabbitmq`, or `signalr` |
 | `display` | Human-readable name shown in CI pipeline |
-| `stopEventHub` | Set to `"true"` if your emulator conflicts with EventHub ports |
+| `stopEventHub` | Set to `"true"` if your emulator conflicts with EventHub ports (see [Emulator Port Assignments](#emulator-port-assignments)) |
 
 **Adding Tests to Existing Groups**:
 
@@ -793,14 +793,41 @@ To add a new test file to an existing group, simply append it to the `files` fie
 2. If your tests require a new emulator, add the startup logic in `eng/ci/templates/jobs/emulator-tests.yml` under the "Start Additional Emulators" step
 3. Create Docker Compose configuration in `tests/emulator_tests/utils/your_emulator/docker-compose.yml`
 
-### 5. **Important Notes**
+### 5. **Emulator Port Assignments**
+
+The EventHub emulator binds to **host port 5672** (AMQP 1.0) as part of the base emulator set that starts for every test group. Any additional emulator that also uses the AMQP protocol must avoid this port to prevent a protocol-version handshake conflict.
+
+| Emulator | Protocol | Container Port | Host Port | Notes |
+| --- | --- | --- | --- | --- |
+| EventHub | AMQP 1.0 | 5672 | 5672 | Base emulator, always started first |
+| Azurite (Blob) | HTTP | 10000 | 10000 | Base emulator |
+| Azurite (Queue) | HTTP | 10001 | 10001 | Base emulator |
+| Azurite (Table) | HTTP | 10002 | 10002 | Base emulator |
+| RabbitMQ | AMQP 0-9-1 | 5672 | **5673** | Remapped to avoid EventHub conflict |
+| RabbitMQ Management | HTTP | 15672 | 15672 | |
+| Kafka | Kafka | 9092 | 9092 | |
+| Service Bus | AMQP 1.0 | 5672 | 5672 | Requires `stopEventHub: true` |
+
+**Why RabbitMQ uses port 5673:**
+
+RabbitMQ speaks AMQP 0-9-1 while the EventHub emulator speaks AMQP 1.0. If both bind to host port 5672, clients (such as the `pika` Python library) connect to the EventHub emulator instead of RabbitMQ and receive an incompatible protocol handshake, resulting in `pika.exceptions.IncompatibleProtocolError`. To prevent this:
+
+1. The RabbitMQ `docker-compose.yml` maps the container's internal port 5672 to **host port 5673**.
+2. The RabbitMQ test group sets `stopEventHub: true` as defense-in-depth.
+3. All CI environment variables (`RabbitMQConnectionString`, `RabbitMQHost`, `RabbitMQPort`) reference port 5673.
+
+The Service Bus emulator avoids this issue differently — it uses `stopEventHub: true` and takes over host port 5672 directly, since it also speaks AMQP 1.0 and there is no protocol mismatch.
+
+**When adding a new AMQP-based emulator**, check whether it conflicts with the EventHub emulator on port 5672 and either remap the host port or set `stopEventHub: true` (or both).
+
+### 6. **Important Notes**
 
 - **No host.json required**: The host.json file is automatically generated during test execution with the correct extension bundle configuration
 - **Function metadata**: Use `function.json` files to define triggers, inputs, and outputs for each function
 - **Test isolation**: Each test class gets its own Function Host instance for isolation
 - **Emulator dependencies**: Ensure required emulators (Azurite, Event Hubs, etc.) are running before tests
 
-### 6. **Test Structure Best Practices**
+### 7. **Test Structure Best Practices**
 
 - Group related functions in the same directory (e.g., `blob_functions/`, `http_functions/`)
 - Use descriptive test method names that indicate what scenario is being tested

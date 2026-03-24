@@ -30,7 +30,7 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 @app.function_name(name="eventgrid_trigger")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventgrid-triggered.txt",
+                 path="bundle-tests/test-eventgrid-triggered.txt",
                  connection="AzureWebJobsStorage")
 def eventgrid_trigger(event: func.EventGridEvent) -> str:
     """Process a single EventGridEvent and write result to blob storage."""
@@ -50,7 +50,7 @@ def eventgrid_trigger(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_eventgrid_triggered")
 @app.route(route="get_eventgrid_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-triggered.txt",
+                path="bundle-tests/test-eventgrid-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_eventgrid_triggered(req: func.HttpRequest,
                             file: func.InputStream) -> str:
@@ -66,7 +66,7 @@ def get_eventgrid_triggered(req: func.HttpRequest,
 @app.function_name(name="cloudevent_trigger")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-cloudevent-triggered.txt",
+                 path="bundle-tests/test-cloudevent-triggered.txt",
                  connection="AzureWebJobsStorage")
 def cloudevent_trigger(event: func.EventGridEvent) -> str:
     """Process a single CloudEvent and write result to blob storage.
@@ -89,7 +89,7 @@ def cloudevent_trigger(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_cloudevent_triggered")
 @app.route(route="get_cloudevent_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-cloudevent-triggered.txt",
+                path="bundle-tests/test-cloudevent-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_cloudevent_triggered(req: func.HttpRequest,
                              file: func.InputStream) -> str:
@@ -106,7 +106,7 @@ def get_cloudevent_triggered(req: func.HttpRequest,
 @app.function_name(name="eventgrid_event_construction")
 @app.route(route="eventgrid_event_construction")
 @app.blob_output(arg_name="outputblob",
-                 path="python-worker-tests/test-eventgrid-output.txt",
+                 path="bundle-tests/test-eventgrid-output.txt",
                  connection="AzureWebJobsStorage")
 def eventgrid_event_construction(req: func.HttpRequest,
                                  outputblob: func.Out[str]) -> func.HttpResponse:
@@ -149,7 +149,7 @@ def eventgrid_event_construction(req: func.HttpRequest,
 @app.function_name(name="get_eventgrid_event_construction")
 @app.route(route="get_eventgrid_event_construction")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-output.txt",
+                path="bundle-tests/test-eventgrid-output.txt",
                 connection="AzureWebJobsStorage")
 def get_eventgrid_event_construction(req: func.HttpRequest,
                                      file: func.InputStream) -> str:
@@ -164,7 +164,7 @@ def get_eventgrid_event_construction(req: func.HttpRequest,
 @app.function_name(name="cloudevent_construction")
 @app.route(route="cloudevent_construction")
 @app.blob_output(arg_name="outputblob",
-                 path="python-worker-tests/test-cloudevent-output.txt",
+                 path="bundle-tests/test-cloudevent-output.txt",
                  connection="AzureWebJobsStorage")
 def cloudevent_construction(req: func.HttpRequest,
                             outputblob: func.Out[str]) -> func.HttpResponse:
@@ -209,7 +209,7 @@ def cloudevent_construction(req: func.HttpRequest,
 @app.function_name(name="get_cloudevent_construction")
 @app.route(route="get_cloudevent_construction")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-cloudevent-output.txt",
+                path="bundle-tests/test-cloudevent-output.txt",
                 connection="AzureWebJobsStorage")
 def get_cloudevent_construction(req: func.HttpRequest,
                                 file: func.InputStream) -> str:
@@ -231,7 +231,7 @@ def get_cloudevent_construction(req: func.HttpRequest,
 @app.function_name(name="eventgrid_trigger_string_data")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventgrid-stringdata-triggered.txt",
+                 path="bundle-tests/test-eventgrid-stringdata-triggered.txt",
                  connection="AzureWebJobsStorage")
 def eventgrid_trigger_string_data(event: func.EventGridEvent) -> str:
     """Process EventGridEvent with string data payload."""
@@ -250,7 +250,7 @@ def eventgrid_trigger_string_data(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_eventgrid_stringdata_triggered")
 @app.route(route="get_eventgrid_stringdata_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-stringdata-triggered.txt",
+                path="bundle-tests/test-eventgrid-stringdata-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_eventgrid_stringdata_triggered(req: func.HttpRequest,
                                        file: func.InputStream) -> str:
@@ -264,7 +264,7 @@ def get_eventgrid_stringdata_triggered(req: func.HttpRequest,
 @app.function_name(name="eventgrid_trigger_array_data")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventgrid-arraydata-triggered.txt",
+                 path="bundle-tests/test-eventgrid-arraydata-triggered.txt",
                  connection="AzureWebJobsStorage")
 def eventgrid_trigger_array_data(event: func.EventGridEvent) -> str:
     """Process EventGridEvent with array data payload."""
@@ -283,7 +283,7 @@ def eventgrid_trigger_array_data(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_eventgrid_arraydata_triggered")
 @app.route(route="get_eventgrid_arraydata_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-arraydata-triggered.txt",
+                path="bundle-tests/test-eventgrid-arraydata-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_eventgrid_arraydata_triggered(req: func.HttpRequest,
                                       file: func.InputStream) -> str:
@@ -297,7 +297,7 @@ def get_eventgrid_arraydata_triggered(req: func.HttpRequest,
 @app.function_name(name="eventgrid_trigger_primitive_data")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventgrid-primitivedata-triggered.txt",
+                 path="bundle-tests/test-eventgrid-primitivedata-triggered.txt",
                  connection="AzureWebJobsStorage")
 def eventgrid_trigger_primitive_data(event: func.EventGridEvent) -> str:
     """Process EventGridEvent with primitive (number) data payload."""
@@ -315,7 +315,7 @@ def eventgrid_trigger_primitive_data(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_eventgrid_primitivedata_triggered")
 @app.route(route="get_eventgrid_primitivedata_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-primitivedata-triggered.txt",
+                path="bundle-tests/test-eventgrid-primitivedata-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_eventgrid_primitivedata_triggered(req: func.HttpRequest,
                                           file: func.InputStream) -> str:
@@ -329,7 +329,7 @@ def get_eventgrid_primitivedata_triggered(req: func.HttpRequest,
 @app.function_name(name="eventgrid_trigger_nested_data")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventgrid-nesteddata-triggered.txt",
+                 path="bundle-tests/test-eventgrid-nesteddata-triggered.txt",
                  connection="AzureWebJobsStorage")
 def eventgrid_trigger_nested_data(event: func.EventGridEvent) -> str:
     """Process EventGridEvent with nested object data payload."""
@@ -348,7 +348,7 @@ def eventgrid_trigger_nested_data(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_eventgrid_nesteddata_triggered")
 @app.route(route="get_eventgrid_nesteddata_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-nesteddata-triggered.txt",
+                path="bundle-tests/test-eventgrid-nesteddata-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_eventgrid_nesteddata_triggered(req: func.HttpRequest,
                                        file: func.InputStream) -> str:
@@ -363,7 +363,7 @@ def get_eventgrid_nesteddata_triggered(req: func.HttpRequest,
 @app.function_name(name="cloudevent_backcompat_trigger")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-cloudevent-backcompat-triggered.txt",
+                 path="bundle-tests/test-cloudevent-backcompat-triggered.txt",
                  connection="AzureWebJobsStorage")
 def cloudevent_backcompat_trigger(event: func.EventGridEvent) -> str:
     """Process CloudEvent in backward compatible mode.
@@ -384,7 +384,7 @@ def cloudevent_backcompat_trigger(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_cloudevent_backcompat_triggered")
 @app.route(route="get_cloudevent_backcompat_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-cloudevent-backcompat-triggered.txt",
+                path="bundle-tests/test-cloudevent-backcompat-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_cloudevent_backcompat_triggered(req: func.HttpRequest,
                                         file: func.InputStream) -> str:
@@ -399,7 +399,7 @@ def get_cloudevent_backcompat_triggered(req: func.HttpRequest,
 @app.function_name(name="eventgrid_trigger_missing_data")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventgrid-missingdata-triggered.txt",
+                 path="bundle-tests/test-eventgrid-missingdata-triggered.txt",
                  connection="AzureWebJobsStorage")
 def eventgrid_trigger_missing_data(event: func.EventGridEvent) -> str:
     """Process EventGridEvent with missing data field."""
@@ -423,7 +423,7 @@ def eventgrid_trigger_missing_data(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_eventgrid_missingdata_triggered")
 @app.route(route="get_eventgrid_missingdata_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-missingdata-triggered.txt",
+                path="bundle-tests/test-eventgrid-missingdata-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_eventgrid_missingdata_triggered(req: func.HttpRequest,
                                         file: func.InputStream) -> str:
@@ -438,7 +438,7 @@ def get_eventgrid_missingdata_triggered(req: func.HttpRequest,
 @app.function_name(name="eventgrid_trigger_null_data")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventgrid-nulldata-triggered.txt",
+                 path="bundle-tests/test-eventgrid-nulldata-triggered.txt",
                  connection="AzureWebJobsStorage")
 def eventgrid_trigger_null_data(event: func.EventGridEvent) -> str:
     """Process EventGridEvent with null data field."""
@@ -461,7 +461,7 @@ def eventgrid_trigger_null_data(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_eventgrid_nulldata_triggered")
 @app.route(route="get_eventgrid_nulldata_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-nulldata-triggered.txt",
+                path="bundle-tests/test-eventgrid-nulldata-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_eventgrid_nulldata_triggered(req: func.HttpRequest,
                                      file: func.InputStream) -> str:
@@ -476,7 +476,7 @@ def get_eventgrid_nulldata_triggered(req: func.HttpRequest,
 @app.function_name(name="eventgrid_trigger_empty_data")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventgrid-emptydata-triggered.txt",
+                 path="bundle-tests/test-eventgrid-emptydata-triggered.txt",
                  connection="AzureWebJobsStorage")
 def eventgrid_trigger_empty_data(event: func.EventGridEvent) -> str:
     """Process EventGridEvent with empty string data field."""
@@ -499,7 +499,7 @@ def eventgrid_trigger_empty_data(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_eventgrid_emptydata_triggered")
 @app.route(route="get_eventgrid_emptydata_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-emptydata-triggered.txt",
+                path="bundle-tests/test-eventgrid-emptydata-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_eventgrid_emptydata_triggered(req: func.HttpRequest,
                                       file: func.InputStream) -> str:
@@ -514,7 +514,7 @@ def get_eventgrid_emptydata_triggered(req: func.HttpRequest,
 @app.function_name(name="eventgrid_trigger_special_chars")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventgrid-specialchars-triggered.txt",
+                 path="bundle-tests/test-eventgrid-specialchars-triggered.txt",
                  connection="AzureWebJobsStorage")
 def eventgrid_trigger_special_chars(event: func.EventGridEvent) -> str:
     """Process EventGridEvent with special characters in fields."""
@@ -533,7 +533,7 @@ def eventgrid_trigger_special_chars(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_eventgrid_specialchars_triggered")
 @app.route(route="get_eventgrid_specialchars_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-specialchars-triggered.txt",
+                path="bundle-tests/test-eventgrid-specialchars-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_eventgrid_specialchars_triggered(req: func.HttpRequest,
                                          file: func.InputStream) -> str:
@@ -548,7 +548,7 @@ def get_eventgrid_specialchars_triggered(req: func.HttpRequest,
 @app.function_name(name="eventgrid_trigger_large_payload")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventgrid-largepayload-triggered.txt",
+                 path="bundle-tests/test-eventgrid-largepayload-triggered.txt",
                  connection="AzureWebJobsStorage")
 def eventgrid_trigger_large_payload(event: func.EventGridEvent) -> str:
     """Process EventGridEvent with a large data payload."""
@@ -569,7 +569,7 @@ def eventgrid_trigger_large_payload(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_eventgrid_largepayload_triggered")
 @app.route(route="get_eventgrid_largepayload_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-largepayload-triggered.txt",
+                path="bundle-tests/test-eventgrid-largepayload-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_eventgrid_largepayload_triggered(req: func.HttpRequest,
                                          file: func.InputStream) -> str:
@@ -583,7 +583,7 @@ def get_eventgrid_largepayload_triggered(req: func.HttpRequest,
 @app.function_name(name="eventgrid_trigger_duplicate_id")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventgrid-duplicateid-triggered.txt",
+                 path="bundle-tests/test-eventgrid-duplicateid-triggered.txt",
                  connection="AzureWebJobsStorage")
 def eventgrid_trigger_duplicate_id(event: func.EventGridEvent) -> str:
     """Process EventGridEvent - tests that duplicate IDs are handled."""
@@ -600,7 +600,7 @@ def eventgrid_trigger_duplicate_id(event: func.EventGridEvent) -> str:
 @app.function_name(name="get_eventgrid_duplicateid_triggered")
 @app.route(route="get_eventgrid_duplicateid_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-eventgrid-duplicateid-triggered.txt",
+                path="bundle-tests/test-eventgrid-duplicateid-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_eventgrid_duplicateid_triggered(req: func.HttpRequest,
                                         file: func.InputStream) -> str:

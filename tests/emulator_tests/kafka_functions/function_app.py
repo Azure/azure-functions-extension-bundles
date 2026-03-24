@@ -18,7 +18,7 @@ _kafka_metadata_result = {}
                    consumer_group="e2e_tests",
                    data_type="string")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-kafka-triggered.txt",
+                 path="bundle-tests/test-kafka-triggered.txt",
                  connection="AzureWebJobsStorage")
 def kafka_trigger(event: func.KafkaEvent) -> str:
     body = event.get_body()
@@ -30,7 +30,7 @@ def kafka_trigger(event: func.KafkaEvent) -> str:
 @app.function_name(name="get_kafka_triggered")
 @app.route(route="get_kafka_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-kafka-triggered.txt",
+                path="bundle-tests/test-kafka-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_kafka_triggered(req: func.HttpRequest,
                         file: func.InputStream) -> str:
@@ -56,7 +56,7 @@ def kafka_output(req: func.HttpRequest, event: func.Out[str]):
                    consumer_group="e2e_output_tests",
                    data_type="string")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-kafka-output-triggered.txt",
+                 path="bundle-tests/test-kafka-output-triggered.txt",
                  connection="AzureWebJobsStorage")
 def kafka_output_trigger(event: func.KafkaEvent) -> str:
     body = event.get_body()
@@ -68,7 +68,7 @@ def kafka_output_trigger(event: func.KafkaEvent) -> str:
 @app.function_name(name="get_kafka_output_triggered")
 @app.route(route="get_kafka_output_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-kafka-output-triggered.txt",
+                path="bundle-tests/test-kafka-output-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_kafka_output_triggered(req: func.HttpRequest,
                                file: func.InputStream) -> str:

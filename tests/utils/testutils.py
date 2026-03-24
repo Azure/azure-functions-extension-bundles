@@ -38,6 +38,8 @@ DEFAULT_PYTHON_ISOLATE_WORKER_DEPENDENCIES = '1'
 # SignalR emulator default connection string (used when AzureSignalRConnectionString is not set)
 # The emulator runs on port 8888 by default with a placeholder access key
 DEFAULT_SIGNALR_CONNECTION_STRING = "Endpoint=http://localhost;Port=8888;AccessKey=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGH;Version=1.0;"
+# RabbitMQ emulator default connection string (host port 5673 to avoid EventHub AMQP conflict on 5672)
+DEFAULT_RABBITMQ_CONNECTION_STRING = "amqp://guest:guest@localhost:5673"
 
 def _get_bundle_config():
     """Get the bundle configuration from bundleConfig.json."""
@@ -302,6 +304,7 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         'FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI': os.environ.get('FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI', DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI),
         "MySqlConnectionString": os.environ.get('MySqlConnectionString', DEFAULT_MYSQL_CONNECTION_STRING),
         "AzureSignalRConnectionString": os.environ.get('AzureSignalRConnectionString', DEFAULT_SIGNALR_CONNECTION_STRING),
+        "RabbitMQConnectionString": os.environ.get('RabbitMQConnectionString', DEFAULT_RABBITMQ_CONNECTION_STRING),
         "PYTHON_ISOLATE_WORKER_DEPENDENCIES": os.environ.get('PYTHON_ISOLATE_WORKER_DEPENDENCIES', DEFAULT_PYTHON_ISOLATE_WORKER_DEPENDENCIES),
         "WEBSITE_SITE_NAME": MYSQL_WEBSITE_SITE_NAME,
         "PYTHON_ENABLE_WORKER_EXTENSIONS": '1'
