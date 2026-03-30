@@ -1,7 +1,7 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "version": "5.3.7",
+    "majorVersion": "5",
     "name": "AzureStorage",
     "bindings": [
       "blobtrigger",
@@ -12,7 +12,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
-    "version": "5.3.7",
+    "majorVersion": "5",
     "name": "AzureStorageQueues",
     "bindings": [
       "queue",
@@ -29,7 +29,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
-    "version": "5.3.7",
+    "majorVersion": "5",
     "name": "AzureStorageBlobs",
     "bindings": [
       "blobtrigger",
@@ -64,7 +64,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "version": "3.12.2",
+    "majorVersion": "3",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -188,7 +188,7 @@
   },
   {
     "id": "System.Private.Uri",
-    "Version": "4.3.2",
+    "version": "4.3.2",
     "name": "SystemPrivateUri",
     "bindings": []
   },
@@ -243,7 +243,7 @@
     ]
   },
   {
-    "id": " System.Formats.Asn1",
+    "id": "System.Formats.Asn1",
     "version": "6.0.1",
     "name": "SystemFormatsAsn1",
     "bindings": []
