@@ -109,7 +109,7 @@ class TestBlobFunctions(testutils.WebHostTestCase):
                 response = r.json()
 
                 self.assertEqual(response['name'],
-                                 'python-worker-tests/test-blob-trigger.txt')
+                                 'bundle-tests/test-blob-trigger.txt')
                 self.assertEqual(response['content'], data)
 
                 break
@@ -141,7 +141,7 @@ class TestBlobFunctions(testutils.WebHostTestCase):
                 response = r.json()
 
                 self.assertEqual(response['name'],
-                                 'python-worker-tests/test-blob-trigger.txt')
+                                 'bundle-tests/test-blob-trigger.txt')
                 self.assertEqual(response['content'], data)
                 break
             # JSONDecodeError will be thrown if the response is empty.

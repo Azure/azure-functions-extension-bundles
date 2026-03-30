@@ -4,7 +4,7 @@ This guide covers the complete setup and execution of emulator tests for Azure F
 
 ## About This Testing Framework
 
-The original emulator test code is taken from <https://github.com/Azure/azure-functions-python-worker> and unchanged the test code. We use it for testing extension bundle scenario.
+The original emulator test code is taken from [Python worker](https://github.com/Azure/azure-functions-python-worker). We use it for testing extension bundle scenarios.
 
 **We modified the following:**
 
@@ -142,14 +142,18 @@ Start the Docker-based storage emulator using Docker Compose:
 # Start Azurite storage emulator using Docker Compose
 docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml up -d
 docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml up -d
+docker compose -f tests/emulator_tests/utils/sql/docker-compose.yml up -d
 
 # This will start:
 # - Azurite storage emulator on ports 10000, 10001, 10002
 # - Event Hubs emulator (if needed for testing)
+# - MySQL emulator on port 3307
+# - SQL Server emulator on port 1433
 
 # To verify services are running
 docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml ps
 docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml ps
+docker compose -f tests/emulator_tests/utils/sql/docker-compose.yml ps
 
 ```
 
@@ -166,6 +170,7 @@ docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmosdb-emul
 ```powershell
 docker compose -f tests/emulator_tests/utils/eventhub/docker-compose.yml down
 docker compose -f tests/emulator_tests/utils/mysql/docker-compose.yml down
+docker compose -f tests/emulator_tests/utils/sql/docker-compose.yml down
 
 ```
 
@@ -187,6 +192,8 @@ python -m venv venv
 ```
 
 ### 4. **Install Python Dependencies**
+
+Install the project with dev dependencies from `pyproject.toml`:
 
 ```powershell
 # Install with dev dependencies
@@ -247,51 +254,41 @@ According to the emulator you want to run, configure the following:
 
 ```powershell
 $env:AzureWebJobsEventHubConnectionString = "<Find the value on the official doc>"
-$env:AzureWebJobsCosmosDBConnectionString = "<Find the value on the official doc>"
+$env:AzureWebJobsCosmosDBConnectionString = "<Find the value on the official doc with replacing https to http>"
 $env:CosmosDBEmulatorUrl = "<Find the value on the official doc>"
 $env:CosmosDBEmulatorKey = "<Find the value on the official doc>"
-$env:AzureWebJobsServiceBusConnectionString = "<Find the value on the official doc with replacing https to http>"
-$env:AzureWebJobsSQLPassword = "<AnyPassword is fine>"
+$env:AzureWebJobsServiceBusConnectionString = "<Find the value on the official doc>"
+$env:AzureWebJobsSQLPassword = "<Your SQL password>"
+$env:SqlConnectionString = "Server=localhost,1433;Database=testdb;User Id=sa;Password=<Your SQL password>;TrustServerCertificate=True"
+# SignalR emulator (default connection string used automatically if not set)
+$env:AzureSignalRConnectionString = "Endpoint=http://localhost;Port=8888;AccessKey=<Your access key>;Version=1.0;"
 ```
 
 - [EventHubs emulator authentication](https://learn.microsoft.com/en-us/azure/event-hubs/test-locally-with-event-hub-emulator?tabs=docker-linux-container%2Cusing-kafka#interact-with-the-emulator)
 - [Cosmos DB emulator authentication](https://learn.microsoft.com/en-us/azure/cosmos-db/emulator?context=%2Fazure%2Fcosmos-db%2Fnosql%2Fcontext%2Fcontext#authentication)
 - [ServiceBus emulator authentication](https://learn.microsoft.com/en-us/azure/service-bus-messaging/test-locally-with-service-bus-emulator?tabs=automated-script#interact-with-the-emulator)
 - [SQL edge](https://docs.azure.cn/en-us/azure-sql-edge/disconnected-deployment)
+- [SignalR emulator](https://learn.microsoft.com/en-us/azure/azure-signalr/signalr-howto-emulator)
 
 ### 8. **Run Tests**
 
-Now you can run the emulator tests:```powershell
-
-#### Run all emulator tests
+Now you can run the emulator tests:
 
 ```powershell
+# Run all emulator tests
 cd ..
 python -m pytest tests/emulator_tests -v
 
-```
-
-#### Run a specific test file
-
-```powershell
+# Run a specific test file
 python -m pytest tests/emulator_tests/test_blob_functions.py -v
-```
 
-#### Run a specific test method
-
-```powershell
+# Run a specific test method
 python -m pytest tests/emulator_tests/test_blob_functions.py::TestBlobFunctions::test_blob_trigger -v
-```
 
-#### Run with extra verbose output
-
-```powershell
+# Run with extra verbose output
 python -m pytest tests/emulator_tests -v -s
-```
 
-#### Run with coverage report
-
-```powershell
+# Run with coverage report
 python -m pytest tests/emulator_tests --cov=utils --cov-report=html
 ```
 
@@ -300,6 +297,8 @@ python -m pytest tests/emulator_tests --cov=utils --cov-report=html
 For convenience, here's a PowerShell script that sets up everything:
 
 ```powershell
+# setup-emulator-tests.ps1
+
 # Navigate to tests directory
 Set-Location "C:\repo\azure-functions-extension-bundles\tests"
 
@@ -307,6 +306,9 @@ Set-Location "C:\repo\azure-functions-extension-bundles\tests"
 .\venv\Scripts\Activate.ps1
 
 # Set environment variables
+$env:CORE_TOOLS_EXE_PATH = "C:\repo\azure-functions-extension-bundles\tests\build\webhost\func.exe"
+$env:AzureWebJobsStorage = "UseDevelopmentStorage=true"
+$env:FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI = "http://localhost:3000"
 $env:PYAZURE_WEBHOST_DEBUG = "true"
 
 # Start background services (run each in separate terminals)
@@ -526,7 +528,6 @@ You can create additional debug configurations for different test files:
     "PYTHONPATH": "${workspaceFolder};${workspaceFolder}\\tests",
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI": "http://localhost:3000",
-    "PYTHON_ISOLATE_WORKER_DEPENDENCIES":"1",
     "CORE_TOOLS_EXE_PATH": "${workspaceFolder}\\tests\\build\\webhost\\func.exe",
     "PYAZURE_WEBHOST_DEBUG": "true"
   },
@@ -771,9 +772,9 @@ Tests are organized into groups for parallel CI execution. To add tests to CI, u
 | `name` | Unique identifier for the test group (used in matrix job names) |
 | `group` | Short identifier (used in artifact names) |
 | `files` | Space-separated list of test files to run |
-| `emulators` | Emulator to start: `none`, `cosmosdb`, `mysql`, `servicebus`, or `dts` |
+| `emulators` | Emulator to start: `none`, `cosmosdb`, `mysql`, `sql`, `servicebus`, `dts`, `kafka`, `rabbitmq`, or `signalr` |
 | `display` | Human-readable name shown in CI pipeline |
-| `stopEventHub` | Set to `"true"` if your emulator conflicts with EventHub ports |
+| `stopEventHub` | Set to `"true"` if your emulator conflicts with EventHub ports (see [Emulator Port Assignments](#emulator-port-assignments)) |
 
 **Adding Tests to Existing Groups**:
 
@@ -792,14 +793,41 @@ To add a new test file to an existing group, simply append it to the `files` fie
 2. If your tests require a new emulator, add the startup logic in `eng/ci/templates/jobs/emulator-tests.yml` under the "Start Additional Emulators" step
 3. Create Docker Compose configuration in `tests/emulator_tests/utils/your_emulator/docker-compose.yml`
 
-### 5. **Important Notes**
+### 5. **Emulator Port Assignments**
+
+The EventHub emulator binds to **host port 5672** (AMQP 1.0) as part of the base emulator set that starts for every test group. Any additional emulator that also uses the AMQP protocol must avoid this port to prevent a protocol-version handshake conflict.
+
+| Emulator | Protocol | Container Port | Host Port | Notes |
+| --- | --- | --- | --- | --- |
+| EventHub | AMQP 1.0 | 5672 | 5672 | Base emulator, always started first |
+| Azurite (Blob) | HTTP | 10000 | 10000 | Base emulator |
+| Azurite (Queue) | HTTP | 10001 | 10001 | Base emulator |
+| Azurite (Table) | HTTP | 10002 | 10002 | Base emulator |
+| RabbitMQ | AMQP 0-9-1 | 5672 | **5673** | Remapped to avoid EventHub conflict |
+| RabbitMQ Management | HTTP | 15672 | 15672 | |
+| Kafka | Kafka | 9092 | 9092 | |
+| Service Bus | AMQP 1.0 | 5672 | 5672 | Requires `stopEventHub: true` |
+
+**Why RabbitMQ uses port 5673:**
+
+RabbitMQ speaks AMQP 0-9-1 while the EventHub emulator speaks AMQP 1.0. If both bind to host port 5672, clients (such as the `pika` Python library) connect to the EventHub emulator instead of RabbitMQ and receive an incompatible protocol handshake, resulting in `pika.exceptions.IncompatibleProtocolError`. To prevent this:
+
+1. The RabbitMQ `docker-compose.yml` maps the container's internal port 5672 to **host port 5673**.
+2. The RabbitMQ test group sets `stopEventHub: true` as defense-in-depth.
+3. All CI environment variables (`RabbitMQConnectionString`, `RabbitMQHost`, `RabbitMQPort`) reference port 5673.
+
+The Service Bus emulator avoids this issue differently — it uses `stopEventHub: true` and takes over host port 5672 directly, since it also speaks AMQP 1.0 and there is no protocol mismatch.
+
+**When adding a new AMQP-based emulator**, check whether it conflicts with the EventHub emulator on port 5672 and either remap the host port or set `stopEventHub: true` (or both).
+
+### 6. **Important Notes**
 
 - **No host.json required**: The host.json file is automatically generated during test execution with the correct extension bundle configuration
 - **Function metadata**: Use `function.json` files to define triggers, inputs, and outputs for each function
 - **Test isolation**: Each test class gets its own Function Host instance for isolation
 - **Emulator dependencies**: Ensure required emulators (Azurite, Event Hubs, etc.) are running before tests
 
-### 6. **Test Structure Best Practices**
+### 7. **Test Structure Best Practices**
 
 - Group related functions in the same directory (e.g., `blob_functions/`, `http_functions/`)
 - Use descriptive test method names that indicate what scenario is being tested
