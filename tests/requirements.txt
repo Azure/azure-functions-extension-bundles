@@ -9,10 +9,9 @@ azure-functions
 azure-cosmos
 azure-eventhub
 confluent-kafka
+azure-functions-durable
 python-dateutil~=2.9.0
-fabric-user-data-functions
 
 # Additional utilities
 python-dotenv
-azure-functions-durable
 pika

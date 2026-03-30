@@ -78,7 +78,7 @@ namespace Build
 
             if (!FileUtility.DirectoryExists(Settings.TemplatesV1RootDirectory) || !FileUtility.FileExists(Settings.ResourcesEnUSFilePath))
             {
-                throw new Exception("Resource Copy failed");
+                Directory.Move(Settings.TemplatesV2Directory, Path.Join(Settings.TemplatesV2RootDirectory, "templates"));
             }
 
             if (!FileUtility.DirectoryExists(Settings.TemplatesV2RootDirectory))
@@ -161,38 +161,6 @@ namespace Build
                 FileUtility.EnsureDirectoryExists(Directory.GetParent(buildConfig.PublishBinDirectoryPath).FullName);
                 Directory.Move(Path.Combine(buildConfig.PublishDirectoryPath, "bin"), buildConfig.PublishBinDirectoryPath);
             }
-        }
-
-        public static void GenerateVulnerabilityReport()
-        {
-            Settings.WindowsBuildConfigurations.ForEach((config) => RunVulnerabilityReport(config));
-        }
-
-        public static void RunVulnerabilityReport(BuildConfiguration buildConfig)
-        {
-            string projectDirectory = Path.Combine(Settings.RootBuildDirectory, buildConfig.ConfigId.ToString());
-            string projectFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, "extensions.csproj");
-
-            var currectDirectory = Directory.GetCurrentDirectory();
-            try
-            {
-                Directory.SetCurrentDirectory(Settings.RootBuildDirectory);
-
-                Console.WriteLine(Directory.GetCurrentDirectory());
-                Console.WriteLine($"dotnet list \"{projectFilePath}\" package --include-transitive --vulnerable");
-
-                string output = Shell.GetOutput("dotnet", $"list \"{projectFilePath}\" package --include-transitive --vulnerable");
-
-                if (!output.Contains("has no vulnerable packages given the current sources."))
-                {
-                    Console.WriteLine(output);
-                    throw new Exception($"Vulnerabilities found in {projectFilePath}");
-                }
-            }
-            finally
-            {
-                Directory.SetCurrentDirectory(currectDirectory);
-            }
 
         }
 
@@ -264,22 +232,22 @@ namespace Build
             File.Copy(bundlePackageConfig.CsProjFilePath, projectPath);
 
             FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
-            ZipFile.CreateFromDirectory(bundlePath, bundlePackageConfig.GeneratedBundleZipFilePath, CompressionLevel.NoCompression, false);
+            ZipFile.CreateFromDirectory(bundlePath, bundlePackageConfig.GeneratedBundleZipFilePath, CompressionLevel.Optimal, false);
         }
 
-        public static void PackageNetCoreV3Bundle()
+        public static void PackageBundle()
         {
-            CreateExtensionBundle(Settings.BundlePackageNetCoreV3);
+            CreateExtensionBundle(Settings.BundlePackage);
         }
 
-        public static void PackageNetCoreV3BundlesLinux()
+        public static void PackageBundlesLinux()
         {
-            CreateExtensionBundle(Settings.BundlePackageNetCoreV3Linux);
+            CreateExtensionBundle(Settings.BundlePackageLinux);
         }
 
-        public static void PackageNetCoreV3BundlesWindows()
+        public static void PackageBundlesWindows()
         {
-            CreateExtensionBundle(Settings.BundlePackageNetCoreV3Any);
+            CreateExtensionBundle(Settings.BundlePackageAny);
             CreateExtensionBundle(Settings.BundlePackageNetCoreWindows);
         }
 
@@ -332,16 +300,16 @@ namespace Build
                 var indexFilePath = Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory, BundleConfiguration.Instance.ExtensionBundleId, Settings.IndexFileName);
                 FileUtility.Write(indexFilePath, JsonConvert.SerializeObject(indexFile));
 
-                AddBundleZipFile(bundleVersionDirectory, Settings.BundlePackageNetCoreV3);
+                AddBundleZipFile(bundleVersionDirectory, Settings.BundlePackage);
 
                 // Add bundle.json
                 CreateBundleJsonFile(bundleVersionDirectory);
 
                 // Add Csproj file
                 string projectPath = Path.Combine(bundleVersionDirectory, "extensions.csproj");
-                File.Copy(Settings.BundlePackageNetCoreV3.CsProjFilePath, projectPath);
+                File.Copy(Settings.BundlePackage.CsProjFilePath, projectPath);
 
-                ZipFile.CreateFromDirectory(Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory), Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}.zip"), CompressionLevel.NoCompression, false);
+                ZipFile.CreateFromDirectory(Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory), Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}.zip"), CompressionLevel.Optimal, false);
             }
         }
 
@@ -353,11 +321,11 @@ namespace Build
                 string packageBundleDirectory = Path.Combine(packageRootDirectoryPath, BundleConfiguration.Instance.ExtensionBundleId, BundleConfiguration.Instance.ExtensionBundleVersion);
                 FileUtility.EnsureDirectoryExists(packageBundleDirectory);
 
-                AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageNetCoreV3Any);
+                AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageAny);
                 AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageNetCoreWindows);
 
                 string packageZipFilePath = Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}_windows.zip");
-                ZipFile.CreateFromDirectory(packageRootDirectoryPath, packageZipFilePath, CompressionLevel.NoCompression, false);
+                ZipFile.CreateFromDirectory(packageRootDirectoryPath, packageZipFilePath, CompressionLevel.Optimal, false);
             }
         }
 
@@ -369,10 +337,10 @@ namespace Build
                 string packageBundleDirectory = Path.Combine(packageRootDirectoryPath, BundleConfiguration.Instance.ExtensionBundleId, BundleConfiguration.Instance.ExtensionBundleVersion);
                 FileUtility.EnsureDirectoryExists(packageBundleDirectory);
 
-                AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageNetCoreV3Linux);
+                AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageLinux);
 
                 string packageZipFilePath = Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}_linux.zip");
-                ZipFile.CreateFromDirectory(packageRootDirectoryPath, packageZipFilePath, CompressionLevel.NoCompression, false);
+                ZipFile.CreateFromDirectory(packageRootDirectoryPath, packageZipFilePath, CompressionLevel.Optimal, false);
             }
         }
 
