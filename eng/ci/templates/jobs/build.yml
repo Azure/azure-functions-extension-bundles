@@ -16,9 +16,6 @@ jobs:
       artifact: zip
 
   steps:
-  - task: NuGetAuthenticate@1
-    displayName: 'NuGet Authenticate'
-
   - task: DownloadBuildArtifacts@1
     inputs:
       buildType: 'specific'
@@ -31,13 +28,16 @@ jobs:
       downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'
     condition: ${{ parameters.official }}
 
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+
   - task: DotNetCoreCLI@2
     displayName: 'Build'
     inputs:
       command: 'run'
       workingDirectory: '.\build'
       ${{ if eq(parameters.official, false) }}:
-        arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
+        arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,PackageBundle,PackageBundlesWindows,PackageBundlesLinux'
 
   - ${{ if eq(parameters.official, true) }}:
     - task: CopyFiles@2

@@ -51,7 +51,7 @@ def _get_bundle_config():
         print(f"[DEBUG] Path exists: {bundle_config_path.exists()}")
         
     try:
-        with open(bundle_config_path, 'r') as f:
+        with open(bundle_config_path, 'r', encoding='utf-8-sig') as f:
             config = json.load(f)
             
             # Debug: Print the loaded config
@@ -298,6 +298,7 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         'host:logger:consoleLoggingMode': 'always',
         'AZURE_FUNCTIONS_ENVIRONMENT': 'development',
         'AzureWebJobsSecretStorageType': 'files',
+        'PYTHON_ENABLE_WORKER_EXTENSIONS': '1',
         'FUNCTIONS_WORKER_RUNTIME': 'python',
         'FUNCTIONS_WORKER_RUNTIME_VERSION': f'{sys.version_info.major}.{sys.version_info.minor}',  # Use current Python version
         'AzureWebJobsStorage': os.environ.get('AzureWebJobsStorage', 'UseDevelopmentStorage=true'),
@@ -306,8 +307,7 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         "AzureSignalRConnectionString": os.environ.get('AzureSignalRConnectionString', DEFAULT_SIGNALR_CONNECTION_STRING),
         "RabbitMQConnectionString": os.environ.get('RabbitMQConnectionString', DEFAULT_RABBITMQ_CONNECTION_STRING),
         "PYTHON_ISOLATE_WORKER_DEPENDENCIES": os.environ.get('PYTHON_ISOLATE_WORKER_DEPENDENCIES', DEFAULT_PYTHON_ISOLATE_WORKER_DEPENDENCIES),
-        "WEBSITE_SITE_NAME": MYSQL_WEBSITE_SITE_NAME,
-        "PYTHON_ENABLE_WORKER_EXTENSIONS": '1'
+        "WEBSITE_SITE_NAME": MYSQL_WEBSITE_SITE_NAME
     }  # Add connection strings from config
     if testconfig and 'azure' in testconfig:
         for key in ['storage_key', 'cosmosdb_key', 'eventhub_key', 

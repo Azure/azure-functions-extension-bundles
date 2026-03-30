@@ -57,7 +57,7 @@ extends:
     sdl:
       sourceRepositoriesToScan:
         include:
-        - repository: coretools
+          - repository: coretools
         runInSingleJob: true
     stages:
       - stage: RunUnitTests
