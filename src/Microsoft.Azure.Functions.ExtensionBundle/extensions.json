@@ -72,7 +72,7 @@
       "durableclient",
       "orchestrationclient"
     ],
-    "version": "3.10.1"
+    "version": "3.10.2"
   },
   {
     "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
