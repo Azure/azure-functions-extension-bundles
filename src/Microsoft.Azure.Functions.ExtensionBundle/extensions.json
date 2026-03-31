@@ -122,7 +122,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.AzureCosmosDb.Mongo",
-    "version": "1.1.0-preview",
+    "majorVersion": "1",
     "name": "CosmosDBMongo",
     "bindings": [
       "cosmosdbmongotrigger",
