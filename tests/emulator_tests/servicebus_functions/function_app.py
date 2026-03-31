@@ -17,7 +17,7 @@ def put_message(req: func.HttpRequest, msg: func.Out[str]):
 
 @app.route(route="get_servicebus_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-servicebus-triggered.txt",
+                path="bundle-tests/test-servicebus-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_servicebus_triggered(req: func.HttpRequest,
                              file: func.InputStream) -> str:
@@ -30,7 +30,7 @@ def get_servicebus_triggered(req: func.HttpRequest,
     connection="AzureWebJobsServiceBusConnectionString",
     queue_name="testqueue")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-servicebus-triggered.txt",
+                 path="bundle-tests/test-servicebus-triggered.txt",
                  connection="AzureWebJobsStorage")
 def servicebus_trigger(msg: func.ServiceBusMessage) -> str:
     result = json.dumps({
