@@ -35,6 +35,11 @@ DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI = 'http://localhost:3000'
 DEFAULT_MYSQL_CONNECTION_STRING = "Server=localhost;UserID=root;Password=password;Database=testdb;Port=3307"
 MYSQL_WEBSITE_SITE_NAME = "SampleMysqlPythonApp"
 DEFAULT_PYTHON_ISOLATE_WORKER_DEPENDENCIES = '1'
+# SignalR emulator default connection string (used when AzureSignalRConnectionString is not set)
+# The emulator runs on port 8888 by default with a placeholder access key
+DEFAULT_SIGNALR_CONNECTION_STRING = "Endpoint=http://localhost;Port=8888;AccessKey=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGH;Version=1.0;"
+# RabbitMQ emulator default connection string (host port 5673 to avoid EventHub AMQP conflict on 5672)
+DEFAULT_RABBITMQ_CONNECTION_STRING = "amqp://guest:guest@localhost:5673"
 
 def _get_bundle_config():
     """Get the bundle configuration from bundleConfig.json."""
@@ -46,7 +51,7 @@ def _get_bundle_config():
         print(f"[DEBUG] Path exists: {bundle_config_path.exists()}")
         
     try:
-        with open(bundle_config_path, 'r', encoding='utf-8-sig') as f:
+        with open(bundle_config_path, 'r') as f:
             config = json.load(f)
             
             # Debug: Print the loaded config
@@ -293,14 +298,16 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         'host:logger:consoleLoggingMode': 'always',
         'AZURE_FUNCTIONS_ENVIRONMENT': 'development',
         'AzureWebJobsSecretStorageType': 'files',
-        'PYTHON_ENABLE_WORKER_EXTENSIONS': '1',
         'FUNCTIONS_WORKER_RUNTIME': 'python',
         'FUNCTIONS_WORKER_RUNTIME_VERSION': f'{sys.version_info.major}.{sys.version_info.minor}',  # Use current Python version
         'AzureWebJobsStorage': os.environ.get('AzureWebJobsStorage', 'UseDevelopmentStorage=true'),
         'FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI': os.environ.get('FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI', DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI),
         "MySqlConnectionString": os.environ.get('MySqlConnectionString', DEFAULT_MYSQL_CONNECTION_STRING),
+        "AzureSignalRConnectionString": os.environ.get('AzureSignalRConnectionString', DEFAULT_SIGNALR_CONNECTION_STRING),
+        "RabbitMQConnectionString": os.environ.get('RabbitMQConnectionString', DEFAULT_RABBITMQ_CONNECTION_STRING),
         "PYTHON_ISOLATE_WORKER_DEPENDENCIES": os.environ.get('PYTHON_ISOLATE_WORKER_DEPENDENCIES', DEFAULT_PYTHON_ISOLATE_WORKER_DEPENDENCIES),
-        "WEBSITE_SITE_NAME": MYSQL_WEBSITE_SITE_NAME
+        "WEBSITE_SITE_NAME": MYSQL_WEBSITE_SITE_NAME,
+        "PYTHON_ENABLE_WORKER_EXTENSIONS": '1'
     }  # Add connection strings from config
     if testconfig and 'azure' in testconfig:
         for key in ['storage_key', 'cosmosdb_key', 'eventhub_key', 
