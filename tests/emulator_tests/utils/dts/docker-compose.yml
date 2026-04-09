@@ -9,4 +9,3 @@ services:
     ports:
       - "8080:8080" # Durable Task Scheduler endpoint
       - "8082:8082" # Dashboard
-

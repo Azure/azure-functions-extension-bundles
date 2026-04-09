@@ -1,0 +1,299 @@
+#!/usr/bin/env pwsh
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
+<#
+.SYNOPSIS
+    Builds multiple versions of Azure Functions Core Tools based on latest host tags.
+
+.DESCRIPTION
+    This script:
+    1. Fetches the latest N host tags from azure-functions-host repository
+    2. For each tag version:
+       - Updates Packages.props with the host version
+       - Runs validate-worker-versions.ps1 to sync worker versions
+       - Builds the core tools with that version
+    3. Outputs all build artifacts
+
+.PARAMETER Count
+    Number of latest host tags to build (default: 2)
+
+.PARAMETER Pattern
+    Version pattern to match host tags (default: v4.10)
+    Example: "v4.10" matches v4.1046.100, v4.1047.200
+    Update when moving to new major/minor versions (e.g., v4.11, v5.0)
+
+.PARAMETER Configuration
+    Build configuration - Debug or Release (default: Release)
+
+.PARAMETER CloneDir
+    Directory where the core-tools repository is located
+
+.EXAMPLE
+    .\build-multi-version-core-tools.ps1 -Count 2 -Pattern "v4.10" -Configuration Release
+#>
+
+param(
+    [int]$Count = 2,
+    [string]$Pattern = "v4.10",
+    [string]$Configuration = "Release",
+    [string]$CloneDir = ""
+)
+
+$ErrorActionPreference = "Stop"
+
+Write-Host "===========================================================" -ForegroundColor Cyan
+Write-Host "Multi-Version Azure Functions Core Tools Build Script" -ForegroundColor Cyan
+Write-Host "===========================================================" -ForegroundColor Cyan
+Write-Host "Building $Count version(s) of Core Tools" -ForegroundColor Yellow
+Write-Host "Configuration: $Configuration" -ForegroundColor Yellow
+Write-Host "===========================================================" -ForegroundColor Cyan
+
+# Get the script directory
+$ScriptDir = $PSScriptRoot
+$RepoRoot = Split-Path (Split-Path (Split-Path $ScriptDir -Parent) -Parent) -Parent
+
+# Set default CloneDir if not provided
+if ([string]::IsNullOrEmpty($CloneDir)) {
+    $CloneDir = Join-Path $RepoRoot "tests\build\core-tools-source"
+}
+
+# Resolve paths
+if (Test-Path $CloneDir) {
+    $CloneDir = Resolve-Path $CloneDir
+} else {
+    Write-Error "Clone directory does not exist: $CloneDir"
+    exit 1
+}
+$PackagesPropsPath = Join-Path $CloneDir "eng/build/Packages.props"
+$UpdateVersionsScript = Join-Path $ScriptDir "update-core-tools-versions.ps1"
+$GetLatestTagsScript = Join-Path $ScriptDir "get-latest-host-tags.ps1"
+
+Write-Host "`nPaths:" -ForegroundColor Yellow
+Write-Host "  Repo Root: $RepoRoot"
+Write-Host "  Clone Dir: $CloneDir"
+Write-Host "  Packages.props: $PackagesPropsPath"
+Write-Host "  Update Versions Script: $UpdateVersionsScript"
+Write-Host ""
+
+# Verify required files exist
+if (-not (Test-Path $PackagesPropsPath)) {
+    Write-Error "Packages.props not found at: $PackagesPropsPath"
+    exit 1
+}
+
+if (-not (Test-Path $UpdateVersionsScript)) {
+    Write-Error "update-core-tools-versions.ps1 not found at: $UpdateVersionsScript"
+    exit 1
+}
+
+if (-not (Test-Path $GetLatestTagsScript)) {
+    Write-Error "get-latest-host-tags.ps1 not found at: $GetLatestTagsScript"
+    exit 1
+}
+
+# Step 1: Get latest host tags
+Write-Host "Step 1: Fetching latest $Count host tag(s) matching pattern $Pattern..." -ForegroundColor Cyan
+$latestTags = & $GetLatestTagsScript -Count $Count -Pattern $Pattern
+
+if (-not $latestTags) {
+    Write-Error "Failed to fetch host tags"
+    exit 1
+}
+
+Write-Host "`nFound $($latestTags.Count) tag(s) to build:" -ForegroundColor Green
+$latestTags | ForEach-Object {
+    Write-Host "  - $($_.Tag) -> $($_.VersionNoPrefix)" -ForegroundColor White
+}
+
+# Backup all files that update-core-tools-versions.ps1 modifies
+# This ensures clean state for each version build
+$BackupFiles = @{
+    PackagesProps = @{
+        Path = $PackagesPropsPath
+        Backup = "$PackagesPropsPath.backup"
+    }
+    GlobalJson = @{
+        Path = Join-Path $CloneDir "global.json"
+        Backup = Join-Path $CloneDir "global.json.backup"
+    }
+    StartupCs = @{
+        Path = Join-Path $CloneDir "src\Cli\func\Actions\HostActions\Startup.cs"
+        Backup = Join-Path $CloneDir "src\Cli\func\Actions\HostActions\Startup.cs.backup"
+    }
+    DirectoryVersionProps = @{
+        Path = Join-Path $CloneDir "src\Cli\func\Directory.Version.props"
+        Backup = Join-Path $CloneDir "src\Cli\func\Directory.Version.props.backup"
+    }
+}
+
+Write-Host "`nBacking up files that will be modified..." -ForegroundColor Gray
+foreach ($fileKey in $BackupFiles.Keys) {
+    $fileInfo = $BackupFiles[$fileKey]
+    if (Test-Path $fileInfo.Path) {
+        Copy-Item $fileInfo.Path $fileInfo.Backup -Force
+        Write-Host "  ✓ Backed up: $($fileInfo.Path)" -ForegroundColor Green
+    } else {
+        Write-Host "  - Skipped (not found): $($fileInfo.Path)" -ForegroundColor Gray
+    }
+}
+
+# Array to store build results
+$buildResults = @()
+
+try {
+    # Step 2: Build each version
+    $versionIndex = 1
+    foreach ($tagInfo in $latestTags) {
+        $hostVersion = $tagInfo.VersionNoPrefix
+        
+        Write-Host "`n===========================================================" -ForegroundColor Cyan
+        Write-Host "Building Version $versionIndex of $($latestTags.Count): $hostVersion" -ForegroundColor Cyan
+        Write-Host "===========================================================" -ForegroundColor Cyan
+        
+        # Restore all modified files to original state before each build
+        Write-Host "`nRestoring files to original state..." -ForegroundColor Gray
+        foreach ($fileKey in $BackupFiles.Keys) {
+            $fileInfo = $BackupFiles[$fileKey]
+            if (Test-Path $fileInfo.Backup) {
+                Copy-Item $fileInfo.Backup $fileInfo.Path -Force
+                Write-Host "  ✓ Restored: $($fileInfo.Path)" -ForegroundColor Green
+            }
+        }
+            
+        # Step 2a: Update host and worker versions in Packages.props
+        Write-Host "`nStep 2.$versionIndex.a: Updating host and worker versions to $hostVersion" -ForegroundColor Yellow
+        
+        try {
+            & $UpdateVersionsScript -HostVersion $hostVersion -PackagesPropsPath $PackagesPropsPath
+            
+            if ($LASTEXITCODE -ne 0) {
+                throw "update-core-tools-versions.ps1 failed with exit code $LASTEXITCODE"
+            }
+            
+            Write-Host "  ✓ Host and worker versions updated successfully" -ForegroundColor Green
+        }
+        catch {
+            throw "Failed to update versions: $_"
+        }
+        
+        # Step 2b: Build core tools
+        Write-Host "`nStep 2.$versionIndex.b: Building Core Tools for version $hostVersion..." -ForegroundColor Yellow
+        
+        $buildScript = Join-Path $ScriptDir "build-core-tools.ps1"
+        # Use version-specific output directory to prevent overwriting
+        $versionZipDir = "artifacts-coretools-zip-$hostVersion"
+        $buildOutput = & $buildScript -Configuration $Configuration -CoreToolsDir $CloneDir -ZipOutputDir $versionZipDir
+        
+        if ($LASTEXITCODE -ne 0) {
+            throw "Core Tools build failed with exit code $LASTEXITCODE"
+        }
+        
+        # Step 2c: Copy and rename zip files to consolidated artifacts directory
+        Write-Host "`nStep 2.$versionIndex.c: Consolidating artifacts for host version $hostVersion..." -ForegroundColor Yellow
+        
+        $tempZipDir = Join-Path $CloneDir $versionZipDir
+        $finalZipDir = Join-Path $CloneDir "artifacts-coretools-zip"
+        
+        # Create final directory if it doesn't exist
+        if (-not (Test-Path $finalZipDir)) {
+            New-Item -ItemType Directory -Path $finalZipDir -Force | Out-Null
+        }
+        
+        if (Test-Path $tempZipDir) {
+            # Get only the first zip file to avoid overwrites if multiple exist
+            $zipFile = Get-ChildItem -Path $tempZipDir -Filter "*.zip" | Select-Object -First 1
+            
+            if ($zipFile) {
+                $oldName = $zipFile.Name
+                # Use iteration-prefixed naming: {iteration}-cli-host-{version}.zip
+                $newName = "$versionIndex-cli-host-$hostVersion.zip"
+                $destPath = Join-Path $finalZipDir $newName
+                
+                Copy-Item -Path $zipFile.FullName -Destination $destPath -Force
+                Write-Host "  Copied and renamed: $oldName -> $newName" -ForegroundColor Green
+            } else {
+                Write-Warning "  No zip files found in $tempZipDir"
+            }
+            
+            # Clean up version-specific directory
+            Remove-Item -Path $tempZipDir -Recurse -Force
+        }
+        
+        # Step 2d: Clean up intermediate build artifacts to save disk space
+        Write-Host "`nStep 2.$versionIndex.d: Cleaning up intermediate build artifacts..." -ForegroundColor Yellow
+        
+        $artifactsDir = Join-Path $CloneDir "artifacts"
+        if (Test-Path $artifactsDir) {
+            Remove-Item -Path $artifactsDir -Recurse -Force
+            Write-Host "  ✓ Removed artifacts directory" -ForegroundColor Green
+        }
+        
+        # Clean up obj/bin directories in source
+        $srcDir = Join-Path $CloneDir "src"
+        if (Test-Path $srcDir) {
+            Get-ChildItem -Path $srcDir -Include "obj","bin" -Recurse -Directory -Force | ForEach-Object {
+                Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
+            }
+            Write-Host "  ✓ Cleaned obj/bin directories" -ForegroundColor Green
+        }
+        
+        # Store result
+        $buildResults += [PSCustomObject]@{
+            HostVersion = $hostVersion
+            Tag = $tagInfo.Tag
+            BuildOutput = $buildOutput
+            Success = $true
+        }
+        
+        Write-Host "`n  ✓ Successfully built Core Tools for version $hostVersion" -ForegroundColor Green
+        Write-Host "  Build Output: $buildOutput" -ForegroundColor White
+        
+        $versionIndex++
+    }
+    
+    # Summary
+    Write-Host "`n===========================================================" -ForegroundColor Cyan
+    Write-Host "Build Summary" -ForegroundColor Cyan
+    Write-Host "===========================================================" -ForegroundColor Cyan
+    Write-Host "Successfully built $($buildResults.Count) version(s):" -ForegroundColor Green
+    
+    $buildResults | ForEach-Object {
+        Write-Host "  ✓ $($_.Tag) ($($_.HostVersion))" -ForegroundColor Green
+        Write-Host "    Output: $($_.BuildOutput)" -ForegroundColor White
+    }
+    
+    # Verify artifacts directory
+    $finalZipDir = Join-Path $CloneDir "artifacts-coretools-zip"
+    Write-Host "`nVerifying artifacts in: $finalZipDir" -ForegroundColor Cyan
+    if (Test-Path $finalZipDir) {
+        $zipFiles = Get-ChildItem -Path $finalZipDir -Filter "*.zip"
+        Write-Host "Found $($zipFiles.Count) zip file(s):" -ForegroundColor Green
+        $zipFiles | ForEach-Object {
+            $sizeKB = [math]::Round($_.Length / 1KB, 2)
+            Write-Host "  - $($_.Name) (${sizeKB} KB)" -ForegroundColor White
+        }
+    } else {
+        Write-Host "##[error]Artifacts directory not found: $finalZipDir" -ForegroundColor Red
+    }
+    
+    Write-Host "`n===========================================================" -ForegroundColor Cyan
+    
+    # Return build results
+    return $buildResults
+    
+} catch {
+    Write-Error "Build failed: $_"
+    exit 1
+} finally {
+    # Restore all original files and clean up backups
+    Write-Host "`nRestoring original files and cleaning up backups..." -ForegroundColor Gray
+    foreach ($fileKey in $BackupFiles.Keys) {
+        $fileInfo = $BackupFiles[$fileKey]
+        if (Test-Path $fileInfo.Backup) {
+            Copy-Item $fileInfo.Backup $fileInfo.Path -Force
+            Remove-Item $fileInfo.Backup -Force
+            Write-Host "  ✓ Restored and cleaned up: $($fileInfo.Path)" -ForegroundColor Green
+        }
+    }
+}
