@@ -1,14 +1,18 @@
 pytest
 invoke
 mysql-connector-python
+pyodbc
 requests==2.*
 azure-functions
 
 # Azure SDK packages for emulator tests
 azure-cosmos
 azure-eventhub
-azure-functions-durable
+confluent-kafka
 python-dateutil~=2.9.0
+fabric-user-data-functions
 
 # Additional utilities
 python-dotenv
+azure-functions-durable
+pika

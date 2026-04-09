@@ -11,17 +11,6 @@ trigger:
     include:
       - 'v*'
 
-schedules:
-  # Ensure we build nightly to catch any new CVEs and report SDL often.
-  - cron: '0 0 * * *'
-    displayName: Nightly Build
-    branches:
-      include:
-        - main
-        - main-preview
-        - main-experimental
-    always: true
-
 # CI only, does not trigger on PRs.
 pr: none
 
@@ -35,9 +24,17 @@ resources:
       type: git
       name: engineering
       ref: refs/tags/release
+    - repository: coretools
+      type: git
+      name: azure.azure-functions-core-tools
+      ref: refs/heads/main
 
 variables:
   - template: /ci/variables/cfs.yml@eng
+  - name: hostTagsCount
+    value: 2
+  - name: hostTagPattern
+    value: 'v4.10'
 
 extends:
   template: v1/1ES.Official.PipelineTemplate.yml@1es
@@ -46,6 +43,14 @@ extends:
       name: 1es-pool-azfunc
       image: 1es-windows-2022
       os: windows
+      ${{ if eq( variables['Build.Reason'], 'Schedule' ) }}:
+        demands:
+          - Priority -equals Low
+    sdl:
+      sourceRepositoriesToScan:
+        include:
+          - repository: coretools
+        runInSingleJob: true
     stages:
       - stage: RunUnitTests
         dependsOn: []

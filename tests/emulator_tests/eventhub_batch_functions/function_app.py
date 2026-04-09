@@ -20,7 +20,7 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
     data_type="string",
     cardinality="many")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-eventhub-batch-triggered.txt",
+                 path="bundle-tests/test-eventhub-batch-triggered.txt",
                  connection="AzureWebJobsStorage")
 def eventhub_multiple(events) -> str:
     table_entries = []
@@ -49,7 +49,7 @@ def eventhub_output_batch(req: func.HttpRequest, out: func.Out[str]) -> str:
 @app.function_name(name="get_eventhub_batch_triggered")
 @app.route(route="get_eventhub_batch_triggered")
 @app.blob_input(arg_name="testEntities",
-                path="python-worker-tests/test-eventhub-batch-triggered.txt",
+                path="bundle-tests/test-eventhub-batch-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_eventhub_batch_triggered(req: func.HttpRequest, testEntities: func.InputStream):
     return func.HttpResponse(status_code=200, body=testEntities.read().decode('utf-8'))
@@ -59,7 +59,7 @@ def get_eventhub_batch_triggered(req: func.HttpRequest, testEntities: func.Input
 @app.function_name(name="get_metadata_batch_triggered")
 @app.route(route="get_metadata_batch_triggered")
 @app.blob_input(arg_name="file",
-                path="python-worker-tests/test-metadata-batch-triggered.txt",
+                path="bundle-tests/test-metadata-batch-triggered.txt",
                 connection="AzureWebJobsStorage")
 def get_metadata_batch_triggered(req: func.HttpRequest,
                                  file: func.InputStream) -> str:
@@ -78,7 +78,7 @@ def get_metadata_batch_triggered(req: func.HttpRequest,
     data_type="binary",
     cardinality="many")
 @app.blob_output(arg_name="$return",
-                 path="python-worker-tests/test-metadata-batch-triggered.txt",
+                 path="bundle-tests/test-metadata-batch-triggered.txt",
                  connection="AzureWebJobsStorage")
 def metadata_multiple(events: typing.List[func.EventHubEvent]) -> bytes:
     event_list = []

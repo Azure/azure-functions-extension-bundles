@@ -1,0 +1,39 @@
+----------------------------------------------------------------------
+To run this command manually, execute the following:
+
+Environment Variables:
+
+$env:AzureWebJobsScriptRoot = 'D:\PyFx\azure-functions-extension-bundles\tests\emulator_tests\sql_functions'
+$env:host:logger:consoleLoggingMode = 'always'
+$env:AZURE_FUNCTIONS_ENVIRONMENT = 'development'
+$env:AzureWebJobsSecretStorageType = 'files'
+$env:FUNCTIONS_WORKER_RUNTIME = 'python'
+$env:FUNCTIONS_WORKER_RUNTIME_VERSION = '3.11'
+$env:AzureWebJobsStorage = 'UseDevelopmentStorage=true'
+$env:FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI = 'http://localhost:3000'
+$env:MySqlConnectionString = 'Server=localhost;UserID=root;Password=password;Database=testdb;Port=3307'
+$env:PYTHON_ISOLATE_WORKER_DEPENDENCIES = '1'
+$env:WEBSITE_SITE_NAME = 'SampleMysqlPythonApp'
+$env:PYTHON_ENABLE_WORKER_EXTENSIONS = '1'
+
+Current Directory:
+
+cd D:\PyFx\azure-functions-extension-bundles\tests\emulator_tests\sql_functions
+
+Run core tools:
+
+C:\Users\manvkaur\AppData\Roaming\npm\func.cmd host start --verbose --port 52868
+
+----------------------------------------------------------------------
+host.json Configuration:
+
+{
+    "version": "2.0",
+    "logging": {"logLevel": {"default": "Trace"}},
+    "extensionBundle": {
+    "id": "Microsoft.Azure.Functions.ExtensionBundle",
+    "version": "4.33.0"
+    }
+}
+
+----------------------------------------------------------------------

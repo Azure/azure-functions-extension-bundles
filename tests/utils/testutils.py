@@ -35,6 +35,11 @@ DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI = 'http://localhost:3000'
 DEFAULT_MYSQL_CONNECTION_STRING = "Server=localhost;UserID=root;Password=password;Database=testdb;Port=3307"
 MYSQL_WEBSITE_SITE_NAME = "SampleMysqlPythonApp"
 DEFAULT_PYTHON_ISOLATE_WORKER_DEPENDENCIES = '1'
+# SignalR emulator default connection string (used when AzureSignalRConnectionString is not set)
+# The emulator runs on port 8888 by default with a placeholder access key
+DEFAULT_SIGNALR_CONNECTION_STRING = "Endpoint=http://localhost;Port=8888;AccessKey=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGH;Version=1.0;"
+# RabbitMQ emulator default connection string (host port 5673 to avoid EventHub AMQP conflict on 5672)
+DEFAULT_RABBITMQ_CONNECTION_STRING = "amqp://guest:guest@localhost:5673"
 
 def _get_bundle_config():
     """Get the bundle configuration from bundleConfig.json."""
@@ -46,7 +51,7 @@ def _get_bundle_config():
         print(f"[DEBUG] Path exists: {bundle_config_path.exists()}")
         
     try:
-        with open(bundle_config_path, 'r', encoding='utf-8-sig') as f:
+        with open(bundle_config_path, 'r') as f:
             config = json.load(f)
             
             # Debug: Print the loaded config
@@ -209,20 +214,36 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         testconfig.read(WORKER_CONFIG)    # Get Core Tools executable path
     coretools_exe = os.environ.get('CORE_TOOLS_EXE_PATH')
     if not coretools_exe:
+        # Check for HOST_VERSION to use version-specific directory
+        host_version = os.environ.get('HOST_VERSION')
+        
+        if not host_version:
+            raise RuntimeError('\n'.join([
+                'HOST_VERSION environment variable is required.',
+                'This should be set automatically in CI pipelines.',
+                'For local testing, set it manually:',
+                '  export HOST_VERSION=4.1046.100  # Linux/Mac',
+                '  $env:HOST_VERSION="4.1046.100"  # PowerShell',
+                '',
+                'Or set CORE_TOOLS_EXE_PATH to point directly to func binary.'
+            ]))
+        
         # Default to the webhost directory structure from test_setup.py
-        # BUILD_DIR / "webhost" is where test_setup.py extracts Core Tools
+        # BUILD_DIR / "webhost-{version}" is where test_setup.py extracts Core Tools
+        webhost_subdir = f"webhost-{host_version}"
+        
         if ON_WINDOWS:
-            default_path = BUILD_DIR / "webhost" / "func.exe"
+            default_path = BUILD_DIR / webhost_subdir / "func.exe"
         else:
-            default_path = BUILD_DIR / "webhost" / "func"
+            default_path = BUILD_DIR / webhost_subdir / "func"
         
         if default_path.exists():
             coretools_exe = str(default_path)
         else:
-            # Try to find Core Tools in the build directory (fallback)
+            # Try to find Core Tools in the build directory
             potential_paths = [
-                BUILD_DIR / "webhost" / "func.exe",
-                BUILD_DIR / "webhost" / "func"
+                BUILD_DIR / webhost_subdir / "func.exe",
+                BUILD_DIR / webhost_subdir / "func"
             ]
             for path in potential_paths:
                 if path.exists():
@@ -246,6 +267,10 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         ]))
 
     coretools_exe = coretools_exe.strip()
+    
+    # Log the selected version for debugging
+    host_version = os.environ.get('HOST_VERSION', 'default')
+    logging.info(f"HOST_VERSION: {host_version}")
     logging.info(f"Using Azure Functions Core Tools at: {coretools_exe}")
     
     # Check if the Core Tools binary exists and is executable
@@ -273,14 +298,16 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         'host:logger:consoleLoggingMode': 'always',
         'AZURE_FUNCTIONS_ENVIRONMENT': 'development',
         'AzureWebJobsSecretStorageType': 'files',
-        'PYTHON_ENABLE_WORKER_EXTENSIONS': '1',
         'FUNCTIONS_WORKER_RUNTIME': 'python',
         'FUNCTIONS_WORKER_RUNTIME_VERSION': f'{sys.version_info.major}.{sys.version_info.minor}',  # Use current Python version
         'AzureWebJobsStorage': os.environ.get('AzureWebJobsStorage', 'UseDevelopmentStorage=true'),
         'FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI': os.environ.get('FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI', DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI),
         "MySqlConnectionString": os.environ.get('MySqlConnectionString', DEFAULT_MYSQL_CONNECTION_STRING),
+        "AzureSignalRConnectionString": os.environ.get('AzureSignalRConnectionString', DEFAULT_SIGNALR_CONNECTION_STRING),
+        "RabbitMQConnectionString": os.environ.get('RabbitMQConnectionString', DEFAULT_RABBITMQ_CONNECTION_STRING),
         "PYTHON_ISOLATE_WORKER_DEPENDENCIES": os.environ.get('PYTHON_ISOLATE_WORKER_DEPENDENCIES', DEFAULT_PYTHON_ISOLATE_WORKER_DEPENDENCIES),
-        "WEBSITE_SITE_NAME": MYSQL_WEBSITE_SITE_NAME
+        "WEBSITE_SITE_NAME": MYSQL_WEBSITE_SITE_NAME,
+        "PYTHON_ENABLE_WORKER_EXTENSIONS": '1'
     }  # Add connection strings from config
     if testconfig and 'azure' in testconfig:
         for key in ['storage_key', 'cosmosdb_key', 'eventhub_key', 
