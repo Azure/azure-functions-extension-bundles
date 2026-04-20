@@ -113,10 +113,6 @@ $BackupFiles = @{
         Path = $PackagesPropsPath
         Backup = "$PackagesPropsPath.backup"
     }
-    GlobalJson = @{
-        Path = Join-Path $CloneDir "global.json"
-        Backup = Join-Path $CloneDir "global.json.backup"
-    }
     StartupCs = @{
         Path = Join-Path $CloneDir "src\Cli\func\Actions\HostActions\Startup.cs"
         Backup = Join-Path $CloneDir "src\Cli\func\Actions\HostActions\Startup.cs.backup"

@@ -80,6 +80,16 @@ Write-Host "Zip Output Directory: $ZipOutputDir" -ForegroundColor Yellow
 Write-Host "`nPublishing Azure.Functions.Cli with $Configuration configuration..." -ForegroundColor Yellow
 Write-Host "Output Directory: $OutputDir" -ForegroundColor Yellow
 
+# Detect target framework from the project file
+$projXml = [xml](Get-Content $ProjectPath)
+$targetFramework = $projXml.Project.PropertyGroup.TargetFramework | Where-Object { $_ } | Select-Object -First 1
+if (-not $targetFramework) {
+    $targetFramework = "net8.0"
+    Write-Host "Could not detect TargetFramework, defaulting to $targetFramework" -ForegroundColor Yellow
+} else {
+    Write-Host "Detected TargetFramework: $targetFramework" -ForegroundColor Green
+}
+
 Push-Location $CoreToolsDir
 
 try {
@@ -88,7 +98,7 @@ try {
         $ProjectPath,
         "-o", $OutputDir,
         "-c", $Configuration,
-        "-f", "net8.0",
+        "-f", $targetFramework,
         "--self-contained",
         "/p:ZipAfterPublish=true",
         "/p:ZipArtifactsPath=$ZipOutputDir"
