@@ -45,7 +45,20 @@ jobs:
   - script: |
       echo "Disk space before build:"
       df -h
-    displayName: 'Check Initial Disk Space'
+      
+      echo "Pruning unused Docker images to free disk space..."
+      docker image prune -af 2>/dev/null || true
+      
+      echo "Disk space after cleanup:"
+      df -h
+    displayName: 'Free Disk Space Before Build'
+
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK from core-tools global.json'
+    inputs:
+      packageType: 'sdk'
+      useGlobalJson: true
+      workingDirectory: '$(Agent.BuildDirectory)/core-tools'
   
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
