@@ -106,37 +106,23 @@ $latestTags | ForEach-Object {
     Write-Host "  - $($_.Tag) -> $($_.VersionNoPrefix)" -ForegroundColor White
 }
 
-# Backup all files that update-core-tools-versions.ps1 modifies
-# This ensures clean state for each version build
-$BackupFiles = @{
-    PackagesProps = @{
-        Path = $PackagesPropsPath
-        Backup = "$PackagesPropsPath.backup"
+# Determine the core-tools branch for a given host version
+# Host versions >= 4.1049.* require the liliankasem/host/4.1049.100 branch (net10.0 support)
+# Older host versions use the main branch (net8.0)
+$LilianBranch = "origin/liliankasem/host/4.1049.100"
+
+function Get-CoreToolsBranch {
+    param([string]$HostVersion)
+    $parts = $HostVersion -split '\.'
+    $minor = [int]$parts[1]
+    if ($minor -ge 1049) {
+        return $LilianBranch
     }
-    GlobalJson = @{
-        Path = Join-Path $CloneDir "global.json"
-        Backup = Join-Path $CloneDir "global.json.backup"
-    }
-    StartupCs = @{
-        Path = Join-Path $CloneDir "src\Cli\func\Actions\HostActions\Startup.cs"
-        Backup = Join-Path $CloneDir "src\Cli\func\Actions\HostActions\Startup.cs.backup"
-    }
-    DirectoryVersionProps = @{
-        Path = Join-Path $CloneDir "src\Cli\func\Directory.Version.props"
-        Backup = Join-Path $CloneDir "src\Cli\func\Directory.Version.props.backup"
-    }
+    return "origin/main"
 }
 
-Write-Host "`nBacking up files that will be modified..." -ForegroundColor Gray
-foreach ($fileKey in $BackupFiles.Keys) {
-    $fileInfo = $BackupFiles[$fileKey]
-    if (Test-Path $fileInfo.Path) {
-        Copy-Item $fileInfo.Path $fileInfo.Backup -Force
-        Write-Host "  ✓ Backed up: $($fileInfo.Path)" -ForegroundColor Green
-    } else {
-        Write-Host "  - Skipped (not found): $($fileInfo.Path)" -ForegroundColor Gray
-    }
-}
+# Capture current HEAD so we can restore in finally
+$originalRef = & git -C $CloneDir rev-parse HEAD
 
 # Array to store build results
 $buildResults = @()
@@ -151,15 +137,12 @@ try {
         Write-Host "Building Version $versionIndex of $($latestTags.Count): $hostVersion" -ForegroundColor Cyan
         Write-Host "===========================================================" -ForegroundColor Cyan
         
-        # Restore all modified files to original state before each build
-        Write-Host "`nRestoring files to original state..." -ForegroundColor Gray
-        foreach ($fileKey in $BackupFiles.Keys) {
-            $fileInfo = $BackupFiles[$fileKey]
-            if (Test-Path $fileInfo.Backup) {
-                Copy-Item $fileInfo.Backup $fileInfo.Path -Force
-                Write-Host "  ✓ Restored: $($fileInfo.Path)" -ForegroundColor Green
-            }
-        }
+        # Switch to the appropriate core-tools branch for this host version
+        $targetBranch = Get-CoreToolsBranch -HostVersion $hostVersion
+        Write-Host "`nSwitching core-tools to branch: $targetBranch" -ForegroundColor Yellow
+        & git -C $CloneDir checkout -f $targetBranch
+        & git -C $CloneDir clean -ffd -e artifacts-coretools-zip/
+        Write-Host "  ✓ Checked out $targetBranch" -ForegroundColor Green
             
         # Step 2a: Update host and worker versions in Packages.props
         Write-Host "`nStep 2.$versionIndex.a: Updating host and worker versions to $hostVersion" -ForegroundColor Yellow
@@ -286,14 +269,9 @@ try {
     Write-Error "Build failed: $_"
     exit 1
 } finally {
-    # Restore all original files and clean up backups
-    Write-Host "`nRestoring original files and cleaning up backups..." -ForegroundColor Gray
-    foreach ($fileKey in $BackupFiles.Keys) {
-        $fileInfo = $BackupFiles[$fileKey]
-        if (Test-Path $fileInfo.Backup) {
-            Copy-Item $fileInfo.Backup $fileInfo.Path -Force
-            Remove-Item $fileInfo.Backup -Force
-            Write-Host "  ✓ Restored and cleaned up: $($fileInfo.Path)" -ForegroundColor Green
-        }
-    }
+    # Restore original branch/commit
+    Write-Host "`nRestoring core-tools to original state..." -ForegroundColor Gray
+    & git -C $CloneDir checkout -f $originalRef 2>$null
+    & git -C $CloneDir clean -ffd -e artifacts-coretools-zip/ 2>$null
+    Write-Host "  ✓ Restored to original ref: $originalRef" -ForegroundColor Green
 }

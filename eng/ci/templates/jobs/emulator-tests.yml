@@ -38,6 +38,11 @@ jobs:
     fetchDepth: 1
 
   - script: |
+      cd $(Agent.BuildDirectory)/core-tools
+      git fetch origin liliankasem/host/4.1049.100 --depth=1
+    displayName: 'Fetch liliankasem branch for net10 host builds'
+
+  - script: |
       echo "Disk space before build:"
       df -h
     displayName: 'Check Initial Disk Space'

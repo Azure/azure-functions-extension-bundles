@@ -184,21 +184,6 @@ $workers = @{
     "Microsoft.Azure.Functions.PowerShellWorker.PS7.4" = "eng/build/Workers.Powershell.props"
 }
 
-# Fix until core tool can sync with new host changes
-# Define additional packages to sync from host repo
-$additionalPackages = @{
-    "Azure.Core" = "Directory.Packages.props"
-    "Azure.Storage.Blobs" = "Directory.Packages.props"
-    "Azure.Identity" = "Directory.Packages.props"
-    "System.Private.Uri" = "Directory.Packages.props"
-    "Microsoft.ApplicationInsights" = "Directory.Packages.props"
-}
-
-# Define packages with hardcoded versions (not in Directory.Packages.props directly but need updates)
-$hardcodedPackages = @{
-    "Microsoft.Identity.Client" = "4.78.0"
-}
-
 # Update worker versions
 Write-Host "`nUpdating worker versions from host repo..." -ForegroundColor Yellow
 
@@ -234,57 +219,13 @@ foreach ($packageName in $workers.Keys) {
     }
 }
 
-# Update additional packages
-Write-Host "`nUpdating additional packages from host repo..." -ForegroundColor Yellow
+# Save the updated Packages.props
+Write-Host "`nSaving updated Packages.props..." -ForegroundColor Yellow
+$packagesXml.Save($PackagesPropsPath)
+Write-Host "✓ Successfully updated Packages.props" -ForegroundColor Green
 
-foreach ($packageName in $additionalPackages.Keys) {
-    $sourceFile = $additionalPackages[$packageName]
-    
-    Write-Host "  Processing $packageName..." -ForegroundColor Gray
-    
-    # Get version from host repo
-    $hostPackageVersion = Get-WorkerVersionFromHost -WorkerPropsFile $sourceFile -PackageName $packageName
-    
-    if (-not $hostPackageVersion) {
-        Write-Warning "    Skipping $packageName - could not determine version from host"
-        continue
-    }
-    
-    # Find and update in Packages.props
-    $packageNode = Select-Xml -Xml $packagesXml -XPath "//PackageVersion[@Include='$packageName']" | 
-                  Select-Object -ExpandProperty Node
-    
-    if (-not $packageNode) {
-        # Package doesn't exist, add it
-        Write-Host "    Adding new package $packageName`: $hostPackageVersion" -ForegroundColor Cyan
-        
-        # Find the func ItemGroup (after the comment "<!-- func -->")
-        $funcItemGroup = $packagesXml.Project.ItemGroup | Where-Object { 
-            $_.PreviousSibling -and $_.PreviousSibling.Value -match "func"
-        } | Select-Object -First 1
-        
-        if ($funcItemGroup) {
-            # Create new PackageVersion element
-            $newPackage = $packagesXml.CreateElement("PackageVersion")
-            $newPackage.SetAttribute("Include", $packageName)
-            $newPackage.SetAttribute("Version", $hostPackageVersion)
-            $funcItemGroup.AppendChild($newPackage) | Out-Null
-        } else {
-            Write-Warning "    Could not find appropriate ItemGroup to add $packageName"
-            continue
-        }
-    } else {
-        # Package exists, update it
-        $oldPackageVersion = $packageNode.Version
-        
-        if ($oldPackageVersion -ne $hostPackageVersion) {
-            $packageNode.Version = $hostPackageVersion
-            Write-Host "    $packageName`: $oldPackageVersion -> $hostPackageVersion" -ForegroundColor Green
-        } else {
-            Write-Host "    $packageName`: $oldPackageVersion (no change)" -ForegroundColor Gray
-        }
-    }
-}
+# Get core tools root path for subsequent file modifications until core tools adopt the new host changes in v4.1047.100
+$coreToolsRoot = Split-Path (Split-Path (Split-Path $PackagesPropsPath -Parent) -Parent) -Parent
 
 # Parse version to compare for conditional updates
 $versionParts = $HostVersion -split '\.'
@@ -296,45 +237,6 @@ $patchVersion = [int]$versionParts[2]
 $shouldApplyHostFixes = ($majorVersion -gt 4) -or 
                         ($majorVersion -eq 4 -and $minorVersion -gt 1047) -or 
                         ($majorVersion -eq 4 -and $minorVersion -eq 1047 -and $patchVersion -ge 100)
-
-# Update hardcoded packages (only for host version >= 4.1047.100)
-if ($shouldApplyHostFixes) {
-    Write-Host "`nUpdating hardcoded package versions..." -ForegroundColor Yellow
-
-    foreach ($packageName in $hardcodedPackages.Keys) {
-        $targetVersion = $hardcodedPackages[$packageName]
-        
-        Write-Host "  Processing $packageName..." -ForegroundColor Gray
-        
-        # Find and update in Packages.props
-        $packageNode = Select-Xml -Xml $packagesXml -XPath "//PackageVersion[@Include='$packageName']" | 
-                      Select-Object -ExpandProperty Node
-        
-        if (-not $packageNode) {
-            Write-Warning "    $packageName not found in Packages.props"
-            continue
-        }
-        
-        $oldPackageVersion = $packageNode.Version
-        
-        if ($oldPackageVersion -ne $targetVersion) {
-            $packageNode.Version = $targetVersion
-            Write-Host "    $packageName`: $oldPackageVersion -> $targetVersion" -ForegroundColor Green
-        } else {
-            Write-Host "    $packageName`: $oldPackageVersion (no change)" -ForegroundColor Gray
-        }
-    }
-} else {
-    Write-Host "`nSkipping hardcoded package updates (host version $HostVersion < 4.1047.100)" -ForegroundColor Gray
-}
-
-# Save the updated Packages.props
-Write-Host "`nSaving updated Packages.props..." -ForegroundColor Yellow
-$packagesXml.Save($PackagesPropsPath)
-Write-Host "✓ Successfully updated Packages.props" -ForegroundColor Green
-
-# Get core tools root path for subsequent file modifications until core tools adopt the new host changes in v4.1047.100
-$coreToolsRoot = Split-Path (Split-Path (Split-Path $PackagesPropsPath -Parent) -Parent) -Parent
 
 # Update Startup.cs to remove deprecated IApplicationLifetime usage (for host version >= 4.1047.100)
 Write-Host "`nChecking for Startup.cs updates..." -ForegroundColor Yellow
