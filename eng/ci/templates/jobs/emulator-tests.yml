@@ -41,9 +41,6 @@ jobs:
       echo "Disk space before build:"
       df -h
       
-      echo "Pruning unused Docker images to free disk space..."
-      docker image prune -af 2>/dev/null || true
-      
       echo "Removing .git directory from core-tools to free disk space..."
       rm -rf $(Agent.BuildDirectory)/core-tools/.git 2>/dev/null || true
       
