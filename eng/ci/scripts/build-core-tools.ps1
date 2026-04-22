@@ -93,6 +93,28 @@ if (-not $targetFramework) {
 Push-Location $CoreToolsDir
 
 try {
+    # Restore packages first, then publish with --no-restore to avoid redundant downloads
+    $restoreArgs = @(
+        "restore",
+        $ProjectPath,
+        "-f", $targetFramework
+    )
+    
+    if (-not [string]::IsNullOrEmpty($Runtime)) {
+        $restoreArgs += "-r", $Runtime
+    }
+    
+    Write-Host "Running: dotnet $($restoreArgs -join ' ')" -ForegroundColor Cyan
+    & dotnet $restoreArgs 2>&1 | Tee-Object -Variable restoreLogs
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "`n##[error]dotnet restore failed with exit code $LASTEXITCODE" -ForegroundColor Red
+        $restoreLogs | ForEach-Object { Write-Host $_ }
+        throw "Restore failed with exit code $LASTEXITCODE"
+    }
+    
+    Write-Host "✓ Restore completed successfully" -ForegroundColor Green
+
     $publishArgs = @(
         "publish",
         $ProjectPath,
@@ -100,6 +122,7 @@ try {
         "-c", $Configuration,
         "-f", $targetFramework,
         "--self-contained",
+        "--no-restore",
         "/p:ZipAfterPublish=true",
         "/p:ZipArtifactsPath=$ZipOutputDir"
     )

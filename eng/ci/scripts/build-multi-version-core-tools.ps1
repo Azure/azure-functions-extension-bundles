@@ -233,6 +233,11 @@ try {
             }
             Write-Host "  ✓ Cleaned obj/bin directories" -ForegroundColor Green
         }
+
+        # Clean NuGet cache between builds to reclaim disk space
+        Write-Host "  Clearing NuGet cache..." -ForegroundColor Gray
+        & dotnet nuget locals all --clear 2>$null
+        Write-Host "  ✓ Cleared NuGet cache" -ForegroundColor Green
         
         # Store result
         $buildResults += [PSCustomObject]@{

@@ -43,6 +43,39 @@ if (-not (Test-Path $PackagesPropsPath)) {
 
 Write-Host "Packages.props: $PackagesPropsPath" -ForegroundColor Yellow
 
+# Get core tools root path for global.json update
+$coreToolsRootForGlobal = Split-Path (Split-Path (Split-Path $PackagesPropsPath -Parent) -Parent) -Parent
+
+# Sync global.json with host repo
+$GlobalJsonPath = Join-Path $coreToolsRootForGlobal "global.json"
+if (Test-Path $GlobalJsonPath) {
+    Write-Host "`nSyncing global.json with host repo..." -ForegroundColor Yellow
+    
+    $hostGlobalJsonUri = "https://raw.githubusercontent.com/Azure/azure-functions-host/refs/tags/v$HostVersion/global.json"
+    
+    try {
+        $hostGlobalJsonContent = (Invoke-WebRequest -Uri $hostGlobalJsonUri -Headers @{"User-Agent" = "azure-functions-extension-bundles-emulator-tests"} -ErrorAction Stop).Content
+        $hostGlobalJson = $hostGlobalJsonContent | ConvertFrom-Json
+        $hostSdkVersion = $hostGlobalJson.sdk.version
+        
+        $localGlobalJson = Get-Content $GlobalJsonPath -Raw | ConvertFrom-Json
+        $localSdkVersion = $localGlobalJson.sdk.version
+        
+        if ($localSdkVersion -ne $hostSdkVersion) {
+            # Update SDK version from host repo
+            $localGlobalJson.sdk.version = $hostSdkVersion
+            $localGlobalJson.sdk.rollForward = "latestMajor"
+            $localGlobalJson | ConvertTo-Json -Depth 10 | Set-Content $GlobalJsonPath
+            Write-Host "  ✓ Updated global.json SDK: $localSdkVersion -> $hostSdkVersion (from host repo)" -ForegroundColor Green
+        } else {
+            Write-Host "  global.json SDK version: $localSdkVersion (no change)" -ForegroundColor Gray
+        }
+    } catch {
+        Write-Warning "  Could not fetch global.json from host repo: $_"
+        Write-Host "  Keeping existing global.json" -ForegroundColor Gray
+    }
+}
+
 # Set up GitHub API headers for compliance with GitHub API requirements
 $script:GitHubHeaders = @{
     "User-Agent" = "azure-functions-extension-bundles-emulator-tests"

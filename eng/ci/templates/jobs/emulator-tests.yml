@@ -40,17 +40,19 @@ jobs:
   - script: |
       echo "Disk space before build:"
       df -h
-    displayName: 'Check Initial Disk Space'
+      
+      echo "Pruning unused Docker images to free disk space..."
+      docker image prune -af 2>/dev/null || true
+      
+      echo "Removing .git directory from core-tools to free disk space..."
+      rm -rf $(Agent.BuildDirectory)/core-tools/.git 2>/dev/null || true
+      
+      echo "Disk space after cleanup:"
+      df -h
+    displayName: 'Free Disk Space Before Build'
   
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
-
-  - task: UseDotNet@2
-    displayName: 'Install .NET SDK from core-tools global.json'
-    inputs:
-      packageType: 'sdk'
-      useGlobalJson: true
-      workingDirectory: '$(Agent.BuildDirectory)/core-tools'
     
   - task: PowerShell@2
     displayName: 'Build Azure Functions Core Tools'
@@ -72,10 +74,6 @@ jobs:
       # Clean NuGet cache
       echo "Clearing NuGet cache..."
       rm -rf ~/.nuget/packages/* 2>/dev/null || true
-      
-      # Remove git history from core-tools to save space
-      echo "Removing git history..."
-      rm -rf $(Agent.BuildDirectory)/core-tools/.git 2>/dev/null || true
       
       echo "Disk space after cleanup:"
       df -h
