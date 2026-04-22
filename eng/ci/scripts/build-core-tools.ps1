@@ -97,7 +97,7 @@ try {
     $restoreArgs = @(
         "restore",
         $ProjectPath,
-        "-f", $targetFramework
+        "/p:TargetFramework=$targetFramework"
     )
     
     if (-not [string]::IsNullOrEmpty($Runtime)) {
