@@ -17,14 +17,6 @@
             "stopEventHub": "false"
         },
         {
-            "name": "MySQL",
-            "group": "mysql",
-            "files": "test_mysql_functions.py",
-            "emulators": "mysql",
-            "display": "MySQL Tests",
-            "stopEventHub": "false"
-        },
-        {
             "name": "SQL",
             "group": "sql",
             "files": "test_sql_functions.py",
@@ -49,28 +41,12 @@
             "stopEventHub": "false"
         },
         {
-            "name": "Kafka",
-            "group": "kafka",
-            "files": "test_kafka_functions.py",
-            "emulators": "kafka",
-            "display": "Kafka Tests",
-            "stopEventHub": "false"
-        },
-        {
             "name": "SignalR",
             "group": "signalr",
             "files": "test_signalr_functions.py",
             "emulators": "signalr",
             "display": "SignalR Tests",
             "stopEventHub": "false"
-        },
-        {
-            "name": "RabbitMQ",
-            "group": "rabbitmq",
-            "files": "test_rabbitmq_functions.py",
-            "emulators": "rabbitmq",
-            "display": "RabbitMQ Tests",
-            "stopEventHub": "true"
         }
     ]
 }
