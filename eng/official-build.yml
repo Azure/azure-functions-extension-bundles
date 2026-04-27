@@ -55,8 +55,6 @@ extends:
       ${{ if eq( variables['Build.Reason'], 'Schedule' ) }}:
         demands:
         - Priority -equals Low
-    settings:
-      networkIsolationPolicy: Good, PyPi
     sdl:
       sourceRepositoriesToScan:
         include:
