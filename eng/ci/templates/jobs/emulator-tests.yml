@@ -300,6 +300,11 @@ jobs:
       architecture: 'x64'
     displayName: 'Set up Python 3.12'
 
+  - task: PipAuthenticate@1
+    displayName: 'PyPI Authenticate'
+    inputs:
+      artifactFeeds: 'public/azure-functions-extension-bundles-feed'
+
   - script: |
       cd tests
       python -m venv venv
@@ -307,6 +312,8 @@ jobs:
       pip install --upgrade pip
       pip install --cache-dir ~/.cache/pip -r requirements.txt
     displayName: 'Install Python Dependencies (cached)'
+    env:
+      PIP_INDEX_URL: $(PIP_INDEX_URL)
 
   # Install Microsoft ODBC Driver 18 for SQL Server (required for SQL tests)
   - script: |
