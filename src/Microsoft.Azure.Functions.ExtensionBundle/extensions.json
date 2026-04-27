@@ -312,5 +312,13 @@
       "mcpToolProperty",
       "mcpResourceTrigger"
     ]
+  },
+  {
+    "id": "Microsoft.Azure.Functions.Extensions.Connector",
+    "majorVersion": "0.1.1-alpha",
+    "name": "Connector",
+    "bindings": [
+      "connectorTrigger"
+    ]
   }
 ]
