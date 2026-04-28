@@ -40,7 +40,7 @@ jobs:
       - script: |
           echo "Disk space before build:"
           df -h
-        displayName: 'Check Initial Disk Space'
+        displayName: 'Check Disk Space Before Build'
 
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Authenticate'
@@ -56,6 +56,10 @@ jobs:
       - script: |
           echo "Cleaning up build artifacts to free disk space..."
 
+          # Remove .git directory (no longer needed after build)
+          echo "Removing core-tools .git directory..."
+          rm -rf $(Agent.BuildDirectory)/core-tools/.git 2>/dev/null || true
+
           # Remove source code (keep only artifacts)
           echo "Removing Core Tools source files..."
           find $(Agent.BuildDirectory)/core-tools -type f -name "*.cs" -delete 2>/dev/null || true
@@ -65,10 +69,6 @@ jobs:
           # Clean NuGet cache
           echo "Clearing NuGet cache..."
           rm -rf ~/.nuget/packages/* 2>/dev/null || true
-
-          # Remove git history from core-tools to save space
-          echo "Removing git history..."
-          rm -rf $(Agent.BuildDirectory)/core-tools/.git 2>/dev/null || true
 
           echo "Disk space after cleanup:"
           df -h
@@ -301,6 +301,11 @@ jobs:
           architecture: 'x64'
         displayName: 'Set up Python 3.12'
 
+      - task: PipAuthenticate@1
+        displayName: 'PyPI Authenticate'
+        inputs:
+          artifactFeeds: 'public/azure-functions-extension-bundles-feed'
+
       - script: |
           cd tests
           python -m venv venv
@@ -308,6 +313,8 @@ jobs:
           pip install --upgrade pip
           pip install --cache-dir ~/.cache/pip -r requirements.txt
         displayName: 'Install Python Dependencies (cached)'
+        env:
+          PIP_INDEX_URL: $(PIP_INDEX_URL)
 
       # Install Microsoft ODBC Driver 18 for SQL Server (required for SQL tests)
       - script: |
