@@ -310,7 +310,8 @@
     "bindings": [
       "mcpToolTrigger",
       "mcpToolProperty",
-      "mcpResourceTrigger"
+      "mcpResourceTrigger",
+      "mcpPromptTrigger"
     ]
   }
 ]
