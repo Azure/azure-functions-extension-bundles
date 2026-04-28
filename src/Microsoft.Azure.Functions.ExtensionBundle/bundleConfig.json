@@ -1,5 +1,5 @@
 {
   "bundleId": "Microsoft.Azure.Functions.ExtensionBundle.Preview",
-  "bundleVersion": "4.40.0",
+  "bundleVersion": "4.41.0",
   "isPreviewBundle": true
 }
