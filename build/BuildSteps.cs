@@ -343,21 +343,12 @@ namespace Build
             // Package using the same logic as other bundles, but reading from RU output dirs
             var ruPackageConfig = new BundlePackageConfiguration()
             {
-                PackageIdentifier = "RU",
+                PackageIdentifier = "RU_package",
                 ConfigBinariesToInclude = Settings.BundlePackageNetCoreWindows.ConfigBinariesToInclude,
                 CsProjFilePath = Path.Combine(Settings.RootBuildDirectory, $"ru_{ConfigId.any_any}", "extensions.csproj")
             };
 
             CreateExtensionBundle(ruPackageConfig, configPrefix: "ru");
-
-            // Create the final RU zip from the bundle output
-            string ruBundlePath = Path.Combine(Settings.RootBuildDirectory, ruPackageConfig.BundleName);
-            FileUtility.EnsureDirectoryExists(Settings.RUPackagePath);
-            FileUtility.CopyDirectory(ruBundlePath, Settings.RUPackagePath);
-
-            var RURootPackagePath = Directory.GetParent(Settings.RUPackagePath);
-            FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
-            ZipFile.CreateFromDirectory(RURootPackagePath.FullName, Path.Combine(Settings.ArtifactsDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package.zip"), CompressionLevel.Optimal, false);
         }
 
         public static void CreateCDNStoragePackage()
