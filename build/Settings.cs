@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
 using static Build.BasePath;
 
 namespace Build
@@ -7,6 +9,22 @@ namespace Build
     public static class Settings
     {
         public static string basePath = path;
+
+        public static readonly string RUExclusionsFilePath = Path.Combine(Path.GetFullPath(basePath), "src", "Microsoft.Azure.Functions.ExtensionBundle", "ruExclusions.json");
+
+        public static string[] RUExclusions { get; private set; } = LoadRUExclusions();
+
+        private static string[] LoadRUExclusions()
+        {
+            if (!File.Exists(RUExclusionsFilePath))
+            {
+                return Array.Empty<string>();
+            }
+
+            var content = File.ReadAllText(RUExclusionsFilePath);
+            var exclusions = JsonConvert.DeserializeObject<string[]>(content);
+            return exclusions ?? Array.Empty<string>();
+        }
 
         public static readonly string SourcePath = Path.GetFullPath(basePath + "/src/Microsoft.Azure.Functions.ExtensionBundle/");
         public static readonly string BuildPath = Path.Combine(Path.GetFullPath(basePath), "build");
