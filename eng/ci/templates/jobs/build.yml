@@ -51,7 +51,7 @@ jobs:
 
   - ${{ if eq(parameters.official, true) }}:
     - pwsh: |
-        $maxSize = 193986560  # 185 MB
+        $maxSize = 183500800  # 175 MB
         $ruZip = Get-ChildItem '$(Build.Repository.LocalPath)\artifacts\*_RU_package.zip'
         if (-not $ruZip) {
           Write-Error "RU package zip not found in artifacts directory"
