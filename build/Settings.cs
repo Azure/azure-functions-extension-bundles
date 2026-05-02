@@ -21,9 +21,17 @@ namespace Build
                 return Array.Empty<string>();
             }
 
-            var content = File.ReadAllText(RUExclusionsFilePath);
-            var exclusions = JsonConvert.DeserializeObject<string[]>(content);
-            return exclusions ?? Array.Empty<string>();
+            try
+            {
+                var content = File.ReadAllText(RUExclusionsFilePath);
+                var exclusions = JsonConvert.DeserializeObject<string[]>(content);
+                return exclusions ?? Array.Empty<string>();
+            }
+            catch (JsonException ex)
+            {
+                throw new InvalidOperationException(
+                    $"Failed to parse RU exclusions from '{RUExclusionsFilePath}': {ex.Message}", ex);
+            }
         }
 
         public static readonly string SourcePath = Path.GetFullPath(basePath + "/src/Microsoft.Azure.Functions.ExtensionBundle/");

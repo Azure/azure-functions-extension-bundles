@@ -47,16 +47,17 @@ jobs:
       inputs:
         command: 'run'
         workingDirectory: '.\build'
-        arguments: 'skip:Clean,DownloadTemplates,BuildBundleBinariesForWindows,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux'
+        arguments: 'CreateRUPackage skip:Clean,DownloadTemplates,BuildBundleBinariesForWindows,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,PackageNetCoreV3BundlesLinux'
 
   - ${{ if eq(parameters.official, true) }}:
     - pwsh: |
         $maxSize = 183500800  # 175 MB
-        $ruZip = Get-ChildItem '$(Build.Repository.LocalPath)\artifacts\*_RU_package.zip'
-        if (-not $ruZip) {
+        $ruZips = @(Get-ChildItem '$(Build.Repository.LocalPath)\artifacts\*_RU_package.zip')
+        if ($ruZips.Count -eq 0) {
           Write-Error "RU package zip not found in artifacts directory"
           exit 1
         }
+        $ruZip = $ruZips[0]
         $size = $ruZip.Length
         Write-Host "RU package size: $([math]::Round($size / 1MB, 2)) MB ($size bytes)"
         if ($size -gt $maxSize) {

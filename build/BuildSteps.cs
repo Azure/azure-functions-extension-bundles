@@ -245,6 +245,11 @@ namespace Build
                 var buildConfig = Settings.WindowsBuildConfigurations.FirstOrDefault(b => b.ConfigId == packageConfig) ??
                     Settings.LinuxBuildConfigurations.FirstOrDefault(b => b.ConfigId == packageConfig);
 
+                if (buildConfig == null)
+                {
+                    throw new InvalidOperationException($"Build configuration for ConfigId '{packageConfig}' not found.");
+                }
+
                 string sourceBinPath = bundlePackageConfig.OutputDirectoryPrefix != null
                     ? Path.Combine(Settings.RootBinDirectory, $"{bundlePackageConfig.OutputDirectoryPrefix}_{buildConfig.ConfigId}", buildConfig.PublishBinDirectorySubPath)
                     : buildConfig.PublishBinDirectoryPath;
@@ -309,38 +314,20 @@ namespace Build
             if (Settings.RUExclusions.Length > 0)
             {
                 Console.WriteLine($"Building RU package with exclusions: {string.Join(", ", Settings.RUExclusions)}");
-                BuildAndPackageRUWithExclusions();
             }
-            else
-            {
-                BuildRUFromWindowsPackage();
-            }
-        }
 
-        private static void BuildRUFromWindowsPackage()
-        {
-            FileUtility.EnsureDirectoryExists(Settings.RUPackagePath);
-
-            ZipFile.ExtractToDirectory(Settings.BundlePackageNetCoreWindows.GeneratedBundleZipFilePath, Settings.RUPackagePath);
-
-            var RURootPackagePath = Directory.GetParent(Settings.RUPackagePath);
-            ZipFile.CreateFromDirectory(RURootPackagePath.FullName, Path.Combine(Settings.ArtifactsDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package.zip"), CompressionLevel.Optimal, false);
-        }
-
-        private static void BuildAndPackageRUWithExclusions()
-        {
-            // Filter extensions once, pass the explicit list to the build pipeline
+            // Always build RU self-contained (filtered extension list, own output dirs)
             var allExtensions = GetExtensionList();
             var filteredExtensions = allExtensions
                 .Where(ext => !Settings.RUExclusions.Contains(ext.Id, StringComparer.OrdinalIgnoreCase))
                 .ToList();
-            Console.WriteLine($"RU build: including {filteredExtensions.Count} extensions (excluded {allExtensions.Count - filteredExtensions.Count})");
+            Console.WriteLine($"RU build: including {filteredExtensions.Count} of {allExtensions.Count} extensions");
 
-            // Rebuild Windows configs with filtered extension list
+            // Build Windows configs with filtered extension list
             Settings.WindowsBuildConfigurations.ForEach(config =>
                 BuildExtensionsBundle(config, configPrefix: "ru", extensionList: filteredExtensions).GetAwaiter().GetResult());
 
-            // Package using the same logic as other bundles, reading from RU output dirs
+            // Package into RU zip with version folder structure for downstream compatibility
             var ruPackageConfig = new BundlePackageConfiguration()
             {
                 PackageIdentifier = "RU_package",
@@ -349,7 +336,51 @@ namespace Build
                 CompressionLevel = CompressionLevel.Optimal
             };
 
-            CreateExtensionBundle(ruPackageConfig);
+            CreateRUExtensionBundle(ruPackageConfig);
+        }
+
+        private static void CreateRUExtensionBundle(BundlePackageConfiguration bundlePackageConfig)
+        {
+            // Stage bundle content under <root>/<version>/ to match legacy RU zip layout
+            string ruRootPath = Path.Combine(Settings.RootBuildDirectory, bundlePackageConfig.BundleName);
+            string bundlePath = Path.Combine(ruRootPath, BundleConfiguration.Instance.ExtensionBundleVersion);
+
+            foreach (var packageConfig in bundlePackageConfig.ConfigBinariesToInclude)
+            {
+                var buildConfig = Settings.WindowsBuildConfigurations.FirstOrDefault(b => b.ConfigId == packageConfig) ??
+                    Settings.LinuxBuildConfigurations.FirstOrDefault(b => b.ConfigId == packageConfig);
+
+                if (buildConfig == null)
+                {
+                    throw new InvalidOperationException($"Build configuration for ConfigId '{packageConfig}' not found.");
+                }
+
+                string sourceBinPath = bundlePackageConfig.OutputDirectoryPrefix != null
+                    ? Path.Combine(Settings.RootBinDirectory, $"{bundlePackageConfig.OutputDirectoryPrefix}_{buildConfig.ConfigId}", buildConfig.PublishBinDirectorySubPath)
+                    : buildConfig.PublishBinDirectoryPath;
+
+                string targetBundleBinariesPath = Path.Combine(bundlePath, buildConfig.PublishBinDirectorySubPath);
+
+                FileUtility.CopyDirectory(sourceBinPath, targetBundleBinariesPath);
+
+                string extensionJsonFilePath = Path.Join(targetBundleBinariesPath, Settings.ExtensionsJsonFileName);
+                AddBindingInfoToExtensionsJson(extensionJsonFilePath);
+            }
+
+            if (FileUtility.DirectoryExists(Settings.StaticContentDirectoryPath))
+            {
+                var staticContentDirectory = Path.Combine(bundlePath, Settings.StaticContentDirectoryName);
+                FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, staticContentDirectory);
+            }
+
+            CreateBundleJsonFile(bundlePath);
+
+            string projectPath = Path.Combine(bundlePath, "extensions.csproj");
+            File.Copy(bundlePackageConfig.CsProjFilePath, projectPath);
+
+            FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
+            // Zip from ruRootPath so the zip contains <version>/... at root
+            ZipFile.CreateFromDirectory(ruRootPath, bundlePackageConfig.GeneratedBundleZipFilePath, bundlePackageConfig.CompressionLevel, false);
         }
 
         public static void CreateCDNStoragePackage()
