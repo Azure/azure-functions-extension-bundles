@@ -7,7 +7,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using static Build.Settings;
 
 namespace Build
 {
@@ -113,7 +112,7 @@ namespace Build
             Settings.LinuxBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config).GetAwaiter().GetResult());
         }
 
-        public static async Task<string> GenerateBundleProjectFile(BuildConfiguration buildConfig, string configPrefix = null, string[] exclusions = null)
+        private static async Task<string> GenerateBundleProjectFile(BuildConfiguration buildConfig, string configPrefix = null, List<Extension> extensionList = null)
         {
             var sourceNugetConfig = Path.Combine(Settings.SourcePath, Settings.NugetConfigFileName);
             var sourceProjectFilePath = Path.Combine(Settings.SourcePath, buildConfig.SourceProjectFileName);
@@ -126,19 +125,13 @@ namespace Build
             FileUtility.CopyFile(sourceProjectFilePath, targetProjectFilePath);
             FileUtility.CopyFile(sourceNugetConfig, targetNugetConfigFilePath);
 
-            await AddExtensionPackages(targetProjectFilePath, BundleConfiguration.Instance.IsPreviewBundle, exclusions);
+            await AddExtensionPackages(targetProjectFilePath, BundleConfiguration.Instance.IsPreviewBundle, extensionList);
             return targetProjectFilePath;
         }
 
-        public static async Task AddExtensionPackages(string projectFilePath, bool addPrereleasePackages, string[] exclusions = null)
+        private static async Task AddExtensionPackages(string projectFilePath, bool addPrereleasePackages, List<Extension> extensionList = null)
         {
-            var extensions = GetExtensionList();
-
-            if (exclusions != null && exclusions.Length > 0)
-            {
-                extensions = extensions.Where(ext => !exclusions.Contains(ext.Id, StringComparer.OrdinalIgnoreCase)).ToList();
-                Console.WriteLine($"Including {extensions.Count} extensions (excluded {exclusions.Length} by ID)");
-            }
+            var extensions = extensionList ?? GetExtensionList();
 
             foreach (var extension in extensions)
             {
@@ -147,9 +140,9 @@ namespace Build
             }
         }
 
-        public static async Task BuildExtensionsBundle(BuildConfiguration buildConfig, string configPrefix = null, string[] exclusions = null)
+        private static async Task BuildExtensionsBundle(BuildConfiguration buildConfig, string configPrefix = null, List<Extension> extensionList = null)
         {
-            var projectFilePath = await GenerateBundleProjectFile(buildConfig, configPrefix, exclusions);
+            var projectFilePath = await GenerateBundleProjectFile(buildConfig, configPrefix, extensionList);
 
             string publishPath = configPrefix != null
                 ? Path.Combine(Settings.RootBinDirectory, $"{configPrefix}_{buildConfig.ConfigId}")
@@ -241,7 +234,7 @@ namespace Build
             return JsonConvert.DeserializeObject<List<Extension>>(extensionsJsonFileContent);
         }
 
-        public static void CreateExtensionBundle(BundlePackageConfiguration bundlePackageConfig, string configPrefix = null, CompressionLevel compressionLevel = CompressionLevel.NoCompression)
+        public static void CreateExtensionBundle(BundlePackageConfiguration bundlePackageConfig)
         {
             // Create a directory to hold the bundle content
             string bundlePath = Path.Combine(Settings.RootBuildDirectory, bundlePackageConfig.BundleName);
@@ -252,8 +245,8 @@ namespace Build
                 var buildConfig = Settings.WindowsBuildConfigurations.FirstOrDefault(b => b.ConfigId == packageConfig) ??
                     Settings.LinuxBuildConfigurations.FirstOrDefault(b => b.ConfigId == packageConfig);
 
-                string sourceBinPath = configPrefix != null
-                    ? Path.Combine(Settings.RootBinDirectory, $"{configPrefix}_{buildConfig.ConfigId}", buildConfig.PublishBinDirectorySubPath)
+                string sourceBinPath = bundlePackageConfig.OutputDirectoryPrefix != null
+                    ? Path.Combine(Settings.RootBinDirectory, $"{bundlePackageConfig.OutputDirectoryPrefix}_{buildConfig.ConfigId}", buildConfig.PublishBinDirectorySubPath)
                     : buildConfig.PublishBinDirectoryPath;
 
                 string targetBundleBinariesPath = Path.Combine(bundlePath, buildConfig.PublishBinDirectorySubPath);
@@ -285,7 +278,7 @@ namespace Build
             File.Copy(bundlePackageConfig.CsProjFilePath, projectPath);
 
             FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
-            ZipFile.CreateFromDirectory(bundlePath, bundlePackageConfig.GeneratedBundleZipFilePath, compressionLevel, false);
+            ZipFile.CreateFromDirectory(bundlePath, bundlePackageConfig.GeneratedBundleZipFilePath, bundlePackageConfig.CompressionLevel, false);
         }
 
         public static void PackageNetCoreV3Bundle()
@@ -336,19 +329,27 @@ namespace Build
 
         private static void BuildAndPackageRUWithExclusions()
         {
-            // Rebuild Windows configs with excluded extensions filtered out
-            Settings.WindowsBuildConfigurations.ForEach(config =>
-                BuildExtensionsBundle(config, configPrefix: "ru", exclusions: Settings.RUExclusions).GetAwaiter().GetResult());
+            // Filter extensions once, pass the explicit list to the build pipeline
+            var allExtensions = GetExtensionList();
+            var filteredExtensions = allExtensions
+                .Where(ext => !Settings.RUExclusions.Contains(ext.Id, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+            Console.WriteLine($"RU build: including {filteredExtensions.Count} extensions (excluded {allExtensions.Count - filteredExtensions.Count})");
 
-            // Package using the same logic as other bundles, but reading from RU output dirs
+            // Rebuild Windows configs with filtered extension list
+            Settings.WindowsBuildConfigurations.ForEach(config =>
+                BuildExtensionsBundle(config, configPrefix: "ru", extensionList: filteredExtensions).GetAwaiter().GetResult());
+
+            // Package using the same logic as other bundles, reading from RU output dirs
             var ruPackageConfig = new BundlePackageConfiguration()
             {
                 PackageIdentifier = "RU_package",
                 ConfigBinariesToInclude = Settings.BundlePackageNetCoreWindows.ConfigBinariesToInclude,
-                CsProjFilePath = Path.Combine(Settings.RootBuildDirectory, $"ru_{ConfigId.any_any}", "extensions.csproj")
+                OutputDirectoryPrefix = "ru",
+                CompressionLevel = CompressionLevel.Optimal
             };
 
-            CreateExtensionBundle(ruPackageConfig, configPrefix: "ru", compressionLevel: CompressionLevel.Optimal);
+            CreateExtensionBundle(ruPackageConfig);
         }
 
         public static void CreateCDNStoragePackage()
