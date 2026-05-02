@@ -12,7 +12,9 @@ namespace Build
 
         public static readonly string RUExclusionsFilePath = Path.Combine(Path.GetFullPath(basePath), "src", "Microsoft.Azure.Functions.ExtensionBundle", "ruExclusions.json");
 
-        public static string[] RUExclusions { get; private set; } = LoadRUExclusions();
+        private static readonly Lazy<string[]> _ruExclusions = new Lazy<string[]>(LoadRUExclusions);
+
+        public static string[] RUExclusions => _ruExclusions.Value;
 
         private static string[] LoadRUExclusions()
         {

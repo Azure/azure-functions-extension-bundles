@@ -343,6 +343,10 @@ namespace Build
         {
             // Stage bundle content under <root>/<version>/ to match legacy RU zip layout
             string ruRootPath = Path.Combine(Settings.RootBuildDirectory, bundlePackageConfig.BundleName);
+            if (Directory.Exists(ruRootPath))
+            {
+                Directory.Delete(ruRootPath, recursive: true);
+            }
             string bundlePath = Path.Combine(ruRootPath, BundleConfiguration.Instance.ExtensionBundleVersion);
 
             foreach (var packageConfig in bundlePackageConfig.ConfigBinariesToInclude)
