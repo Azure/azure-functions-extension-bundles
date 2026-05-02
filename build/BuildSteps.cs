@@ -241,7 +241,7 @@ namespace Build
             return JsonConvert.DeserializeObject<List<Extension>>(extensionsJsonFileContent);
         }
 
-        public static void CreateExtensionBundle(BundlePackageConfiguration bundlePackageConfig, string configPrefix = null)
+        public static void CreateExtensionBundle(BundlePackageConfiguration bundlePackageConfig, string configPrefix = null, CompressionLevel compressionLevel = CompressionLevel.NoCompression)
         {
             // Create a directory to hold the bundle content
             string bundlePath = Path.Combine(Settings.RootBuildDirectory, bundlePackageConfig.BundleName);
@@ -285,7 +285,7 @@ namespace Build
             File.Copy(bundlePackageConfig.CsProjFilePath, projectPath);
 
             FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
-            ZipFile.CreateFromDirectory(bundlePath, bundlePackageConfig.GeneratedBundleZipFilePath, CompressionLevel.NoCompression, false);
+            ZipFile.CreateFromDirectory(bundlePath, bundlePackageConfig.GeneratedBundleZipFilePath, compressionLevel, false);
         }
 
         public static void PackageNetCoreV3Bundle()
@@ -348,7 +348,7 @@ namespace Build
                 CsProjFilePath = Path.Combine(Settings.RootBuildDirectory, $"ru_{ConfigId.any_any}", "extensions.csproj")
             };
 
-            CreateExtensionBundle(ruPackageConfig, configPrefix: "ru");
+            CreateExtensionBundle(ruPackageConfig, configPrefix: "ru", compressionLevel: CompressionLevel.Optimal);
         }
 
         public static void CreateCDNStoragePackage()
