@@ -26,6 +26,7 @@ namespace Build
             get => _csProjFilePath ?? GetDefaultCsProjFilePath();
             set => _csProjFilePath = value;
         }
+
         private string _csProjFilePath;
 
         private string GetDefaultCsProjFilePath()
