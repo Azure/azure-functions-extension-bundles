@@ -19,6 +19,13 @@ jobs:
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
 
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK from global.json'
+    inputs:
+      packageType: 'sdk'
+      useGlobalJson: true
+      workingDirectory: '$(Build.Repository.LocalPath)'
+
   - task: DownloadBuildArtifacts@1
     inputs:
       buildType: 'specific'

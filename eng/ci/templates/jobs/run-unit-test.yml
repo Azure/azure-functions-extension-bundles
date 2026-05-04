@@ -7,10 +7,12 @@ jobs:
     displayName: 'NuGet Authenticate'
     
   - task: UseDotNet@2
+    displayName: 'Install .NET SDK from global.json'
     inputs:
       packageType: 'sdk'
-      version: '8.x'
-      performMultiLevelLookup: true
+      useGlobalJson: true
+      workingDirectory: '$(Build.Repository.LocalPath)'
+
   - task: DotNetCoreCLI@2
     displayName: 'Run tests'
     inputs:
