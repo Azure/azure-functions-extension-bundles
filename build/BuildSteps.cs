@@ -12,6 +12,9 @@ namespace Build
 {
     public static class BuildSteps
     {
+        private const string RUConfigPrefix = "ru";
+        private const string RUPackageIdentifier = "RU_package";
+
         public static void Clean()
         {
             if (FileUtility.DirectoryExists(Settings.RootBinDirectory))
@@ -318,21 +321,26 @@ namespace Build
 
             // Always build RU self-contained (filtered extension list, own output dirs)
             var allExtensions = GetExtensionList();
+            if (allExtensions == null || allExtensions.Count == 0)
+            {
+                throw new InvalidOperationException("Extension list is empty or could not be loaded.");
+            }
+
             var filteredExtensions = allExtensions
-                .Where(ext => !Settings.RUExclusions.Contains(ext.Id, StringComparer.OrdinalIgnoreCase))
+                .Where(ext => !string.IsNullOrEmpty(ext.Id) && !Settings.RUExclusions.Contains(ext.Id, StringComparer.OrdinalIgnoreCase))
                 .ToList();
             Console.WriteLine($"RU build: including {filteredExtensions.Count} of {allExtensions.Count} extensions");
 
             // Build Windows configs with filtered extension list
             Settings.WindowsBuildConfigurations.ForEach(config =>
-                BuildExtensionsBundle(config, configPrefix: "ru", extensionList: filteredExtensions).GetAwaiter().GetResult());
+                BuildExtensionsBundle(config, configPrefix: RUConfigPrefix, extensionList: filteredExtensions).GetAwaiter().GetResult());
 
             // Package into RU zip with version folder structure for downstream compatibility
             var ruPackageConfig = new BundlePackageConfiguration()
             {
-                PackageIdentifier = "RU_package",
+                PackageIdentifier = RUPackageIdentifier,
                 ConfigBinariesToInclude = Settings.BundlePackageNetCoreWindows.ConfigBinariesToInclude,
-                OutputDirectoryPrefix = "ru",
+                OutputDirectoryPrefix = RUConfigPrefix,
                 CompressionLevel = CompressionLevel.Optimal
             };
 
