@@ -242,6 +242,14 @@ namespace Build
             // Create a directory to hold the bundle content
             string bundlePath = Path.Combine(Settings.RootBuildDirectory, bundlePackageConfig.BundleName);
 
+            StageBundleContent(bundlePackageConfig, bundlePath);
+
+            FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
+            ZipFile.CreateFromDirectory(bundlePath, bundlePackageConfig.GeneratedBundleZipFilePath, bundlePackageConfig.CompressionLevel, false);
+        }
+
+        private static void StageBundleContent(BundlePackageConfiguration bundlePackageConfig, string bundlePath)
+        {
             foreach (var packageConfig in bundlePackageConfig.ConfigBinariesToInclude)
             {
                 // find the build configuration matching the config id
@@ -284,9 +292,6 @@ namespace Build
             // Add Csproj file
             string projectPath = Path.Combine(bundlePath, "extensions.csproj");
             File.Copy(bundlePackageConfig.CsProjFilePath, projectPath);
-
-            FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
-            ZipFile.CreateFromDirectory(bundlePath, bundlePackageConfig.GeneratedBundleZipFilePath, bundlePackageConfig.CompressionLevel, false);
         }
 
         public static void PackageNetCoreV3Bundle()
@@ -357,38 +362,7 @@ namespace Build
             }
             string bundlePath = Path.Combine(ruRootPath, BundleConfiguration.Instance.ExtensionBundleVersion);
 
-            foreach (var packageConfig in bundlePackageConfig.ConfigBinariesToInclude)
-            {
-                var buildConfig = Settings.WindowsBuildConfigurations.FirstOrDefault(b => b.ConfigId == packageConfig) ??
-                    Settings.LinuxBuildConfigurations.FirstOrDefault(b => b.ConfigId == packageConfig);
-
-                if (buildConfig == null)
-                {
-                    throw new InvalidOperationException($"Build configuration for ConfigId '{packageConfig}' not found.");
-                }
-
-                string sourceBinPath = bundlePackageConfig.OutputDirectoryPrefix != null
-                    ? Path.Combine(Settings.RootBinDirectory, $"{bundlePackageConfig.OutputDirectoryPrefix}_{buildConfig.ConfigId}", buildConfig.PublishBinDirectorySubPath)
-                    : buildConfig.PublishBinDirectoryPath;
-
-                string targetBundleBinariesPath = Path.Combine(bundlePath, buildConfig.PublishBinDirectorySubPath);
-
-                FileUtility.CopyDirectory(sourceBinPath, targetBundleBinariesPath);
-
-                string extensionJsonFilePath = Path.Join(targetBundleBinariesPath, Settings.ExtensionsJsonFileName);
-                AddBindingInfoToExtensionsJson(extensionJsonFilePath);
-            }
-
-            if (FileUtility.DirectoryExists(Settings.StaticContentDirectoryPath))
-            {
-                var staticContentDirectory = Path.Combine(bundlePath, Settings.StaticContentDirectoryName);
-                FileUtility.CopyDirectory(Settings.StaticContentDirectoryPath, staticContentDirectory);
-            }
-
-            CreateBundleJsonFile(bundlePath);
-
-            string projectPath = Path.Combine(bundlePath, "extensions.csproj");
-            File.Copy(bundlePackageConfig.CsProjFilePath, projectPath);
+            StageBundleContent(bundlePackageConfig, bundlePath);
 
             FileUtility.EnsureDirectoryExists(Settings.ArtifactsDirectory);
             // Zip from ruRootPath so the zip contains <version>/... at root
