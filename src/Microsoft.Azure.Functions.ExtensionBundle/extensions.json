@@ -159,7 +159,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Kafka",
-    "majorVersion": "4",
+    "version": "4.2.0",
     "name": "Kafka",
     "bindings": [
       "kafkatrigger",
@@ -274,9 +274,8 @@
     "bindings": [
       "mcpToolTrigger",
       "mcpToolProperty",
-      "mcpResourceTrigger"
+      "mcpResourceTrigger",
+      "mcpPromptTrigger"
     ]
   }
 ]
-
-

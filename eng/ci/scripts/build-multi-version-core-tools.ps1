@@ -9,11 +9,17 @@
 .DESCRIPTION
     This script:
     1. Fetches the latest N host tags from azure-functions-host repository
-    2. For each tag version:
-       - Updates Packages.props with the host version
-       - Runs validate-worker-versions.ps1 to sync worker versions
-       - Builds the core tools with that version
-    3. Outputs all build artifacts
+    2. Resolves each host version to a core-tools tag or origin/main
+    3. For each version:
+       - Checks out the matching core-tools tag or origin/main (no patching needed)
+       - Applies minimal build compatibility fixes (rollForward, UpdateBuildNumber)
+       - Builds the core tools
+    4. Outputs all build artifacts
+
+    Resolution order per host version:
+    - Exact core-tools tag match → checkout tag (cleanest, no patching)
+    - origin/main already has this host version → checkout main (no patching)
+    - No match → checkout main + run update-core-tools-versions.ps1 (fallback)
 
 .PARAMETER Count
     Number of latest host tags to build (default: 2)
@@ -27,7 +33,7 @@
     Build configuration - Debug or Release (default: Release)
 
 .PARAMETER CloneDir
-    Directory where the core-tools repository is located
+    Directory where the core-tools repository is located (must have full git history + tags)
 
 .EXAMPLE
     .\build-multi-version-core-tools.ps1 -Count 2 -Pattern "v4.10" -Configuration Release
@@ -65,31 +71,107 @@ if (Test-Path $CloneDir) {
     Write-Error "Clone directory does not exist: $CloneDir"
     exit 1
 }
-$PackagesPropsPath = Join-Path $CloneDir "eng/build/Packages.props"
-$UpdateVersionsScript = Join-Path $ScriptDir "update-core-tools-versions.ps1"
+
 $GetLatestTagsScript = Join-Path $ScriptDir "get-latest-host-tags.ps1"
+$ResolveTagsScript = Join-Path $ScriptDir "resolve-core-tools-tags.ps1"
+$UpdateVersionsScript = Join-Path $ScriptDir "update-core-tools-versions.ps1"
+$BuildScript = Join-Path $ScriptDir "build-core-tools.ps1"
+$CoreToolsGitHubUrl = "https://github.com/Azure/azure-functions-core-tools.git"
+$PackagesPropsPath = Join-Path $CloneDir "eng/build/Packages.props"
+$FinalZipDir = Join-Path $CloneDir "artifacts-coretools-zip"
 
 Write-Host "`nPaths:" -ForegroundColor Yellow
 Write-Host "  Repo Root: $RepoRoot"
 Write-Host "  Clone Dir: $CloneDir"
-Write-Host "  Packages.props: $PackagesPropsPath"
-Write-Host "  Update Versions Script: $UpdateVersionsScript"
+Write-Host "  Artifacts Output: $FinalZipDir"
 Write-Host ""
 
-# Verify required files exist
-if (-not (Test-Path $PackagesPropsPath)) {
-    Write-Error "Packages.props not found at: $PackagesPropsPath"
-    exit 1
+# Verify required scripts exist
+foreach ($script in @($GetLatestTagsScript, $ResolveTagsScript, $UpdateVersionsScript, $BuildScript)) {
+    if (-not (Test-Path $script)) {
+        Write-Error "Required script not found: $script"
+        exit 1
+    }
 }
 
-if (-not (Test-Path $UpdateVersionsScript)) {
-    Write-Error "update-core-tools-versions.ps1 not found at: $UpdateVersionsScript"
-    exit 1
+# Create artifacts output directory
+if (-not (Test-Path $FinalZipDir)) {
+    New-Item -ItemType Directory -Path $FinalZipDir -Force | Out-Null
 }
 
-if (-not (Test-Path $GetLatestTagsScript)) {
-    Write-Error "get-latest-host-tags.ps1 not found at: $GetLatestTagsScript"
-    exit 1
+# Applies minimal build compatibility fixes after checkout.
+# These are universal fixes needed regardless of checkout source (tag, main, or fallback).
+function Apply-PostCheckoutFixes {
+    param(
+        [string]$RepoDir,
+        [string]$HostVersion
+    )
+    
+    Write-Host "  Applying post-checkout compatibility fixes..." -ForegroundColor Gray
+    
+    # Fix 1: Sync global.json SDK version from the host repo, then adjust to installed SDKs
+    # The host's global.json is the source of truth for SDK expectations.
+    $globalJsonPath = Join-Path $RepoDir "global.json"
+    if (Test-Path $globalJsonPath) {
+        $globalJson = Get-Content $globalJsonPath -Raw | ConvertFrom-Json
+        $oldSdkVersion = $globalJson.sdk.version
+        $oldRollForward = $globalJson.sdk.rollForward
+        
+        # Step 1a: Fetch SDK version from the host repo's global.json
+        $hostGlobalJsonUri = "https://raw.githubusercontent.com/Azure/azure-functions-host/refs/tags/v$HostVersion/global.json"
+        try {
+            $hostGlobalJsonContent = (Invoke-WebRequest -Uri $hostGlobalJsonUri -Headers @{"User-Agent" = "azure-functions-extension-bundles"} -ErrorAction Stop).Content
+            $hostGlobalJson = $hostGlobalJsonContent | ConvertFrom-Json
+            $hostSdkVersion = $hostGlobalJson.sdk.version
+            
+            if ($oldSdkVersion -ne $hostSdkVersion) {
+                $globalJson.sdk.version = $hostSdkVersion
+                Write-Host "    ✓ Synced SDK version from host: $oldSdkVersion -> $hostSdkVersion" -ForegroundColor Green
+            } else {
+                Write-Host "    SDK version already matches host: $oldSdkVersion" -ForegroundColor Gray
+            }
+        } catch {
+            Write-Host "    ⚠ Could not fetch host global.json, keeping core-tools version: $oldSdkVersion" -ForegroundColor Yellow
+        }
+        
+        # Step 1b: Set rollForward to latestFeature (stay within major, allow patch flexibility)
+        $globalJson.sdk.rollForward = "latestFeature"
+        
+        # Step 1c: Adjust SDK version to closest installed match if exact version isn't available
+        $requestedVersion = $globalJson.sdk.version
+        $installedSdks = (dotnet --list-sdks 2>$null) | ForEach-Object { ($_ -split '\s')[0] }
+        
+        if ($installedSdks -and $requestedVersion) {
+            $reqParts = $requestedVersion -split '\.'
+            $reqMajorMinor = "$($reqParts[0]).$($reqParts[1])"
+            
+            # Find installed SDKs in the same major.minor
+            $matchingSdks = $installedSdks | Where-Object { $_.StartsWith("$reqMajorMinor.") } | Sort-Object { [version]$_ } -Descending
+            
+            if ($matchingSdks -and ($matchingSdks -notcontains $requestedVersion)) {
+                $bestMatch = $matchingSdks | Select-Object -First 1
+                $globalJson.sdk.version = $bestMatch
+                Write-Host "    ✓ Adjusted SDK to installed: $requestedVersion -> $bestMatch" -ForegroundColor Green
+            }
+        }
+        
+        $globalJson | ConvertTo-Json -Depth 10 | Set-Content $globalJsonPath
+        if ($oldRollForward -ne "latestFeature") {
+            Write-Host "    ✓ Set rollForward to latestFeature (was: $oldRollForward)" -ForegroundColor Green
+        }
+    }
+    
+    # Fix 2: Disable UpdateBuildNumber to prevent build from updating Azure DevOps build number
+    $versionPropsPath = Join-Path $RepoDir "src/Cli/func/Directory.Version.props"
+    if (Test-Path $versionPropsPath) {
+        [xml]$versionPropsXml = Get-Content $versionPropsPath
+        $node = Select-Xml -Xml $versionPropsXml -XPath "//UpdateBuildNumber" | Select-Object -ExpandProperty Node
+        if ($node -and $node.'#text' -ne 'false') {
+            $node.'#text' = 'false'
+            $versionPropsXml.Save($versionPropsPath)
+            Write-Host "    ✓ Set UpdateBuildNumber to false" -ForegroundColor Green
+        }
+    }
 }
 
 # Step 1: Get latest host tags
@@ -106,136 +188,144 @@ $latestTags | ForEach-Object {
     Write-Host "  - $($_.Tag) -> $($_.VersionNoPrefix)" -ForegroundColor White
 }
 
-# Determine the core-tools branch for a given host version
-# Host versions >= 4.1049.* require the liliankasem/host/4.1049.100 branch (net10.0 support)
-# Older host versions use the main branch (net8.0)
-$LilianBranch = "origin/liliankasem/host/4.1049.100"
+# Step 2: Resolve host versions to core-tools refs
+Write-Host "`nStep 2: Resolving core-tools refs for each host version..." -ForegroundColor Cyan
+$hostVersions = $latestTags | ForEach-Object { $_.VersionNoPrefix }
+$refMap = & $ResolveTagsScript -HostVersions $hostVersions -CoreToolsDir $CloneDir
 
-function Get-CoreToolsBranch {
-    param([string]$HostVersion)
-    $parts = $HostVersion -split '\.'
-    $minor = [int]$parts[1]
-    if ($minor -ge 1049) {
-        return $LilianBranch
-    }
-    return "origin/main"
+if (-not $refMap) {
+    Write-Error "Failed to resolve core-tools tags"
+    exit 1
 }
-
-# Capture current HEAD so we can restore in finally
-$originalRef = & git -C $CloneDir rev-parse HEAD
 
 # Array to store build results
 $buildResults = @()
 
 try {
-    # Step 2: Build each version
+    # Step 3: Build each version
     $versionIndex = 1
     foreach ($tagInfo in $latestTags) {
         $hostVersion = $tagInfo.VersionNoPrefix
+        $refInfo = $refMap[$hostVersion]
         
         Write-Host "`n===========================================================" -ForegroundColor Cyan
         Write-Host "Building Version $versionIndex of $($latestTags.Count): $hostVersion" -ForegroundColor Cyan
+        Write-Host "  Resolution: $($refInfo.DisplayRef)" -ForegroundColor White
         Write-Host "===========================================================" -ForegroundColor Cyan
         
-        # Switch to the appropriate core-tools branch for this host version
-        $targetBranch = Get-CoreToolsBranch -HostVersion $hostVersion
-        Write-Host "`nSwitching core-tools to branch: $targetBranch" -ForegroundColor Yellow
-        & git -C $CloneDir checkout -f $targetBranch
-        & git -C $CloneDir clean -ffd -e artifacts-coretools-zip/
-        Write-Host "  ✓ Checked out $targetBranch" -ForegroundColor Green
-            
-        # Step 2a: Update host and worker versions in Packages.props
-        Write-Host "`nStep 2.$versionIndex.a: Updating host and worker versions to $hostVersion" -ForegroundColor Yellow
-        
+        # Step 3a: Reset repo to clean state
+        Write-Host "`nStep 3.$versionIndex.a: Resetting repo to clean state..." -ForegroundColor Yellow
+        Push-Location $CloneDir
         try {
-            & $UpdateVersionsScript -HostVersion $hostVersion -PackagesPropsPath $PackagesPropsPath
-            
-            if ($LASTEXITCODE -ne 0) {
-                throw "update-core-tools-versions.ps1 failed with exit code $LASTEXITCODE"
+            $null = git reset --hard 2>&1
+            # Clean untracked files but preserve the final artifacts directory
+            $null = git clean -fdx -e "artifacts-coretools-zip" 2>&1
+            Write-Host "  ✓ Repo reset to clean state" -ForegroundColor Green
+        } finally {
+            Pop-Location
+        }
+        
+        # Step 3b: Checkout the resolved ref
+        Write-Host "`nStep 3.$versionIndex.b: Checking out $($refInfo.DisplayRef)..." -ForegroundColor Yellow
+        Push-Location $CloneDir
+        try {
+            if ($refInfo.Type -eq "tag") {
+                # Shallow clone may not have the tag's commit — fetch from GitHub
+                Write-Host "  Fetching tag $($refInfo.Ref) from GitHub..." -ForegroundColor Gray
+                $fetchOutput = git fetch $CoreToolsGitHubUrl tag $refInfo.Ref --no-tags --depth=1 2>&1
+                if ($LASTEXITCODE -ne 0) { throw "git fetch tag failed: $fetchOutput" }
+                $checkoutOutput = git checkout $refInfo.Ref 2>&1
+                if ($LASTEXITCODE -ne 0) { throw "git checkout failed: $checkoutOutput" }
+            } else {
+                # main or fallback — fetch latest main from GitHub
+                Write-Host "  Fetching main from GitHub..." -ForegroundColor Gray
+                $fetchOutput = git fetch $CoreToolsGitHubUrl main --depth=1 2>&1
+                if ($LASTEXITCODE -ne 0) { throw "git fetch main failed: $fetchOutput" }
+                $checkoutOutput = git checkout FETCH_HEAD 2>&1
+                if ($LASTEXITCODE -ne 0) { throw "git checkout FETCH_HEAD failed: $checkoutOutput" }
             }
-            
-            Write-Host "  ✓ Host and worker versions updated successfully" -ForegroundColor Green
-        }
-        catch {
-            throw "Failed to update versions: $_"
+            Write-Host "  ✓ Checked out $($refInfo.DisplayRef)" -ForegroundColor Green
+        } finally {
+            Pop-Location
         }
         
-        # Step 2b: Build core tools
-        Write-Host "`nStep 2.$versionIndex.b: Building Core Tools for version $hostVersion..." -ForegroundColor Yellow
+        # Step 3c: Apply version patching if this is a fallback (no exact match)
+        if ($refInfo.Type -eq "fallback") {
+            Write-Host "`nStep 3.$versionIndex.c: Applying version patching (fallback)..." -ForegroundColor Yellow
+            try {
+                & $UpdateVersionsScript -HostVersion $hostVersion -PackagesPropsPath $PackagesPropsPath
+                if ($LASTEXITCODE -ne 0) {
+                    throw "update-core-tools-versions.ps1 failed with exit code $LASTEXITCODE"
+                }
+                Write-Host "  ✓ Version patching applied" -ForegroundColor Green
+            } catch {
+                throw "Failed to apply version patching: $_"
+            }
+        } else {
+            Write-Host "`nStep 3.$versionIndex.c: No patching needed ($($refInfo.Type) match)" -ForegroundColor Green
+        }
         
-        $buildScript = Join-Path $ScriptDir "build-core-tools.ps1"
-        # Use version-specific output directory to prevent overwriting
+        # Step 3d: Apply minimal post-checkout fixes (all paths)
+        Apply-PostCheckoutFixes -RepoDir $CloneDir -HostVersion $hostVersion
+        
+        # Step 3e: Build core tools
+        Write-Host "`nStep 3.$versionIndex.e: Building Core Tools for version $hostVersion..." -ForegroundColor Yellow
+        
+        # Use a temp zip dir inside the repo (will be cleaned by git clean next iteration)
         $versionZipDir = "artifacts-coretools-zip-$hostVersion"
-        $buildOutput = & $buildScript -Configuration $Configuration -CoreToolsDir $CloneDir -ZipOutputDir $versionZipDir
+        $buildOutput = & $BuildScript -Configuration $Configuration -CoreToolsDir $CloneDir -ZipOutputDir $versionZipDir
         
         if ($LASTEXITCODE -ne 0) {
             throw "Core Tools build failed with exit code $LASTEXITCODE"
         }
         
-        # Step 2c: Copy and rename zip files to consolidated artifacts directory
-        Write-Host "`nStep 2.$versionIndex.c: Consolidating artifacts for host version $hostVersion..." -ForegroundColor Yellow
+        # Step 3f: Move artifacts to output directory (outside repo tree)
+        Write-Host "`nStep 3.$versionIndex.f: Moving artifacts..." -ForegroundColor Yellow
         
         $tempZipDir = Join-Path $CloneDir $versionZipDir
-        $finalZipDir = Join-Path $CloneDir "artifacts-coretools-zip"
-        
-        # Create final directory if it doesn't exist
-        if (-not (Test-Path $finalZipDir)) {
-            New-Item -ItemType Directory -Path $finalZipDir -Force | Out-Null
-        }
-        
         if (Test-Path $tempZipDir) {
-            # Get only the first zip file to avoid overwrites if multiple exist
             $zipFile = Get-ChildItem -Path $tempZipDir -Filter "*.zip" | Select-Object -First 1
-            
             if ($zipFile) {
-                $oldName = $zipFile.Name
-                # Use iteration-prefixed naming: {iteration}-cli-host-{version}.zip
                 $newName = "$versionIndex-cli-host-$hostVersion.zip"
-                $destPath = Join-Path $finalZipDir $newName
-                
+                $destPath = Join-Path $FinalZipDir $newName
                 Copy-Item -Path $zipFile.FullName -Destination $destPath -Force
-                Write-Host "  Copied and renamed: $oldName -> $newName" -ForegroundColor Green
+                Write-Host "  ✓ $($zipFile.Name) -> $newName" -ForegroundColor Green
             } else {
                 Write-Warning "  No zip files found in $tempZipDir"
             }
-            
-            # Clean up version-specific directory
-            Remove-Item -Path $tempZipDir -Recurse -Force
         }
         
-        # Step 2d: Clean up intermediate build artifacts to save disk space
-        Write-Host "`nStep 2.$versionIndex.d: Cleaning up intermediate build artifacts..." -ForegroundColor Yellow
+        # Step 3g: Clean up to save disk space
+        Write-Host "`nStep 3.$versionIndex.g: Cleaning up..." -ForegroundColor Yellow
         
         $artifactsDir = Join-Path $CloneDir "artifacts"
         if (Test-Path $artifactsDir) {
             Remove-Item -Path $artifactsDir -Recurse -Force
-            Write-Host "  ✓ Removed artifacts directory" -ForegroundColor Green
         }
         
-        # Clean up obj/bin directories in source
+        # Clean obj/bin
         $srcDir = Join-Path $CloneDir "src"
         if (Test-Path $srcDir) {
             Get-ChildItem -Path $srcDir -Include "obj","bin" -Recurse -Directory -Force | ForEach-Object {
                 Remove-Item -Path $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
             }
-            Write-Host "  ✓ Cleaned obj/bin directories" -ForegroundColor Green
         }
 
-        # Clean NuGet cache between builds to reclaim disk space
+        # Clear NuGet cache between builds to reclaim disk space
         Write-Host "  Clearing NuGet cache..." -ForegroundColor Gray
         & dotnet nuget locals all --clear 2>$null
-        Write-Host "  ✓ Cleared NuGet cache" -ForegroundColor Green
+        Write-Host "  ✓ Cleanup complete" -ForegroundColor Green
         
         # Store result
         $buildResults += [PSCustomObject]@{
             HostVersion = $hostVersion
             Tag = $tagInfo.Tag
-            BuildOutput = $buildOutput
+            CoreToolsRef = $refInfo.DisplayRef
+            RefType = $refInfo.Type
             Success = $true
         }
         
         Write-Host "`n  ✓ Successfully built Core Tools for version $hostVersion" -ForegroundColor Green
-        Write-Host "  Build Output: $buildOutput" -ForegroundColor White
         
         $versionIndex++
     }
@@ -247,36 +337,28 @@ try {
     Write-Host "Successfully built $($buildResults.Count) version(s):" -ForegroundColor Green
     
     $buildResults | ForEach-Object {
-        Write-Host "  ✓ $($_.Tag) ($($_.HostVersion))" -ForegroundColor Green
-        Write-Host "    Output: $($_.BuildOutput)" -ForegroundColor White
+        $icon = if ($_.RefType -eq "fallback") { "⚠" } else { "✓" }
+        Write-Host "  $icon $($_.Tag) ($($_.HostVersion)) via $($_.CoreToolsRef)" -ForegroundColor $(if ($_.RefType -eq "fallback") { "Yellow" } else { "Green" })
     }
     
-    # Verify artifacts directory
-    $finalZipDir = Join-Path $CloneDir "artifacts-coretools-zip"
-    Write-Host "`nVerifying artifacts in: $finalZipDir" -ForegroundColor Cyan
-    if (Test-Path $finalZipDir) {
-        $zipFiles = Get-ChildItem -Path $finalZipDir -Filter "*.zip"
+    # Verify artifacts
+    Write-Host "`nVerifying artifacts in: $FinalZipDir" -ForegroundColor Cyan
+    if (Test-Path $FinalZipDir) {
+        $zipFiles = Get-ChildItem -Path $FinalZipDir -Filter "*.zip"
         Write-Host "Found $($zipFiles.Count) zip file(s):" -ForegroundColor Green
         $zipFiles | ForEach-Object {
             $sizeKB = [math]::Round($_.Length / 1KB, 2)
             Write-Host "  - $($_.Name) (${sizeKB} KB)" -ForegroundColor White
         }
     } else {
-        Write-Host "##[error]Artifacts directory not found: $finalZipDir" -ForegroundColor Red
+        Write-Host "##[error]Artifacts directory not found: $FinalZipDir" -ForegroundColor Red
     }
     
     Write-Host "`n===========================================================" -ForegroundColor Cyan
     
-    # Return build results
     return $buildResults
     
 } catch {
     Write-Error "Build failed: $_"
     exit 1
-} finally {
-    # Restore original branch/commit
-    Write-Host "`nRestoring core-tools to original state..." -ForegroundColor Gray
-    & git -C $CloneDir checkout -f $originalRef 2>$null
-    & git -C $CloneDir clean -ffd -e artifacts-coretools-zip/ 2>$null
-    Write-Host "  ✓ Restored to original ref: $originalRef" -ForegroundColor Green
 }
