@@ -11,8 +11,6 @@ namespace Build
 
         public List<ConfigId> ConfigBinariesToInclude { get; set; } = new List<ConfigId>();
 
-        public string OutputDirectoryPrefix { get; set; }
-
         public CompressionLevel CompressionLevel { get; set; } = CompressionLevel.NoCompression;
 
         public string BundleName => $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_{PackageIdentifier}".Trim('_');
@@ -31,10 +29,7 @@ namespace Build
 
         private string GetDefaultCsProjFilePath()
         {
-            string configDir = OutputDirectoryPrefix != null
-                ? $"{OutputDirectoryPrefix}_{ConfigId.any_any}"
-                : ConfigId.any_any.ToString();
-            return Path.Combine(Settings.RootBuildDirectory, configDir, "extensions.csproj");
+            return Path.Combine(Settings.RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj");
         }
     }
 

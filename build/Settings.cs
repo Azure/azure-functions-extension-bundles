@@ -106,15 +106,16 @@ namespace Build
                 RuntimeIdentifier = "win-x64",
                 PublishReadyToRun = true,
                 PublishBinDirectorySubPath = Path.Combine("bin_v3", "win-x64")
-            },
-            new BuildConfiguration()
-            {
-                ConfigId = ConfigId.any_any,
-                SourceProjectFileName = "extensions.csproj",
-                RuntimeIdentifier = "any",
-                PublishReadyToRun = false,
-                PublishBinDirectorySubPath = "bin"
             }
+        };
+
+        public static BuildConfiguration PortableBuildConfiguration = new BuildConfiguration()
+        {
+            ConfigId = ConfigId.any_any,
+            SourceProjectFileName = "extensions.csproj",
+            RuntimeIdentifier = "any",
+            PublishReadyToRun = false,
+            PublishBinDirectorySubPath = "bin"
         };
 
         public static List<BuildConfiguration> LinuxBuildConfigurations = new List<BuildConfiguration>()
@@ -150,7 +151,6 @@ namespace Build
         {
             PackageIdentifier = "win-any",
             ConfigBinariesToInclude = new List<ConfigId>() {
-                ConfigId.any_any,
                 ConfigId.win_x86,
                 ConfigId.win_x64
             },
