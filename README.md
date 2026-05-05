@@ -182,10 +182,10 @@ The project uses Azure DevOps pipelines with multiple stages:
 The Functions host downloads one of three bundle flavors depending on the runtime environment:
 
 | Environment/SKU | Bundle Flavor | Description |
-|-----------------|---------------|-------------|
-| Windows App Service | `win-any` | For Windows Azure managed hosting |
-| Linux App Service | `linux-x64` | For Linux Azure managed hosting |
-| Non-App Service (Core Tools, Container, etc.) | `any-any` | For all other environments |
+| ----------------- | --------------- | ------------- |
+| Windows | `win-any` | For Windows Azure managed hosting |
+| Linux | `linux-x64` | For Linux Azure managed hosting |
+| Others (Core Tools, etc.) | `any-any` | For all other environments |
 
 ### CDN Download Pattern
 
