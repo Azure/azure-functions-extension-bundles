@@ -64,21 +64,31 @@ $result = @{}
 
 Push-Location $CoreToolsDir
 try {
-    # Step 1: Check main branch via GitHub raw URL (works with shallow clones)
-    Write-Host "`nChecking main branch..." -ForegroundColor Yellow
-    $mainPropsUrl = "https://raw.githubusercontent.com/Azure/azure-functions-core-tools/refs/heads/main/eng/build/Packages.props"
-    try {
-        $mainPropsResponse = Invoke-WebRequest -Uri $mainPropsUrl -Headers $GitHubHeaders -ErrorAction Stop -TimeoutSec 10
-        $mainHostVersion = Get-HostVersionFromProps -Content $mainPropsResponse.Content
-        Write-Host "  main has host version: $mainHostVersion" -ForegroundColor Gray
-        
-        if ($mainHostVersion -and $unresolved.ContainsKey($mainHostVersion)) {
-            $result[$mainHostVersion] = @{ Ref = "main"; Type = "main"; DisplayRef = "main (host $mainHostVersion)" }
-            $unresolved.Remove($mainHostVersion)
-            Write-Host "  ✓ Matched main for host $mainHostVersion" -ForegroundColor Green
+    # Step 1: Check branches via GitHub raw URL (works with shallow clones)
+    # For host versions >= 4.1049, check the net10 branch first
+    $net10Branch = "liliankasem/host/4.1049.100"
+    $branchesToCheck = @(
+        @{ Name = $net10Branch; DisplayName = "net10 branch ($net10Branch)" },
+        @{ Name = "main"; DisplayName = "main" }
+    )
+
+    foreach ($branch in $branchesToCheck) {
+        if ($unresolved.Count -eq 0) { break }
+        Write-Host "`nChecking $($branch.DisplayName)..." -ForegroundColor Yellow
+        $branchPropsUrl = "https://raw.githubusercontent.com/Azure/azure-functions-core-tools/refs/heads/$($branch.Name)/eng/build/Packages.props"
+        try {
+            $branchPropsResponse = Invoke-WebRequest -Uri $branchPropsUrl -Headers $GitHubHeaders -ErrorAction Stop -TimeoutSec 10
+            $branchHostVersion = Get-HostVersionFromProps -Content $branchPropsResponse.Content
+            Write-Host "  $($branch.Name) has host version: $branchHostVersion" -ForegroundColor Gray
+            
+            if ($branchHostVersion -and $unresolved.ContainsKey($branchHostVersion)) {
+                $result[$branchHostVersion] = @{ Ref = $branch.Name; Type = "main"; DisplayRef = "$($branch.DisplayName) (host $branchHostVersion)" }
+                $unresolved.Remove($branchHostVersion)
+                Write-Host "  ✓ Matched $($branch.Name) for host $branchHostVersion" -ForegroundColor Green
+            }
+        } catch {
+            Write-Host "  ⚠ Could not check $($branch.Name): $_" -ForegroundColor Yellow
         }
-    } catch {
-        Write-Host "  ⚠ Could not check main branch: $_" -ForegroundColor Yellow
     }
 
     if ($unresolved.Count -eq 0) {

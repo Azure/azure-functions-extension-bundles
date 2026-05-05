@@ -237,10 +237,11 @@ try {
                 $checkoutOutput = git checkout $refInfo.Ref 2>&1
                 if ($LASTEXITCODE -ne 0) { throw "git checkout failed: $checkoutOutput" }
             } else {
-                # main or fallback — fetch latest main from GitHub
-                Write-Host "  Fetching main from GitHub..." -ForegroundColor Gray
-                $fetchOutput = git fetch $CoreToolsGitHubUrl main --depth=1 2>&1
-                if ($LASTEXITCODE -ne 0) { throw "git fetch main failed: $fetchOutput" }
+                # main, fallback, or named branch — fetch the resolved ref from GitHub
+                $branchToFetch = $refInfo.Ref
+                Write-Host "  Fetching $branchToFetch from GitHub..." -ForegroundColor Gray
+                $fetchOutput = git fetch $CoreToolsGitHubUrl $branchToFetch --depth=1 2>&1
+                if ($LASTEXITCODE -ne 0) { throw "git fetch $branchToFetch failed: $fetchOutput" }
                 $checkoutOutput = git checkout FETCH_HEAD 2>&1
                 if ($LASTEXITCODE -ne 0) { throw "git checkout FETCH_HEAD failed: $checkoutOutput" }
             }
