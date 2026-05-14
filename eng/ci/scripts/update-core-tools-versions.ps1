@@ -64,7 +64,7 @@ if (Test-Path $GlobalJsonPath) {
         if ($localSdkVersion -ne $hostSdkVersion) {
             # Update SDK version from host repo
             $localGlobalJson.sdk.version = $hostSdkVersion
-            $localGlobalJson.sdk.rollForward = "latestMajor"
+            $localGlobalJson.sdk.rollForward = "latestFeature"
             $localGlobalJson | ConvertTo-Json -Depth 10 | Set-Content $GlobalJsonPath
             Write-Host "  ✓ Updated global.json SDK: $localSdkVersion -> $hostSdkVersion (from host repo)" -ForegroundColor Green
         } else {
@@ -182,6 +182,7 @@ $workers = @{
     "Microsoft.Azure.Functions.PowerShellWorker.PS7.0" = "eng/build/Workers.Powershell.props"
     "Microsoft.Azure.Functions.PowerShellWorker.PS7.2" = "eng/build/Workers.Powershell.props"
     "Microsoft.Azure.Functions.PowerShellWorker.PS7.4" = "eng/build/Workers.Powershell.props"
+    "Microsoft.Azure.Functions.PowerShellWorker.PS7.6" = "eng/build/Workers.Powershell.props"
 }
 
 # Fix until core tool can sync with new host changes
@@ -333,51 +334,8 @@ Write-Host "`nSaving updated Packages.props..." -ForegroundColor Yellow
 $packagesXml.Save($PackagesPropsPath)
 Write-Host "✓ Successfully updated Packages.props" -ForegroundColor Green
 
-# Get core tools root path for subsequent file modifications until core tools adopt the new host changes in v4.1047.100
+# Get core tools root path for subsequent file modifications
 $coreToolsRoot = Split-Path (Split-Path (Split-Path $PackagesPropsPath -Parent) -Parent) -Parent
-
-# Update Startup.cs to remove deprecated IApplicationLifetime usage (for host version >= 4.1047.100)
-Write-Host "`nChecking for Startup.cs updates..." -ForegroundColor Yellow
-
-if ($shouldApplyHostFixes) {
-    $startupPath = Join-Path $coreToolsRoot "src\Cli\func\Actions\HostActions\Startup.cs"
-    
-    if (Test-Path $startupPath) {
-        $startupContent = Get-Content $startupPath -Raw
-        
-        # Define the old code pattern to replace
-        $oldCode = @"
-            }
-#pragma warning disable CS0618 // IApplicationLifetime is obsolete
-            IApplicationLifetime applicationLifetime = app.ApplicationServices
-                .GetRequiredService<IApplicationLifetime>();
-
-            app.UseWebJobsScriptHost(applicationLifetime);
-#pragma warning restore CS0618 // Type is obsolete
-        }
-"@
-        
-        # Define the new simplified code
-        $newCode = @"
-            }
-
-            app.UseWebJobsScriptHost();
-        }
-"@
-        
-        if ($startupContent.Contains($oldCode)) {
-            $startupContent = $startupContent.Replace($oldCode, $newCode)
-            Set-Content -Path $startupPath -Value $startupContent -NoNewline
-            Write-Host "  ✓ Updated Startup.cs - removed deprecated IApplicationLifetime usage" -ForegroundColor Green
-        } else {
-            Write-Host "  Startup.cs already updated or pattern not found (no change needed)" -ForegroundColor Gray
-        }
-    } else {
-        Write-Warning "  Startup.cs not found at: $startupPath"
-    }
-} else {
-    Write-Host "  Skipping Startup.cs update (host version $HostVersion < 4.1047.100)" -ForegroundColor Gray
-}
 
 # Disable UpdateBuildNumber in Directory.Version.props to prevent build output from updating Azure DevOps build number
 Write-Host "`nDisabling UpdateBuildNumber in Directory.Version.props..." -ForegroundColor Yellow

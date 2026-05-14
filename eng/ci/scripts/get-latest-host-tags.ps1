@@ -90,6 +90,20 @@ $parsedTags = $tags | ForEach-Object {
     }
 } | Where-Object { $_ -ne $null }
 
+# Exclude host versions >= 4.1049 which require dotnet 10.
+# TODO: Remove this filter once core tools complete migration to dotnet 10.
+$parsedTags = $parsedTags | Where-Object {
+    $versionParts = $_.VersionNoPrefix -split '\.'
+    [int]$versionParts[1] -lt 1049
+}
+
+if (-not $parsedTags) {
+    Write-Error "No tags found after filtering for versions < 4.1049"
+    exit 1
+}
+
+Write-Host "Tags after filtering (< 4.1049): $($parsedTags.Count)" -ForegroundColor Green
+
 # Group by middle version and get the highest patch from each group
 $groupedTags = $parsedTags | 
     Group-Object MiddleVersion | 

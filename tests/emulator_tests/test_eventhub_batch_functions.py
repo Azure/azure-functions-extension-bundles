@@ -4,7 +4,7 @@ import json
 import logging
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 
 from dateutil import parser
 from tests.utils import testutils
@@ -62,7 +62,7 @@ class TestEventHubBatchFunctions(testutils.WebHostTestCase):
     def test_eventhub_multiple_with_metadata(self):
         # Generate a unique event body for EventHub event
         # Record the start_time and end_time for checking event enqueue time
-        start_time = datetime.utcnow()
+        start_time = datetime.now(tz=timezone.utc)
         count = 10
         random_number = str(round(time.time()) % 1000)
         req_body = {
@@ -76,7 +76,7 @@ class TestEventHubBatchFunctions(testutils.WebHostTestCase):
                                 max_retries=3,
                                 expected_status=200)
         self.assertIn('OK', r.text)
-        end_time = datetime.utcnow()
+        end_time = datetime.now(tz=timezone.utc)
 
         # Wait for metadata_multiple trigger to execute and convert event metadata into blob
         logger.info("Waiting for EventHub metadata trigger to execute...")
@@ -96,7 +96,9 @@ class TestEventHubBatchFunctions(testutils.WebHostTestCase):
 
             # Check if the event is enqueued between start_time and end_time
             enqueued_time = parser.isoparse(event['enqueued_time'])
-            self.assertTrue(start_time < enqueued_time < end_time)
+            self.assertTrue(
+                start_time.timestamp() < enqueued_time.timestamp()
+                < end_time.timestamp())
 
             # Check if event properties are properly set
             self.assertIsNone(event['partition_key'])  # only 1 partition

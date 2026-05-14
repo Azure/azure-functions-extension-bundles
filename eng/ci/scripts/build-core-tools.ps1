@@ -80,16 +80,49 @@ Write-Host "Zip Output Directory: $ZipOutputDir" -ForegroundColor Yellow
 Write-Host "`nPublishing Azure.Functions.Cli with $Configuration configuration..." -ForegroundColor Yellow
 Write-Host "Output Directory: $OutputDir" -ForegroundColor Yellow
 
+# Detect target framework from the project file
+$projXml = [xml](Get-Content $ProjectPath)
+$targetFramework = $projXml.Project.PropertyGroup.TargetFramework | Where-Object { $_ } | Select-Object -First 1
+if (-not $targetFramework) {
+    $targetFramework = "net8.0"
+    Write-Host "Could not detect TargetFramework, defaulting to $targetFramework" -ForegroundColor Yellow
+} else {
+    Write-Host "Detected TargetFramework: $targetFramework" -ForegroundColor Green
+}
+
 Push-Location $CoreToolsDir
 
 try {
+    # Restore packages first, then publish with --no-restore to avoid redundant downloads
+    $restoreArgs = @(
+        "restore",
+        $ProjectPath,
+        "/p:TargetFramework=$targetFramework"
+    )
+    
+    if (-not [string]::IsNullOrEmpty($Runtime)) {
+        $restoreArgs += "-r", $Runtime
+    }
+    
+    Write-Host "Running: dotnet $($restoreArgs -join ' ')" -ForegroundColor Cyan
+    & dotnet $restoreArgs 2>&1 | Tee-Object -Variable restoreLogs
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "`n##[error]dotnet restore failed with exit code $LASTEXITCODE" -ForegroundColor Red
+        $restoreLogs | ForEach-Object { Write-Host $_ }
+        throw "Restore failed with exit code $LASTEXITCODE"
+    }
+    
+    Write-Host "✓ Restore completed successfully" -ForegroundColor Green
+
     $publishArgs = @(
         "publish",
         $ProjectPath,
         "-o", $OutputDir,
         "-c", $Configuration,
-        "-f", "net8.0",
+        "-f", $targetFramework,
         "--self-contained",
+        "--no-restore",
         "/p:ZipAfterPublish=true",
         "/p:ZipArtifactsPath=$ZipOutputDir"
     )
