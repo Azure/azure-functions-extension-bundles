@@ -151,6 +151,7 @@ namespace Build
         {
             PackageIdentifier = "win-any",
             ConfigBinariesToInclude = new List<ConfigId>() {
+                ConfigId.any_any,
                 ConfigId.win_x86,
                 ConfigId.win_x64
             },

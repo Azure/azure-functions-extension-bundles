@@ -185,7 +185,7 @@ The Functions host downloads one of three bundle flavors depending on the runtim
 | ----------------- | --------------- | ------------- |
 | Windows | `win-any` | For Windows Azure managed hosting |
 | Linux | `linux-x64` | For Linux Azure managed hosting |
-| Others (Core Tools, etc.) | `any-any` | For all other environments |
+| Others (Core Tools, Container Apps etc.) | `any-any` | For all other environments |
 
 ### CDN Download Pattern
 

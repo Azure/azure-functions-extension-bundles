@@ -420,6 +420,7 @@ namespace Build
                 string packageBundleDirectory = Path.Combine(packageRootDirectoryPath, BundleConfiguration.Instance.ExtensionBundleId, BundleConfiguration.Instance.ExtensionBundleVersion);
                 FileUtility.EnsureDirectoryExists(packageBundleDirectory);
 
+                AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageNetCoreV3Any);
                 AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageNetCoreWindows);
 
                 string packageZipFilePath = Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}_windows.zip");
