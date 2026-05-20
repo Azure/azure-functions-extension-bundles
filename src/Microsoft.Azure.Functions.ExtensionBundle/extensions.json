@@ -113,7 +113,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "version": "4.13.0-preview.1",
+    "majorVersion": "4",
     "name": "CosmosDB",
     "bindings": [
       "cosmosdbtrigger",
