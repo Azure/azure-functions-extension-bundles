@@ -9,6 +9,7 @@
       "extensions/1.0.0": {
         "dependencies": {
           "Microsoft.Azure.DurableTask.Netherite.AzureFunctions": "3.1.1",
+          "Microsoft.Azure.Functions.Extensions.Connector": "0.2.0-alpha",
           "Microsoft.Azure.Functions.Extensions.Mcp": "1.5.0",
           "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents": "1.1.0",
           "Microsoft.Azure.WebJobs.Extensions.AzureCosmosDb.Mongo": "1.2.4-preview",
@@ -1142,6 +1143,17 @@
           "lib/netstandard2.0/Microsoft.Azure.Functions.Extensions.dll": {
             "assemblyVersion": "1.1.0.0",
             "fileVersion": "1.1.0.0"
+          }
+        }
+      },
+      "Microsoft.Azure.Functions.Extensions.Connector/0.2.0-alpha": {
+        "dependencies": {
+          "Microsoft.Azure.WebJobs": "3.0.45"
+        },
+        "runtime": {
+          "lib/net8.0/Microsoft.Azure.Functions.Extensions.Connector.dll": {
+            "assemblyVersion": "0.2.0.0",
+            "fileVersion": "0.2.0.26271"
           }
         }
       },
@@ -4787,6 +4799,13 @@
       "sha512": "sha512-zYKtQQoS1fdzufxFApuMFiFtoi9QAGH6McXxntpylwLKgKjmCMWdgUd1dcekzTKNR9DPSDPRLiulvukqXnpWrQ==",
       "path": "microsoft.azure.functions.extensions/1.1.0",
       "hashPath": "microsoft.azure.functions.extensions.1.1.0.nupkg.sha512"
+    },
+    "Microsoft.Azure.Functions.Extensions.Connector/0.2.0-alpha": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-baY//mHmA5TFeR9g0aM1WLK5RMgS5mJcFMrh9UvMrniwOia7v8+wBd3axG5bIiDygaV1SGeJpHOij84dgg/OwQ==",
+      "path": "microsoft.azure.functions.extensions.connector/0.2.0-alpha",
+      "hashPath": "microsoft.azure.functions.extensions.connector.0.2.0-alpha.nupkg.sha512"
     },
     "Microsoft.Azure.Functions.Extensions.Dapr.Core/0.17.0-preview01": {
       "type": "package",
