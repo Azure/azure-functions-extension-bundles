@@ -56,7 +56,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "version": "3.8.0",
+    "majorVersion": "3",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -92,7 +92,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged",
-    "version": "1.0.1",
+    "majorVersion": "1",
     "name": "AzureManagedProvider",
     "bindings": [
       "activitytrigger",
@@ -113,7 +113,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "version": "4.13.0-preview.1",
+    "majorVersion": "4",
     "name": "CosmosDB",
     "bindings": [
       "cosmosdbtrigger",
@@ -279,7 +279,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Fabric",
-    "version": "1.0.53",
+    "majorVersion": "1",
     "name": "Startup",
     "bindings": [
       "FabricItem",
@@ -295,7 +295,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO",
-    "version": "1.0.0-beta.4",
+    "majorVersion": "1",
     "name": "WebPubSubForSocketIO",
     "bindings": [
       "socketiotrigger",
@@ -312,6 +312,14 @@
       "mcpToolProperty",
       "mcpResourceTrigger",
       "mcpPromptTrigger"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.Functions.Extensions.Connector",
+    "majorVersion": "0",
+    "name": "Connector",
+    "bindings": [
+      "connectorTrigger"
     ]
   }
 ]
