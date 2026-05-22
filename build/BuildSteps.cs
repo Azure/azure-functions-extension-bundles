@@ -317,7 +317,6 @@ namespace Build
         public static void PackageNetCoreV3Bundle()
         {
             CreateExtensionBundle(Settings.BundlePackageNetCoreV3);
-            CreateExtensionBundle(Settings.BundlePackageNetCoreV3Any);
         }
 
         public static void PackageNetCoreV3BundlesLinux()
@@ -327,6 +326,7 @@ namespace Build
 
         public static void PackageNetCoreV3BundlesWindows()
         {
+            CreateExtensionBundle(Settings.BundlePackageNetCoreV3Any);
             CreateExtensionBundle(Settings.BundlePackageNetCoreWindows);
         }
 

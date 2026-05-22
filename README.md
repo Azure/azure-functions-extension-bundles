@@ -83,31 +83,28 @@ dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesWindows,Creat
 
 1. Identify the bundle version you want to update and checkout the corresponding branch
 
-    |Bundle version | Branch |
+    |Bundle version|Branch|
     |------|------|
-    | v4.x | [main](https://github.com/Azure/azure-functions-extension-bundles/tree/main) |
-    | v4.x-preview | [main-preview](https://github.com/Azure/azure-functions-extension-bundles/tree/main-preview) |
-    | v4.x-experimental | [main-experimental](https://github.com/Azure/azure-functions-extension-bundles/tree/main-experimental) |
+    |v4.x|[main](https://github.com/Azure/azure-functions-extension-bundles/tree/main)|
+    |v4.x-preview|[main-preview](https://github.com/Azure/azure-functions-extension-bundles/tree/main-preview)|
+    |v4.x-experimental|[main-experimental](https://github.com/Azure/azure-functions-extension-bundles/tree/main-experimental)|
 
 2. Add the following details to [extensions.json](src/Microsoft.Azure.Functions.ExtensionBundle/extensions.json) file
 
-    ```Javascript
+    ```json
     {
-            "id": "Microsoft.Azure.WebJobs.Extensions.Kafka", // Nuget package id for the extension
-
-            "majorVersion": "3",                              // Major version of the extension
-
-            "name": "Kafka",                                  // This should match the name proprerty from bin/extensions.json in the generated output
-                                                              // Easiest way to find out this is to perform the following steps.
-                                                              // 1. Install the extension package to pre-compiled function app
-                                                              // 2. Build the function app
-                                                              // 3. Look at the bin/extension.json file in the output
-
-            "bindings": [                                     // binding attributes supported by the extension.
-                "kafkatrigger",
-                "kafka"
-            ]
-        }
+        "id": "Microsoft.Azure.WebJobs.Extensions.Kafka", // Nuget package id for the extension
+        "majorVersion": "3",                              // Major version of the extension
+        "name": "Kafka",                                  // This should match the name proprerty from bin/extensions.json in the generated output
+                                                            // Easiest way to find out this is to perform the following steps.
+                                                            // 1. Install the extension package to pre-compiled function app
+                                                            // 2. Build the function app
+                                                            // 3. Look at the bin/extension.json file in the output
+        "bindings": [                                     // binding attributes supported by the extension.
+            "kafkatrigger",
+            "kafka"
+        ]
+    }
     ```
 
 3. Build and test the extension bundle
@@ -181,11 +178,11 @@ The project uses Azure DevOps pipelines with multiple stages:
 
 The Functions host downloads one of three bundle flavors depending on the runtime environment:
 
-| Environment/SKU | Bundle Flavor | Description |
-| ----------------- | --------------- | ------------- |
-| Windows | `win-any` | For Windows Azure managed hosting |
-| Linux | `linux-x64` | For Linux Azure managed hosting |
-| Others (Core Tools, Container Apps etc.) | `any-any` | For all other environments |
+|Environment/SKU|Bundle Flavor|Description|
+|------|------|------|
+|Windows|`win-any`|For Windows Azure managed hosting|
+|Linux|`linux-x64`|For Linux Azure managed hosting|
+|Others (Core Tools, Container Apps etc.)|`any-any`|For all other environments|
 
 ### CDN Download Pattern
 
