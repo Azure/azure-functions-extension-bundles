@@ -22,8 +22,6 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
                 BuildSteps.BuildBundleBinariesForWindows();
             }
 
-            BuildSteps.BuildBundleBinariesPortable();
-
         }
     }
 

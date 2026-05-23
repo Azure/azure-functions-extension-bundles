@@ -12,10 +12,8 @@ namespace Build
 {
     public static class BuildSteps
     {
+        private const string RUConfigPrefix = "ru";
         private const string RUPackageIdentifier = "RU_package";
-        private const string ExtensionsCsProjFileName = "extensions.csproj";
-        private const string BinDirectoryName = "bin";
-        private const string AnyRuntimeIdentifier = "any";
 
         public static void Clean()
         {
@@ -109,13 +107,7 @@ namespace Build
 
         public static void BuildBundleBinariesForWindows()
         {
-            var filteredExtensionList = GetFilteredExtensionList();
-            Settings.WindowsBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config, extensionList: filteredExtensionList).GetAwaiter().GetResult());
-        }
-
-        public static void BuildBundleBinariesPortable()
-        {
-            BuildExtensionsBundle(Settings.PortableBuildConfiguration).GetAwaiter().GetResult();
+            Settings.WindowsBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config).GetAwaiter().GetResult());
         }
 
         public static void BuildBundleBinariesForLinux()
@@ -123,12 +115,13 @@ namespace Build
             Settings.LinuxBuildConfigurations.ForEach((config) => BuildExtensionsBundle(config).GetAwaiter().GetResult());
         }
 
-        private static async Task<string> GenerateBundleProjectFile(BuildConfiguration buildConfig, IReadOnlyList<Extension> extensionList = null)
+        private static async Task<string> GenerateBundleProjectFile(BuildConfiguration buildConfig, string configPrefix = null, List<Extension> extensionList = null)
         {
             var sourceNugetConfig = Path.Combine(Settings.SourcePath, Settings.NugetConfigFileName);
             var sourceProjectFilePath = Path.Combine(Settings.SourcePath, buildConfig.SourceProjectFileName);
-            string projectDirectory = Path.Combine(Settings.RootBuildDirectory, buildConfig.ConfigId.ToString());
-            string targetProjectFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, ExtensionsCsProjFileName);
+            string configDirName = configPrefix != null ? $"{configPrefix}_{buildConfig.ConfigId}" : buildConfig.ConfigId.ToString();
+            string projectDirectory = Path.Combine(Settings.RootBuildDirectory, configDirName);
+            string targetProjectFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, "extensions.csproj");
             string targetNugetConfigFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, Settings.NugetConfigFileName);
 
             FileUtility.EnsureDirectoryExists(projectDirectory);
@@ -139,7 +132,7 @@ namespace Build
             return targetProjectFilePath;
         }
 
-        private static async Task AddExtensionPackages(string projectFilePath, bool addPrereleasePackages, IReadOnlyList<Extension> extensionList = null)
+        private static async Task AddExtensionPackages(string projectFilePath, bool addPrereleasePackages, List<Extension> extensionList = null)
         {
             var extensions = extensionList ?? GetExtensionList();
 
@@ -150,13 +143,21 @@ namespace Build
             }
         }
 
-        private static async Task BuildExtensionsBundle(BuildConfiguration buildConfig, IReadOnlyList<Extension> extensionList = null)
+        private static async Task BuildExtensionsBundle(BuildConfiguration buildConfig, string configPrefix = null, List<Extension> extensionList = null)
         {
-            var projectFilePath = await GenerateBundleProjectFile(buildConfig, extensionList);
+            var projectFilePath = await GenerateBundleProjectFile(buildConfig, configPrefix, extensionList);
 
-            var publishCommandArguments = $"publish {projectFilePath} -c Release -o {buildConfig.PublishDirectoryPath}";
+            string publishPath = configPrefix != null
+                ? Path.Combine(Settings.RootBinDirectory, $"{configPrefix}_{buildConfig.ConfigId}")
+                : buildConfig.PublishDirectoryPath;
 
-            if (!buildConfig.RuntimeIdentifier.Equals(AnyRuntimeIdentifier, StringComparison.OrdinalIgnoreCase))
+            string publishBinPath = configPrefix != null
+                ? Path.Combine(publishPath, buildConfig.PublishBinDirectorySubPath)
+                : buildConfig.PublishBinDirectoryPath;
+
+            var publishCommandArguments = $"publish {projectFilePath} -c Release -o {publishPath}";
+
+            if (!buildConfig.RuntimeIdentifier.Equals("any", StringComparison.OrdinalIgnoreCase))
             {
                 publishCommandArguments += $" -r {buildConfig.RuntimeIdentifier}";
             }
@@ -168,23 +169,22 @@ namespace Build
 
             Shell.Run("dotnet", publishCommandArguments);
 
-            if (Path.Combine(buildConfig.PublishDirectoryPath, BinDirectoryName) != buildConfig.PublishBinDirectoryPath)
+            if (Path.Combine(publishPath, "bin") != publishBinPath)
             {
-                FileUtility.EnsureDirectoryExists(Directory.GetParent(buildConfig.PublishBinDirectoryPath).FullName);
-                Directory.Move(Path.Combine(buildConfig.PublishDirectoryPath, BinDirectoryName), buildConfig.PublishBinDirectoryPath);
+                FileUtility.EnsureDirectoryExists(Directory.GetParent(publishBinPath).FullName);
+                Directory.Move(Path.Combine(publishPath, "bin"), publishBinPath);
             }
         }
 
         public static void GenerateVulnerabilityReport()
         {
             Settings.WindowsBuildConfigurations.ForEach((config) => RunVulnerabilityReport(config));
-            RunVulnerabilityReport(Settings.PortableBuildConfiguration);
         }
 
         public static void RunVulnerabilityReport(BuildConfiguration buildConfig)
         {
             string projectDirectory = Path.Combine(Settings.RootBuildDirectory, buildConfig.ConfigId.ToString());
-            string projectFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, ExtensionsCsProjFileName);
+            string projectFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, "extensions.csproj");
 
             var currectDirectory = Directory.GetCurrentDirectory();
             try
@@ -237,27 +237,6 @@ namespace Build
             return JsonConvert.DeserializeObject<List<Extension>>(extensionsJsonFileContent);
         }
 
-        private static IReadOnlyList<Extension> GetFilteredExtensionList()
-        {
-            var allExtensions = GetExtensionList();
-            if (allExtensions == null || allExtensions.Count == 0)
-            {
-                throw new InvalidOperationException("Extension list is empty or could not be loaded.");
-            }
-
-            if (Settings.RUExclusions.Length == 0)
-            {
-                return allExtensions;
-            }
-
-            Console.WriteLine($"Excluding extensions: {string.Join(", ", Settings.RUExclusions)}");
-            var filtered = allExtensions
-                .Where(ext => !string.IsNullOrEmpty(ext.Id) && !Settings.RUExclusions.Contains(ext.Id, StringComparer.OrdinalIgnoreCase))
-                .ToList();
-            Console.WriteLine($"Including {filtered.Count} of {allExtensions.Count} extensions");
-            return filtered;
-        }
-
         public static void CreateExtensionBundle(BundlePackageConfiguration bundlePackageConfig)
         {
             // Create a directory to hold the bundle content
@@ -275,15 +254,16 @@ namespace Build
             {
                 // find the build configuration matching the config id
                 var buildConfig = Settings.WindowsBuildConfigurations.FirstOrDefault(b => b.ConfigId == packageConfig) ??
-                    Settings.LinuxBuildConfigurations.FirstOrDefault(b => b.ConfigId == packageConfig) ??
-                    (Settings.PortableBuildConfiguration.ConfigId == packageConfig ? Settings.PortableBuildConfiguration : null);
+                    Settings.LinuxBuildConfigurations.FirstOrDefault(b => b.ConfigId == packageConfig);
 
                 if (buildConfig == null)
                 {
                     throw new InvalidOperationException($"Build configuration for ConfigId '{packageConfig}' not found.");
                 }
 
-                string sourceBinPath = buildConfig.PublishBinDirectoryPath;
+                string sourceBinPath = bundlePackageConfig.OutputDirectoryPrefix != null
+                    ? Path.Combine(Settings.RootBinDirectory, $"{bundlePackageConfig.OutputDirectoryPrefix}_{buildConfig.ConfigId}", buildConfig.PublishBinDirectorySubPath)
+                    : buildConfig.PublishBinDirectoryPath;
 
                 string targetBundleBinariesPath = Path.Combine(bundlePath, buildConfig.PublishBinDirectorySubPath);
 
@@ -310,7 +290,7 @@ namespace Build
             CreateBundleJsonFile(bundlePath);
 
             // Add Csproj file
-            string projectPath = Path.Combine(bundlePath, ExtensionsCsProjFileName);
+            string projectPath = Path.Combine(bundlePath, "extensions.csproj");
             File.Copy(bundlePackageConfig.CsProjFilePath, projectPath);
         }
 
@@ -339,11 +319,33 @@ namespace Build
 
         public static void CreateRUPackage()
         {
-            // Repackage the already-filtered Windows binaries with RU zip layout and Optimal compression
+            if (Settings.RUExclusions.Length > 0)
+            {
+                Console.WriteLine($"Building RU package with exclusions: {string.Join(", ", Settings.RUExclusions)}");
+            }
+
+            // Always build RU self-contained (filtered extension list, own output dirs)
+            var allExtensions = GetExtensionList();
+            if (allExtensions == null || allExtensions.Count == 0)
+            {
+                throw new InvalidOperationException("Extension list is empty or could not be loaded.");
+            }
+
+            var filteredExtensions = allExtensions
+                .Where(ext => !string.IsNullOrEmpty(ext.Id) && !Settings.RUExclusions.Contains(ext.Id, StringComparer.OrdinalIgnoreCase))
+                .ToList();
+            Console.WriteLine($"RU build: including {filteredExtensions.Count} of {allExtensions.Count} extensions");
+
+            // Build Windows configs with filtered extension list
+            Settings.WindowsBuildConfigurations.ForEach(config =>
+                BuildExtensionsBundle(config, configPrefix: RUConfigPrefix, extensionList: filteredExtensions).GetAwaiter().GetResult());
+
+            // Package into RU zip with version folder structure for downstream compatibility
             var ruPackageConfig = new BundlePackageConfiguration()
             {
                 PackageIdentifier = RUPackageIdentifier,
                 ConfigBinariesToInclude = Settings.BundlePackageNetCoreWindows.ConfigBinariesToInclude,
+                OutputDirectoryPrefix = RUConfigPrefix,
                 CompressionLevel = CompressionLevel.Optimal
             };
 
@@ -405,7 +407,7 @@ namespace Build
                 CreateBundleJsonFile(bundleVersionDirectory);
 
                 // Add Csproj file
-                string projectPath = Path.Combine(bundleVersionDirectory, ExtensionsCsProjFileName);
+                string projectPath = Path.Combine(bundleVersionDirectory, "extensions.csproj");
                 File.Copy(Settings.BundlePackageNetCoreV3.CsProjFilePath, projectPath);
 
                 ZipFile.CreateFromDirectory(Path.Combine(Settings.RootBinDirectory, indexFileMetadata.IndexFileDirectory), Path.Combine(Settings.ArtifactsDirectory, $"{indexFileMetadata.IndexFileDirectory}.zip"), CompressionLevel.NoCompression, false);

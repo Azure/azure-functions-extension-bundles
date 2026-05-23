@@ -11,7 +11,6 @@ namespace Build
                 .Then(Clean)
                 .Then(DownloadTemplates)
                 .Then(BuildBundleBinariesForWindows)
-                .Then(BuildBundleBinariesPortable)
                 .Then(BuildBundleBinariesForLinux)
                 .Then(GenerateVulnerabilityReport)
                 .Then(PackageNetCoreV3Bundle)

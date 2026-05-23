@@ -121,11 +121,11 @@ jobs:
     displayName: 'NuGet Authenticate'
     
   - task: DotNetCoreCLI@2
-    displayName: 'Build Portable Bundle (once)'
+    displayName: 'Build Linux Bundle (once)'
     inputs:
       command: 'run'
       workingDirectory: './build'
-      arguments: 'skip:BuildBundleBinariesForWindows,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV3BundlesWindows,PackageNetCoreV3BundlesLinux,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux'
+      arguments: 'PackageNetCoreV3BundlesLinux'
     env:
       BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
       TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'

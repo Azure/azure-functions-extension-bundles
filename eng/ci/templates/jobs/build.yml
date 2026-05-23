@@ -36,8 +36,18 @@ jobs:
     inputs:
       command: 'run'
       workingDirectory: '.\build'
+      ${{ if eq(parameters.official, true) }}:
+        arguments: 'skip:CreateRUPackage'
       ${{ if eq(parameters.official, false) }}:
-        arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
+        arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
+
+  - ${{ if eq(parameters.official, true) }}:
+    - task: DotNetCoreCLI@2
+      displayName: 'Build RU Package'
+      inputs:
+        command: 'run'
+        workingDirectory: '.\build'
+        arguments: 'CreateRUPackage skip:Clean,DownloadTemplates,BuildBundleBinariesForWindows,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,PackageNetCoreV3BundlesLinux'
 
   - pwsh: |
       $maxSize = 183500800  # 175 MB
