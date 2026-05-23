@@ -37,19 +37,12 @@ jobs:
       command: 'run'
       workingDirectory: '.\build'
       ${{ if eq(parameters.official, true) }}:
-        arguments: 'skip:CreateRUPackage'
+        arguments: ''
       ${{ if eq(parameters.official, false) }}:
         arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux'
 
   - ${{ if eq(parameters.official, true) }}:
-    - task: DotNetCoreCLI@2
-      displayName: 'Build RU Package'
-      inputs:
-        command: 'run'
-        workingDirectory: '.\build'
-        arguments: 'CreateRUPackage skip:Clean,DownloadTemplates,BuildBundleBinariesForWindows,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,PackageNetCoreV3BundlesLinux'
-
-  - pwsh: |
+    - pwsh: |
       $maxSize = 183500800  # 175 MB
       $ruZips = @(Get-ChildItem '$(Build.Repository.LocalPath)\artifacts\*_RU_package.zip')
       if ($ruZips.Count -eq 0) {

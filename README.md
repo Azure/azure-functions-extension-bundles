@@ -209,7 +209,7 @@ The flavor selection in the Functions host uses these environment checks:
 
 ### Extension Exclusions
 
-Certain extensions may be excluded from specific bundle flavors. Exclusions are defined in [`ruExclusions.json`](src/Microsoft.Azure.Functions.ExtensionBundle/ruExclusions.json).
+Certain extensions may be excluded from specific bundle flavors. Exclusions are defined in [`windowsExclusions.json`](src/Microsoft.Azure.Functions.ExtensionBundle/windowsExclusions.json).
 
 Currently excluded from `win-any` and Rapid Update package builds:
 

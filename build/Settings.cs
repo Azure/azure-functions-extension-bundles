@@ -10,29 +10,29 @@ namespace Build
     {
         public static string basePath = path;
 
-        public static readonly string RUExclusionsFilePath = Path.Combine(Path.GetFullPath(basePath), "src", "Microsoft.Azure.Functions.ExtensionBundle", "ruExclusions.json");
+        public static readonly string WindowsExclusionsFilePath = Path.Combine(Path.GetFullPath(basePath), "src", "Microsoft.Azure.Functions.ExtensionBundle", "windowsExclusions.json");
 
-        private static readonly Lazy<string[]> _ruExclusions = new Lazy<string[]>(LoadRUExclusions);
+        private static readonly Lazy<string[]> _windowsExclusions = new Lazy<string[]>(LoadWindowsExclusions);
 
-        public static string[] RUExclusions => _ruExclusions.Value;
+        public static string[] WindowsExclusions => _windowsExclusions.Value;
 
-        private static string[] LoadRUExclusions()
+        private static string[] LoadWindowsExclusions()
         {
-            if (!File.Exists(RUExclusionsFilePath))
+            if (!File.Exists(WindowsExclusionsFilePath))
             {
                 return Array.Empty<string>();
             }
 
             try
             {
-                var content = File.ReadAllText(RUExclusionsFilePath);
+                var content = File.ReadAllText(WindowsExclusionsFilePath);
                 var exclusions = JsonConvert.DeserializeObject<string[]>(content);
                 return exclusions ?? Array.Empty<string>();
             }
             catch (JsonException ex)
             {
                 throw new InvalidOperationException(
-                    $"Failed to parse RU exclusions from '{RUExclusionsFilePath}': {ex.Message}", ex);
+                    $"Failed to parse Windows exclusions from '{WindowsExclusionsFilePath}': {ex.Message}", ex);
             }
         }
 
@@ -78,8 +78,6 @@ namespace Build
         public static readonly string BundleConfigJsonFileName = "bundleConfig.json";
 
         public static readonly string NugetConfigFileName = "NuGet.Config";
-
-        public static readonly string RUPackagePath = Path.Combine(RootBinDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package", BundleConfiguration.Instance.ExtensionBundleVersion);
 
         public static readonly string IndexFileName = "index.json";
 
