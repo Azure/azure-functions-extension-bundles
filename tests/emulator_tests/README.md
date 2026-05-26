@@ -127,12 +127,12 @@ Build the extension bundle locally. For detailed build instructions, see the "Lo
 ```powershell
 # From the repository root
 cd build
-dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux
+dotnet run skip:DownloadTemplates,BuildWindowsBinaries,BuildFilteredPortableBinaries,BuildLinuxBinaries,GenerateVulnerabilityReport,PackageBundle,PackageWindowsBundle,PackageLinuxBundle,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux
 ```
 
 This will generate extension bundle packages in the `artifacts/` directory.
 
-**Note:** Ensure you have the required template artifacts in the `templatesArtifacts/` directory before building. See the main README.md for details on obtaining these files.
+**Note:** Ensure you have the required template artifacts in the `templatesArtifacts/` directory before building if you want to test the templates. See the main README.md for details on obtaining these files.
 
 ### 2. Start Docker Emulator
 

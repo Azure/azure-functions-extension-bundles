@@ -125,7 +125,7 @@ jobs:
     inputs:
       command: 'run'
       workingDirectory: './build'
-      arguments: 'PackageNetCoreV3BundlesLinux'
+      arguments: 'skip:DownloadTemplates,BuildWindowsBinaries,BuildFilteredPortableBinaries,BuildLinuxBinaries,GenerateVulnerabilityReport,PackageBundle,PackageWindowsBundle,PackageLinuxBundle,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux'
     env:
       BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
       TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
