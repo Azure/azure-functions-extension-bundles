@@ -87,6 +87,15 @@ namespace Build
             new IndexFileV2Metadata("https://cdn.functions.azure.com", BundleConfiguration.Instance.ExtensionBundleId, "cdnProd")
         };
 
+        public static BuildConfiguration PortableBuildConfiguration = new BuildConfiguration()
+        {
+            ConfigId = ConfigId.any_any,
+            SourceProjectFileName = "extensions.csproj",
+            RuntimeIdentifier = "any",
+            PublishReadyToRun = false,
+            PublishBinDirectorySubPath = "bin"
+        };
+
         public static List<BuildConfiguration> WindowsBuildConfigurations = new List<BuildConfiguration>()
         {
             new BuildConfiguration()
@@ -104,14 +113,6 @@ namespace Build
                 RuntimeIdentifier = "win-x64",
                 PublishReadyToRun = true,
                 PublishBinDirectorySubPath = Path.Combine("bin_v3", "win-x64")
-            },
-            new BuildConfiguration()
-            {
-                ConfigId = ConfigId.any_any,
-                SourceProjectFileName = "extensions.csproj",
-                RuntimeIdentifier = "any",
-                PublishReadyToRun = false,
-                PublishBinDirectorySubPath = "bin"
             }
         };
 
@@ -135,43 +136,35 @@ namespace Build
             linux_x64
         }
 
-        public static BundlePackageConfiguration BundlePackageNetCoreV3Any = new BundlePackageConfiguration()
+        public static BundlePackageConfiguration BundlePackagePortable = new BundlePackageConfiguration()
         {
             PackageIdentifier = "any-any",
             ConfigBinariesToInclude = new List<ConfigId>() {
                 ConfigId.any_any
-            },
-            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj")
+            }
         };
 
-        public static BundlePackageConfiguration BundlePackageNetCoreWindows = new BundlePackageConfiguration()
+        public static BundlePackageConfiguration BundlePackageWindows = new BundlePackageConfiguration()
         {
             PackageIdentifier = "win-any",
-            ConfigBinariesToInclude = new List<ConfigId>() {
-                ConfigId.any_any,
-                ConfigId.win_x86,
-                ConfigId.win_x64
-            },
-            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj")
+            // Note: ConfigBinariesToInclude not used — PackageWindowsBundle uses StageWindowsBundleContent directly
         };
 
-        public static BundlePackageConfiguration BundlePackageNetCoreV3Linux = new BundlePackageConfiguration()
+        public static BundlePackageConfiguration BundlePackageLinux = new BundlePackageConfiguration()
         {
             PackageIdentifier = "linux-x64",
             ConfigBinariesToInclude = new List<ConfigId>() {
                 ConfigId.any_any,
                 ConfigId.linux_x64
-            },
-            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj")
+            }
         };
 
-        public static BundlePackageConfiguration BundlePackageNetCoreV3 = new BundlePackageConfiguration()
+        public static BundlePackageConfiguration BundlePackageBase = new BundlePackageConfiguration()
         {
             PackageIdentifier = string.Empty,
             ConfigBinariesToInclude = new List<ConfigId>() {
                 ConfigId.any_any
-            },
-            CsProjFilePath = Path.Combine(RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj")
+            }
         };
     }
 }

@@ -62,7 +62,7 @@ $env:TEMPLATES_ARTIFACTS_DIRECTORY = "templatesArtifacts"
 
 # Navigate to build directory and run
 cd build
-dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux
+dotnet run skip:GenerateVulnerabilityReport,PackageLinuxBundle,CreateCDNStoragePackageLinux,BuildLinuxBinaries
 ```
 
 ### Building on Linux
@@ -74,7 +74,7 @@ export TEMPLATES_ARTIFACTS_DIRECTORY="templatesArtifacts"
 
 # Navigate to build directory and run
 cd build
-dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows
+dotnet run skip:GenerateVulnerabilityReport,PackageWindowsBundle,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildWindowsBinaries,BuildFilteredPortableBinaries
 ```
 
 **Note:** Replace `<ExtensionBundleRepoPath>` with the actual path to your extension bundle repository.

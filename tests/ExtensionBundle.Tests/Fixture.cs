@@ -15,11 +15,13 @@ namespace Microsoft.Azure.Functions.ExtensionBundle.Tests
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                BuildSteps.BuildBundleBinariesForLinux();
+                BuildSteps.BuildLinuxBinaries();
             }
             else
             {
-                BuildSteps.BuildBundleBinariesForWindows();
+                BuildSteps.BuildPortableBinaries();
+                BuildSteps.BuildWindowsBinaries();
+                BuildSteps.BuildFilteredPortableBinaries();
             }
 
         }

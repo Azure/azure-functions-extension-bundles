@@ -21,16 +21,11 @@ namespace Build
 
         public string CsProjFilePath
         {
-            get => _csProjFilePath ?? GetDefaultCsProjFilePath();
+            get => _csProjFilePath ?? Path.Combine(Settings.RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj");
             set => _csProjFilePath = value;
         }
 
         private string _csProjFilePath;
-
-        private string GetDefaultCsProjFilePath()
-        {
-            return Path.Combine(Settings.RootBuildDirectory, ConfigId.any_any.ToString(), "extensions.csproj");
-        }
     }
 
 }
