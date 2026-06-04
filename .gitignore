@@ -361,3 +361,8 @@ __queuestorage__/
 
 # Agent plan files
 PLAN-*.md
+
+# Azure Developer CLI local environment files
+.azure/
+# Bicep build output
+infra/acr-artifact-cache/infra/main.json

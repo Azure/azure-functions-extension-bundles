@@ -1,0 +1,5 @@
+name: acr-artifact-cache
+metadata:
+  template: acr-artifact-cache@0.0.1
+infra:
+  provider: bicep
