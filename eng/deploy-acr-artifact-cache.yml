@@ -1,0 +1,70 @@
+# Manual-only pipeline for provisioning the ACR Artifact Cache used by mirror CI.
+trigger: none
+pr: none
+
+resources:
+  repositories:
+  - repository: 1es
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+
+variables:
+- group: acr-artifact-cache
+- name: AZD_ENV_NAME
+  value: acr-artifact-cache
+- name: ACR_ARTIFACT_CACHE_DIR
+  value: infra/acr-artifact-cache
+
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1es
+  parameters:
+    pool:
+      name: 1es-pool-azfunc
+      image: 1es-ubuntu-22.04
+      os: linux
+    stages:
+    - stage: ProvisionAcrArtifactCache
+      displayName: Provision ACR Artifact Cache
+      dependsOn: []
+      jobs:
+      - job: Provision
+        displayName: Provision ACR Artifact Cache
+        timeoutInMinutes: 60
+        templateContext:
+          outputs: []
+        steps:
+        - checkout: self
+          fetchDepth: 1
+
+        - task: AzureCLI@2
+          displayName: Validate and provision ACR Artifact Cache
+          inputs:
+            azureSubscription: $(AZURE_SERVICE_CONNECTION)
+            scriptType: pscore
+            scriptLocation: inlineScript
+            workingDirectory: $(Build.Repository.LocalPath)/$(ACR_ARTIFACT_CACHE_DIR)
+            inlineScript: |
+              $ErrorActionPreference = 'Stop'
+
+              if (-not (Get-Command azd -ErrorAction SilentlyContinue)) {
+                curl -fsSL https://aka.ms/install-azd.sh | bash
+                $env:PATH = "$env:HOME/.azd/bin:$env:PATH"
+              }
+
+              azd version
+
+              azd env new $(AZD_ENV_NAME) --no-prompt
+              azd env set AZURE_SUBSCRIPTION_ID $(AZURE_SUBSCRIPTION_ID)
+              azd env set AZURE_LOCATION $(AZURE_LOCATION)
+              azd env set AZURE_RESOURCE_GROUP $(AZURE_RESOURCE_GROUP)
+              azd env set ACR_NAME $(ACR_NAME)
+              azd env set ACR_SKU $(ACR_SKU)
+              azd env set ACR_ANONYMOUS_PULL_ENABLED $(ACR_ANONYMOUS_PULL_ENABLED)
+              azd env set DOCKERHUB_USERNAME_SECRET_URI $(DOCKERHUB_USERNAME_SECRET_URI)
+              azd env set DOCKERHUB_TOKEN_SECRET_URI $(DOCKERHUB_TOKEN_SECRET_URI)
+
+              azd provision --preview --no-prompt
+              azd provision --no-prompt
+          env:
+            AZURE_ENV_NAME: $(AZD_ENV_NAME)

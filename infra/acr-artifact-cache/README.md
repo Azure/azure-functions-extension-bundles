@@ -52,6 +52,32 @@ azd provision
 
 Set `ACR_ANONYMOUS_PULL_ENABLED` to `true` only when cached images should be pullable without ACR authentication. Anonymous pull removes the need for `az acr login` or Docker credentials for image pulls, but anyone who can reach the registry login server can pull repositories that allow anonymous access.
 
+## Deploy from 1ES pipeline
+
+Use `eng/deploy-acr-artifact-cache.yml` from the mirror repository to reprovision the same ACR after cache rule changes. The pipeline is manual-only and uses the 1ES official template.
+
+Recommended setup:
+
+1. Run the first deployment locally to choose and verify stable names for the resource group, ACR, and Key Vault secrets.
+2. Create an Azure Resource Manager service connection in Azure DevOps that uses Workload Identity Federation.
+3. Grant the service connection identity `Contributor` on the subscription or target resource group.
+4. If Key Vault access is managed by the deployment identity, grant the service connection identity the required Key Vault management permissions. The preferred steady-state model is that ACR reads Docker Hub credentials through Key Vault secret URIs.
+5. Create an Azure DevOps variable group named `acr-artifact-cache` with these values:
+
+| Variable | Secret | Description |
+|---|---:|---|
+| `AZURE_SERVICE_CONNECTION` | No | Name of the Azure Resource Manager service connection used by `AzureCLI@2`. |
+| `AZURE_SUBSCRIPTION_ID` | No | Subscription for the deployment. |
+| `AZURE_LOCATION` | No | Azure region, for example `westus2`. |
+| `AZURE_RESOURCE_GROUP` | No | Stable resource group name. |
+| `ACR_NAME` | No | Stable, globally unique ACR name. Keep this unchanged after first deployment. |
+| `ACR_SKU` | No | ACR SKU, for example `Standard`. |
+| `ACR_ANONYMOUS_PULL_ENABLED` | No | `true` or `false`. Keep `false` unless unauthenticated pulls are intended. |
+| `DOCKERHUB_USERNAME_SECRET_URI` | Yes | Key Vault secret URI containing the Docker Hub username. |
+| `DOCKERHUB_TOKEN_SECRET_URI` | Yes | Key Vault secret URI containing the Docker Hub token. |
+
+When cache rules or image paths change, update the Bicep files and run the pipeline. Because `ACR_NAME` and `AZURE_RESOURCE_GROUP` are fixed in the variable group, the deployment updates the existing registry instead of creating a new one.
+
 ## Cache rules and pull paths
 
 Artifact Cache creates rules, but it does not pre-populate tags. A tag is cached only after the first successful pull through the ACR login server.
