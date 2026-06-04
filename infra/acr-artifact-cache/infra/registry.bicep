@@ -4,6 +4,9 @@ param acrName string
 @description('Azure Container Registry SKU.')
 param acrSku string
 
+@description('Allow anonymous pull access to cached images in the registry.')
+param anonymousPullEnabled bool
+
 @description('Azure region for the registry.')
 param location string
 
@@ -77,7 +80,7 @@ resource registry 'Microsoft.ContainerRegistry/registries@2023-11-01-preview' = 
   }
   properties: {
     adminUserEnabled: false
-    anonymousPullEnabled: false
+    anonymousPullEnabled: anonymousPullEnabled
     dataEndpointEnabled: false
     networkRuleBypassOptions: 'AzureServices'
     policies: {

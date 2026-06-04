@@ -44,10 +44,13 @@ azd env set AZURE_LOCATION westus2
 azd env set AZURE_RESOURCE_GROUP rg-acr-artifact-cache
 azd env set ACR_NAME <globally-unique-acr-name>
 azd env set ACR_SKU Standard
+azd env set ACR_ANONYMOUS_PULL_ENABLED false
 azd env set DOCKERHUB_USERNAME_SECRET_URI $dockerHubUsernameSecretUri
 azd env set DOCKERHUB_TOKEN_SECRET_URI $dockerHubTokenSecretUri
 azd provision
 ```
+
+Set `ACR_ANONYMOUS_PULL_ENABLED` to `true` only when cached images should be pullable without ACR authentication. Anonymous pull removes the need for `az acr login` or Docker credentials for image pulls, but anyone who can reach the registry login server can pull repositories that allow anonymous access.
 
 ## Cache rules and pull paths
 
@@ -78,6 +81,12 @@ docker pull "$acr/cache/library/mysql:9.0"
 ```
 
 The `confluentinc/cp-schema-registry` and `rabbitmq` entries are intentionally shared by duplicate image requirements.
+
+If anonymous pull is disabled, authenticate before pulling:
+
+```powershell
+az acr login --name <acr-name>
+```
 
 ## Security scanning
 

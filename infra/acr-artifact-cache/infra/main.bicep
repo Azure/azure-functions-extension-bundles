@@ -19,6 +19,9 @@ param acrName string = toLower('acr${uniqueString(subscription().id, resourceGro
 ])
 param acrSku string = 'Standard'
 
+@description('Allow anonymous pull access to cached images in the registry. Keep disabled unless the cache is intended to be public within the registry network boundary.')
+param anonymousPullEnabled bool = false
+
 @description('Key Vault secret URI for the Docker Hub username used by the ACR artifact cache credential set.')
 param dockerHubUsernameSecretUri string
 
@@ -36,6 +39,7 @@ module registry 'registry.bicep' = {
   params: {
     acrName: acrName
     acrSku: acrSku
+    anonymousPullEnabled: anonymousPullEnabled
     location: location
     dockerHubUsernameSecretUri: dockerHubUsernameSecretUri
     dockerHubTokenSecretUri: dockerHubTokenSecretUri

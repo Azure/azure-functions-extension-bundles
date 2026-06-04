@@ -14,6 +14,9 @@
     "acrSku": {
       "value": "${ACR_SKU=Standard}"
     },
+    "anonymousPullEnabled": {
+      "value": "${ACR_ANONYMOUS_PULL_ENABLED=false}"
+    },
     "dockerHubUsernameSecretUri": {
       "value": "${DOCKERHUB_USERNAME_SECRET_URI}"
     },
