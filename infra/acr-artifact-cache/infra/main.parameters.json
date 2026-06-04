@@ -14,11 +14,11 @@
     "acrSku": {
       "value": "${ACR_SKU=Standard}"
     },
-    "dockerHubUsername": {
-      "value": "${DOCKERHUB_USERNAME}"
+    "dockerHubUsernameSecretUri": {
+      "value": "${DOCKERHUB_USERNAME_SECRET_URI}"
     },
-    "dockerHubPassword": {
-      "value": "${DOCKERHUB_PASSWORD}"
+    "dockerHubTokenSecretUri": {
+      "value": "${DOCKERHUB_TOKEN_SECRET_URI}"
     }
   }
 }

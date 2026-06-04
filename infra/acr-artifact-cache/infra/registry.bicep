@@ -7,13 +7,11 @@ param acrSku string
 @description('Azure region for the registry.')
 param location string
 
-@secure()
-@description('Docker Hub username used by the ACR artifact cache credential set.')
-param dockerHubUsername string
+@description('Key Vault secret URI for the Docker Hub username used by the ACR artifact cache credential set.')
+param dockerHubUsernameSecretUri string
 
-@secure()
-@description('Docker Hub personal access token or password used by the ACR artifact cache credential set.')
-param dockerHubPassword string
+@description('Key Vault secret URI for the Docker Hub personal access token used by the ACR artifact cache credential set.')
+param dockerHubTokenSecretUri string
 
 var dockerHubLoginServer = 'docker.io'
 var dockerHubCredentialName = 'dockerhub'
@@ -106,8 +104,8 @@ resource credentialSet 'Microsoft.ContainerRegistry/registries/credentialSets@20
     authCredentials: [
       {
         name: 'Credential1'
-        usernameSecretIdentifier: dockerHubUsername
-        passwordSecretIdentifier: dockerHubPassword
+        usernameSecretIdentifier: dockerHubUsernameSecretUri
+        passwordSecretIdentifier: dockerHubTokenSecretUri
       }
     ]
   }

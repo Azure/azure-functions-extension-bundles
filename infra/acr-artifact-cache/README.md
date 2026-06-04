@@ -6,9 +6,33 @@ This azd project deploys an Azure Container Registry with Artifact Cache rules f
 
 - Azure Developer CLI (`azd`)
 - Azure CLI (`az`)
-- Docker Hub account and access token
+- Docker Hub account and personal access token
+- Azure Key Vault that stores the Docker Hub username and token as secrets
 
-Docker Hub upstreams require authenticated pulls for ACR Artifact Cache. Use a Docker Hub personal access token instead of an account password when possible.
+Docker Hub upstreams require authenticated pulls for ACR Artifact Cache. Use a Docker Hub personal access token instead of an account password.
+
+The Bicep template expects Key Vault secret URIs, not raw Docker Hub credentials.
+
+## Prepare Key Vault secrets
+
+Create or choose a Key Vault, then store the Docker Hub credentials as secrets:
+
+```powershell
+$resourceGroup = "rg-acr-artifact-cache"
+$location = "westus2"
+$keyVaultName = "<globally-unique-key-vault-name>"
+
+az group create --name $resourceGroup --location $location
+az keyvault create --resource-group $resourceGroup --name $keyVaultName --location $location --enable-rbac-authorization false
+
+az keyvault secret set --vault-name $keyVaultName --name dockerhub-username --value "<docker-hub-username>"
+az keyvault secret set --vault-name $keyVaultName --name dockerhub-token --value "<docker-hub-token>"
+
+$dockerHubUsernameSecretUri = az keyvault secret show --vault-name $keyVaultName --name dockerhub-username --query id -o tsv
+$dockerHubTokenSecretUri = az keyvault secret show --vault-name $keyVaultName --name dockerhub-token --query id -o tsv
+```
+
+The deploying identity must be able to read the secrets and create the ACR credential set. Keep the Key Vault in the same tenant as the deployment.
 
 ## Deploy
 
@@ -20,8 +44,8 @@ azd env set AZURE_LOCATION westus2
 azd env set AZURE_RESOURCE_GROUP rg-acr-artifact-cache
 azd env set ACR_NAME <globally-unique-acr-name>
 azd env set ACR_SKU Standard
-azd env set DOCKERHUB_USERNAME <docker-hub-username>
-azd env set DOCKERHUB_PASSWORD <docker-hub-token>
+azd env set DOCKERHUB_USERNAME_SECRET_URI $dockerHubUsernameSecretUri
+azd env set DOCKERHUB_TOKEN_SECRET_URI $dockerHubTokenSecretUri
 azd provision
 ```
 
@@ -63,6 +87,6 @@ Enable Defender for Containers or the relevant Defender for Cloud registry vulne
 
 ## Sharing azd files
 
-It is safe to share source files such as `azure.yaml`, Bicep templates, and this README. Do not commit `.azure` environment files if they contain secrets.
+It is safe to share source files such as `azure.yaml`, Bicep templates, and this README. Do not commit `.azure` environment files if they contain secrets or Key Vault secret URIs.
 
-Resource names like an ACR name or resource group name are not secrets by themselves, but they can reveal environment naming and subscription organization details. Sharing them in a repo is usually acceptable for non-sensitive test infrastructure, but avoid committing Docker Hub credentials, access tokens, subscription IDs, tenant IDs, or production-only naming details.
+Resource names like an ACR name, resource group name, or Key Vault name are not secrets by themselves, but they can reveal environment naming and subscription organization details. Sharing them in a repo is usually acceptable for non-sensitive test infrastructure, but avoid committing Docker Hub credentials, access tokens, Key Vault secret URIs, subscription IDs, tenant IDs, or production-only naming details.

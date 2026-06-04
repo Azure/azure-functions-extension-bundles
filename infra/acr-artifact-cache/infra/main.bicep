@@ -19,13 +19,11 @@ param acrName string = toLower('acr${uniqueString(subscription().id, resourceGro
 ])
 param acrSku string = 'Standard'
 
-@secure()
-@description('Docker Hub username used by the ACR artifact cache credential set.')
-param dockerHubUsername string
+@description('Key Vault secret URI for the Docker Hub username used by the ACR artifact cache credential set.')
+param dockerHubUsernameSecretUri string
 
-@secure()
-@description('Docker Hub personal access token or password used by the ACR artifact cache credential set.')
-param dockerHubPassword string
+@description('Key Vault secret URI for the Docker Hub personal access token used by the ACR artifact cache credential set.')
+param dockerHubTokenSecretUri string
 
 resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   name: resourceGroupName
@@ -39,8 +37,8 @@ module registry 'registry.bicep' = {
     acrName: acrName
     acrSku: acrSku
     location: location
-    dockerHubUsername: dockerHubUsername
-    dockerHubPassword: dockerHubPassword
+    dockerHubUsernameSecretUri: dockerHubUsernameSecretUri
+    dockerHubTokenSecretUri: dockerHubTokenSecretUri
   }
 }
 
