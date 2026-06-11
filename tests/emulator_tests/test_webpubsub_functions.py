@@ -314,16 +314,15 @@ class TestWebPubSubFunctions(WebPubSubTestMixin, testutils.WebHostTestCase):
     def test_trigger_connect_event_legacy_connection(self):
         """
         Test trigger using connection= (singular) — the common customer pattern.
-        The singular 'connection' property does NOT map to the C# attribute's
-        Connections[] — validation falls back to the default WebPubSubConnectionString.
-        So we must use the DEFAULT origin and key for signature validation.
+        The obsolete singular 'connection' property maps to the C# attribute's
+        Connections[], so validation uses the configured custom connection.
         Routing still works via ce-hub header.
         """
         logger.info("Testing trigger connect event for legacy connection hub...")
 
         headers = {
             "Content-Type": "application/json",
-            "WebHook-Request-Origin": "test-default.webpubsub.azure.com",
+            "WebHook-Request-Origin": "test-custom.webpubsub.azure.com",
             "ce-type": "azure.webpubsub.sys.connect",
             "ce-specversion": "1.0",
             "ce-source": "/hubs/legacyhub",
@@ -334,7 +333,7 @@ class TestWebPubSubFunctions(WebPubSubTestMixin, testutils.WebHostTestCase):
             "ce-connectionId": "test-conn-id-legacy",
             "ce-userId": "legacy-user",
             "ce-signature": self._compute_ce_signature(
-                self._get_access_key("test-default"), "test-conn-id-legacy"),
+                self._get_access_key("test-custom"), "test-conn-id-legacy"),
         }
         body = (
             '{"claims":{},"query":{},"subprotocols":[],'
@@ -976,12 +975,9 @@ class TestWebPubSubCustomConnectionOnly(WebPubSubTestMixin,
             "ce-hub": "customhub",
             "ce-connectionId": "test-conn-custom-001",
             "ce-userId": "custom-user",
-            # Empty signature is intentional: connection= (singular) does NOT
-            # populate the C# attribute's Connections[] property, and no default
-            # WebPubSubConnectionString is set either. ResolveAccessesOrDefault()
-            # returns null → RequestValidator sets _skipValidation = true →
-            # any signature (including empty) is accepted.
-            "ce-signature": "sha256=",
+            "ce-signature": self._compute_ce_signature(
+                base64.b64encode(b"test-custom-key").decode(),
+                "test-conn-custom-001"),
         }
         body = (
             '{"claims":{},"query":{},"subprotocols":[],'

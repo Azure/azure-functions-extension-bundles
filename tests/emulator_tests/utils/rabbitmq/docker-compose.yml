@@ -1,7 +1,7 @@
 name: rabbitmq-emulator
 services:
   rabbitmq:
-    image: rabbitmq:3-management
+    image: funcacrcache.azurecr.io/cache/library/rabbitmq:3-management
     hostname: rabbitmq
     container_name: rabbitmq
     ports:
