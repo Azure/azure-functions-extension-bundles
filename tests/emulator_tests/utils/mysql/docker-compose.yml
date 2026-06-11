@@ -3,7 +3,7 @@ services:
   # Service for MySQL Database
   mysql:
     container_name: "mysql"
-    image: "mysql:8.0"
+    image: "funcacrcache.azurecr.io/cache/library/mysql:9.0"
     ports:
       - "3307:3306"
     environment:
