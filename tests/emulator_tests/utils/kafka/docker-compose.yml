@@ -1,7 +1,7 @@
 name: kafka-emulator
 services:
   kafka:
-    image: confluentinc/cp-kafka:7.6.0
+    image: funcacrcache.azurecr.io/cache/confluentinc/cp-kafka:7.6.0
     hostname: kafka
     container_name: kafka
     ports:
