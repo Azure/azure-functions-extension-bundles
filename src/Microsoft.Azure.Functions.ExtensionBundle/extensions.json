@@ -277,5 +277,11 @@
       "mcpResourceTrigger",
       "mcpPromptTrigger"
     ]
+  },
+  {
+    "id": "MessagePack",
+    "version": "2.5.301",
+    "name": "MessagePack",
+    "bindings": []
   }
 ]
