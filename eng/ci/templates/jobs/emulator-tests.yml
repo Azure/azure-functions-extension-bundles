@@ -18,7 +18,7 @@ jobs:
     displayName: Build Core Tools
     pool:
       name: ${{ parameters.poolName }}
-      image: 1es-ubuntu-22.04
+      image: 1es-ubuntu-24.04-min
       os: linux
     templateContext:
       outputs:
@@ -79,7 +79,7 @@ jobs:
     displayName: Build Extension Bundle
     pool:
       name: ${{ parameters.poolName }}
-      image: 1es-ubuntu-22.04
+      image: 1es-ubuntu-24.04-min
       os: linux
     # 1ES-compliant artifact publication via templateContext.outputs
     templateContext:
@@ -93,6 +93,12 @@ jobs:
 
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Authenticate'
+
+      - task: UseDotNet@2
+        displayName: 'Install current .NET SDK'
+        inputs:
+          packageType: 'sdk'
+          useGlobalJson: true
 
       # Build the any-any bundle
       - task: DotNetCoreCLI@2
@@ -120,7 +126,7 @@ jobs:
     dependsOn: PrepareCoreTools
     pool:
       name: ${{ parameters.poolName }}
-      image: 1es-ubuntu-22.04
+      image: 1es-ubuntu-24.04-min
       os: linux
 
     steps:
@@ -213,7 +219,7 @@ jobs:
       - GenerateTestMatrix
     pool:
       name: ${{ parameters.poolName }}
-      image: 1es-ubuntu-22.04
+      image: 1es-ubuntu-24.04-min
       os: linux
     strategy:
       maxParallel: 5
@@ -294,7 +300,7 @@ jobs:
           if [ "$(ADDITIONAL_EMULATORS)" = "sql" ]; then
             echo "Installing Microsoft ODBC Driver 18 for SQL Server..."
             curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /etc/apt/trusted.gpg.d/microsoft.asc
-            curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+            curl https://packages.microsoft.com/config/ubuntu/24.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
             sudo apt-get update
             sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
             echo "ODBC Driver 18 installed successfully"
