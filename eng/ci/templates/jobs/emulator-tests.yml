@@ -79,7 +79,7 @@ jobs:
     displayName: Build Extension Bundle
     pool:
       name: ${{ parameters.poolName }}
-      image: 1es-ubuntu-22.04
+      image: 1es-ubuntu-24.04-min
       os: linux
     # 1ES-compliant artifact publication via templateContext.outputs
     templateContext:
@@ -90,46 +90,19 @@ jobs:
           artifact: bundle-artifacts
 
     steps:
-      # Download template artifacts for the build
-      # Official templates
-      - task: DownloadBuildArtifacts@1
-        inputs:
-          buildType: 'specific'
-          project: '3f99e810-c336-441f-8892-84983093ad7f'
-          pipeline: '963'
-          buildVersionToDownload: 'latestFromBranch'
-          branchName: 'refs/heads/dev'
-          downloadType: 'single'
-          artifactName: 'drop'
-          downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
-        condition: ${{ parameters.official }}
-
-      # Public templates
-      - task: DownloadBuildArtifacts@1
-        inputs:
-          buildType: 'specific'
-          project: 'ae7e3bf3-d41a-4480-9ac0-b6cf9df9ac24'
-          pipeline: '976'
-          buildVersionToDownload: 'latestFromBranch'
-          branchName: 'refs/heads/dev'
-          downloadType: 'single'
-          artifactName: 'drop'
-          downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
-        condition: ${{ eq(parameters.official, false) }}
 
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Authenticate'
 
-      # Build the Linux bundle first
+      # Build the any-any bundle
       - task: DotNetCoreCLI@2
-        displayName: 'Build Linux Bundle (once)'
+        displayName: 'Build any-any Bundle (once)'
         inputs:
           command: 'run'
           workingDirectory: './build'
-          arguments: 'PackageBundlesLinux'
+          arguments: 'skip:DownloadTemplates,BuildBundleBinariesForLinux,PackageBundle,PackageBundlesLinux,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux'
         env:
           BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
-          TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
 
       - script: |
           echo "Checking for build artifacts..."
