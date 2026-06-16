@@ -220,6 +220,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI",
     "majorVersion": "0",
+    "Version": "0.19.0-alpha",
     "name": "OpenAI",
     "bindings": [
       "TextCompletion",
@@ -244,6 +245,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.AzureAISearch",
     "majorVersion": "0",
+    "Version": "0.5.0-alpha",
     "name": "OpenAIAzureAISearch",
     "bindings": [
       "SemanticSearch",
@@ -253,6 +255,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.CosmosDBSearch",
     "majorVersion": "0",
+    "Version": "0.4.0-alpha",
     "name": "OpenAICosmosDBSearch",
     "bindings": [
       "SemanticSearch",
@@ -262,6 +265,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.CosmosDBNoSqlSearch",
     "majorVersion": "0",
+    "Version": "0.1.0-alpha",
     "name": "OpenAICosmosDBNoSqlSearch",
     "bindings": [
       "SemanticSearch",
@@ -271,6 +275,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.Kusto",
     "majorVersion": "0",
+    "Version": "0.17.0-alpha",
     "name": "OpenAIKusto",
     "bindings": [
       "SemanticSearch",
