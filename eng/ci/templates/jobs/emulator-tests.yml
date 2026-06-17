@@ -18,7 +18,7 @@ jobs:
     displayName: Build Core Tools
     pool:
       name: ${{ parameters.poolName }}
-      image: 1es-ubuntu-24.04-min
+      image: 1es-ubuntu-22.04
       os: linux
     templateContext:
       outputs:
@@ -44,13 +44,6 @@ jobs:
 
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Authenticate'
-
-      - task: UseDotNet@2
-        displayName: 'Install current .NET SDK'
-        inputs:
-          packageType: 'sdk'
-          useGlobalJson: true
-          workingDirectory: '$(Agent.BuildDirectory)/core-tools'
 
       - task: PowerShell@2
         displayName: 'Build Azure Functions Core Tools'
