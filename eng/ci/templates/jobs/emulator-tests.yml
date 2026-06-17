@@ -79,7 +79,7 @@ jobs:
     displayName: Build Extension Bundle
     pool:
       name: ${{ parameters.poolName }}
-      image: 1es-ubuntu-22.04
+      image: 1es-ubuntu-24.04-min
       os: linux
     # 1ES-compliant artifact publication via templateContext.outputs
     templateContext:
@@ -93,6 +93,12 @@ jobs:
 
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Authenticate'
+
+      - task: UseDotNet@2
+        displayName: 'Install current .NET SDK'
+        inputs:
+          packageType: 'sdk'
+          useGlobalJson: true
 
       # Build the any-any bundle
       - task: DotNetCoreCLI@2
