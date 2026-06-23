@@ -249,6 +249,12 @@
     "bindings": []
   },
   {
+    "id": "MessagePack",
+    "version": "2.5.301",
+    "name": "MessagePack",
+    "bindings": []
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.MySql",
     "majorVersion": "1",
     "name": "MySqlBinding",
