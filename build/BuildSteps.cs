@@ -412,26 +412,14 @@ namespace Build
 
         public static void CreateCDNStoragePackageWindows()
         {
-            // Stage filtered portable bundle content (reused across CDN index directories)
-            var portableConfig = Settings.PortableBuildConfiguration;
-            string filteredPortableBundlePath = Path.Combine(Settings.RootBuildDirectory, "filtered_any_any_bundle");
-            string filteredAnyBinPath = Path.Combine(Settings.RootBinDirectory, $"{WindowsConfigPrefix}_{portableConfig.ConfigId}", portableConfig.PublishBinDirectorySubPath);
-            string targetBinPath = Path.Combine(filteredPortableBundlePath, portableConfig.PublishBinDirectorySubPath);
-            FileUtility.CopyDirectory(filteredAnyBinPath, targetBinPath);
-            AddBindingInfoToExtensionsJson(Path.Join(targetBinPath, Settings.ExtensionsJsonFileName));
-
-            string filteredCsProjPath = Path.Combine(Settings.RootBuildDirectory, $"{WindowsConfigPrefix}_{portableConfig.ConfigId}", "extensions.csproj");
-            StageCommonBundleFiles(filteredPortableBundlePath, filteredCsProjPath);
-
             foreach (var indexFileMetadata in Settings.IndexFiles)
             {
                 string packageRootDirectoryPath = Path.Combine(Settings.RootBinDirectory, $"{indexFileMetadata.IndexFileDirectory}_windows");
                 string packageBundleDirectory = Path.Combine(packageRootDirectoryPath, BundleConfiguration.Instance.ExtensionBundleId, BundleConfiguration.Instance.ExtensionBundleVersion);
                 FileUtility.EnsureDirectoryExists(packageBundleDirectory);
 
-                // Create filtered any-any.zip directly in the CDN package directory
-                string filteredPortableZipPath = Path.Combine(packageBundleDirectory, Settings.BundlePackagePortable.GeneratedBundleZipFileName);
-                ZipFile.CreateFromDirectory(filteredPortableBundlePath, filteredPortableZipPath, CompressionLevel.NoCompression, false);
+                // Include the full unfiltered any-any.zip (all extensions including Fabric)
+                AddBundleZipFile(packageBundleDirectory, Settings.BundlePackagePortable);
 
                 AddBundleZipFile(packageBundleDirectory, Settings.BundlePackageWindows);
 
