@@ -159,7 +159,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Kafka",
-    "version": "4.2.0",
+    "version": "4.3.2",
     "name": "Kafka",
     "bindings": [
       "kafkatrigger",
@@ -246,6 +246,12 @@
     "id": "System.Formats.Asn1",
     "version": "6.0.1",
     "name": "SystemFormatsAsn1",
+    "bindings": []
+  },
+  {
+    "id": "MessagePack",
+    "version": "2.5.301",
+    "name": "MessagePack",
     "bindings": []
   },
   {
