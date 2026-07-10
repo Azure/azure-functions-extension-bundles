@@ -1,7 +1,7 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "majorVersion": "5",
+    "version": "5.3.7",
     "name": "AzureStorage",
     "bindings": [
       "blobtrigger",
@@ -12,7 +12,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
-    "majorVersion": "5",
+    "version": "5.3.7",
     "name": "AzureStorageQueues",
     "bindings": [
       "queue",
@@ -21,7 +21,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
-    "majorVersion": "5",
+    "version": "5.3.7",
     "name": "AzureStorageBlobs",
     "bindings": [
       "blobtrigger",
@@ -296,6 +296,12 @@
     "id": "System.Formats.Asn1",
     "Version": "6.0.1",
     "name": "SystemFormatsAsn1",
+    "bindings": []
+  },
+  {
+    "id": "MessagePack",
+    "version": "2.5.301",
+    "name": "MessagePack",
     "bindings": []
   },
   {
