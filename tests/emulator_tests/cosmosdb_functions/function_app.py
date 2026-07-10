@@ -16,7 +16,7 @@ import json
 import logging
 import azure.functions as func
 
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+app = func.FunctionApp()
 
 # Store triggered documents for verification (in-memory for tests)
 _triggered_docs = []
