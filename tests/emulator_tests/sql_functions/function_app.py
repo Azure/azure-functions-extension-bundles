@@ -6,7 +6,7 @@ import azure.functions as func
 import pyodbc
 import connection_utils
 
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+app = func.FunctionApp()
 
 
 # ============================================================================
