@@ -91,7 +91,6 @@ $parsedTags = $tags | ForEach-Object {
 } | Where-Object { $_ -ne $null }
 
 # Only include host versions >= 4.1049 which require dotnet 10.
-# This branch tests dotnet 10 based host versions using a core-tools workaround branch.
 $parsedTags = $parsedTags | Where-Object {
     $versionParts = $_.VersionNoPrefix -split '\.'
     [int]$versionParts[1] -ge 1049
