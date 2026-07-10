@@ -1,7 +1,7 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "majorVersion": "5",
+    "version": "5.3.7",
     "name": "AzureStorage",
     "bindings": [
       "blobtrigger",
@@ -12,7 +12,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
-    "majorVersion": "5",
+    "version": "5.3.7",
     "name": "AzureStorageQueues",
     "bindings": [
       "queue",
@@ -21,7 +21,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
-    "majorVersion": "5",
+    "version": "5.3.7",
     "name": "AzureStorageBlobs",
     "bindings": [
       "blobtrigger",
@@ -56,7 +56,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "version": "3.8.0",
+    "majorVersion": "3",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -92,7 +92,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged",
-    "version": "1.0.1",
+    "majorVersion": "1",
     "name": "AzureManagedProvider",
     "bindings": [
       "activitytrigger",
@@ -113,7 +113,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "version": "4.13.0-preview.1",
+    "majorVersion": "4",
     "name": "CosmosDB",
     "bindings": [
       "cosmosdbtrigger",
@@ -194,12 +194,13 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Redis",
-    "majorVersion": "0",
+    "majorVersion": "1",
     "name": "Redis",
     "bindings": [
-      "RedisPubSubTrigger",
-      "RedisStreamTrigger",
-      "RedisListTrigger"
+      "redisPubSubTrigger",
+      "redisStreamTrigger",
+      "redisListTrigger",
+      "redis"
     ]
   },
   {
@@ -220,6 +221,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI",
     "majorVersion": "0",
+    "version": "0.19.0-alpha",
     "name": "OpenAI",
     "bindings": [
       "TextCompletion",
@@ -244,6 +246,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.AzureAISearch",
     "majorVersion": "0",
+    "version": "0.5.0-alpha",
     "name": "OpenAIAzureAISearch",
     "bindings": [
       "SemanticSearch",
@@ -253,6 +256,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.CosmosDBSearch",
     "majorVersion": "0",
+    "version": "0.4.0-alpha",
     "name": "OpenAICosmosDBSearch",
     "bindings": [
       "SemanticSearch",
@@ -262,6 +266,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.CosmosDBNoSqlSearch",
     "majorVersion": "0",
+    "version": "0.1.0-alpha",
     "name": "OpenAICosmosDBNoSqlSearch",
     "bindings": [
       "SemanticSearch",
@@ -271,6 +276,7 @@
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI.Kusto",
     "majorVersion": "0",
+    "version": "0.17.0-alpha",
     "name": "OpenAIKusto",
     "bindings": [
       "SemanticSearch",
@@ -279,7 +285,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Fabric",
-    "version": "1.0.53",
+    "majorVersion": "1",
     "name": "Startup",
     "bindings": [
       "FabricItem",
@@ -289,13 +295,19 @@
   },
   {
     "id": "System.Formats.Asn1",
-    "Version": "6.0.1",
+    "version": "6.0.1",
     "name": "SystemFormatsAsn1",
     "bindings": []
   },
   {
+    "id": "MessagePack",
+    "version": "2.5.301",
+    "name": "MessagePack",
+    "bindings": []
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO",
-    "version": "1.0.0-beta.4",
+    "majorVersion": "1",
     "name": "WebPubSubForSocketIO",
     "bindings": [
       "socketiotrigger",
@@ -310,12 +322,13 @@
     "bindings": [
       "mcpToolTrigger",
       "mcpToolProperty",
-      "mcpResourceTrigger"
+      "mcpResourceTrigger",
+      "mcpPromptTrigger"
     ]
   },
   {
     "id": "Microsoft.Azure.Functions.Extensions.Connector",
-    "version": "0.1.0-alpha",
+    "majorVersion": "0",
     "name": "Connector",
     "bindings": [
       "connectorTrigger"

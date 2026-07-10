@@ -232,3 +232,98 @@ class TestMcpFunctions(testutils.WebHostTestCase):
             )
         except (json.JSONDecodeError, ValueError) as e:
             self.fail(f"Failed to parse response: {e}\nResponse text: {response.text}")
+
+    def test_prompts_list(self):
+        """
+        Test the prompts/list MCP API to verify it returns available prompts.
+        """
+        payload = {
+            "jsonrpc": "2.0",
+            "id": "test-prompts-list-1",
+            "method": "prompts/list"
+        }
+
+        response = self.webhost.request(
+            'POST',
+            self.MCP_WEBHOOK_PATH,
+            json=payload,
+            no_prefix=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        try:
+            try:
+                data = response.json()
+            except json.JSONDecodeError:
+                data = self._parse_sse_response(response.text)
+
+            self.assertEqual(data.get("jsonrpc"), "2.0")
+            self.assertEqual(data.get("id"), "test-prompts-list-1")
+            self.assertIn("result", data)
+
+            result = data["result"]
+            self.assertIn("prompts", result)
+            prompts = result["prompts"]
+            self.assertIsInstance(prompts, list)
+
+            prompt_names = [p.get("name") for p in prompts]
+            self.assertIn("greeting_prompt", prompt_names)
+
+            greeting = next(p for p in prompts if p.get("name") == "greeting_prompt")
+            self.assertEqual(
+                greeting.get("description"),
+                "Generates a greeting message for a given name."
+            )
+
+            arguments = greeting.get("arguments") or []
+            arg_names = [a.get("name") for a in arguments]
+            self.assertIn("name", arg_names)
+        except (json.JSONDecodeError, ValueError) as e:
+            self.fail(f"Failed to parse response: {e}\nResponse text: {response.text}")
+
+    def test_prompts_get(self):
+        """
+        Test the prompts/get MCP API to invoke the greeting_prompt.
+        """
+        payload = {
+            "jsonrpc": "2.0",
+            "id": "test-prompts-get-1",
+            "method": "prompts/get",
+            "params": {
+                "name": "greeting_prompt",
+                "arguments": {"name": "Functions"}
+            }
+        }
+
+        response = self.webhost.request(
+            'POST',
+            self.MCP_WEBHOOK_PATH,
+            json=payload,
+            no_prefix=True
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        try:
+            try:
+                data = response.json()
+            except json.JSONDecodeError:
+                data = self._parse_sse_response(response.text)
+
+            self.assertEqual(data.get("jsonrpc"), "2.0")
+            self.assertEqual(data.get("id"), "test-prompts-get-1")
+            self.assertIn("result", data)
+
+            result = data["result"]
+            self.assertIn("messages", result)
+            messages = result["messages"]
+            self.assertIsInstance(messages, list)
+            self.assertTrue(len(messages) > 0)
+
+            first = messages[0]
+            content = first.get("content") or {}
+            self.assertEqual(content.get("type"), "text")
+            self.assertIn("Functions", content.get("text", ""))
+        except (json.JSONDecodeError, ValueError) as e:
+            self.fail(f"Failed to parse response: {e}\nResponse text: {response.text}")
