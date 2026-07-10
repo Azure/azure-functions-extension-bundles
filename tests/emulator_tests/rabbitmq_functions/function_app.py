@@ -10,7 +10,7 @@ import logging
 
 import azure.functions as func
 
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+app = func.FunctionApp()
 
 
 # A RabbitMQ trigger which stores the message value into a storage blob.
