@@ -307,7 +307,7 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         'AzureWebJobsStorage': os.environ.get('AzureWebJobsStorage', 'UseDevelopmentStorage=true'),
         'FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI': os.environ.get('FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI', DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI),
         "MySqlConnectionString": os.environ.get('MySqlConnectionString', DEFAULT_MYSQL_CONNECTION_STRING),
-        "redisConnectionString": os.environ.get('redisConnectionString', DEFAULT_REDIS_CONNECTION_STRING),
+        "RedisConnectionString": os.environ.get('RedisConnectionString', DEFAULT_REDIS_CONNECTION_STRING),
         "AzureSignalRConnectionString": os.environ.get('AzureSignalRConnectionString', DEFAULT_SIGNALR_CONNECTION_STRING),
         "RabbitMQConnectionString": os.environ.get('RabbitMQConnectionString', DEFAULT_RABBITMQ_CONNECTION_STRING),
         "PYTHON_ISOLATE_WORKER_DEPENDENCIES": os.environ.get('PYTHON_ISOLATE_WORKER_DEPENDENCIES', DEFAULT_PYTHON_ISOLATE_WORKER_DEPENDENCIES),

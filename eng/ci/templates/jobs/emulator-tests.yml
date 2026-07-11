@@ -549,7 +549,7 @@ jobs:
       RabbitMQConnectionString: "amqp://guest:guest@localhost:5673"
       RabbitMQHost: "localhost"
       RabbitMQPort: "5673"
-      redisConnectionString: "localhost:6379"
+      RedisConnectionString: "localhost:6379"
       RedisHost: "localhost"
       RedisPort: "6379"
 

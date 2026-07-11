@@ -108,14 +108,14 @@ class TestRedisFunctions(testutils.WebHostTestCase):
         last_response = None
         while time.time() < deadline:
             client.publish(PUBSUB_CHANNEL, value)
-            try:
-                r = self.webhost.request('GET', 'get_redis_pubsub_triggered',
-                                         max_retries=1)
-                last_response = r
-                if r.status_code == 200 and r.text == value:
-                    return
-            except Exception as e:  # noqa: BLE001
-                logger.info(f"Waiting for pubsub trigger: {e}")
+            # max_retries=0 returns the raw response without raising, so we
+            # can poll the blob endpoint (which 5xx/404s until the trigger
+            # has persisted the message) without try/except noise.
+            r = self.webhost.request('GET', 'get_redis_pubsub_triggered',
+                                     max_retries=0)
+            last_response = r
+            if r.status_code == 200 and r.text == value:
+                return
             time.sleep(3)
 
         self.fail(

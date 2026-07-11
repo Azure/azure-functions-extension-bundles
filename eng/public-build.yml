@@ -1,5 +1,5 @@
 variables:
-  hostTagsCount: 2
+  hostTagsCount: 1
   hostTagPattern: 'v4.10'
 
 trigger:

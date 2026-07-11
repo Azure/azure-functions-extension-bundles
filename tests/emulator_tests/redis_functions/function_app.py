@@ -26,7 +26,7 @@ app = func.FunctionApp()
 # Connection app-setting name expected by the Redis bindings. Its value is a
 # StackExchange.Redis connection string (e.g. "localhost:6379"), injected by
 # the test harness / CI.
-REDIS_CONNECTION = "redisConnectionString"
+REDIS_CONNECTION = "RedisConnectionString"
 
 # Keys / channel used by the E2E test functions.
 LIST_KEY = "e2e-list-test"
