@@ -451,6 +451,21 @@ jobs:
         sleep 15
         echo "SignalR emulator started with PID: $SIGNALR_PID"
         echo "SignalR connection string: $SIGNALR_CONN"
+      elif [ "$(ADDITIONAL_EMULATORS)" = "redis" ]; then
+        echo "Starting Redis Emulator for $(DISPLAY_NAME)..."
+        cd tests/emulator_tests/utils/redis
+        docker compose pull
+        docker compose up -d --wait
+        echo "Redis container is healthy. Verifying port..."
+        for i in $(seq 1 10); do
+          if python3 -c "import socket; s=socket.create_connection(('localhost',6379),5); s.close()" 2>/dev/null; then
+            echo "Redis port 6379 is accepting connections (attempt $i)"
+            break
+          fi
+          echo "Waiting for Redis port 6379... (attempt $i)"
+          sleep 3
+        done
+        docker compose ps
       else
         echo "No additional emulators required for $(DISPLAY_NAME)"
       fi
@@ -534,6 +549,9 @@ jobs:
       RabbitMQConnectionString: "amqp://guest:guest@localhost:5673"
       RabbitMQHost: "localhost"
       RabbitMQPort: "5673"
+      redisConnectionString: "localhost:6379"
+      RedisHost: "localhost"
+      RedisPort: "6379"
 
   # Copy webhost config for debugging
   - script: |
@@ -603,6 +621,10 @@ jobs:
           kill $SIGNALR_PID 2>/dev/null || true
         fi
         pkill -f asrs-emulator || true
+      elif [ "$(ADDITIONAL_EMULATORS)" = "redis" ]; then
+        echo "Stopping Redis emulator..."
+        cd tests/emulator_tests/utils/redis
+        docker compose down -v
       fi
       
       # Stop base emulators (EventHub/Azurite) - unless EventHub was stopped for Service Bus

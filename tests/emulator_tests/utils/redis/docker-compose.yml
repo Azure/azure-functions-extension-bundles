@@ -1,0 +1,17 @@
+name: redis-emulator
+services:
+  redis:
+    image: funcacrcache.azurecr.io/cache/library/redis:7.4-alpine
+    hostname: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    # Enable keyspace/keyevent notifications (AKE) so the RedisPubSubTrigger
+    # can subscribe to __keyspace@0__ / __keyevent@0__ channels.
+    command: ["redis-server", "--notify-keyspace-events", "AKE"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s

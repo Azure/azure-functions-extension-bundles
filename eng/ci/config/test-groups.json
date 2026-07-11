@@ -71,6 +71,14 @@
             "emulators": "signalr",
             "display": "SignalR Tests",
             "stopEventHub": "false"
+        },
+        {
+            "name": "Redis",
+            "group": "redis",
+            "files": "test_redis_functions.py",
+            "emulators": "redis",
+            "display": "Redis Tests",
+            "stopEventHub": "false"
         }
     ]
 }

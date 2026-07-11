@@ -41,6 +41,10 @@ DEFAULT_SIGNALR_CONNECTION_STRING = "Endpoint=http://localhost;Port=8888;AccessK
 # RabbitMQ emulator default connection string (host port 5673 to avoid EventHub AMQP conflict on 5672)
 DEFAULT_RABBITMQ_CONNECTION_STRING = "amqp://guest:guest@localhost:5673"
 
+# Redis emulator default connection string (StackExchange.Redis format, local Docker on 6379)
+DEFAULT_REDIS_CONNECTION_STRING = "localhost:6379"
+
+
 def _get_bundle_config():
     """Get the bundle configuration from bundleConfig.json."""
     bundle_config_path = PROJECT_ROOT / 'src' / 'Microsoft.Azure.Functions.ExtensionBundle' / 'bundleConfig.json'
@@ -303,6 +307,7 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         'AzureWebJobsStorage': os.environ.get('AzureWebJobsStorage', 'UseDevelopmentStorage=true'),
         'FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI': os.environ.get('FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI', DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI),
         "MySqlConnectionString": os.environ.get('MySqlConnectionString', DEFAULT_MYSQL_CONNECTION_STRING),
+        "redisConnectionString": os.environ.get('redisConnectionString', DEFAULT_REDIS_CONNECTION_STRING),
         "AzureSignalRConnectionString": os.environ.get('AzureSignalRConnectionString', DEFAULT_SIGNALR_CONNECTION_STRING),
         "RabbitMQConnectionString": os.environ.get('RabbitMQConnectionString', DEFAULT_RABBITMQ_CONNECTION_STRING),
         "PYTHON_ISOLATE_WORKER_DEPENDENCIES": os.environ.get('PYTHON_ISOLATE_WORKER_DEPENDENCIES', DEFAULT_PYTHON_ISOLATE_WORKER_DEPENDENCIES),
