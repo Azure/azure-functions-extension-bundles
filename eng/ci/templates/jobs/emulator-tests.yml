@@ -327,8 +327,17 @@ jobs:
       - script: |
           if [ "$(ADDITIONAL_EMULATORS)" = "cosmosdb" ]; then
             echo "Starting CosmosDB Emulator for $(DISPLAY_NAME)..."
+            # Generate the local emulator credential because secret pipeline variables are unavailable to fork PRs.
+            COSMOS_KEY_FILE="$(mktemp)"
+            COSMOS_KEY="$(openssl rand -base64 64 | tr -d '\n')"
+            printf '%s' "$COSMOS_KEY" > "$COSMOS_KEY_FILE"
             docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
-            docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmosdb-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+            docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmosdb-emulator \
+              --volume "$COSMOS_KEY_FILE:/cosmos-emulator.key:ro" \
+              --env KEY_FILE=/cosmos-emulator.key \
+              mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+            echo "##vso[task.setvariable variable=CosmosDBEmulatorKey;issecret=true]$COSMOS_KEY"
+            echo "##vso[task.setvariable variable=EmulatorCosmosDBConnectionString;issecret=true]AccountEndpoint=http://localhost:8081/;AccountKey=$COSMOS_KEY;"
             echo "Waiting for CosmosDB Emulator to start..."
             sleep 60
             docker ps
@@ -502,7 +511,7 @@ jobs:
           PYAZURE_WEBHOST_DEBUG: 1
           FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI: 'http://localhost:8000'
           AzureWebJobsStorage: 'UseDevelopmentStorage=true'
-          AzureWebJobsEventHubConnectionString: $(EmulatorEventHubConnectionString)
+          AzureWebJobsEventHubConnectionString: 'Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;'
           AzureWebJobsCosmosDBConnectionString: $(EmulatorCosmosDBConnectionString)
           AzureWebJobsServiceBusConnectionString: $(EmulatorServiceBusConnectionString)
           AzureWebJobsSQLPassword: $(AzureWebJobsSQLPassword)
