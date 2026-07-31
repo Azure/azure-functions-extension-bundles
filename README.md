@@ -122,7 +122,7 @@ dotnet run --no-restore -- skip:GenerateVulnerabilityReport,PackageWindowsBundle
 
 1. Open the `build/Build.sln` file in Visual Studio
 1. Create a debug profile for the project (right-click on the project, "Properties", "Debug", "Open debug launch profiles UI")
-1. Set the Command Line arguments using the instructions above (everything after `dotnet run`, i.e. `"skip:XXX,YYY,..."`)
+1. Set the application arguments to the value after the `--` separator in the commands above (for example, `"skip:XXX,YYY,..."`)
 1. Set the working directory to be the `build` directory
 1. F5
 

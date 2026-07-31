@@ -43,7 +43,6 @@ if (-not (Test-Path -LiteralPath $NuGetConfigPath)) {
 
 $NuGetConfigPath = (Resolve-Path -LiteralPath $NuGetConfigPath).Path
 
-
 if ($IsWindows -or $env:OS -eq "Windows_NT") {
     $osName = "win"
 } elseif ($IsMacOS) {

@@ -127,7 +127,8 @@ Build the extension bundle locally. For detailed build instructions, see the "Lo
 ```powershell
 # From the repository root
 cd build
-dotnet run skip:DownloadTemplates,BuildWindowsBinaries,BuildFilteredPortableBinaries,BuildLinuxBinaries,GenerateVulnerabilityReport,PackageBundle,PackageWindowsBundle,PackageLinuxBundle,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux
+dotnet restore .\Build.csproj --configfile ..\NuGet.config
+dotnet run --no-restore -- skip:DownloadTemplates,BuildWindowsBinaries,BuildFilteredPortableBinaries,BuildLinuxBinaries,GenerateVulnerabilityReport,PackageBundle,PackageWindowsBundle,PackageLinuxBundle,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux
 ```
 
 This will generate extension bundle packages in the `artifacts/` directory.
@@ -198,7 +199,8 @@ Install the project with dev dependencies from `pyproject.toml`:
 ```powershell
 # Install with dev dependencies
 cd tests
-pip install -r requirements.txt
+$env:PIP_INDEX_URL = "https://pkgs.dev.azure.com/azfunc/public/_packaging/upstream-public/pypi/simple/"
+python -m pip install -r requirements.txt
 
 # This installs all required packages including:
 # - pytest, requests, psutil
@@ -566,7 +568,7 @@ You can create additional debug configurations for different test files:
 7. **Import Errors**: If you see import errors during debugging, verify that:
    - The virtual environment is activated
    - VS Code is using the correct Python interpreter
-   - All dependencies are installed with `cd tests && pip install -r requirements.txt`
+   - All dependencies are installed with `PIP_INDEX_URL` set as shown above and `cd tests && python -m pip install -r requirements.txt`
 
 ```text
 
@@ -626,7 +628,8 @@ You can create additional debug configurations for different test files:
    which python  # Should point to venv/Scripts/python.exe
    
    # Reinstall dependencies if needed
-   pip install -r requirements.txt --force-reinstall
+   $env:PIP_INDEX_URL = "https://pkgs.dev.azure.com/azfunc/public/_packaging/upstream-public/pypi/simple/"
+   python -m pip install -r requirements.txt --force-reinstall
    ```
 
 5. **Port Conflicts**:

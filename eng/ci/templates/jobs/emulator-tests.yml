@@ -274,15 +274,6 @@ jobs:
       artifact: 'bundle-artifacts'
       path: '$(Build.Repository.LocalPath)/artifacts'
 
-  - task: NuGetAuthenticate@1
-    displayName: 'NuGet Authenticate'
-
-  - task: PipAuthenticate@1
-    displayName: 'PyPI Authenticate'
-    inputs:
-      artifactFeeds: 'public/upstream-public'
-      onlyAddExtraIndex: false
-
   - script: |
       echo "Testing: $(DISPLAY_NAME)"
       echo "Host Index: $(HOST_INDEX)"
@@ -307,6 +298,15 @@ jobs:
         exit 1
       fi
     displayName: 'Verify Core Tools Artifact'
+
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+
+  - task: PipAuthenticate@1
+    displayName: 'PyPI Authenticate'
+    inputs:
+      artifactFeeds: 'public/upstream-public'
+      onlyAddExtraIndex: false
 
   # Set up Python 3.12 and create virtual environment
   - task: UsePythonVersion@0
