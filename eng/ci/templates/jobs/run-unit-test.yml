@@ -11,10 +11,19 @@ jobs:
       packageType: 'sdk'
       version: '8.x'
       performMultiLevelLookup: true
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore tests'
+    inputs:
+      command: 'restore'
+      projects: 'ExtensionBundle.Tests.sln'
+      feedsToUse: 'config'
+      nugetConfigPath: 'NuGet.config'
+
   - task: DotNetCoreCLI@2
     displayName: 'Run tests'
     inputs:
       command: 'test'
-      arguments: '-c Release'
+      arguments: '--configuration Release --no-restore'
       projects: |
         **/*Tests.csproj

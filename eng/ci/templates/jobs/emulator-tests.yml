@@ -31,7 +31,6 @@ jobs:
   - checkout: self
     path: bundle
     fetchDepth: 1
-    sparseCheckoutDirectories: eng
     
   - checkout: coretools
     path: core-tools
@@ -49,7 +48,7 @@ jobs:
     displayName: 'Build Azure Functions Core Tools'
     inputs:
       filePath: '$(Agent.BuildDirectory)/bundle/eng/ci/scripts/build-multi-version-core-tools.ps1'
-      arguments: '-Count $(hostTagsCount) -Pattern "$(hostTagPattern)" -Configuration Release -CloneDir "$(Agent.BuildDirectory)/core-tools"'
+      arguments: '-Count $(hostTagsCount) -Pattern "$(hostTagPattern)" -Configuration Release -CloneDir "$(Agent.BuildDirectory)/core-tools" -NuGetConfigPath "$(Agent.BuildDirectory)/bundle/NuGet.config"'
       pwsh: true
       workingDirectory: '$(Agent.BuildDirectory)/core-tools'
   
@@ -119,13 +118,21 @@ jobs:
 
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
-    
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore build tooling'
+    inputs:
+      command: 'restore'
+      projects: 'build/Build.csproj'
+      feedsToUse: 'config'
+      nugetConfigPath: 'NuGet.config'
+
   - task: DotNetCoreCLI@2
     displayName: 'Build Linux Bundle (once)'
     inputs:
       command: 'run'
       workingDirectory: './build'
-      arguments: 'skip:DownloadTemplates,BuildWindowsBinaries,BuildFilteredPortableBinaries,BuildLinuxBinaries,GenerateVulnerabilityReport,PackageBundle,PackageWindowsBundle,PackageLinuxBundle,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux'
+      arguments: '--no-restore -- skip:DownloadTemplates,BuildWindowsBinaries,BuildFilteredPortableBinaries,BuildLinuxBinaries,GenerateVulnerabilityReport,PackageBundle,PackageWindowsBundle,PackageLinuxBundle,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux'
     env:
       BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
       TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
@@ -267,6 +274,15 @@ jobs:
       artifact: 'bundle-artifacts'
       path: '$(Build.Repository.LocalPath)/artifacts'
 
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+
+  - task: PipAuthenticate@1
+    displayName: 'PyPI Authenticate'
+    inputs:
+      artifactFeeds: 'public/upstream-public'
+      onlyAddExtraIndex: false
+
   - script: |
       echo "Testing: $(DISPLAY_NAME)"
       echo "Host Index: $(HOST_INDEX)"
@@ -300,17 +316,12 @@ jobs:
       architecture: 'x64'
     displayName: 'Set up Python 3.12'
 
-  - task: PipAuthenticate@1
-    displayName: 'PyPI Authenticate'
-    inputs:
-      artifactFeeds: 'public/azure-functions-extension-bundles-feed'
-
   - script: |
       cd tests
       python -m venv venv
       source venv/bin/activate
-      pip install --upgrade pip
-      pip install --cache-dir ~/.cache/pip -r requirements.txt
+      python -m pip install --upgrade pip
+      python -m pip install --cache-dir ~/.cache/pip -r requirements.txt
     displayName: 'Install Python Dependencies (cached)'
     env:
       PIP_INDEX_URL: $(PIP_INDEX_URL)
@@ -433,7 +444,8 @@ jobs:
         echo "Starting SignalR Emulator for $(DISPLAY_NAME)..."
         
         # Install SignalR emulator .NET tool
-        dotnet tool install -g Microsoft.Azure.SignalR.Emulator || dotnet tool update -g Microsoft.Azure.SignalR.Emulator
+        tool_args=(--global Microsoft.Azure.SignalR.Emulator --configfile "$NUGET_CONFIG_PATH")
+        dotnet tool install "${tool_args[@]}" || dotnet tool update "${tool_args[@]}"
         export PATH="$PATH:$HOME/.dotnet/tools"
         
         # Start emulator in background with settings file
@@ -457,6 +469,7 @@ jobs:
     displayName: 'Start Additional Emulators'
     env:
       AzureWebJobsSQLPassword: $(AzureWebJobsSQLPassword)
+      NUGET_CONFIG_PATH: '$(Build.Repository.LocalPath)/NuGet.config'
 
   # Start mock extension site in background
   - script: |
