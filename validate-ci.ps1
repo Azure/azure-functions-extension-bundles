@@ -19,6 +19,7 @@ $requiredFiles = @(
     "tests\test_setup.py",
     "tests\utils\testutils.py",
     "tests\emulator_tests\utils\eventhub\docker-compose.yml",
+    "eng\ci\config\core-tools.NuGet.config",
     "eng\ci\templates\jobs\emulator-tests.yml"
 )
 

@@ -61,7 +61,7 @@ $ScriptDir = $PSScriptRoot
 $RepoRoot = Split-Path (Split-Path (Split-Path $ScriptDir -Parent) -Parent) -Parent
 
 if ([string]::IsNullOrEmpty($NuGetConfigPath)) {
-    $NuGetConfigPath = Join-Path $RepoRoot "NuGet.config"
+    $NuGetConfigPath = Join-Path $RepoRoot "eng\ci\config\core-tools.NuGet.config"
 }
 
 if (-not (Test-Path -LiteralPath $NuGetConfigPath)) {

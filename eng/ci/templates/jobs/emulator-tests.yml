@@ -48,7 +48,7 @@ jobs:
     displayName: 'Build Azure Functions Core Tools'
     inputs:
       filePath: '$(Agent.BuildDirectory)/bundle/eng/ci/scripts/build-multi-version-core-tools.ps1'
-      arguments: '-Count $(hostTagsCount) -Pattern "$(hostTagPattern)" -Configuration Release -CloneDir "$(Agent.BuildDirectory)/core-tools" -NuGetConfigPath "$(Agent.BuildDirectory)/bundle/NuGet.config"'
+      arguments: '-Count $(hostTagsCount) -Pattern "$(hostTagPattern)" -Configuration Release -CloneDir "$(Agent.BuildDirectory)/core-tools" -NuGetConfigPath "$(Agent.BuildDirectory)/bundle/eng/ci/config/core-tools.NuGet.config"'
       pwsh: true
       workingDirectory: '$(Agent.BuildDirectory)/core-tools'
   
