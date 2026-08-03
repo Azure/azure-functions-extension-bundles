@@ -146,16 +146,13 @@ namespace Build
 
         private static async Task<string> GenerateBundleProjectFile(BuildConfiguration buildConfig, string configPrefix = null, IList<Extension> extensionList = null)
         {
-            var sourceNugetConfig = Path.Combine(Settings.SourcePath, Settings.NugetConfigFileName);
             var sourceProjectFilePath = Path.Combine(Settings.SourcePath, buildConfig.SourceProjectFileName);
             string configDirName = configPrefix != null ? $"{configPrefix}_{buildConfig.ConfigId}" : buildConfig.ConfigId.ToString();
             string projectDirectory = Path.Combine(Settings.RootBuildDirectory, configDirName);
             string targetProjectFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, "extensions.csproj");
-            string targetNugetConfigFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, Settings.NugetConfigFileName);
 
             FileUtility.EnsureDirectoryExists(projectDirectory);
             FileUtility.CopyFile(sourceProjectFilePath, targetProjectFilePath);
-            FileUtility.CopyFile(sourceNugetConfig, targetNugetConfigFilePath);
 
             await AddExtensionPackages(targetProjectFilePath, BundleConfiguration.Instance.IsPreviewBundle, extensionList);
             return targetProjectFilePath;
@@ -168,7 +165,7 @@ namespace Build
             foreach (var extension in extensions)
             {
                 string version = string.IsNullOrEmpty(extension.Version) ? await Helper.GetLatestPackageVersion(extension.Id, extension.MajorVersion, addPrereleasePackages) : extension.Version;
-                Shell.Run("dotnet", $"add {projectFilePath} package {extension.Id} -v {version} -n");
+                Shell.Run("dotnet", new[] { "add", projectFilePath, "package", extension.Id, "--version", version, "--no-restore" });
             }
         }
 
@@ -184,18 +181,37 @@ namespace Build
                 ? Path.Combine(publishPath, buildConfig.PublishBinDirectorySubPath)
                 : buildConfig.PublishBinDirectoryPath;
 
-            var publishCommandArguments = $"publish {projectFilePath} -c Release -o {publishPath}";
+            var restoreCommandArguments = new List<string>
+            {
+                "restore",
+                projectFilePath,
+                "--configfile",
+                Settings.NuGetConfigFilePath
+            };
+            var publishCommandArguments = new List<string>
+            {
+                "publish",
+                projectFilePath,
+                "--configuration",
+                "Release",
+                "--output",
+                publishPath,
+                "--no-restore"
+            };
 
             if (!buildConfig.RuntimeIdentifier.Equals("any", StringComparison.OrdinalIgnoreCase))
             {
-                publishCommandArguments += $" -r {buildConfig.RuntimeIdentifier}";
+                restoreCommandArguments.AddRange(new[] { "--runtime", buildConfig.RuntimeIdentifier });
+                publishCommandArguments.AddRange(new[] { "--runtime", buildConfig.RuntimeIdentifier });
             }
 
             if (buildConfig.PublishReadyToRun)
             {
-                publishCommandArguments += $" /p:PublishReadyToRun=true";
+                restoreCommandArguments.Add("/p:PublishReadyToRun=true");
+                publishCommandArguments.Add("/p:PublishReadyToRun=true");
             }
 
+            Shell.Run("dotnet", restoreCommandArguments);
             Shell.Run("dotnet", publishCommandArguments);
 
             if (Path.Combine(publishPath, "bin") != publishBinPath)
@@ -222,9 +238,17 @@ namespace Build
                 Directory.SetCurrentDirectory(Settings.RootBuildDirectory);
 
                 Console.WriteLine(Directory.GetCurrentDirectory());
-                Console.WriteLine($"dotnet list \"{projectFilePath}\" package --include-transitive --vulnerable");
-
-                string output = Shell.GetOutput("dotnet", $"list \"{projectFilePath}\" package --include-transitive --vulnerable");
+                var arguments = new[]
+                {
+                    "list",
+                    projectFilePath,
+                    "package",
+                    "--include-transitive",
+                    "--vulnerable",
+                    "--configfile",
+                    Settings.NuGetConfigFilePath
+                };
+                string output = Shell.GetOutput("dotnet", arguments);
 
                 if (!output.Contains("has no vulnerable packages given the current sources."))
                 {
