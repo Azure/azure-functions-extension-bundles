@@ -47,11 +47,9 @@ ExtensionBundle.v4.Templates.1.0.5130.zip
 
 - Download the files from the [templates.public](https://dev.azure.com/azfunc/public/_build/results?buildId=221883) Pipeline
 
-#### (Optional) Using Custom NuGet feed for local testing
+#### NuGet feed configuration
 
-- Set up a NuGet feed with `NuGet Gallery (https://api.nuget.org/v3/index.json)` as upstream sources.
-- Update [NuGet.Config](src/Microsoft.Azure.Functions.ExtensionBundle/NuGet.Config) and [Helper.cs](build/Helper.cs#L14) with the custom NuGet feed.
-- Publish extension packages to new feed and build the project using below instructions.
+The repository restores packages through the root [NuGet.config](NuGet.config), which uses the Azure Functions CFS feed. To test unpublished extension packages, use an Azure Artifacts feed and update both the root configuration and the metadata source in [Settings.cs](build/Settings.cs) for the local test.
 
 ### Building on Windows
 
@@ -62,7 +60,8 @@ $env:TEMPLATES_ARTIFACTS_DIRECTORY = "templatesArtifacts"
 
 # Navigate to build directory and run
 cd build
-dotnet run skip:GenerateVulnerabilityReport,PackageLinuxBundle,CreateCDNStoragePackageLinux,BuildLinuxBinaries
+dotnet restore .\Build.csproj --configfile ..\NuGet.config
+dotnet run --no-restore -- skip:GenerateVulnerabilityReport,PackageLinuxBundle,CreateCDNStoragePackageLinux,BuildLinuxBinaries
 ```
 
 ### Building on Linux
@@ -74,7 +73,8 @@ export TEMPLATES_ARTIFACTS_DIRECTORY="templatesArtifacts"
 
 # Navigate to build directory and run
 cd build
-dotnet run skip:GenerateVulnerabilityReport,PackageWindowsBundle,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildWindowsBinaries,BuildFilteredPortableBinaries
+dotnet restore ./Build.csproj --configfile ../NuGet.config
+dotnet run --no-restore -- skip:GenerateVulnerabilityReport,PackageWindowsBundle,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildWindowsBinaries,BuildFilteredPortableBinaries
 ```
 
 **Note:** Replace `<ExtensionBundleRepoPath>` with the actual path to your extension bundle repository.
@@ -122,7 +122,7 @@ dotnet run skip:GenerateVulnerabilityReport,PackageWindowsBundle,CreateRUPackage
 
 1. Open the `build/Build.sln` file in Visual Studio
 1. Create a debug profile for the project (right-click on the project, "Properties", "Debug", "Open debug launch profiles UI")
-1. Set the Command Line arguments using the instructions above (everything after `dotnet run`, i.e. `"skip:XXX,YYY,..."`)
+1. Set the application arguments to the value after the `--` separator in the commands above (for example, `"skip:XXX,YYY,..."`)
 1. Set the working directory to be the `build` directory
 1. F5
 

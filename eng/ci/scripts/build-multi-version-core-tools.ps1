@@ -43,7 +43,8 @@ param(
     [int]$Count = 2,
     [string]$Pattern = "v4.10",
     [string]$Configuration = "Release",
-    [string]$CloneDir = ""
+    [string]$CloneDir = "",
+    [string]$NuGetConfigPath = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -58,6 +59,17 @@ Write-Host "===========================================================" -Foregr
 # Get the script directory
 $ScriptDir = $PSScriptRoot
 $RepoRoot = Split-Path (Split-Path (Split-Path $ScriptDir -Parent) -Parent) -Parent
+
+if ([string]::IsNullOrEmpty($NuGetConfigPath)) {
+    $NuGetConfigPath = Join-Path $RepoRoot "eng\ci\config\core-tools.NuGet.config"
+}
+
+if (-not (Test-Path -LiteralPath $NuGetConfigPath)) {
+    Write-Error "NuGet configuration not found at $NuGetConfigPath"
+    exit 1
+}
+
+$NuGetConfigPath = (Resolve-Path -LiteralPath $NuGetConfigPath).Path
 
 # Set default CloneDir if not provided
 if ([string]::IsNullOrEmpty($CloneDir)) {
@@ -273,7 +285,7 @@ try {
         
         # Use a temp zip dir inside the repo (will be cleaned by git clean next iteration)
         $versionZipDir = "artifacts-coretools-zip-$hostVersion"
-        $buildOutput = & $BuildScript -Configuration $Configuration -CoreToolsDir $CloneDir -ZipOutputDir $versionZipDir
+        $buildOutput = & $BuildScript -Configuration $Configuration -CoreToolsDir $CloneDir -NuGetConfigPath $NuGetConfigPath -ZipOutputDir $versionZipDir
         
         if ($LASTEXITCODE -ne 0) {
             throw "Core Tools build failed with exit code $LASTEXITCODE"
