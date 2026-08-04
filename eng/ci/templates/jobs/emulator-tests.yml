@@ -359,7 +359,7 @@ jobs:
       if [ "$(ADDITIONAL_EMULATORS)" = "cosmosdb" ]; then
         echo "Starting CosmosDB Emulator for $(DISPLAY_NAME)..."
         docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
-        docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmosdb-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+        docker run --detach --env ENABLE_EXPLORER=false --publish 8081:8081 --name cosmosdb-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
         echo "Waiting for CosmosDB Emulator to start..."
         sleep 60
         docker ps
