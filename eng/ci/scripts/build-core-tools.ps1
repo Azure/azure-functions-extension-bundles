@@ -24,13 +24,24 @@ param(
     [string]$Configuration = "Release",
     [Parameter(Mandatory=$true)]
     [string]$CoreToolsDir,
+    [string]$NuGetConfigPath = "",
     [string]$ZipOutputDir = "artifacts-coretools-zip"
     
 )
 
 $ErrorActionPreference = "Stop"
 
+$RepoRoot = Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent
+if ([string]::IsNullOrEmpty($NuGetConfigPath)) {
+    $NuGetConfigPath = Join-Path $RepoRoot "eng\ci\config\core-tools.NuGet.config"
+}
 
+if (-not (Test-Path -LiteralPath $NuGetConfigPath)) {
+    Write-Error "NuGet configuration not found at $NuGetConfigPath"
+    exit 1
+}
+
+$NuGetConfigPath = (Resolve-Path -LiteralPath $NuGetConfigPath).Path
 if ($IsWindows -or $env:OS -eq "Windows_NT") {
     $osName = "win"
 } elseif ($IsMacOS) {
@@ -97,7 +108,9 @@ try {
     $restoreArgs = @(
         "restore",
         $ProjectPath,
-        "/p:TargetFramework=$targetFramework"
+        "--configfile", $NuGetConfigPath,
+        "/p:TargetFramework=$targetFramework",
+        "/p:SelfContained=true"
     )
     
     if (-not [string]::IsNullOrEmpty($Runtime)) {
