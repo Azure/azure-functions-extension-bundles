@@ -119,15 +119,12 @@ namespace Build
 
         public static async Task<string> GenerateBundleProjectFile(BuildConfiguration buildConfig)
         {
-            var sourceNugetConfig = Path.Combine(Settings.SourcePath, Settings.NugetConfigFileName);
             var sourceProjectFilePath = Path.Combine(Settings.SourcePath, buildConfig.SourceProjectFileName);
             string projectDirectory = Path.Combine(Settings.RootBuildDirectory, buildConfig.ConfigId.ToString());
             string targetProjectFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, "extensions.csproj");
-            string targetNugetConfigFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, Settings.NugetConfigFileName);
 
             FileUtility.EnsureDirectoryExists(projectDirectory);
             FileUtility.CopyFile(sourceProjectFilePath, targetProjectFilePath);
-            FileUtility.CopyFile(sourceNugetConfig, targetNugetConfigFilePath);
 
             await AddExtensionPackages(targetProjectFilePath, BundleConfiguration.Instance.IsPreviewBundle);
             return targetProjectFilePath;
@@ -147,15 +144,18 @@ namespace Build
         {
             var projectFilePath = await GenerateBundleProjectFile(buildConfig);
 
-            var publishCommandArguments = $"publish {projectFilePath} -c Release -o {buildConfig.PublishDirectoryPath}";
+            var restoreCommandArguments = $"restore \"{projectFilePath}\" --configfile \"{Settings.NuGetConfigFilePath}\"";
+            var publishCommandArguments = $"publish \"{projectFilePath}\" -c Release -o \"{buildConfig.PublishDirectoryPath}\" --no-restore";
 
             if (!buildConfig.RuntimeIdentifier.Equals("any", StringComparison.OrdinalIgnoreCase))
             {
+                restoreCommandArguments += $" -r {buildConfig.RuntimeIdentifier}";
                 publishCommandArguments += $" -r {buildConfig.RuntimeIdentifier}";
             }
 
             if (buildConfig.PublishReadyToRun)
             {
+                restoreCommandArguments += " /p:PublishReadyToRun=true";
                 publishCommandArguments += $" /p:PublishReadyToRun=true";
             }
 
@@ -164,6 +164,7 @@ namespace Build
                 publishCommandArguments += " /p:SuppressTfmSupportBuildWarnings=true";
             }
 
+            Shell.Run("dotnet", restoreCommandArguments);
             Shell.Run("dotnet", publishCommandArguments);
 
             if (Path.Combine(buildConfig.PublishDirectoryPath, "bin") != buildConfig.PublishBinDirectoryPath)
@@ -195,9 +196,9 @@ namespace Build
                 Directory.SetCurrentDirectory(Settings.RootBuildDirectory);
 
                 Console.WriteLine(Directory.GetCurrentDirectory());
-                Console.WriteLine($"dotnet list \"{projectFilePath}\" package --include-transitive --vulnerable");
+                Console.WriteLine($"dotnet list \"{projectFilePath}\" package --include-transitive --vulnerable --configfile \"{Settings.NuGetConfigFilePath}\"");
 
-                string output = Shell.GetOutput("dotnet", $"list \"{projectFilePath}\" package --include-transitive --vulnerable");
+                string output = Shell.GetOutput("dotnet", $"list \"{projectFilePath}\" package --include-transitive --vulnerable --configfile \"{Settings.NuGetConfigFilePath}\"");
 
                 if (!output.Contains("has no vulnerable packages given the current sources."))
                 {

@@ -24,16 +24,22 @@ jobs:
       version: '3.1.x'
       performMultiLevelLookup: true
       
-  - task: NuGetAuthenticate@0
+  - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
-    
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore tests'
+    inputs:
+      command: 'restore'
+      projects: 'ExtensionBundle.Tests/ExtensionBundle.Tests.csproj'
+      feedsToUse: 'config'
+      nugetConfigPath: 'NuGet.config'
+
   - task: DotNetCoreCLI@2
     displayName: 'Run tests'
     inputs:
       command: 'test'
-      arguments: '-c Release'
+      arguments: '--configuration Release --no-restore'
       projects: |
 
         **/*Tests.csproj
-
-
