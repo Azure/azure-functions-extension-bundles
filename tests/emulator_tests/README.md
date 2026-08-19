@@ -198,7 +198,8 @@ Install the project with dev dependencies from `pyproject.toml`:
 ```powershell
 # Install with dev dependencies
 cd tests
-pip install -r requirements.txt
+$env:PIP_INDEX_URL = "https://pkgs.dev.azure.com/azfunc/public/_packaging/upstream-public/pypi/simple/"
+python -m pip install -r requirements.txt
 
 # This installs all required packages including:
 # - pytest, requests, psutil

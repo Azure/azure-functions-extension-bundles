@@ -114,15 +114,12 @@ namespace Build
 
         public static async Task<string> GenerateBundleProjectFile(BuildConfiguration buildConfig)
         {
-            var sourceNugetConfig = Path.Combine(Settings.SourcePath, Settings.NugetConfigFileName);
             var sourceProjectFilePath = Path.Combine(Settings.SourcePath, buildConfig.SourceProjectFileName);
             string projectDirectory = Path.Combine(Settings.RootBuildDirectory, buildConfig.ConfigId.ToString());
             string targetProjectFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, "extensions.csproj");
-            string targetNugetConfigFilePath = Path.Combine(Settings.RootBuildDirectory, projectDirectory, Settings.NugetConfigFileName);
 
             FileUtility.EnsureDirectoryExists(projectDirectory);
             FileUtility.CopyFile(sourceProjectFilePath, targetProjectFilePath);
-            FileUtility.CopyFile(sourceNugetConfig, targetNugetConfigFilePath);
 
             await AddExtensionPackages(targetProjectFilePath, BundleConfiguration.Instance.IsExperimentalBundle);
             return targetProjectFilePath;
@@ -134,7 +131,7 @@ namespace Build
             foreach (var extension in extensions)
             {
                 string version = string.IsNullOrEmpty(extension.Version) ? await Helper.GetLatestPackageVersion(extension.Id, extension.MajorVersion, addPrereleasePackages) : extension.Version;
-                Shell.Run("dotnet", $"add {projectFilePath} package {extension.Id} -v {version} -n");
+                Shell.Run("dotnet", new[] { "add", projectFilePath, "package", extension.Id, "--version", version, "--no-restore" });
             }
         }
 
@@ -142,18 +139,37 @@ namespace Build
         {
             var projectFilePath = await GenerateBundleProjectFile(buildConfig);
 
-            var publishCommandArguments = $"publish {projectFilePath} -c Release -o {buildConfig.PublishDirectoryPath}";
+            var restoreCommandArguments = new List<string>
+            {
+                "restore",
+                projectFilePath,
+                "--configfile",
+                Settings.NuGetConfigFilePath
+            };
+            var publishCommandArguments = new List<string>
+            {
+                "publish",
+                projectFilePath,
+                "--configuration",
+                "Release",
+                "--output",
+                buildConfig.PublishDirectoryPath,
+                "--no-restore"
+            };
 
             if (!buildConfig.RuntimeIdentifier.Equals("any", StringComparison.OrdinalIgnoreCase))
             {
-                publishCommandArguments += $" -r {buildConfig.RuntimeIdentifier}";
+                restoreCommandArguments.AddRange(new[] { "--runtime", buildConfig.RuntimeIdentifier });
+                publishCommandArguments.AddRange(new[] { "--runtime", buildConfig.RuntimeIdentifier });
             }
 
             if (buildConfig.PublishReadyToRun)
             {
-                publishCommandArguments += $" /p:PublishReadyToRun=true";
+                restoreCommandArguments.Add("/p:PublishReadyToRun=true");
+                publishCommandArguments.Add("/p:PublishReadyToRun=true");
             }
 
+            Shell.Run("dotnet", restoreCommandArguments);
             Shell.Run("dotnet", publishCommandArguments);
 
             if (Path.Combine(buildConfig.PublishDirectoryPath, "bin") != buildConfig.PublishBinDirectoryPath)
