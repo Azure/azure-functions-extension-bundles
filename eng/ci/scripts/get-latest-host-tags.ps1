@@ -91,17 +91,21 @@ $parsedTags = $tags | ForEach-Object {
 } | Where-Object { $_ -ne $null }
 
 # Only include host versions >= 4.1049 which require dotnet 10.
+# Upper bound (< 4.1054): host 4.1054.100 adds a package dependency on
+# Azure.Functions.Rpc.Server, which is not yet published to any consumable feed
+# (core-tools restore fails with NU1101). Skip these tags until the package ships.
+# TODO: Remove the upper bound once Azure.Functions.Rpc.Server is published.
 $parsedTags = $parsedTags | Where-Object {
     $versionParts = $_.VersionNoPrefix -split '\.'
-    [int]$versionParts[1] -ge 1049
+    [int]$versionParts[1] -ge 1049 -and [int]$versionParts[1] -lt 1054
 }
 
 if (-not $parsedTags) {
-    Write-Error "No tags found after filtering for versions >= 4.1049"
+    Write-Error "No tags found after filtering for versions >= 4.1049 and < 4.1054"
     exit 1
 }
 
-Write-Host "Tags after filtering (>= 4.1049): $($parsedTags.Count)" -ForegroundColor Green
+Write-Host "Tags after filtering (>= 4.1049, < 4.1054): $($parsedTags.Count)" -ForegroundColor Green
 
 # Group by middle version and get the highest patch from each group
 $groupedTags = $parsedTags | 
