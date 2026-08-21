@@ -17,23 +17,10 @@ jobs:
       packageType: 'sdk'
       version: '3.1.x'
       performMultiLevelLookup: true
-
-  - task: NuGetAuthenticate@1
-    displayName: 'NuGet Authenticate'
-
-  - task: DotNetCoreCLI@2
-    displayName: 'Restore tests'
-    inputs:
-      command: 'restore'
-      projects: |
-        **/*Tests.csproj
-      feedsToUse: 'config'
-      nugetConfigPath: 'NuGet.config'
-
   - task: DotNetCoreCLI@2
     displayName: 'Run tests'
     inputs:
       command: 'test'
-      arguments: '--configuration Release --no-restore'
+      arguments: '-c Release'
       projects: |
         **/*Tests.csproj

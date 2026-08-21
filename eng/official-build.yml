@@ -6,15 +6,6 @@ trigger:
     include:
     - 'v*'
 
-schedules:
-# Ensure we build nightly to catch any new CVEs and report SDL often.
-- cron: "0 3 * * *"
-  displayName: Nightly Build
-  branches:
-    include:
-    - main-v2
-  always: true
-
 # CI only, does not trigger on PRs.
 pr: none
 
@@ -60,4 +51,3 @@ extends:
         parameters:
           official: true
           poolName: 1es-pool-azfunc
-
