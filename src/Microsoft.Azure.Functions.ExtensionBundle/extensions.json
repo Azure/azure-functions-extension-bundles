@@ -139,7 +139,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
-    "majorVersion": "2",
+    "version": "2.1.0",
     "name": "SignalR",
     "bindings": [
       "signalr",
