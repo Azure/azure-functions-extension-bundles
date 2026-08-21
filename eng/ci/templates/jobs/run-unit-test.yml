@@ -23,6 +23,12 @@ jobs:
       packageType: 'sdk'
       version: '3.1.x'
       performMultiLevelLookup: true
+
+  - task: UseDotNet@2
+    displayName: 'Install credential provider runtime'
+    inputs:
+      packageType: 'runtime'
+      version: '6.x'
       
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
