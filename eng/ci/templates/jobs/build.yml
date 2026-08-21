@@ -36,10 +36,10 @@ jobs:
       performMultiLevelLookup: true
 
   - task: UseDotNet@2
-    displayName: 'Install credential provider runtime'
+    displayName: 'Install authentication SDK'
     inputs:
-      packageType: 'runtime'
-      version: '6.x'
+      packageType: 'sdk'
+      version: '8.x'
 
   - ${{ if eq(parameters.official, true) }}:
     - task: DownloadBuildArtifacts@1
@@ -110,10 +110,10 @@ jobs:
       performMultiLevelLookup: true
 
   - task: UseDotNet@2
-    displayName: 'Install credential provider runtime'
+    displayName: 'Install authentication SDK'
     inputs:
-      packageType: 'runtime'
-      version: '6.x'
+      packageType: 'sdk'
+      version: '8.x'
 
   - ${{ if eq(parameters.official, true) }}:
     - task: DownloadBuildArtifacts@1
