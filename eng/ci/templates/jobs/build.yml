@@ -35,6 +35,12 @@ jobs:
       version: '3.1.x'
       performMultiLevelLookup: true
 
+  - task: UseDotNet@2
+    displayName: 'Install authentication SDK'
+    inputs:
+      packageType: 'sdk'
+      version: '8.x'
+
   - ${{ if eq(parameters.official, true) }}:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -47,17 +53,25 @@ jobs:
         artifactName: 'drop'
         downloadPath: '$(Build.Repository.LocalPath)\templatesArtifacts'
         
-  - task: NuGetAuthenticate@0
+  - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'    
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore build tooling'
+    inputs:
+      command: 'restore'
+      projects: 'build/Build.csproj'
+      feedsToUse: 'config'
+      nugetConfigPath: 'NuGet.config'
 
   - task: DotNetCoreCLI@2
     inputs:
       command: 'run'
       workingDirectory: '.\build'
       ${{ if eq(parameters.official, true) }}:
-        arguments: 'skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
+        arguments: '--no-restore -- skip:PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
       ${{ else }}:
-        arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,BuildBundleBinariesForLinux,PackageNetCoreV2Bundle'
+        arguments: '--no-restore -- skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,BuildBundleBinariesForLinux,PackageNetCoreV2Bundle'
         
   - ${{ if eq(parameters.official, true) }}:
     - task: CopyFiles@2
@@ -95,6 +109,12 @@ jobs:
       version: '3.1.x'
       performMultiLevelLookup: true
 
+  - task: UseDotNet@2
+    displayName: 'Install authentication SDK'
+    inputs:
+      packageType: 'sdk'
+      version: '8.x'
+
   - ${{ if eq(parameters.official, true) }}:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -107,8 +127,16 @@ jobs:
         artifactName: 'drop'
         downloadPath: '$(Build.Repository.LocalPath)/templatesArtifacts'
 
-  - task: NuGetAuthenticate@0
+  - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore build tooling'
+    inputs:
+      command: 'restore'
+      projects: 'build/Build.csproj'
+      feedsToUse: 'config'
+      nugetConfigPath: 'NuGet.config'
     
   - ${{ if eq(parameters.official, false) }}:      
     - task: Bash@3
@@ -117,7 +145,7 @@ jobs:
         script: |
           PATH=".dotnet:"$PATH && dotnet --info
           cd build
-          dotnet run skip:DownloadTemplates,PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux
+          dotnet run --no-restore -- skip:DownloadTemplates,PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux
 
   - ${{ if eq(parameters.official, true) }}:      
     - task: Bash@3
@@ -126,7 +154,7 @@ jobs:
         script: |
           PATH=".dotnet:"$PATH && dotnet --info
           cd build
-          dotnet run skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport
+          dotnet run --no-restore -- skip:PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport
 
 
   - ${{ if eq(parameters.official, true) }}:      
@@ -137,4 +165,3 @@ jobs:
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
         CleanTargetFolder: false
-
