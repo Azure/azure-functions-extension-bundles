@@ -7,14 +7,11 @@ using mock HTTP POST events (no Azure Event Grid connection required).
 
 Test scenarios covered (based on .NET SDK samples):
 1. EventGridEvent single trigger
-2. CloudEvent single trigger (CloudEvents mapped to func.EventGridEvent)
+2. CloudEvent single trigger
 3. EventGrid event construction verification (mock - not actual output binding)
 4. CloudEvent construction verification (mock - not actual output binding)
 5. Data shape variations - String, array, primitive, nested payloads
 6. Edge cases - Missing/null/empty data, special characters, large payloads
-
-Note: Python Event Grid triggers only support func.EventGridEvent type annotation.
-CloudEvents format is automatically mapped to EventGridEvent by the runtime.
 """
 import json
 import logging
@@ -60,28 +57,22 @@ def get_eventgrid_triggered(req: func.HttpRequest,
 
 # =============================================================================
 # CloudEvent Trigger - Single Event
-# Note: Python Event Grid triggers only support func.EventGridEvent type.
-# CloudEvents format is mapped to EventGridEvent by the extension runtime.
 # =============================================================================
 @app.function_name(name="cloudevent_trigger")
 @app.event_grid_trigger(arg_name="event")
 @app.blob_output(arg_name="$return",
                  path="bundle-tests/test-cloudevent-triggered.txt",
                  connection="AzureWebJobsStorage")
-def cloudevent_trigger(event: func.EventGridEvent) -> str:
-    """Process a single CloudEvent and write result to blob storage.
-    
-    Note: Python SDK only supports func.EventGridEvent type annotation.
-    CloudEvents are mapped to EventGridEvent by the extension runtime.
-    """
+def cloudevent_trigger(event: func.CloudEvent) -> str:
+    """Process a single CloudEvent and write result to blob storage."""
     logging.info(f"CloudEvent trigger received event: {event.id}")
     result = {
         'id': event.id,
-        'event_type': event.event_type,  # CloudEvent 'type' is mapped here
+        'event_type': event.type,
         'subject': event.subject,
-        'event_time': str(event.event_time) if event.event_time else None,
+        'event_time': str(event.time) if event.time else None,
         'data': event.get_json(),
-        'source': event.topic  # CloudEvent 'source' is mapped to topic
+        'source': event.source
     }
     return json.dumps(result)
 
@@ -218,10 +209,8 @@ def get_cloudevent_construction(req: func.HttpRequest,
 
 
 # =============================================================================
-# NOTE: Python Event Grid triggers only support func.EventGridEvent type annotation.
 # Unlike C#, Python does not support str, bytes, or dict type annotations for
-# eventGridTrigger bindings. The C# equivalents (String, BinaryData, JObject)
-# are not available in Python SDK.
+# eventGridTrigger bindings. Use func.EventGridEvent or func.CloudEvent.
 # =============================================================================
 
 
@@ -353,42 +342,6 @@ def eventgrid_trigger_nested_data(event: func.EventGridEvent) -> str:
 def get_eventgrid_nesteddata_triggered(req: func.HttpRequest,
                                        file: func.InputStream) -> str:
     """Retrieve the nested data trigger result from blob storage."""
-    return file.read().decode('utf-8')
-
-
-# =============================================================================
-# Edge Case: CloudEvent Backward Compatibility (legacy format)
-# Tests handling of older CloudEvent format with 'eventType' instead of 'type'
-# =============================================================================
-@app.function_name(name="cloudevent_backcompat_trigger")
-@app.event_grid_trigger(arg_name="event")
-@app.blob_output(arg_name="$return",
-                 path="bundle-tests/test-cloudevent-backcompat-triggered.txt",
-                 connection="AzureWebJobsStorage")
-def cloudevent_backcompat_trigger(event: func.EventGridEvent) -> str:
-    """Process CloudEvent in backward compatible mode.
-    
-    Handles both legacy 'eventType' and modern 'type' field formats.
-    """
-    logging.info("CloudEvent backcompat trigger received event")
-    result = {
-        'id': event.id,
-        'event_type': event.event_type,
-        'subject': event.subject,
-        'data': event.get_json(),
-        'format': 'backcompat'
-    }
-    return json.dumps(result)
-
-
-@app.function_name(name="get_cloudevent_backcompat_triggered")
-@app.route(route="get_cloudevent_backcompat_triggered")
-@app.blob_input(arg_name="file",
-                path="bundle-tests/test-cloudevent-backcompat-triggered.txt",
-                connection="AzureWebJobsStorage")
-def get_cloudevent_backcompat_triggered(req: func.HttpRequest,
-                                        file: func.InputStream) -> str:
-    """Retrieve the CloudEvent backcompat trigger result."""
     return file.read().decode('utf-8')
 
 
