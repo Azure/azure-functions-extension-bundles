@@ -35,6 +35,24 @@ jobs:
       version: '3.1.x'
       performMultiLevelLookup: true
 
+  - task: UseDotNet@2
+    displayName: 'Install current .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      version: '8.x'
+      performMultiLevelLookup: true
+
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore build tooling'
+    inputs:
+      command: 'restore'
+      projects: 'build/Build.csproj'
+      feedsToUse: 'config'
+      nugetConfigPath: 'NuGet.config'
+
   - ${{ if eq(parameters.official, true) }}:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -52,9 +70,9 @@ jobs:
       command: 'run'
       workingDirectory: '.\build'
       ${{ if eq(parameters.official, true) }}:
-        arguments: 'skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
+        arguments: '--no-restore -- skip:GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux,BuildBundleBinariesForLinux'
       ${{ else }}:
-        arguments: 'skip:DownloadTemplates,GenerateVulnerabilityReport,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV2Bundle'
+        arguments: '--no-restore -- skip:DownloadTemplates,GenerateVulnerabilityReport,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,BuildBundleBinariesForLinux,GenerateVulnerabilityReport,PackageNetCoreV2Bundle'
         
   - ${{ if eq(parameters.official, true) }}:
     - task: CopyFiles@2
@@ -92,6 +110,24 @@ jobs:
       version: '3.1.x'
       performMultiLevelLookup: true
 
+  - task: UseDotNet@2
+    displayName: 'Install current .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      version: '8.x'
+      performMultiLevelLookup: true
+
+  - task: NuGetAuthenticate@1
+    displayName: 'NuGet Authenticate'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore build tooling'
+    inputs:
+      command: 'restore'
+      projects: 'build/Build.csproj'
+      feedsToUse: 'config'
+      nugetConfigPath: 'NuGet.config'
+
   - ${{ if eq(parameters.official, true) }}:
     - task: DownloadBuildArtifacts@1
       inputs:
@@ -111,7 +147,7 @@ jobs:
         script: |
           PATH=".dotnet:"$PATH && dotnet --info
           cd build
-          dotnet run skip:DownloadTemplates,GenerateVulnerabilityReport,PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux
+          dotnet run --no-restore -- skip:DownloadTemplates,GenerateVulnerabilityReport,PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport,PackageNetCoreV3BundlesLinux,CreateCDNStoragePackageLinux
 
   - ${{ if eq(parameters.official, true) }}:      
     - task: Bash@3
@@ -120,7 +156,7 @@ jobs:
         script: |
           PATH=".dotnet:"$PATH && dotnet --info
           cd build
-          dotnet run skip:GenerateVulnerabilityReport,PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport
+          dotnet run --no-restore -- skip:GenerateVulnerabilityReport,PackageNetCoreV2Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,BuildBundleBinariesForWindows,GenerateVulnerabilityReport
 
 
   - ${{ if eq(parameters.official, true) }}:      
