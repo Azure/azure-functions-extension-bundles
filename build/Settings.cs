@@ -6,10 +6,13 @@ namespace Build
 {
     public static class Settings
     {
+        public const string UpstreamPublicNuGetFeedUrl = "https://pkgs.dev.azure.com/azfunc/public/_packaging/upstream-public/nuget/v3/index.json";
+
         public static string basePath = path;
 
         public static readonly string SourcePath = Path.GetFullPath(basePath + "/src/Microsoft.Azure.Functions.ExtensionBundle/");
         public static readonly string BuildPath = Path.Combine(Path.GetFullPath(basePath), "build");
+        public static readonly string NuGetConfigFilePath = Path.Combine(Path.GetFullPath(basePath), NuGetConfigFileName);
 
         public static string ExtensionsJsonFilePath => Path.Combine(SourcePath, ExtensionsJsonFileName);
 
@@ -49,7 +52,7 @@ namespace Build
 
         public static readonly string BundleConfigJsonFileName = "bundleConfig.json";
 
-        public static readonly string NugetConfigFileName = "NuGet.Config";
+        public const string NuGetConfigFileName = "NuGet.config";
 
         public static readonly string RUPackagePath = Path.Combine(RootBinDirectory, $"{BundleConfiguration.Instance.ExtensionBundleId}.{BundleConfiguration.Instance.ExtensionBundleVersion}_RU_package", BundleConfiguration.Instance.ExtensionBundleVersion);
 

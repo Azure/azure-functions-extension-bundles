@@ -32,12 +32,22 @@ jobs:
     displayName: 'NuGet Authenticate'
 
   - task: DotNetCoreCLI@2
+    displayName: 'Restore build tooling'
+    inputs:
+      command: 'restore'
+      projects: 'build/Build.csproj'
+      feedsToUse: 'config'
+      nugetConfigPath: 'NuGet.config'
+
+  - task: DotNetCoreCLI@2
     displayName: 'Build'
     inputs:
       command: 'run'
       workingDirectory: '.\build'
       ${{ if eq(parameters.official, false) }}:
-        arguments: 'skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,PackageBundle,PackageBundlesWindows,PackageBundlesLinux'
+        arguments: '--no-restore -- skip:DownloadTemplates,PackageNetCoreV3Bundle,PackageNetCoreV3BundlesWindows,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageNetCoreV3BundlesLinux,PackageBundle,PackageBundlesWindows,PackageBundlesLinux'
+      ${{ else }}:
+        arguments: '--no-restore'
 
   - ${{ if eq(parameters.official, true) }}:
     - task: CopyFiles@2

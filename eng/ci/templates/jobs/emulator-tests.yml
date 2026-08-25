@@ -49,7 +49,7 @@ jobs:
         displayName: 'Build Azure Functions Core Tools'
         inputs:
           filePath: '$(Agent.BuildDirectory)/bundle/eng/ci/scripts/build-multi-version-core-tools.ps1'
-          arguments: '-Count $(hostTagsCount) -Pattern "$(hostTagPattern)" -Configuration Release -CloneDir "$(Agent.BuildDirectory)/core-tools"'
+          arguments: '-Count $(hostTagsCount) -Pattern "$(hostTagPattern)" -Configuration Release -CloneDir "$(Agent.BuildDirectory)/core-tools" -NuGetConfigPath "$(Agent.BuildDirectory)/bundle/eng/ci/config/core-tools.NuGet.config"'
           pwsh: true
           workingDirectory: '$(Agent.BuildDirectory)/core-tools'
 
@@ -120,13 +120,27 @@ jobs:
       - task: NuGetAuthenticate@1
         displayName: 'NuGet Authenticate'
 
-      # Build the Linux bundle first
+      - task: UseDotNet@2
+        displayName: 'Install current .NET SDK'
+        inputs:
+          packageType: 'sdk'
+          useGlobalJson: true
+
       - task: DotNetCoreCLI@2
-        displayName: 'Build Linux Bundle (once)'
+        displayName: 'Restore build tooling'
+        inputs:
+          command: 'restore'
+          projects: 'build/Build.csproj'
+          feedsToUse: 'config'
+          nugetConfigPath: 'NuGet.config'
+
+      # Build the any-any bundle
+      - task: DotNetCoreCLI@2
+        displayName: 'Build any-any Bundle (once)'
         inputs:
           command: 'run'
           workingDirectory: './build'
-          arguments: 'PackageBundlesLinux'
+          arguments: '--no-restore -- skip:DownloadTemplates,BuildBundleBinariesForLinux,PackageBundle,PackageBundlesLinux,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux'
         env:
           BUILD_REPOSITORY_LOCALPATH: '$(Build.Repository.LocalPath)'
           TEMPLATES_ARTIFACTS_DIRECTORY: '$(Build.Repository.LocalPath)/templatesArtifacts'
@@ -293,6 +307,15 @@ jobs:
           fi
         displayName: 'Verify Core Tools Artifact'
 
+      - task: NuGetAuthenticate@1
+        displayName: 'NuGet Authenticate'
+
+      - task: PipAuthenticate@1
+        displayName: 'PyPI Authenticate'
+        inputs:
+          artifactFeeds: 'public/upstream-public'
+          onlyAddExtraIndex: false
+
       # Set up Python 3.12 and create virtual environment
       - task: UsePythonVersion@0
         inputs:
@@ -301,17 +324,12 @@ jobs:
           architecture: 'x64'
         displayName: 'Set up Python 3.12'
 
-      - task: PipAuthenticate@1
-        displayName: 'PyPI Authenticate'
-        inputs:
-          artifactFeeds: 'public/azure-functions-extension-bundles-feed'
-
       - script: |
           cd tests
           python -m venv venv
           source venv/bin/activate
-          pip install --upgrade pip
-          pip install --cache-dir ~/.cache/pip -r requirements.txt
+          python -m pip install --upgrade pip
+          python -m pip install --cache-dir ~/.cache/pip -r requirements.txt
         displayName: 'Install Python Dependencies (cached)'
         env:
           PIP_INDEX_URL: $(PIP_INDEX_URL)
@@ -349,7 +367,7 @@ jobs:
           if [ "$(ADDITIONAL_EMULATORS)" = "cosmosdb" ]; then
             echo "Starting CosmosDB Emulator for $(DISPLAY_NAME)..."
             docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
-            docker run --detach --publish 8081:8081 --publish 1234:1234 --name cosmosdb-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+            docker run --detach --env ENABLE_EXPLORER=false --publish 8081:8081 --name cosmosdb-emulator mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
             echo "Waiting for CosmosDB Emulator to start..."
             sleep 60
             docker ps
@@ -434,7 +452,8 @@ jobs:
             echo "Starting SignalR Emulator for $(DISPLAY_NAME)..."
             
             # Install SignalR emulator .NET tool
-            dotnet tool install -g Microsoft.Azure.SignalR.Emulator || dotnet tool update -g Microsoft.Azure.SignalR.Emulator
+            tool_args=(--global Microsoft.Azure.SignalR.Emulator --configfile "$NUGET_CONFIG_PATH")
+            dotnet tool install "${tool_args[@]}" || dotnet tool update "${tool_args[@]}"
             export PATH="$PATH:$HOME/.dotnet/tools"
             
             # Start emulator in background with settings file
@@ -458,6 +477,7 @@ jobs:
         displayName: 'Start Additional Emulators'
         env:
           AzureWebJobsSQLPassword: $(AzureWebJobsSQLPassword)
+          NUGET_CONFIG_PATH: '$(Build.Repository.LocalPath)/NuGet.config'
 
       # Start mock extension site in background
       - script: |
