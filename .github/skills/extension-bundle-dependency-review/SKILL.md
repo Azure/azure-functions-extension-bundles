@@ -102,10 +102,22 @@ Within each artifact:
 4. identify which extension NuGet changed between the builds; and
 5. verify that the new extension package was published between the two build timestamps using package metadata.
 
-Read `NuGet.config` and use its configured package source for registration and package metadata. Do not call
-`api.nuget.org` directly; it may be blocked in the development environment. Resolve the feed's
-`RegistrationsBaseUrl/3.6.0` resource from its NuGet v3 service index, then query the lower-cased package ID's
-registration document for the version and `published` timestamp.
+Read `NuGet.config` and honor both `<packageSources>` and `<packageSourceMapping>` when selecting the source for
+the package. Do not call `api.nuget.org` directly; it may be blocked in the development environment.
+
+From the selected source's NuGet v3 service index:
+
+1. resolve its `RegistrationsBaseUrl/3.6.0` resource;
+2. query `<registration-base>/<lower-case-package-id>/index.json`;
+3. select the exact version's catalog entry and record its `published`, dependency groups, and `packageContent`;
+4. use the catalog entry's `packageContent` URL to download the `.nupkg` when package inspection is needed; or
+5. resolve `PackageBaseAddress/3.0.0` and download
+   `<package-base>/<lower-case-id>/<lower-case-version>/<lower-case-id>.<lower-case-version>.nupkg`.
+
+Use `dotnet restore --configfile NuGet.config` when restoring a project so package source mapping and configured
+credentials are applied consistently. Public feeds require no added credentials. For authenticated feeds, use
+the environment's existing Azure Artifacts credential provider or access token without printing or persisting
+the credential. Never add a source, token, or credential to the repository.
 
 If multiple extension packages changed, use the failing assembly's dependency graph to identify the responsible
 package rather than guessing from timestamps.
