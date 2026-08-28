@@ -12,17 +12,17 @@
           "MessagePack": "2.5.301",
           "Microsoft.Azure.DurableTask.Netherite.AzureFunctions": "3.1.1",
           "Microsoft.Azure.Functions.Extensions.Connector": "0.2.0-alpha",
-          "Microsoft.Azure.Functions.Extensions.Mcp": "1.5.0",
+          "Microsoft.Azure.Functions.Extensions.Mcp": "1.6.0",
           "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents": "1.1.0",
           "Microsoft.Azure.WebJobs.Extensions.AzureCosmosDb.Mongo": "1.2.5-preview",
           "Microsoft.Azure.WebJobs.Extensions.CosmosDB": "4.16.1",
           "Microsoft.Azure.WebJobs.Extensions.Dapr": "0.17.0-preview01",
-          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.13.1",
-          "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged": "1.9.0",
+          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.15.0",
+          "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged": "1.10.0",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "3.5.0",
           "Microsoft.Azure.WebJobs.Extensions.EventHubs": "6.5.3",
-          "Microsoft.Azure.WebJobs.Extensions.Fabric": "1.0.100",
-          "Microsoft.Azure.WebJobs.Extensions.Kafka": "4.3.2",
+          "Microsoft.Azure.WebJobs.Extensions.Fabric": "1.0.110",
+          "Microsoft.Azure.WebJobs.Extensions.Kafka": "4.3.3",
           "Microsoft.Azure.WebJobs.Extensions.Kusto": "1.0.13-Preview",
           "Microsoft.Azure.WebJobs.Extensions.MySql": "1.0.129",
           "Microsoft.Azure.WebJobs.Extensions.OpenAI": "0.19.0-alpha",
@@ -41,7 +41,7 @@
           "Microsoft.Azure.WebJobs.Extensions.Storage.Queues": "5.3.7",
           "Microsoft.Azure.WebJobs.Extensions.Twilio": "3.0.2",
           "Microsoft.Azure.WebJobs.Extensions.WebPubSubForSocketIO": "1.0.0",
-          "Microsoft.DurableTask.SqlServer.AzureFunctions": "1.6.0",
+          "Microsoft.DurableTask.SqlServer.AzureFunctions": "1.8.1",
           "Microsoft.NET.Sdk.Functions": "4.6.0",
           "System.Formats.Asn1": "6.0.1",
           "System.Reactive.Reference": "4.4.0.0"
@@ -50,18 +50,15 @@
           "extensions.dll": {}
         }
       },
-      "Apache.Avro/1.11.0": {
+      "Apache.Avro/1.12.0": {
         "dependencies": {
           "Newtonsoft.Json": "13.0.3",
-          "System.CodeDom": "4.4.0",
-          "System.Reflection": "4.3.0",
-          "System.Reflection.Emit.ILGeneration": "4.3.0",
-          "System.Reflection.Emit.Lightweight": "4.3.0"
+          "System.CodeDom": "8.0.0"
         },
         "runtime": {
           "lib/netstandard2.1/Avro.dll": {
-            "assemblyVersion": "1.11.0.0",
-            "fileVersion": "1.11.0.0"
+            "assemblyVersion": "1.12.0.0",
+            "fileVersion": "1.12.0.0"
           }
         }
       },
@@ -79,7 +76,7 @@
       },
       "Azure.Core/1.50.0": {
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
           "System.ClientModel": "1.8.0",
           "System.Memory.Data": "8.0.1"
         },
@@ -171,7 +168,7 @@
           "Azure.Messaging.EventHubs": "5.12.2",
           "Azure.Storage.Blobs": "12.27.0",
           "Microsoft.Azure.Amqp": "2.7.0",
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
           "System.Diagnostics.DiagnosticSource": "8.0.1",
           "System.Reflection.TypeExtensions": "4.7.0",
           "System.Threading.Channels": "8.0.0",
@@ -312,58 +309,54 @@
           }
         }
       },
-      "Confluent.Kafka/2.4.0": {
+      "Confluent.Kafka/2.11.1": {
         "dependencies": {
-          "System.Memory": "4.5.5",
-          "librdkafka.redist": "2.4.0"
+          "librdkafka.redist": "2.11.1"
         },
         "runtime": {
-          "lib/net6.0/Confluent.Kafka.dll": {
-            "assemblyVersion": "2.4.0.0",
-            "fileVersion": "2.4.0.0"
+          "lib/net8.0/Confluent.Kafka.dll": {
+            "assemblyVersion": "2.11.1.0",
+            "fileVersion": "2.11.1.0"
           }
         }
       },
-      "Confluent.SchemaRegistry/2.4.0": {
+      "Confluent.SchemaRegistry/2.11.1": {
         "dependencies": {
-          "Confluent.Kafka": "2.4.0",
-          "Newtonsoft.Json": "13.0.3",
-          "System.Net.Http": "4.3.4"
+          "Confluent.Kafka": "2.11.1",
+          "Microsoft.Extensions.Caching.Memory": "8.0.1",
+          "Newtonsoft.Json": "13.0.3"
         },
         "runtime": {
-          "lib/netstandard2.0/Confluent.SchemaRegistry.dll": {
-            "assemblyVersion": "2.4.0.0",
-            "fileVersion": "2.4.0.0"
+          "lib/net8.0/Confluent.SchemaRegistry.dll": {
+            "assemblyVersion": "2.11.1.0",
+            "fileVersion": "2.11.1.0"
           }
         }
       },
-      "Confluent.SchemaRegistry.Serdes.Avro/2.4.0": {
+      "Confluent.SchemaRegistry.Serdes.Avro/2.11.1": {
         "dependencies": {
-          "Apache.Avro": "1.11.0",
-          "Confluent.Kafka": "2.4.0",
-          "Confluent.SchemaRegistry": "2.4.0",
-          "System.Net.NameResolution": "4.3.0",
-          "System.Net.Sockets": "4.3.0"
+          "Apache.Avro": "1.12.0",
+          "Confluent.Kafka": "2.11.1",
+          "Confluent.SchemaRegistry": "2.11.1"
         },
         "runtime": {
-          "lib/netstandard2.0/Confluent.SchemaRegistry.Serdes.Avro.dll": {
-            "assemblyVersion": "2.4.0.0",
-            "fileVersion": "2.4.0.0"
+          "lib/net8.0/Confluent.SchemaRegistry.Serdes.Avro.dll": {
+            "assemblyVersion": "2.11.1.0",
+            "fileVersion": "2.11.1.0"
           }
         }
       },
-      "Confluent.SchemaRegistry.Serdes.Protobuf/2.4.0": {
+      "Confluent.SchemaRegistry.Serdes.Protobuf/2.11.1": {
         "dependencies": {
-          "Confluent.Kafka": "2.4.0",
-          "Confluent.SchemaRegistry": "2.4.0",
+          "Confluent.Kafka": "2.11.1",
+          "Confluent.SchemaRegistry": "2.11.1",
           "Google.Protobuf": "3.34.1",
-          "System.Net.NameResolution": "4.3.0",
-          "System.Net.Sockets": "4.3.0"
+          "protobuf-net.Reflection": "3.2.12"
         },
         "runtime": {
-          "lib/netstandard2.0/Confluent.SchemaRegistry.Serdes.Protobuf.dll": {
-            "assemblyVersion": "2.4.0.0",
-            "fileVersion": "2.4.0.0"
+          "lib/net8.0/Confluent.SchemaRegistry.Serdes.Protobuf.dll": {
+            "assemblyVersion": "2.11.1.0",
+            "fileVersion": "2.11.1.0"
           }
         }
       },
@@ -489,13 +482,13 @@
           }
         }
       },
-      "librdkafka.redist/2.4.0": {
+      "librdkafka.redist/2.11.1": {
         "native": {
           "runtimes/win-x86/native/libcrypto-3.dll": {
-            "fileVersion": "3.0.8.0"
+            "fileVersion": "3.3.2.0"
           },
           "runtimes/win-x86/native/libcurl.dll": {
-            "fileVersion": "7.86.0.0"
+            "fileVersion": "8.10.1.0"
           },
           "runtimes/win-x86/native/librdkafka.dll": {
             "fileVersion": "0.0.0.0"
@@ -504,19 +497,19 @@
             "fileVersion": "0.0.0.0"
           },
           "runtimes/win-x86/native/libssl-3.dll": {
-            "fileVersion": "3.0.8.0"
+            "fileVersion": "3.3.2.0"
           },
           "runtimes/win-x86/native/msvcp140.dll": {
-            "fileVersion": "14.29.30040.0"
+            "fileVersion": "14.40.33816.0"
           },
           "runtimes/win-x86/native/vcruntime140.dll": {
-            "fileVersion": "14.29.30040.0"
+            "fileVersion": "14.40.33816.0"
           },
           "runtimes/win-x86/native/zlib1.dll": {
-            "fileVersion": "1.2.13.0"
+            "fileVersion": "1.3.1.0"
           },
           "runtimes/win-x86/native/zstd.dll": {
-            "fileVersion": "1.5.2.0"
+            "fileVersion": "1.5.6.0"
           }
         }
       },
@@ -909,7 +902,7 @@
       "Microsoft.Azure.Cosmos/3.60.0": {
         "dependencies": {
           "Azure.Core": "1.50.0",
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
           "Microsoft.Bcl.HashCode": "1.1.0",
           "System.Buffers": "4.6.0",
           "System.Collections.Immutable": "8.0.0",
@@ -944,7 +937,7 @@
         "dependencies": {
           "Microsoft.ApplicationInsights": "2.23.0",
           "Microsoft.Azure.DurableTask.Core": "3.9.0",
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8"
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9"
         },
         "runtime": {
           "lib/netstandard2.0/DurableTask.ApplicationInsights.dll": {
@@ -959,7 +952,7 @@
           "Azure.Storage.Blobs": "12.27.0",
           "Azure.Storage.Queues": "12.24.0",
           "Microsoft.Azure.DurableTask.Core": "3.9.0",
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
           "System.Linq.Async": "6.0.1"
         },
         "runtime": {
@@ -993,7 +986,7 @@
           "Azure.Messaging.EventHubs.Processor": "5.11.5",
           "Azure.Storage.Blobs": "12.27.0",
           "Microsoft.Azure.DurableTask.Core": "3.9.0",
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
           "Microsoft.FASTER.Core": "2.6.5",
           "Newtonsoft.Json": "13.0.3",
           "System.Text.Json": "8.0.6"
@@ -1009,7 +1002,7 @@
         "dependencies": {
           "Microsoft.Azure.DurableTask.Core": "3.9.0",
           "Microsoft.Azure.DurableTask.Netherite": "3.1.1",
-          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.13.1",
+          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.15.0",
           "System.Text.Json": "8.0.6"
         },
         "runtime": {
@@ -1054,13 +1047,13 @@
           }
         }
       },
-      "Microsoft.Azure.Functions.Extensions.Mcp/1.5.0": {
+      "Microsoft.Azure.Functions.Extensions.Mcp/1.6.0": {
         "dependencies": {
           "Azure.Storage.Queues": "12.24.0",
           "Microsoft.Azure.WebJobs": "3.0.45",
           "Microsoft.Azure.WebJobs.Extensions.Http": "3.2.1",
           "Microsoft.Azure.WebJobs.Script.Abstractions": "1.0.4-preview",
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
           "Microsoft.Extensions.Azure": "1.13.1",
           "ModelContextProtocol": "0.4.0-preview.3",
           "System.Drawing.Common": "4.7.3",
@@ -1070,8 +1063,8 @@
         },
         "runtime": {
           "lib/net8.0/Microsoft.Azure.Functions.Extensions.Mcp.dll": {
-            "assemblyVersion": "1.5.0.0",
-            "fileVersion": "1.5.0.26227"
+            "assemblyVersion": "1.6.0.0",
+            "fileVersion": "1.6.0.26380"
           }
         }
       },
@@ -1320,7 +1313,7 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.DurableTask/3.13.1": {
+      "Microsoft.Azure.WebJobs.Extensions.DurableTask/3.15.0": {
         "dependencies": {
           "Azure.Identity": "1.17.1",
           "Microsoft.AspNetCore.Mvc.WebApiCompatShim": "2.3.0",
@@ -1335,12 +1328,12 @@
         "runtime": {
           "lib/net8.0/Microsoft.Azure.WebJobs.Extensions.DurableTask.dll": {
             "assemblyVersion": "3.0.0.0",
-            "fileVersion": "3.13.1.0"
+            "fileVersion": "3.15.0.0"
           }
         }
       },
       "Microsoft.Azure.WebJobs.Extensions.DurableTask.Analyzers/0.5.0": {},
-      "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged/1.9.0": {
+      "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged/1.10.0": {
         "dependencies": {
           "Azure.Core": "1.50.0",
           "Azure.Identity": "1.17.1",
@@ -1348,9 +1341,9 @@
           "Grpc.Net.Client": "2.76.0",
           "Grpc.Tools": "2.78.0",
           "Microsoft.Azure.DurableTask.Core": "3.9.0",
-          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.13.1",
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8",
-          "Microsoft.DurableTask.AzureManagedBackend": "1.9.0",
+          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.15.0",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
+          "Microsoft.DurableTask.AzureManagedBackend": "1.10.0",
           "Microsoft.DurableTask.Extensions.AzureBlobPayloads": "1.24.2",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
           "System.Text.Json": "8.0.6",
@@ -1358,8 +1351,8 @@
         },
         "runtime": {
           "lib/net8.0/Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged.dll": {
-            "assemblyVersion": "1.9.0.0",
-            "fileVersion": "1.9.0.26961"
+            "assemblyVersion": "1.10.0.0",
+            "fileVersion": "1.10.0.19286"
           }
         }
       },
@@ -1391,7 +1384,7 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.Fabric/1.0.100": {
+      "Microsoft.Azure.WebJobs.Extensions.Fabric/1.0.110": {
         "dependencies": {
           "Azure.Core": "1.50.0",
           "Azure.Identity": "1.17.1",
@@ -1407,12 +1400,12 @@
         },
         "runtime": {
           "lib/netstandard2.1/Microsoft.Azure.Extensions.Fabric.Shared.dll": {
-            "assemblyVersion": "1.0.100.0",
-            "fileVersion": "1.0.100.0"
+            "assemblyVersion": "1.0.110.0",
+            "fileVersion": "1.0.110.0"
           },
           "lib/netstandard2.1/Microsoft.Azure.WebJobs.Extensions.Fabric.dll": {
-            "assemblyVersion": "1.0.100.0",
-            "fileVersion": "1.0.100.0"
+            "assemblyVersion": "1.0.110.0",
+            "fileVersion": "1.0.110.0"
           }
         }
       },
@@ -1432,20 +1425,20 @@
           }
         }
       },
-      "Microsoft.Azure.WebJobs.Extensions.Kafka/4.3.2": {
+      "Microsoft.Azure.WebJobs.Extensions.Kafka/4.3.3": {
         "dependencies": {
-          "Confluent.Kafka": "2.4.0",
-          "Confluent.SchemaRegistry": "2.4.0",
-          "Confluent.SchemaRegistry.Serdes.Avro": "2.4.0",
-          "Confluent.SchemaRegistry.Serdes.Protobuf": "2.4.0",
+          "Confluent.Kafka": "2.11.1",
+          "Confluent.SchemaRegistry": "2.11.1",
+          "Confluent.SchemaRegistry.Serdes.Avro": "2.11.1",
+          "Confluent.SchemaRegistry.Serdes.Protobuf": "2.11.1",
           "Microsoft.Azure.WebJobs": "3.0.45",
           "System.Diagnostics.DiagnosticSource": "8.0.1",
           "System.Threading.Channels": "8.0.0"
         },
         "runtime": {
           "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.Kafka.dll": {
-            "assemblyVersion": "4.3.2.0",
-            "fileVersion": "4.3.2.0"
+            "assemblyVersion": "4.3.3.0",
+            "fileVersion": "4.3.3.0"
           }
         }
       },
@@ -1469,7 +1462,7 @@
           "Microsoft.ApplicationInsights": "2.23.0",
           "Microsoft.AspNetCore.Http": "2.3.0",
           "Microsoft.Azure.WebJobs": "3.0.45",
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
           "Microsoft.SqlServer.TransactSql.ScriptDom": "161.9135.0",
           "MySql.Data": "9.0.0",
           "Newtonsoft.Json": "13.0.3",
@@ -1804,11 +1797,11 @@
           }
         }
       },
-      "Microsoft.Bcl.AsyncInterfaces/10.0.8": {
+      "Microsoft.Bcl.AsyncInterfaces/10.0.9": {
         "runtime": {
           "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "assemblyVersion": "10.0.0.8",
-            "fileVersion": "10.0.826.23019"
+            "assemblyVersion": "10.0.0.9",
+            "fileVersion": "10.0.926.27113"
           }
         }
       },
@@ -1899,7 +1892,7 @@
       "Microsoft.DurableTask.Abstractions/1.24.2": {
         "dependencies": {
           "Microsoft.Azure.DurableTask.Core": "3.9.0",
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.1",
           "Microsoft.Extensions.Logging.Abstractions": "8.0.3",
           "System.Collections.Immutable": "8.0.0",
@@ -1912,37 +1905,37 @@
           }
         }
       },
-      "Microsoft.DurableTask.AzureManagedBackend/1.9.0": {
+      "Microsoft.DurableTask.AzureManagedBackend/1.10.0": {
         "dependencies": {
           "Azure.Core": "1.50.0",
           "Azure.Identity": "1.17.1",
           "Google.Protobuf": "3.34.1",
           "Grpc.Net.Client": "2.76.0",
           "Microsoft.Azure.DurableTask.Core": "3.9.0",
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8",
-          "Microsoft.DurableTask.AzureManagedBackend.Protobuf": "1.9.0",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
+          "Microsoft.DurableTask.AzureManagedBackend.Protobuf": "1.10.0",
           "Microsoft.DurableTask.Extensions.AzureBlobPayloads": "1.24.2",
-          "Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged": "1.9.0",
+          "Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged": "1.10.0",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
           "System.Text.Json": "8.0.6",
           "System.Threading.Channels": "8.0.0"
         },
         "runtime": {
           "lib/net8.0/Microsoft.DurableTask.AzureManagedBackend.dll": {
-            "assemblyVersion": "1.9.0.0",
-            "fileVersion": "1.9.0.26961"
+            "assemblyVersion": "1.10.0.0",
+            "fileVersion": "1.10.0.19286"
           }
         }
       },
-      "Microsoft.DurableTask.AzureManagedBackend.Protobuf/1.9.0": {
+      "Microsoft.DurableTask.AzureManagedBackend.Protobuf/1.10.0": {
         "dependencies": {
           "Google.Protobuf": "3.34.1",
           "Grpc.Net.Client": "2.76.0"
         },
         "runtime": {
           "lib/net8.0/Microsoft.DurableTask.AzureManagedBackend.Protobuf.dll": {
-            "assemblyVersion": "1.9.0.0",
-            "fileVersion": "1.9.0.26961"
+            "assemblyVersion": "1.10.0.0",
+            "fileVersion": "1.10.0.19286"
           }
         }
       },
@@ -1991,15 +1984,15 @@
           }
         }
       },
-      "Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged/1.9.0": {
+      "Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged/1.10.0": {
         "dependencies": {
           "Azure.Core": "1.50.0",
           "Azure.Identity": "1.17.1",
           "Google.Protobuf": "3.34.1",
           "Grpc.Net.Client": "2.76.0",
           "Microsoft.Azure.DurableTask.Core": "3.9.0",
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8",
-          "Microsoft.DurableTask.AzureManagedBackend.Protobuf": "1.9.0",
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
+          "Microsoft.DurableTask.AzureManagedBackend.Protobuf": "1.10.0",
           "Microsoft.DurableTask.Extensions.AzureBlobPayloads": "1.24.2",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
           "System.Text.Json": "8.0.6",
@@ -2007,8 +2000,8 @@
         },
         "runtime": {
           "lib/net8.0/Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged.dll": {
-            "assemblyVersion": "1.9.0.0",
-            "fileVersion": "1.9.0.26961"
+            "assemblyVersion": "1.10.0.0",
+            "fileVersion": "1.10.0.19286"
           }
         }
       },
@@ -2024,7 +2017,7 @@
           }
         }
       },
-      "Microsoft.DurableTask.SqlServer/1.6.0": {
+      "Microsoft.DurableTask.SqlServer/1.8.1": {
         "dependencies": {
           "Azure.Core": "1.50.0",
           "Azure.Identity": "1.17.1",
@@ -2032,25 +2025,25 @@
           "Microsoft.Data.SqlClient": "5.2.2",
           "Microsoft.IdentityModel.JsonWebTokens": "7.5.1",
           "SemanticVersion": "2.1.0",
-          "System.IdentityModel.Tokens.Jwt": "7.5.1",
-          "System.Text.Json": "8.0.6"
+          "System.Drawing.Common": "4.7.3",
+          "System.IdentityModel.Tokens.Jwt": "7.5.1"
         },
         "runtime": {
-          "lib/netstandard2.0/DurableTask.SqlServer.dll": {
-            "assemblyVersion": "1.6.0.0",
-            "fileVersion": "1.6.0.4247"
+          "lib/net8.0/DurableTask.SqlServer.dll": {
+            "assemblyVersion": "1.8.0.0",
+            "fileVersion": "1.8.1.34310"
           }
         }
       },
-      "Microsoft.DurableTask.SqlServer.AzureFunctions/1.6.0": {
+      "Microsoft.DurableTask.SqlServer.AzureFunctions/1.8.1": {
         "dependencies": {
-          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.13.1",
-          "Microsoft.DurableTask.SqlServer": "1.6.0"
+          "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.15.0",
+          "Microsoft.DurableTask.SqlServer": "1.8.1"
         },
         "runtime": {
-          "lib/net6.0/DurableTask.SqlServer.AzureFunctions.dll": {
-            "assemblyVersion": "1.6.0.0",
-            "fileVersion": "1.6.0.4247"
+          "lib/net8.0/DurableTask.SqlServer.AzureFunctions.dll": {
+            "assemblyVersion": "1.8.0.0",
+            "fileVersion": "1.8.1.34310"
           }
         }
       },
@@ -2916,6 +2909,28 @@
           }
         }
       },
+      "protobuf-net.Core/3.2.12": {
+        "dependencies": {
+          "System.Collections.Immutable": "8.0.0"
+        },
+        "runtime": {
+          "lib/net6.0/protobuf-net.Core.dll": {
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.2.12.9385"
+          }
+        }
+      },
+      "protobuf-net.Reflection/3.2.12": {
+        "dependencies": {
+          "protobuf-net.Core": "3.2.12"
+        },
+        "runtime": {
+          "lib/netstandard2.0/protobuf-net.Reflection.dll": {
+            "assemblyVersion": "3.0.0.0",
+            "fileVersion": "3.2.12.9385"
+          }
+        }
+      },
       "RabbitMQ.Client/6.8.1": {
         "dependencies": {
           "System.Memory": "4.5.5",
@@ -3155,11 +3170,11 @@
           }
         }
       },
-      "System.CodeDom/4.4.0": {
+      "System.CodeDom/8.0.0": {
         "runtime": {
-          "lib/netstandard2.0/System.CodeDom.dll": {
-            "assemblyVersion": "4.0.0.0",
-            "fileVersion": "4.6.25519.3"
+          "lib/net8.0/System.CodeDom.dll": {
+            "assemblyVersion": "8.0.0.0",
+            "fileVersion": "8.0.23.53103"
           }
         }
       },
@@ -3466,7 +3481,7 @@
       },
       "System.Linq.Async/6.0.1": {
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "10.0.8"
+          "Microsoft.Bcl.AsyncInterfaces": "10.0.9"
         },
         "runtime": {
           "lib/net6.0/System.Linq.Async.dll": {
@@ -4091,12 +4106,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Apache.Avro/1.11.0": {
+    "Apache.Avro/1.12.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-JpBxUTE/JeVt9yugkIiu0N+FHl+SIihDjs4VZsGFmlZM42nntj2QB8nAdj5yu8LOla54pSAQqdqHcxPa458KWQ==",
-      "path": "apache.avro/1.11.0",
-      "hashPath": "apache.avro.1.11.0.nupkg.sha512"
+      "sha512": "sha512-gFFnQ8j91zdbs5QvGo79139WnLpQB4rPbDx2Bnr664uBMSGhh422QsHd89Vv7WyT0+eT7qPL+6rZlnyor3aATw==",
+      "path": "apache.avro/1.12.0",
+      "hashPath": "apache.avro.1.12.0.nupkg.sha512"
     },
     "Azure.AI.OpenAI/2.1.0": {
       "type": "package",
@@ -4238,33 +4253,33 @@
       "path": "cloudnative.cloudevents.systemtextjson/2.6.0",
       "hashPath": "cloudnative.cloudevents.systemtextjson.2.6.0.nupkg.sha512"
     },
-    "Confluent.Kafka/2.4.0": {
+    "Confluent.Kafka/2.11.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-3xrE8SUSLN10klkDaXFBAiXxTc+2wMffvjcZ3RUyvOo2ckaRJZ3dY7yjs6R7at7+tjUiuq2OlyTiEaV6G9zFHA==",
-      "path": "confluent.kafka/2.4.0",
-      "hashPath": "confluent.kafka.2.4.0.nupkg.sha512"
+      "sha512": "sha512-IV06YJSTsBvl4T282qlUADqQa5OPQOnZ+/+mQ8k0wVJy/GSjfFINamUk4zs/PtZ5+NpRdS5VHuQP7bJaTr9RBQ==",
+      "path": "confluent.kafka/2.11.1",
+      "hashPath": "confluent.kafka.2.11.1.nupkg.sha512"
     },
-    "Confluent.SchemaRegistry/2.4.0": {
+    "Confluent.SchemaRegistry/2.11.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-NBIPOvVjvmaSdWUf+J8igmtGRJmsVRiI5CwHdmuz+zATawLFgxDNJxJPhpYYLJnLk504wrjAy8JmeWjkHbiqNA==",
-      "path": "confluent.schemaregistry/2.4.0",
-      "hashPath": "confluent.schemaregistry.2.4.0.nupkg.sha512"
+      "sha512": "sha512-U8+hAp61TLgH0RM/JvvMdQq3x8ScLkmofX9l3I05tuQreT0fk6+iBvs/h2N/IQDgQtq/iNLgpiEFpNjoHjotAA==",
+      "path": "confluent.schemaregistry/2.11.1",
+      "hashPath": "confluent.schemaregistry.2.11.1.nupkg.sha512"
     },
-    "Confluent.SchemaRegistry.Serdes.Avro/2.4.0": {
+    "Confluent.SchemaRegistry.Serdes.Avro/2.11.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-89xbRmZhmxl7JdXeeAIkv8AwQsun7koARMHIgiWIMDMfVgmyNYpWlQK41XEyZ/8kIV/HUQuEtZZLYh23glbpdA==",
-      "path": "confluent.schemaregistry.serdes.avro/2.4.0",
-      "hashPath": "confluent.schemaregistry.serdes.avro.2.4.0.nupkg.sha512"
+      "sha512": "sha512-JEh6zmdwDanp2DQbAh16rkGp1pI4IyPB9S2BJAAgg/qf3pOeMG/vJR15IR8n7RUa+sP0IuV/vqRFLC4y4hotCQ==",
+      "path": "confluent.schemaregistry.serdes.avro/2.11.1",
+      "hashPath": "confluent.schemaregistry.serdes.avro.2.11.1.nupkg.sha512"
     },
-    "Confluent.SchemaRegistry.Serdes.Protobuf/2.4.0": {
+    "Confluent.SchemaRegistry.Serdes.Protobuf/2.11.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-RC128zwUo081k+BQeIVA7CMBrsjhZ6lIOsyY8dL2IuXlekhZF5zsUSo32vgjrxUJvC1i2eY2ZZRfBYz82tJN4g==",
-      "path": "confluent.schemaregistry.serdes.protobuf/2.4.0",
-      "hashPath": "confluent.schemaregistry.serdes.protobuf.2.4.0.nupkg.sha512"
+      "sha512": "sha512-DXW8zTkhB4KTU1DxVf960RuDzfq+LeX1LW2tjppOENJkvUsEZWWdg3haUYdefQe2pa6O+6YcmRXBhgyNiMV1fQ==",
+      "path": "confluent.schemaregistry.serdes.protobuf/2.11.1",
+      "hashPath": "confluent.schemaregistry.serdes.protobuf.2.11.1.nupkg.sha512"
     },
     "DnsClient/1.6.1": {
       "type": "package",
@@ -4357,12 +4372,12 @@
       "path": "k4os.hash.xxhash/1.0.8",
       "hashPath": "k4os.hash.xxhash.1.0.8.nupkg.sha512"
     },
-    "librdkafka.redist/2.4.0": {
+    "librdkafka.redist/2.11.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-uqi1sNe0LEV50pYXZ3mYNJfZFF1VmsZ6m8wbpWugAAPOzOcX8FJP5FOhLMoUKVFiuenBH2v8zVBht7f1RCs3rA==",
-      "path": "librdkafka.redist/2.4.0",
-      "hashPath": "librdkafka.redist.2.4.0.nupkg.sha512"
+      "sha512": "sha512-fgzBgvnvDPyQ+VbGDs4piz7TYv2Gaz9niYv/ztwMoAQ+uyk0wTYR1NmyIKSN8JsE4hr5JHhDccSSNnbAFZQhBA==",
+      "path": "librdkafka.redist/2.11.1",
+      "hashPath": "librdkafka.redist.2.11.1.nupkg.sha512"
     },
     "MessagePack/2.5.301": {
       "type": "package",
@@ -4707,12 +4722,12 @@
       "path": "microsoft.azure.functions.extensions.dapr.core/0.17.0-preview01",
       "hashPath": "microsoft.azure.functions.extensions.dapr.core.0.17.0-preview01.nupkg.sha512"
     },
-    "Microsoft.Azure.Functions.Extensions.Mcp/1.5.0": {
+    "Microsoft.Azure.Functions.Extensions.Mcp/1.6.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-OzglE9PYAB09b9n5IZZMtyMh0BUkHeRuxXocsOlbGk/6v/hBvJIK7i1WsGXhk3pyPGP7YCNQnuFi0YWxCeQ+Pw==",
-      "path": "microsoft.azure.functions.extensions.mcp/1.5.0",
-      "hashPath": "microsoft.azure.functions.extensions.mcp.1.5.0.nupkg.sha512"
+      "sha512": "sha512-sAgPbq06jZzspaTb+6hF4sBkt+0VtH6gmDAfcupZFwyTdsmQHuICCyxPClQ1GKNNWQcqy5RrBxz5r8ZOfMuu8g==",
+      "path": "microsoft.azure.functions.extensions.mcp/1.6.0",
+      "hashPath": "microsoft.azure.functions.extensions.mcp.1.6.0.nupkg.sha512"
     },
     "Microsoft.Azure.Kusto.Cloud.Platform/12.2.8": {
       "type": "package",
@@ -4826,12 +4841,12 @@
       "path": "microsoft.azure.webjobs.extensions.dapr/0.17.0-preview01",
       "hashPath": "microsoft.azure.webjobs.extensions.dapr.0.17.0-preview01.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.DurableTask/3.13.1": {
+    "Microsoft.Azure.WebJobs.Extensions.DurableTask/3.15.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-lIdzf5eluOoD6numPn7EKO9mic5Oct4pgd4Pcds+XRMc/BehqNg6RqGo3yKBBxIx+6U9YmMpbGdZOeX0jhSD7Q==",
-      "path": "microsoft.azure.webjobs.extensions.durabletask/3.13.1",
-      "hashPath": "microsoft.azure.webjobs.extensions.durabletask.3.13.1.nupkg.sha512"
+      "sha512": "sha512-Eb1IGJmU5pMXCf/rd626vrUJoP6mqGC+ahuCWTC7jjVdsvaXPBZrtf2+83H4aFBBHpTy0qmkqenVCVXb1m4PCA==",
+      "path": "microsoft.azure.webjobs.extensions.durabletask/3.15.0",
+      "hashPath": "microsoft.azure.webjobs.extensions.durabletask.3.15.0.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.DurableTask.Analyzers/0.5.0": {
       "type": "package",
@@ -4840,12 +4855,12 @@
       "path": "microsoft.azure.webjobs.extensions.durabletask.analyzers/0.5.0",
       "hashPath": "microsoft.azure.webjobs.extensions.durabletask.analyzers.0.5.0.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged/1.9.0": {
+    "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged/1.10.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-LU4r9UFJuaHzy/JuE18jUGFCHmlHfXYGUoiegus1fFYYhHF55I+gPK5mWJfUSip4EjkG/Z9ygx6znqe04+cp9Q==",
-      "path": "microsoft.azure.webjobs.extensions.durabletask.azuremanaged/1.9.0",
-      "hashPath": "microsoft.azure.webjobs.extensions.durabletask.azuremanaged.1.9.0.nupkg.sha512"
+      "sha512": "sha512-ZgraJnaP9nsp+p8H2qiJ6G2MLAjomzd2vzZEj7JkVO8WrTS2XQcmAvtJZ7RS13RhQG08ZNUX9/cAnf0uJjoyFQ==",
+      "path": "microsoft.azure.webjobs.extensions.durabletask.azuremanaged/1.10.0",
+      "hashPath": "microsoft.azure.webjobs.extensions.durabletask.azuremanaged.1.10.0.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.EventGrid/3.5.0": {
       "type": "package",
@@ -4861,12 +4876,12 @@
       "path": "microsoft.azure.webjobs.extensions.eventhubs/6.5.3",
       "hashPath": "microsoft.azure.webjobs.extensions.eventhubs.6.5.3.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.Fabric/1.0.100": {
+    "Microsoft.Azure.WebJobs.Extensions.Fabric/1.0.110": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-oEVfZaQWHPzK2kep+NWBeaAAXPxF8wTeU8YXD5w9jS51BU5gxkiGmzgO+CVsr2KteMkI2913ZnY9f2tULqEygw==",
-      "path": "microsoft.azure.webjobs.extensions.fabric/1.0.100",
-      "hashPath": "microsoft.azure.webjobs.extensions.fabric.1.0.100.nupkg.sha512"
+      "sha512": "sha512-BiGQ+/fmM7BUX4RPsEa8VT8i7hIFLmpyy54KLl+ws66LBBOjOQIncVbW0UGFvh6o2b+yp03gFOyouM0x4c0eJA==",
+      "path": "microsoft.azure.webjobs.extensions.fabric/1.0.110",
+      "hashPath": "microsoft.azure.webjobs.extensions.fabric.1.0.110.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.Http/3.2.1": {
       "type": "package",
@@ -4875,12 +4890,12 @@
       "path": "microsoft.azure.webjobs.extensions.http/3.2.1",
       "hashPath": "microsoft.azure.webjobs.extensions.http.3.2.1.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.Kafka/4.3.2": {
+    "Microsoft.Azure.WebJobs.Extensions.Kafka/4.3.3": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-aGSnO2BFd2ixPoInj6hp6DLAqolvpxAU4beCqLMOmSxCdGWCl8I9XTB4KSRC3ysatz96kkII9bMH9n/CofwBSw==",
-      "path": "microsoft.azure.webjobs.extensions.kafka/4.3.2",
-      "hashPath": "microsoft.azure.webjobs.extensions.kafka.4.3.2.nupkg.sha512"
+      "sha512": "sha512-/mFvAcFRwQ2e3latJkhvDcnm0+sIYpq741Q1Bn5IiIVKdIEG7VeBF96pgsoAdXFrysJskJKH5Dq/iiVKIU/7MQ==",
+      "path": "microsoft.azure.webjobs.extensions.kafka/4.3.3",
+      "hashPath": "microsoft.azure.webjobs.extensions.kafka.4.3.3.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.Kusto/1.0.13-Preview": {
       "type": "package",
@@ -5057,12 +5072,12 @@
       "path": "microsoft.azure.webpubsub.common/1.5.0",
       "hashPath": "microsoft.azure.webpubsub.common.1.5.0.nupkg.sha512"
     },
-    "Microsoft.Bcl.AsyncInterfaces/10.0.8": {
+    "Microsoft.Bcl.AsyncInterfaces/10.0.9": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-e+kYYRb0HmNo5FTOcjXkP0mIEFHEyygm4ea/iLWpdumsACzCH078nZMfnk6RQFmtSrnNbh654c8nNtmUSwQoow==",
-      "path": "microsoft.bcl.asyncinterfaces/10.0.8",
-      "hashPath": "microsoft.bcl.asyncinterfaces.10.0.8.nupkg.sha512"
+      "sha512": "sha512-Aq7M8lG6BrHeatqKqncVm9m55ec34k6nnfPRLe/PvGg+b/pAsRM2ejofeKmCLjTXMa+5NGXm382f8CG/D5WDow==",
+      "path": "microsoft.bcl.asyncinterfaces/10.0.9",
+      "hashPath": "microsoft.bcl.asyncinterfaces.10.0.9.nupkg.sha512"
     },
     "Microsoft.Bcl.HashCode/1.1.0": {
       "type": "package",
@@ -5106,19 +5121,19 @@
       "path": "microsoft.durabletask.abstractions/1.24.2",
       "hashPath": "microsoft.durabletask.abstractions.1.24.2.nupkg.sha512"
     },
-    "Microsoft.DurableTask.AzureManagedBackend/1.9.0": {
+    "Microsoft.DurableTask.AzureManagedBackend/1.10.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-2C0xLirYzWLC7PHkuSCXiKHhJGwvzN0sUVLjILP5PbRNWRk06pUTy/4Q2H9gMYU49UradHfrkW6EE4q9xyAuvg==",
-      "path": "microsoft.durabletask.azuremanagedbackend/1.9.0",
-      "hashPath": "microsoft.durabletask.azuremanagedbackend.1.9.0.nupkg.sha512"
+      "sha512": "sha512-0xP9HmD2X4/6muiTNOKCUfc10zPlimqH+hf/rtmb9uEdsbM8CPrKms+GUbH2wdoqRXALLOYr/fOpoMlbvDY48g==",
+      "path": "microsoft.durabletask.azuremanagedbackend/1.10.0",
+      "hashPath": "microsoft.durabletask.azuremanagedbackend.1.10.0.nupkg.sha512"
     },
-    "Microsoft.DurableTask.AzureManagedBackend.Protobuf/1.9.0": {
+    "Microsoft.DurableTask.AzureManagedBackend.Protobuf/1.10.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-aaNCASJqkIkcfBhqe+T9QsiGo+XRD6mu8aSLfA7QzwUB7vsnEYJXyxLukgES+bdBTLYEf/V7saZ9GynYjyj6/A==",
-      "path": "microsoft.durabletask.azuremanagedbackend.protobuf/1.9.0",
-      "hashPath": "microsoft.durabletask.azuremanagedbackend.protobuf.1.9.0.nupkg.sha512"
+      "sha512": "sha512-REKLGEdLhFPIgljYQxfp/xxpbhoKRu82v9H0zohK97+9kokjZg9l2LqY3W8QNoqBjTCQ1IBHr3pEMHJNjcRGlw==",
+      "path": "microsoft.durabletask.azuremanagedbackend.protobuf/1.10.0",
+      "hashPath": "microsoft.durabletask.azuremanagedbackend.protobuf.1.10.0.nupkg.sha512"
     },
     "Microsoft.DurableTask.Client/1.24.2": {
       "type": "package",
@@ -5141,12 +5156,12 @@
       "path": "microsoft.durabletask.extensions.azureblobpayloads/1.24.2",
       "hashPath": "microsoft.durabletask.extensions.azureblobpayloads.1.24.2.nupkg.sha512"
     },
-    "Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged/1.9.0": {
+    "Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged/1.10.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-bp+lVqj4B1CQBkFr205/ej2GU9ibTWGhkGxaVxpfc77Y4ONSIV/53GBKZTP4ruPAGyu+2H6T/ggWsaV4JhQzSA==",
-      "path": "microsoft.durabletask.extensions.azureblobpayloads.azuremanaged/1.9.0",
-      "hashPath": "microsoft.durabletask.extensions.azureblobpayloads.azuremanaged.1.9.0.nupkg.sha512"
+      "sha512": "sha512-tgpXYliHOzrs2/qB5xxy1Cip8BkFl2Qz1mv7WEOoxXIyZVHYkgufFo0V+5YzQFLViIbJzpwSMLVHiM2+4uaCWw==",
+      "path": "microsoft.durabletask.extensions.azureblobpayloads.azuremanaged/1.10.0",
+      "hashPath": "microsoft.durabletask.extensions.azureblobpayloads.azuremanaged.1.10.0.nupkg.sha512"
     },
     "Microsoft.DurableTask.Grpc/1.24.2": {
       "type": "package",
@@ -5155,19 +5170,19 @@
       "path": "microsoft.durabletask.grpc/1.24.2",
       "hashPath": "microsoft.durabletask.grpc.1.24.2.nupkg.sha512"
     },
-    "Microsoft.DurableTask.SqlServer/1.6.0": {
+    "Microsoft.DurableTask.SqlServer/1.8.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-V6befDIGgScaR1lIFTi3B36NYsQ2crbwNe0E9d4gpojMBd/NfbLdpwqj6b/xI57YBZEbJ9+OtiDIgSSkEjntTg==",
-      "path": "microsoft.durabletask.sqlserver/1.6.0",
-      "hashPath": "microsoft.durabletask.sqlserver.1.6.0.nupkg.sha512"
+      "sha512": "sha512-Vu7EMVcNOu90eCqnOmjchzWROs6ZsqoL3FObKL9uTWM+bsAq4J/An60BBlrgdZfx+fnqo3NkybLHQL5uRS4wJQ==",
+      "path": "microsoft.durabletask.sqlserver/1.8.1",
+      "hashPath": "microsoft.durabletask.sqlserver.1.8.1.nupkg.sha512"
     },
-    "Microsoft.DurableTask.SqlServer.AzureFunctions/1.6.0": {
+    "Microsoft.DurableTask.SqlServer.AzureFunctions/1.8.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-luzyU+wE8AVNI/qeDqS9A4SU+An8aKvdnpvhuV3ohoPrfZcA5jRhj2WoC+BBoajeuCHECuM0Mw1GXHrgpXclTw==",
-      "path": "microsoft.durabletask.sqlserver.azurefunctions/1.6.0",
-      "hashPath": "microsoft.durabletask.sqlserver.azurefunctions.1.6.0.nupkg.sha512"
+      "sha512": "sha512-8pH9G65T/QTg33u+Fn2QCa/g7/zeJ0rSsz2T+kEtiBOy5KWvF8v0KZkxcZf85/JpNP5+jv2tXViPTgzFVSNzcA==",
+      "path": "microsoft.durabletask.sqlserver.azurefunctions/1.8.1",
+      "hashPath": "microsoft.durabletask.sqlserver.azurefunctions.1.8.1.nupkg.sha512"
     },
     "Microsoft.DurableTask.Worker/1.24.2": {
       "type": "package",
@@ -5666,6 +5681,20 @@
       "path": "pipelines.sockets.unofficial/2.2.8",
       "hashPath": "pipelines.sockets.unofficial.2.2.8.nupkg.sha512"
     },
+    "protobuf-net.Core/3.2.12": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-8kpui+OKAr/IzFfdvkqGcIO859riNT1bp5hLKudY55lHd9oS3daHkvA9XyXiC+yGLRpg+XCc+ZUkNA8u8sXJTw==",
+      "path": "protobuf-net.core/3.2.12",
+      "hashPath": "protobuf-net.core.3.2.12.nupkg.sha512"
+    },
+    "protobuf-net.Reflection/3.2.12": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-bpNTENWPqP2mx1sJJ5C6qZ2xP+f/E3dQF9MYY+xZ+RHxe3sLg+sPyBSCcJDTCY0e4dVIwQ/02gS8m4tVClDoKQ==",
+      "path": "protobuf-net.reflection/3.2.12",
+      "hashPath": "protobuf-net.reflection.3.2.12.nupkg.sha512"
+    },
     "RabbitMQ.Client/6.8.1": {
       "type": "package",
       "serviceable": true,
@@ -6016,12 +6045,12 @@
       "path": "system.clientmodel/1.8.0",
       "hashPath": "system.clientmodel.1.8.0.nupkg.sha512"
     },
-    "System.CodeDom/4.4.0": {
+    "System.CodeDom/8.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-2sCCb7doXEwtYAbqzbF/8UAeDRMNmPaQbU2q50Psg1J9KzumyVVCgKQY8s53WIPTufNT0DpSe9QRvVjOzfDWBA==",
-      "path": "system.codedom/4.4.0",
-      "hashPath": "system.codedom.4.4.0.nupkg.sha512"
+      "sha512": "sha512-WTlRjL6KWIMr/pAaq3rYqh0TJlzpouaQ/W1eelssHgtlwHAH25jXTkUphTYx9HaIIf7XA6qs/0+YhtLEQRkJ+Q==",
+      "path": "system.codedom/8.0.0",
+      "hashPath": "system.codedom.8.0.0.nupkg.sha512"
     },
     "System.Collections/4.3.0": {
       "type": "package",
