@@ -47,7 +47,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-    "majorVersion": "6",
+    "version": "6.5.3",
     "name": "EventHubs",
     "bindings": [
       "eventhubtrigger",
