@@ -1,7 +1,7 @@
 [
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage",
-    "majorVersion": "5",
+    "version": "5.3.7",
     "name": "AzureStorage",
     "bindings": [
       "blobtrigger",
@@ -12,7 +12,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Queues",
-    "majorVersion": "5",
+    "version": "5.3.7",
     "name": "AzureStorageQueues",
     "bindings": [
       "queue",
@@ -29,7 +29,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Storage.Blobs",
-    "majorVersion": "5",
+    "version": "5.3.7",
     "name": "AzureStorageBlobs",
     "bindings": [
       "blobtrigger",
@@ -38,7 +38,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.ServiceBus",
-    "majorVersion": "5",
+    "version": "5.17.0",
     "name": "ServiceBus",
     "bindings": [
       "servicebustrigger",
@@ -47,7 +47,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventHubs",
-    "majorVersion": "6",
+    "version": "6.5.3",
     "name": "EventHubs",
     "bindings": [
       "eventhubtrigger",
@@ -138,7 +138,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SignalRService",
-    "majorVersion": "2",
+    "version": "2.1.0",
     "name": "SignalR",
     "bindings": [
       "signalr",

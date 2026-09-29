@@ -8,7 +8,7 @@ import string
 
 import azure.functions as func
 
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+app = func.FunctionApp()
 
 
 @app.function_name(name="blob_trigger")

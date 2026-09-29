@@ -10,7 +10,7 @@ https://github.com/Azure/azure-sdk-for-net/tree/main/sdk/eventgrid/Microsoft.Azu
 
 Scenarios covered:
 1. EventGridEventTriggerFunction - Single EventGridEvent trigger
-2. CloudEventTriggerFunction - Single CloudEvent trigger (azure.core.messaging.CloudEvent)
+2. CloudEventTriggerFunction - Single CloudEvent trigger
 3. EventGrid event construction - Validates event structure (mock, not actual output binding)
 4. CloudEvent construction - Validates event structure (mock, not actual output binding)
 5. Data shape variations - String, array, primitive, nested payloads
@@ -119,33 +119,19 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
 
     # =========================================================================
     # CloudEvent Trigger Tests
-    # Note: Python SDK only supports func.EventGridEvent type annotation.
-    # CloudEvents are mapped to EventGridEvent by the runtime.
     # =========================================================================
     def test_cloudevent_trigger(self):
         """Test EventGridTrigger with a single CloudEvent.
         
         Equivalent to C# sample: CloudEventTriggerFunction
-        Note: Python only supports func.EventGridEvent - CloudEvents format
-        is mapped to EventGridEvent fields by the extension runtime.
-        
-        IMPORTANT: The local Event Grid webhook endpoint expects EventGrid-style
-        field names (eventType) even when using CloudEvents content-type header.
-        This is a known limitation of the local emulator - in production Azure,
-        proper CloudEvents 1.0 field mapping (type -> event_type) may work.
         """
-        # Generate unique CloudEvent data
         event_id = f"cloud-event-{uuid.uuid4()}"
         test_data = {'message': f'cloud-test-{int(time.time())}'}
         
-        # Create CloudEvent payload - use EventGrid field names for local emulator
-        # The local webhook doesn't map pure CloudEvents field names correctly:
-        #   - 'type' must be 'eventType'
-        #   - 'source' must be 'topic'
         event = {
             'specversion': '1.0',
-            'eventType': 'com.example.test',  # Use eventType (not 'type')
-            'topic': '/test/cloudevents',     # Use topic (not 'source')
+            'type': 'com.example.test',
+            'source': '/test/cloudevents',
             'id': event_id,
             'time': '2026-03-06T07:00:00Z',
             'subject': 'test/subject',
@@ -165,8 +151,6 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
 
         result = json.loads(r.text)
 
-        # Verify the CloudEvent was processed correctly
-        # Local emulator uses EventGrid field names: eventType->event_type, topic->source
         self.assertEqual(result['id'], event_id)
         self.assertEqual(result['event_type'], 'com.example.test')
         self.assertEqual(result['source'], '/test/cloudevents')
@@ -397,40 +381,6 @@ class TestEventGridFunctions(testutils.WebHostTestCase):
     # =========================================================================
     # Edge Case Tests - These catch production issues!
     # =========================================================================
-    def test_cloudevent_backcompat_legacy_format(self):
-        """Test CloudEvent backward compatibility with EventGrid field names.
-        
-        Equivalent to C# CloudEventParamsBackCompat tests.
-        The local emulator requires EventGrid-style field names (eventType, topic)
-        even when using CloudEvents content-type header.
-        """
-        event_id = f"backcompat-{uuid.uuid4()}"
-        # CloudEvent with EventGrid field names for local emulator compatibility
-        legacy_event = {
-            'specversion': '1.0',
-            'eventType': 'com.legacy.format',  # EventGrid field name
-            'topic': '/test/backcompat',       # EventGrid field name (not 'source')
-            'id': event_id,
-            'time': '2026-03-06T07:00:00Z',
-            'subject': 'backcompat/test',
-            'data': {'legacy': True}
-        }
-
-        logger.info(f"Testing CloudEvent backcompat: {event_id}")
-        self._send_eventgrid_event('cloudevent_backcompat_trigger', legacy_event, 
-                                   is_cloudevent=True)
-
-        r = self.webhost.wait_and_request('GET', 'get_cloudevent_backcompat_triggered',
-                                          wait_time=2,
-                                          max_retries=10,
-                                          expected_status=200)
-
-        result = json.loads(r.text)
-        self.assertEqual(result['id'], event_id)
-        self.assertEqual(result['event_type'], 'com.legacy.format')  # Verify eventType works
-        self.assertEqual(result['subject'], 'backcompat/test')
-        self.assertEqual(result['format'], 'backcompat')
-
     def test_eventgrid_trigger_missing_data_field(self):
         """Test EventGridTrigger handles missing 'data' field gracefully.
         

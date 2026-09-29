@@ -2,7 +2,7 @@ import json
 
 import azure.functions as func
 
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+app = func.FunctionApp()
 
 # Global storage for metadata trigger results (shared in-process)
 _kafka_metadata_result = {}

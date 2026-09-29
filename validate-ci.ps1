@@ -19,6 +19,7 @@ $requiredFiles = @(
     "tests\test_setup.py",
     "tests\utils\testutils.py",
     "tests\emulator_tests\utils\eventhub\docker-compose.yml",
+    "eng\ci\config\core-tools.NuGet.config",
     "eng\ci\templates\jobs\emulator-tests.yml"
 )
 
@@ -122,9 +123,10 @@ Write-Host ""
 Write-Host "🎉 All validations passed!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
-Write-Host "1. Build locally: 'cd build && dotnet run'" -ForegroundColor White
-Write-Host "2. Test emulator setup: 'cd tests && python test_setup.py'" -ForegroundColor White
-Write-Host "3. Run emulator tests with mock site:" -ForegroundColor White
+Write-Host "1. Restore locally: 'dotnet restore build/Build.csproj --configfile NuGet.config'" -ForegroundColor White
+Write-Host "2. Build locally: 'cd build && dotnet run --no-restore'" -ForegroundColor White
+Write-Host "3. Test emulator setup: 'cd tests && python test_setup.py'" -ForegroundColor White
+Write-Host "4. Run emulator tests with mock site:" -ForegroundColor White
 Write-Host "   cd tests" -ForegroundColor Gray
 Write-Host "   invoke mock-extension-site --port 8000 --keep-alive &" -ForegroundColor Gray
 Write-Host "   `$env:FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI='http://localhost:8000'" -ForegroundColor Gray

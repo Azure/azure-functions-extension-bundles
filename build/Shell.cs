@@ -1,22 +1,24 @@
 using Colors.Net;
 using Colors.Net.StringColorExtensions;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Build
 {
     public static class Shell
     {
-        public static void Run(string program, string arguments, bool streamOutput = true, bool silent = false)
+        public static void Run(string program, IReadOnlyList<string> arguments, bool streamOutput = true, bool silent = false)
         {
             var exe = new InternalExe(program, arguments, streamOutput);
 
             if (!silent)
             {
-                ColoredConsole.WriteLine($"> {program} {arguments}".Green());
+                ColoredConsole.WriteLine($"> {program} {FormatArguments(arguments)}".Green());
             }
 
             var exitcode = silent
@@ -29,7 +31,7 @@ namespace Build
             }
         }
 
-        public static string GetOutput(string program, string arguments, bool ignoreExitCode = false)
+        public static string GetOutput(string program, IReadOnlyList<string> arguments, bool ignoreExitCode = false)
         {
             var exe = new InternalExe(program, arguments);
             var sb = new StringBuilder();
@@ -43,18 +45,24 @@ namespace Build
             return sb.ToString().Trim(new[] { ' ', '\r', '\n' });
         }
 
+        private static string FormatArguments(IEnumerable<string> arguments)
+        {
+            return string.Join(" ", arguments.Select(argument =>
+                argument.Any(char.IsWhiteSpace) ? $"\"{argument.Replace("\"", "\\\"")}\"" : argument));
+        }
+
         class InternalExe
         {
-            private string _arguments;
-            private string _exeName;
-            private bool _shareConsole;
-            private bool _streamOutput;
+            private readonly IReadOnlyList<string> _arguments;
+            private readonly string _exeName;
+            private readonly bool _shareConsole;
+            private readonly bool _streamOutput;
             private readonly bool _visibleProcess;
 
-            public InternalExe(string exeName, string arguments = null, bool streamOutput = true, bool shareConsole = false, bool visibleProcess = false)
+            public InternalExe(string exeName, IReadOnlyList<string> arguments, bool streamOutput = true, bool shareConsole = false, bool visibleProcess = false)
             {
                 _exeName = exeName;
-                _arguments = arguments;
+                _arguments = arguments ?? Array.Empty<string>();
                 _streamOutput = streamOutput;
                 _shareConsole = shareConsole;
                 _visibleProcess = visibleProcess;
@@ -65,7 +73,6 @@ namespace Build
                 var processInfo = new ProcessStartInfo
                 {
                     FileName = _exeName,
-                    Arguments = _arguments,
                     CreateNoWindow = !_visibleProcess,
                     UseShellExecute = _shareConsole,
                     RedirectStandardError = _streamOutput,
@@ -73,6 +80,11 @@ namespace Build
                     RedirectStandardOutput = _streamOutput,
                     WorkingDirectory = Directory.GetCurrentDirectory()
                 };
+
+                foreach (var argument in _arguments)
+                {
+                    processInfo.ArgumentList.Add(argument);
+                }
 
                 Process process = null;
 

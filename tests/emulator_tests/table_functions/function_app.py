@@ -5,7 +5,7 @@ import uuid
 
 import azure.functions as func
 
-app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
+app = func.FunctionApp()
 
 
 @app.function_name(name="table_in_binding")
