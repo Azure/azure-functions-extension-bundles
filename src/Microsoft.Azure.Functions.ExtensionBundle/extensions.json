@@ -160,7 +160,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Kafka",
-    "majorVersion": "4",
+    "version": "4.3.2",
     "name": "Kafka",
     "bindings": [
       "kafkatrigger",
