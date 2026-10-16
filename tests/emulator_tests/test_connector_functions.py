@@ -43,7 +43,8 @@ class TestConnectorFunctions(testutils.WebHostTestCase):
     def get_script_dir(cls):
         return testutils.EMULATOR_TESTS_FOLDER / 'connector_functions'
 
-    def _send_connector_event(self, function_name: str, payload: dict) -> object:
+    def _send_connector_event(self, function_name: str, payload: dict,
+                              method: str = 'POST') -> object:
         """Send a JSON payload to a Connector trigger function via webhook.
 
         Args:
@@ -60,7 +61,7 @@ class TestConnectorFunctions(testutils.WebHostTestCase):
         path = f"{self.CONNECTOR_WEBHOOK_PATH}?functionName={function_name}"
 
         r = self.webhost.request(
-            'POST', path,
+            method, path,
             data=json.dumps(payload),
             headers=headers,
             no_prefix=True,
@@ -69,6 +70,92 @@ class TestConnectorFunctions(testutils.WebHostTestCase):
         )
         self.assertIsNotNone(r)
         return r
+
+    def test_connector_trigger_put(self):
+        payload = {'id': str(uuid.uuid4()), 'method': 'PUT'}
+        self._send_connector_event('connector_trigger_basic', payload, 'PUT')
+        response = self.webhost.request('GET', 'get_connector_basic')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['payload'], payload)
+
+    def test_connector_trigger_explicit_webhook(self):
+        for method in ('POST', 'PUT'):
+            with self.subTest(method=method):
+                payload = {'id': str(uuid.uuid4()), 'method': method}
+                self._send_connector_event(
+                    'connector_trigger_explicit_webhook', payload, method)
+                response = self.webhost.request(
+                    'GET', 'get_connector_explicit_webhook')
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.json()['payload'], payload)
+
+    def test_connector_trigger_malformed_json(self):
+        response = self.webhost.request(
+            'POST',
+            f'{self.CONNECTOR_WEBHOOK_PATH}?functionName=connector_trigger_basic',
+            data='{"unfinished":',
+            headers={'Content-Type': 'application/json'},
+            no_prefix=True)
+        self.assertEqual(response.status_code, 400)
+
+    def test_connector_trigger_empty_body(self):
+        response = self.webhost.request(
+            'POST',
+            f'{self.CONNECTOR_WEBHOOK_PATH}?functionName=connector_trigger_basic',
+            data='',
+            headers={'Content-Type': 'application/json'},
+            no_prefix=True)
+        self.assertEqual(response.status_code, 202)
+        result = self.webhost.request('GET', 'get_connector_basic')
+        self.assertEqual(result.status_code, 200)
+        self.assertIsNone(result.json()['payload'])
+        self.assertEqual(result.json()['payload_length'], 0)
+
+    def test_connector_trigger_missing_content_type(self):
+        response = self.webhost.request(
+            'POST',
+            f'{self.CONNECTOR_WEBHOOK_PATH}?functionName=connector_trigger_basic',
+            data=json.dumps({'id': str(uuid.uuid4())}),
+            no_prefix=True)
+        self.assertEqual(response.status_code, 415)
+
+    def test_connector_trigger_content_type_with_charset(self):
+        payload = {'id': str(uuid.uuid4())}
+        response = self.webhost.request(
+            'POST',
+            f'{self.CONNECTOR_WEBHOOK_PATH}?functionName=connector_trigger_basic',
+            data=json.dumps(payload),
+            headers={'Content-Type': 'application/json; charset=utf-8'},
+            no_prefix=True)
+        self.assertEqual(response.status_code, 202)
+        result = self.webhost.request('GET', 'get_connector_basic')
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.json()['payload'], payload)
+
+    def test_connector_trigger_payload_size_limit(self):
+        limit = 10 * 1024 * 1024
+        path = f'{self.CONNECTOR_WEBHOOK_PATH}?functionName=connector_trigger_size'
+        accepted_id = str(uuid.uuid4())
+        for size in (limit, limit + 1):
+            with self.subTest(size=size):
+                event_id = accepted_id if size == limit else str(uuid.uuid4())
+                empty = json.dumps({'id': event_id, 'data': ''})
+                body = json.dumps({
+                    'id': event_id,
+                    'data': 'x' * (size - len(empty))
+                }).encode('ascii')
+                self.assertEqual(len(body), size)
+                response = self.webhost.request(
+                    'POST', path, data=body,
+                    headers={'Content-Type': 'application/json'},
+                    no_prefix=True, timeout=30)
+                self.assertEqual(response.status_code,
+                                 202 if size == limit else 413)
+                result = self.webhost.request('GET', 'get_connector_size')
+                self.assertEqual(result.status_code, 200)
+                self.assertEqual(result.json(), {
+                    'id': accepted_id, 'payload_length': limit
+                })
 
     # =========================================================================
     # Basic Connector Trigger Tests

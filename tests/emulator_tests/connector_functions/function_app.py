@@ -208,3 +208,44 @@ def get_connector_process(req: func.HttpRequest,
                           file: func.InputStream) -> str:
     """Retrieve the processed connector trigger result from blob storage."""
     return file.read().decode('utf-8')
+
+
+@app.function_name(name="connector_trigger_explicit_webhook")
+@app.generic_trigger(arg_name="payload", type="connectorTrigger",
+                     deliveryMode="Webhook")
+@app.blob_output(arg_name="$return",
+                 path="bundle-tests/test-connector-explicit.txt",
+                 connection="AzureWebJobsStorage")
+def connector_trigger_explicit_webhook(payload: str) -> str:
+    return json.dumps({'payload': json.loads(payload)})
+
+
+@app.function_name(name="get_connector_explicit_webhook")
+@app.route(route="get_connector_explicit_webhook")
+@app.blob_input(arg_name="file",
+                path="bundle-tests/test-connector-explicit.txt",
+                connection="AzureWebJobsStorage")
+def get_connector_explicit_webhook(req: func.HttpRequest,
+                                   file: func.InputStream) -> str:
+    return file.read().decode('utf-8')
+
+
+@app.function_name(name="connector_trigger_size")
+@app.generic_trigger(arg_name="payload", type="connectorTrigger")
+@app.blob_output(arg_name="$return",
+                 path="bundle-tests/test-connector-size.txt",
+                 connection="AzureWebJobsStorage")
+def connector_trigger_size(payload: str) -> str:
+    return json.dumps({
+        'id': json.loads(payload)['id'],
+        'payload_length': len(payload)
+    })
+
+
+@app.function_name(name="get_connector_size")
+@app.route(route="get_connector_size")
+@app.blob_input(arg_name="file",
+                path="bundle-tests/test-connector-size.txt",
+                connection="AzureWebJobsStorage")
+def get_connector_size(req: func.HttpRequest, file: func.InputStream) -> str:
+    return file.read().decode('utf-8')

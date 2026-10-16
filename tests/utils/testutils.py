@@ -321,49 +321,33 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
                     env_key += "ConnectionString"
                 elif 'uri' in key:
                     env_key += "Uri"
-                extra_env[env_key] = value    # Log the environment setup
-    logging.debug(f"Function host environment: {extra_env}")    # Write manual execution instructions to a file
+                extra_env[env_key] = value
+    logging.debug(
+        "Function host environment variable names (values omitted): %s",
+        sorted(extra_env))
     config_file = pathlib.Path(script_root) / "webhost_config.txt"
     with open(config_file, 'w') as f:
         f.write("-" * 70 + "\n")
-        f.write("To run this command manually, execute the following:\n\n")
-        f.write("Environment Variables:\n\n")
-        
-        # Create PowerShell formatted environment variables
-        for key, value in extra_env.items():
-            if ON_WINDOWS:
-                f.write(f"$env:{key} = '{value}'\n")
-            else:
-                f.write(f"export {key}='{value}'\n")
+        f.write("To run locally, configure these environment variables first.\n")
+        f.write("Values are omitted to keep public-pipeline diagnostics safe.\n\n")
+        f.write("Environment variable names:\n\n")
+        for key in sorted(extra_env):
+            f.write(f"{key}\n")
         
         f.write("\nCurrent Directory:\n\n")
         f.write(f"cd {script_root}\n")
         
         f.write("\nRun core tools:\n\n")
         f.write(f"{coretools_exe} {' '.join(hostexe_args[1:])}\n")  # Skip the executable name
-          # Add host.json content
         f.write("\n" + "-" * 70 + "\n")
-        f.write("host.json Configuration:\n\n")
-        try:
-            host_json_path = pathlib.Path(script_root) / "host.json"
-            if host_json_path.exists():
-                with open(host_json_path, 'r') as host_file:
-                    host_content = host_file.read()
-                f.write(host_content)
-            else:
-                f.write("host.json file not found in the function app directory.\n")
-                f.write("Expected template content:\n")
-                f.write(get_host_json_template())
-        except Exception as e:
-            f.write(f"Error reading host.json: {e}\n")
-            f.write("Expected template content:\n")
-            f.write(get_host_json_template())
+        f.write("host.json path (inspect its contents locally):\n\n")
+        f.write(str(pathlib.Path(script_root) / "host.json"))
         
         f.write("\n" + "-" * 70 + "\n")
 
     # Also print to console that the config file was created
     print(f"\nWebHost configuration written to: {config_file}")
-    print("You can view this file to see how to run the Function Host manually.\n")
+    print("This file omits environment values and configuration contents.\n")
 
     # Start the process
     try:
@@ -530,11 +514,13 @@ class _WebHostProxy:
         if self._proc.stderr:
             self._proc.stderr.close()
 
-        self._proc.terminate()
+        if self._proc.poll() is None:
+            self._proc.terminate()
         try:
             self._proc.wait(20)
         except subprocess.TimeoutExpired:
             self._proc.kill()
+            self._proc.wait(20)
 
 
 def start_webhost(*, script_dir=None, stdout=None):
@@ -561,45 +547,48 @@ def start_webhost(*, script_dir=None, stdout=None):
     addr = f'http://{LOCALHOST}:{port}'
     proxy = _WebHostProxy(proc, addr)
     
-    # Implement health check retries instead of fixed sleep
-    max_retries = 30
-    retry_delay = 1
-    logging.info(f"Waiting for Azure Functions host to start on {addr}...")
-    
-    for i in range(max_retries):
-        if proxy.is_healthy():
-            logging.info(f"Azure Functions host is healthy after {i+1} attempts")
-            return proxy
-        
-        # If not healthy yet, sleep and retry
-        logging.info(f"Waiting for Azure Functions host to start (attempt {i+1}/{max_retries})")
-        time.sleep(retry_delay)
-    
-    # If we get here, we've exhausted all retries
-    # Let's check if there was any output from the process
-    output = ""
-    if capture_output_for_logging and hasattr(stdout, 'name'):
+    try:
+        max_retries = 30
+        retry_delay = 1
+        logging.info(f"Waiting for Azure Functions host to start on {addr}...")
+
+        for i in range(max_retries):
+            if proxy.is_healthy():
+                logging.info(f"Azure Functions host is healthy after {i+1} attempts")
+                return proxy
+            logging.info(
+                f"Waiting for Azure Functions host to start (attempt {i+1}/{max_retries})")
+            time.sleep(retry_delay)
+
+        output = ""
+        if capture_output_for_logging and hasattr(stdout, 'name'):
+            try:
+                if hasattr(stdout, 'close'):
+                    stdout.close()
+                with open(stdout.name, 'r') as f:
+                    output = f.read()
+                logging.error(
+                    f"Azure Functions host output log is available at: {stdout.name}")
+            except Exception as error:
+                logging.error(f"Failed to read Azure Functions host output: {error}")
+
+        error_msg = (
+            f"Azure Functions host failed to start after {max_retries} attempts. "
+            f"Check logs for errors and ensure the port {port} is available.\n"
+        )
+        if output:
+            error_msg += f"\nHost process output:\n{output[:2000]}"
+            if len(output) > 2000:
+                error_msg += "\n... (output truncated) ..."
+        raise RuntimeError(error_msg)
+    except BaseException as error:
         try:
-            if hasattr(stdout, 'close'):
-                stdout.close()
-            with open(stdout.name, 'r') as f:
-                output = f.read()
-            # Keep the log file for inspection
-            logging.error(f"Azure Functions host output log is available at: {stdout.name}")
-        except Exception as e:
-            logging.error(f"Failed to read Azure Functions host output: {e}")
-    
-    error_msg = (
-        f"Azure Functions host failed to start after {max_retries} attempts. "
-        f"Check logs for errors and ensure the port {port} is available.\n"
-    )
-    
-    if output:
-        error_msg += f"\nHost process output:\n{output[:2000]}"
-        if len(output) > 2000:
-            error_msg += "\n... (output truncated) ..."
-    
-    raise RuntimeError(error_msg)
+            proxy.close()
+        except BaseException as cleanup_error:
+            raise BaseExceptionGroup(
+                'Functions host startup and cleanup both failed',
+                [error, cleanup_error]) from None
+        raise
 
 
 def remove_path(path):

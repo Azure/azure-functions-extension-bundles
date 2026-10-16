@@ -294,6 +294,50 @@ python -m pytest tests/emulator_tests -v -s
 python -m pytest tests/emulator_tests --cov=utils --cov-report=html
 ```
 
+## Connector Poll emulator
+
+`test_connector_poll_functions.py` runs the bundled Connector extension against
+a local HTTPS Poll protocol emulator and a local managed-identity token endpoint.
+It requires the existing Azurite setup, but no Azure resources, sign-in, or real
+access tokens. Python tests use single-event delivery, not batched cardinality.
+
+The fixture generates short-lived certificates and reserves `localhost:443`,
+which the Connector Poll endpoint contract requires. On Linux, it starts a
+uniquely named Docker Compose project using `python:3.12-slim` and scopes
+certificate trust to the Functions host process through `SSL_CERT_FILE`;
+system certificate stores are unchanged.
+On Windows, it runs the emulator directly and requires explicit permission to
+temporarily add its generated CA to the current-user root store:
+
+```powershell
+$env:CONNECTOR_EMULATOR_TRUST_LOCAL_CERTIFICATE = "1"
+python -m pytest tests/emulator_tests/test_connector_poll_functions.py -v
+```
+
+Windows may also display a certificate confirmation prompt. Cancelling it fails
+Poll test setup; the fixture does not bypass that decision or skip the tests.
+
+Fixture teardown removes the generated Windows CA, temporary certificate files,
+and emulator process or Compose project. Compose cleanup is registered before
+startup, collects logs before shutdown, and is restricted to that test's unique
+project. No shell file-deletion commands are used. Do not run concurrent Poll suites on the same
+machine because each needs port 443. These tests validate local Poll delivery
+and acknowledgement behavior, not Azure identity authorization or cloud scaling.
+
+Delivery IDs are independent of payload correlation IDs. Concurrency tests use
+four queued messages and controlled function-body and acknowledgement delays to
+check both remaining receive capacity and the complete processing lifetime.
+Recovery tests explicitly expire the current delivery lock after observing the
+expected failure, rather than relying on short lease timers. Received-lock history
+is retained for assertions. This is not a claim about cloud lease timings.
+
+Infrastructure regression checks do not require Core Tools, Docker, or certificate
+store access:
+
+```powershell
+python -m pytest tests/emulator_tests/test_connector_emulator.py -v
+```
+
 ## Quick Setup Script
 
 For convenience, here's a PowerShell script that sets up everything:

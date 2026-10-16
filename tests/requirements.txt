@@ -13,6 +13,7 @@ python-dateutil~=2.9.0
 fabric-user-data-functions
 
 # Additional utilities
+cryptography
 python-dotenv
 azure-functions-durable
 pika
