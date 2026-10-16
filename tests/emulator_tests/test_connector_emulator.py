@@ -239,7 +239,11 @@ def test_compose_cleanup_is_registered_before_startup(startup_failure):
         if 'up' in command:
             config = json.loads(Path(
                 command[command.index('--file') + 1]).read_text(encoding='utf-8'))
-            assert config['services']['connector']['image'] == 'python:3.12-slim'
+            service = config['services']['connector']
+            assert service['image'] == (
+                'mcr.microsoft.com/azure-functions/python:4-python3.12')
+            assert service['entrypoint'] == ['python']
+            assert service['command'][0] == '/emulator/emulator.py'
             if startup_failure == 'process':
                 raise OSError('Docker process could not start')
             return subprocess.CompletedProcess(

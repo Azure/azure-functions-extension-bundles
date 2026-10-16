@@ -41,7 +41,7 @@ resources:
 variables:
   - template: /ci/variables/cfs.yml@eng
   - name: hostTagsCount
-    value: 1
+    value: 2
   - name: hostTagPattern
     value: 'v4.10'
 

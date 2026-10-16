@@ -303,9 +303,13 @@ access tokens. Python tests use single-event delivery, not batched cardinality.
 
 The fixture generates short-lived certificates and reserves `localhost:443`,
 which the Connector Poll endpoint contract requires. On Linux, it starts a
-uniquely named Docker Compose project using `python:3.12-slim` and scopes
+uniquely named Docker Compose project using
+`mcr.microsoft.com/azure-functions/python:4-python3.12` and scopes
 certificate trust to the Functions host process through `SSL_CERT_FILE`;
 system certificate stores are unchanged.
+The container entrypoint is overridden to run only the emulator's Python script,
+not the Functions host. Using MCR avoids a direct Docker Hub dependency on
+restricted pipeline agents.
 On Windows, it runs the emulator directly and requires explicit permission to
 temporarily add its generated CA to the current-user root store:
 

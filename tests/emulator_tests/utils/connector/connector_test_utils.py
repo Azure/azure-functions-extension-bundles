@@ -135,7 +135,8 @@ class ConnectorEmulator:
                 config_path.write_text(json.dumps({
                     'services': {
                         'connector': {
-                            'image': 'python:3.12-slim',
+                            'image': 'mcr.microsoft.com/azure-functions/python:4-python3.12',
+                            'entrypoint': ['python'],
                             'ports': [
                                 '127.0.0.1:443:443',
                                 f'127.0.0.1:{port}:8080',
@@ -154,7 +155,7 @@ class ConnectorEmulator:
                                 'CONNECTOR_EMULATOR_CONTROL_TOKEN': self.control_token,
                             },
                             'command': [
-                                'python', '/emulator/emulator.py',
+                                '/emulator/emulator.py',
                                 '--cert', '/certs/cert.pem',
                                 '--key', '/certs/key.pem',
                                 '--control-port', '8080', '--bind', '0.0.0.0',
