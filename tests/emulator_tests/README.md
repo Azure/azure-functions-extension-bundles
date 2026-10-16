@@ -338,6 +338,11 @@ store access:
 python -m pytest tests/emulator_tests/test_connector_emulator.py -v
 ```
 
+The shared harness selects HTTP ports from 15000-24999, below the default
+Linux and Windows ephemeral ranges used by the host's independently allocated
+gRPC endpoint. Occupied candidates are skipped. This avoids the HTTP/gRPC
+self-collision observed when both allocations used the ephemeral range.
+
 ## Quick Setup Script
 
 For convenience, here's a PowerShell script that sets up everything:

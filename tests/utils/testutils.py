@@ -7,11 +7,13 @@ removing dependencies on azure_functions_worker and proxy_worker modules.
 """
 
 import configparser
+import errno
 import json
 import logging
 import os
 import pathlib
 import platform
+import random
 import shutil
 import socket
 import subprocess
@@ -204,6 +206,21 @@ def _find_open_port():
         s.bind((LOCALHOST, 0))
         s.listen(1)
         return s.getsockname()[1]
+
+
+def _find_webhost_port():
+    """Keep HTTP ports below the default Linux/Windows ephemeral gRPC range."""
+    for port in random.SystemRandom().sample(range(15000, 25000), 100):
+        with socket.socket() as candidate:
+            try:
+                candidate.bind((LOCALHOST, port))
+            except OSError as error:
+                if error.errno not in (errno.EADDRINUSE, errno.EACCES):
+                    raise
+                continue
+            return port
+    raise RuntimeError(
+        'No HTTP test port was available after 100 attempts in 15000-24999.')
 
 
 def popen_webhost(*, stdout, stderr, script_root, port=None):
@@ -539,7 +556,7 @@ def start_webhost(*, script_dir=None, stdout=None):
             stdout = tempfile.NamedTemporaryFile('w+', suffix='.log', delete=False)
             logging.info(f"Capturing Azure Functions host output to {stdout.name}")
 
-    port = _find_open_port()
+    port = _find_webhost_port()
 
     proc = popen_webhost(stdout=stdout, stderr=subprocess.STDOUT,
                         script_root=script_root, port=port)

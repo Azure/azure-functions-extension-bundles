@@ -2,7 +2,9 @@
 # Licensed under the MIT License.
 """Protocol and lifecycle checks for the Connector test infrastructure."""
 
+import errno
 import json
+import socket
 import subprocess
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -367,7 +369,7 @@ def test_webhost_startup_failure_stops_and_reaps_owned_process(failure):
     expected = KeyboardInterrupt if health is not None else RuntimeError
     with (
         patch.object(testutils, 'popen_webhost', return_value=process),
-        patch.object(testutils, '_find_open_port', return_value=7071),
+        patch.object(testutils, '_find_webhost_port', return_value=7071),
         patch.object(testutils._WebHostProxy, 'is_healthy',
                      side_effect=health, return_value=False),
         patch.object(testutils.time, 'sleep'),
@@ -387,7 +389,7 @@ def test_webhost_success_leaves_process_owned_by_returned_proxy():
     process.poll.return_value = None
     with (
         patch.object(testutils, 'popen_webhost', return_value=process),
-        patch.object(testutils, '_find_open_port', return_value=7071),
+        patch.object(testutils, '_find_webhost_port', return_value=7071),
         patch.object(testutils._WebHostProxy, 'is_healthy', return_value=True),
     ):
         proxy = testutils.start_webhost(
@@ -397,3 +399,37 @@ def test_webhost_success_leaves_process_owned_by_returned_proxy():
     proxy.close()
     process.terminate.assert_called_once_with()
     process.wait.assert_called_once_with(20)
+
+
+def test_webhost_http_port_is_outside_default_ephemeral_range():
+    port = testutils._find_webhost_port()
+    assert 15000 <= port < 25000
+    with socket.socket() as candidate:
+        candidate.bind((testutils.LOCALHOST, port))
+
+
+def test_webhost_http_port_skips_an_occupied_listener():
+    with socket.socket() as occupied:
+        occupied.bind((testutils.LOCALHOST, 0))
+        occupied.listen(1)
+        occupied_port = occupied.getsockname()[1]
+        with socket.socket() as available:
+            available.bind((testutils.LOCALHOST, 0))
+            available_port = available.getsockname()[1]
+        with patch.object(
+                testutils.random.SystemRandom, 'sample',
+                return_value=[occupied_port, available_port]):
+            assert testutils._find_webhost_port() == available_port
+
+
+def test_webhost_http_port_exhaustion_is_reported():
+    candidate = Mock()
+    candidate.__enter__ = Mock(return_value=candidate)
+    candidate.__exit__ = Mock(return_value=False)
+    candidate.bind.side_effect = OSError(errno.EADDRINUSE, 'Synthetic port conflict')
+    with (
+        patch.object(testutils.socket, 'socket', return_value=candidate),
+        pytest.raises(RuntimeError, match='No HTTP test port was available'),
+    ):
+        testutils._find_webhost_port()
+    assert candidate.bind.call_count == 100
