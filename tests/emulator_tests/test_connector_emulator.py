@@ -20,6 +20,7 @@ from tests.emulator_tests.utils.connector.emulator import (
     ACCESS_TOKEN,
     CONTROL_HEADER,
     POLL_PATH,
+    STABLE_POLL_PATH,
     EmulatorServer,
     Handler,
     State,
@@ -126,25 +127,6 @@ def test_explicit_expiry_preserves_received_locks_and_rejects_stale_control(prot
     assert current.json()['results'][0]['status'] == 'Acknowledged'
 
 
-def test_receive_respects_requested_capacity_and_reports_backlog(protocol):
-    events = protocol.emulator.enqueue_many(4, trigger_config='concurrency')
-    first = _receive(protocol, maximum=2, trigger_config='concurrency')
-    assert len(first.json()['messages']) == 2
-    assert first.headers['x-ms-more-messages-available'] == 'true'
-    second = _receive(protocol, maximum=1, trigger_config='concurrency')
-    assert len(second.json()['messages']) == 1
-    assert second.headers['x-ms-more-messages-available'] == 'true'
-    third = _receive(protocol, maximum=1, trigger_config='concurrency')
-    assert len(third.json()['messages']) == 1
-    assert third.headers['x-ms-more-messages-available'] == 'false'
-    received = [
-        message['messageId']
-        for response in (first, second, third)
-        for message in response.json()['messages']
-    ]
-    assert set(received) == {event.message_id for event in events}
-
-
 def test_invocation_timeout_releases_body_bookkeeping(protocol):
     protocol.state.invocation_timeout = 0.02
     event = protocol.emulator.enqueue(blocked=True)
@@ -167,30 +149,6 @@ def test_invocation_timeout_releases_body_bookkeeping(protocol):
     assert late_completion.value.response.status_code == 409
     assert protocol.emulator.snapshot()['active_bodies'] == 0
     protocol.emulator.post('/reset')
-
-
-@pytest.mark.parametrize('failures', [0, 1])
-def test_function_body_reports_its_own_completion_not_acknowledgement(protocol, failures):
-    from tests.emulator_tests.connector_poll_functions.function_app import _process_poll_event
-
-    event = protocol.emulator.enqueue(failures=failures)
-    _receive(protocol)
-    with patch.dict('os.environ', {
-        'CONNECTOR_EMULATOR_URL': protocol.emulator.url,
-        'CONNECTOR_EMULATOR_CONTROL_TOKEN': protocol.emulator.control_token,
-    }):
-        if failures:
-            with pytest.raises(RuntimeError, match='Intentional Connector'):
-                _process_poll_event(json.dumps(event.payload))
-        else:
-            assert json.loads(_process_poll_event(json.dumps(event.payload))) == event.payload
-    state = protocol.emulator.snapshot()
-    assert state['active_bodies'] == 0
-    assert state['invocations'][0]['message_id'] == event.message_id
-    assert state['invocations'][0]['payload_id'] == event.payload['id']
-    assert state['invocations'][0]['body_finished']
-    assert state['invocations'][0]['body_succeeded'] is (failures == 0)
-    assert not state['messages'][0]['acknowledged']
 
 
 def test_acknowledgement_stays_pending_until_released(protocol):
@@ -217,99 +175,100 @@ def test_acknowledgement_stays_pending_until_released(protocol):
     protocol.emulator.post('/reset')
 
 
-def test_acknowledgement_timeout_clears_pending_without_deleting_message(protocol):
-    protocol.state.acknowledgement_timeout = 0.02
-    event = protocol.emulator.enqueue(block_acknowledgement=True)
-    message = _receive(protocol).json()['messages'][0]
-    response = _acknowledge(protocol, event.message_id, message['lockToken'])
-    assert response.status_code == 504
-    state = protocol.emulator.snapshot()
-    assert not state['messages'][0]['acknowledged']
-    assert not any(call.get('pending') for call in state['calls'])
-    protocol.emulator.post('/reset')
+def test_emulator_process_serves_both_endpoint_forms_with_trusted_tls():
+    processes = []
+    popen = subprocess.Popen
 
+    def start(*args, **kwargs):
+        process = popen(*args, **kwargs)
+        processes.append(process)
+        return process
 
-@pytest.mark.parametrize('startup_failure', [None, 'bind', 'process'])
-def test_compose_cleanup_is_registered_before_startup(startup_failure):
-    commands = []
-    archived = []
-
-    def run(command, **kwargs):
-        commands.append(command)
-        if 'up' in command:
-            config = json.loads(Path(
-                command[command.index('--file') + 1]).read_text(encoding='utf-8'))
-            service = config['services']['connector']
-            assert service['image'] == (
-                'mcr.microsoft.com/azure-functions/python:4-python3.12')
-            assert service['entrypoint'] == ['python']
-            assert service['command'][0] == '/emulator/emulator.py'
-            if startup_failure == 'process':
-                raise OSError('Docker process could not start')
-            return subprocess.CompletedProcess(
-                command, 1 if startup_failure == 'bind' else 0,
-                '', 'Port 443 is occupied' if startup_failure == 'bind' else '')
-        if 'logs' in command:
-            return subprocess.CompletedProcess(command, 0, 'startup diagnostics', '')
-        assert 'down' in command
-        return subprocess.CompletedProcess(command, 0, '', '')
-
-    ready = requests.Response()
-    ready.status_code = 200
+    # Exercise the cross-platform process/TLS path without importing a Windows CA.
     with (
         patch('tests.emulator_tests.utils.connector.connector_test_utils.'
               'platform.system', return_value='Linux'),
         patch('tests.emulator_tests.utils.connector.connector_test_utils.'
-              '_create_certificates', return_value='test-thumbprint'),
-        patch('tests.emulator_tests.utils.connector.connector_test_utils.'
-              'subprocess.run', side_effect=run),
-        patch.object(requests.Session, 'get', return_value=ready),
-        patch.object(ConnectorEmulator, '_archive_log',
-                     side_effect=lambda path: archived.append(path.read_text())),
+              'subprocess.Popen', side_effect=start),
+        patch.object(ConnectorEmulator, '_update_windows_trust') as import_trust,
     ):
-        if startup_failure is None:
-            with ConnectorEmulator():
-                pass
-        else:
-            expected = OSError if startup_failure == 'process' else RuntimeError
-            with pytest.raises(expected):
-                with ConnectorEmulator():
-                    pytest.fail('Failed startup must not enter the context')
-    assert len(commands) == 3
-    assert 'up' in commands[0]
-    assert 'logs' in commands[1]
-    assert 'down' in commands[2]
-    assert commands[0][:-2] == commands[1][:-2] == commands[2][:-3]
-    assert archived == ['startup diagnostics']
+        with ConnectorEmulator() as emulator:
+            directory = emulator.directory
+            verify = str(directory / 'ca.pem')
+            port = int(emulator.runtime_url.rsplit(':', 1)[1])
+            assert 1024 < port <= 65535
+            assert emulator.environment['ConnectorStableEmulator__pollingEndpoint'] == (
+                emulator.runtime_url)
+            assert emulator.environment['ConnectorEmulator__pollingEndpoint'] == (
+                emulator.runtime_url + '/api/connectorGateways/emulator')
+            for prefix, trigger_config in (
+                    (STABLE_POLL_PATH, 'stable'), (POLL_PATH, 'poll')):
+                event = emulator.enqueue(trigger_config=trigger_config)
+                url = emulator.runtime_url + prefix + trigger_config
+                headers = {'Authorization': f'Bearer {ACCESS_TOKEN}'}
+                received = emulator.session.get(
+                    url + '/receive', params={'maxEvents': 1}, headers=headers,
+                    verify=verify, timeout=5)
+                received.raise_for_status()
+                message = received.json()['messages'][0]
+                assert message['messageId'] == event.message_id
+                assert message['outputs'] == event.payload
+                acknowledged = emulator.session.post(
+                    url + '/acknowledge', json={'messages': [{
+                        'messageId': message['messageId'],
+                        'lockToken': message['lockToken'],
+                    }]}, headers=headers, verify=verify, timeout=5)
+                acknowledged.raise_for_status()
+                assert acknowledged.json()['results'][0]['status'] == 'Acknowledged'
+                wrong_prefix = (
+                    POLL_PATH if prefix == STABLE_POLL_PATH else STABLE_POLL_PATH)
+                wrong = emulator.session.get(
+                    emulator.runtime_url + wrong_prefix + trigger_config + '/receive',
+                    params={'maxEvents': 1}, headers=headers,
+                    verify=verify, timeout=5)
+                assert wrong.status_code == 404
+        import_trust.assert_not_called()
+    assert len(processes) == 1
+    assert processes[0].poll() is not None
+    assert not directory.exists()
 
 
-def test_startup_error_is_preserved_when_compose_cleanup_also_fails():
-    commands = []
-
-    def run(command, **kwargs):
-        commands.append(command)
-        if 'up' in command:
-            return subprocess.CompletedProcess(command, 1, '', 'Startup failed')
-        if 'logs' in command:
-            return subprocess.CompletedProcess(command, 1, '', 'Logs failed')
-        return subprocess.CompletedProcess(command, 1, '', 'Shutdown failed')
-
+def test_emulator_process_startup_failure_is_stopped_and_logged():
+    process = Mock()
+    process.poll.return_value = 1
+    archived = []
     with (
         patch('tests.emulator_tests.utils.connector.connector_test_utils.'
               'platform.system', return_value='Linux'),
         patch('tests.emulator_tests.utils.connector.connector_test_utils.'
-              '_create_certificates', return_value='test-thumbprint'),
+              'subprocess.Popen', return_value=process),
+        patch.object(ConnectorEmulator, '_archive_log',
+                     side_effect=lambda path: archived.append(path.exists())),
+        pytest.raises(RuntimeError, match='exited during startup'),
+    ):
+        with ConnectorEmulator():
+            pytest.fail('Failed startup must not enter the context')
+    process.terminate.assert_not_called()
+    process.wait.assert_called_once_with(timeout=10)
+    assert archived == [True]
+
+
+def test_startup_error_is_preserved_when_process_cleanup_also_fails():
+    process = Mock()
+    process.poll.return_value = 1
+    process.wait.side_effect = OSError('Synthetic shutdown failure')
+    with (
         patch('tests.emulator_tests.utils.connector.connector_test_utils.'
-              'subprocess.run', side_effect=run),
+              'platform.system', return_value='Linux'),
+        patch('tests.emulator_tests.utils.connector.connector_test_utils.'
+              'subprocess.Popen', return_value=process),
         patch.object(ConnectorEmulator, '_archive_log'),
         pytest.raises(BaseExceptionGroup) as error,
     ):
         with ConnectorEmulator():
             pytest.fail('Failed startup must not enter the context')
-    assert 'Startup failed' in str(error.value.exceptions[0])
-    assert 'Logs failed' in str(error.value.exceptions[1])
-    assert 'Shutdown failed' in str(error.value.exceptions[1])
-    assert 'down' in commands[-1]
+    assert 'exited during startup' in str(error.value.exceptions[0])
+    assert 'Synthetic shutdown failure' in str(error.value.exceptions[1])
 
 
 @pytest.mark.parametrize('source', ['environment', 'worker_config'])

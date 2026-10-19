@@ -45,8 +45,8 @@ class TestConnectorPollFunctions(testutils.WebHostTestCase):
             item['id'] == event.message_id and item['acknowledged']
             for item in state['messages']))
 
-    def _assert_poll_output(self, event):
-        response = self.webhost.request('GET', 'get_connector_poll')
+    def _assert_poll_output(self, event, route='get_connector_poll'):
+        response = self.webhost.request('GET', route)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), event.payload)
 
@@ -59,23 +59,34 @@ class TestConnectorPollFunctions(testutils.WebHostTestCase):
             if lock['messageId'] == event.message_id)
 
     def test_poll_delivery_and_acknowledgement(self):
-        event = self.emulator.enqueue()
-        self.assertNotEqual(event.message_id, event.payload['id'])
-        state = self._wait_acknowledged(event)
-        self._assert_poll_output(event)
-        self.assertTrue(state['token_requests'])
-        self.assertEqual(set(state['token_requests']), {'https://apihub.azure.com'})
-        message = state['messages'][0]
-        acknowledgements = [
-            call for call in state['calls'] if call['operation'] == 'acknowledge'
-        ]
-        self.assertEqual(acknowledgements, [{
-            'operation': 'acknowledge', 'trigger_config': 'poll',
-            'status': 200, 'pending': False,
-            'messages': [{
-                'messageId': event.message_id, 'lockToken': message['lock_token']
-            }],
-        }])
+        for endpoint, trigger_config, route in (
+                ('stable_dns', 'stable', 'get_connector_poll_stable'),
+                ('legacy_gateway', 'poll', 'get_connector_poll')):
+            with self.subTest(endpoint=endpoint):
+                event = self.emulator.enqueue(trigger_config=trigger_config)
+                self.assertNotEqual(event.message_id, event.payload['id'])
+                state = self._wait_acknowledged(event)
+                self._assert_poll_output(event, route)
+                self.assertTrue(state['token_requests'])
+                self.assertEqual(
+                    set(state['token_requests']), {'https://apihub.azure.com'})
+                message = next(
+                    item for item in state['messages']
+                    if item['id'] == event.message_id)
+                acknowledgements = [
+                    call for call in state['calls']
+                    if call['operation'] == 'acknowledge'
+                    and any(lock['messageId'] == event.message_id
+                            for lock in call['messages'])
+                ]
+                self.assertEqual(acknowledgements, [{
+                    'operation': 'acknowledge', 'trigger_config': trigger_config,
+                    'status': 200, 'pending': False,
+                    'messages': [{
+                        'messageId': event.message_id,
+                        'lockToken': message['lock_token'],
+                    }],
+                }])
 
     def test_poll_failed_invocation_is_redelivered_without_acknowledgement(self):
         event = self.emulator.enqueue(failures=1)
@@ -122,17 +133,12 @@ class TestConnectorPollFunctions(testutils.WebHostTestCase):
             no_prefix=True)
         self.assertEqual(response.status_code, 404)
 
-    def test_poll_empty_queue_then_delivery(self):
+    def test_poll_recovers_after_idle_and_transient_receive_failures(self):
         state = self.emulator.wait_for(lambda state: sum(
             call['operation'] == 'receive' and call['trigger_config'] == 'poll'
             and call.get('message_ids') == []
             for call in state['calls']) >= 2)
         self.assertEqual(state['invocations'], [])
-        event = self.emulator.enqueue()
-        self._wait_acknowledged(event)
-        self._assert_poll_output(event)
-
-    def test_poll_recovers_from_transient_receive_failures(self):
         self.emulator.post('/faults', {'receive': 2})
         event = self.emulator.enqueue()
         state = self._wait_acknowledged(event)

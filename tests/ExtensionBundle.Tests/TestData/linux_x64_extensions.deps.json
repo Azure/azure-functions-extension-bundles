@@ -11,13 +11,13 @@
         "dependencies": {
           "MessagePack": "2.5.301",
           "Microsoft.AspNetCore.Server.Kestrel.Core": "2.3.6",
-          "Microsoft.Azure.DurableTask.Netherite.AzureFunctions": "3.1.1",
-          "Microsoft.Azure.Functions.Extensions.Connector": "0.4.1-alpha",
+          "Microsoft.Azure.DurableTask.Netherite.AzureFunctions": "3.1.2",
+          "Microsoft.Azure.Functions.Extensions.Connector": "1.0.0",
           "Microsoft.Azure.Functions.Extensions.Mcp": "1.6.0",
           "Microsoft.Azure.WebJobs.Extensions.CosmosDB": "4.16.1",
           "Microsoft.Azure.WebJobs.Extensions.Dapr": "1.0.1",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.15.2",
-          "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged": "1.10.3",
+          "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged": "1.10.4",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "3.5.0",
           "Microsoft.Azure.WebJobs.Extensions.EventHubs": "6.5.3",
           "Microsoft.Azure.WebJobs.Extensions.Fabric": "1.0.121",
@@ -933,7 +933,7 @@
           }
         }
       },
-      "Microsoft.Azure.DurableTask.Netherite/3.1.1": {
+      "Microsoft.Azure.DurableTask.Netherite/3.1.2": {
         "dependencies": {
           "Azure.Core": "1.50.0",
           "Azure.Data.Tables": "12.11.0",
@@ -949,26 +949,26 @@
         "runtime": {
           "lib/netstandard2.0/DurableTask.Netherite.dll": {
             "assemblyVersion": "3.0.0.0",
-            "fileVersion": "3.1.1.60799"
+            "fileVersion": "3.1.2.48510"
           }
         }
       },
-      "Microsoft.Azure.DurableTask.Netherite.AzureFunctions/3.1.1": {
+      "Microsoft.Azure.DurableTask.Netherite.AzureFunctions/3.1.2": {
         "dependencies": {
           "Microsoft.Azure.DurableTask.Core": "3.9.0",
-          "Microsoft.Azure.DurableTask.Netherite": "3.1.1",
+          "Microsoft.Azure.DurableTask.Netherite": "3.1.2",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.15.2",
           "System.Text.Json": "8.0.6"
         },
         "runtime": {
           "lib/net6.0/DurableTask.Netherite.AzureFunctions.dll": {
             "assemblyVersion": "3.0.0.0",
-            "fileVersion": "3.1.1.60799"
+            "fileVersion": "3.1.2.48510"
           }
         }
       },
       "Microsoft.Azure.Functions.Analyzers/1.0.0": {},
-      "Microsoft.Azure.Functions.Extensions.Connector/0.4.1-alpha": {
+      "Microsoft.Azure.Functions.Extensions.Connector/1.0.0": {
         "dependencies": {
           "Azure.Identity": "1.17.1",
           "Microsoft.Azure.WebJobs": "3.0.45",
@@ -977,8 +977,8 @@
         },
         "runtime": {
           "lib/net8.0/Microsoft.Azure.Functions.Extensions.Connector.dll": {
-            "assemblyVersion": "0.4.0.0",
-            "fileVersion": "0.4.1.26513"
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.26519"
           }
         }
       },
@@ -1188,7 +1188,7 @@
         }
       },
       "Microsoft.Azure.WebJobs.Extensions.DurableTask.Analyzers/0.5.0": {},
-      "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged/1.10.3": {
+      "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged/1.10.4": {
         "dependencies": {
           "Azure.Core": "1.50.0",
           "Azure.Identity": "1.17.1",
@@ -1198,16 +1198,17 @@
           "Microsoft.Azure.DurableTask.Core": "3.9.0",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.15.2",
           "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
-          "Microsoft.DurableTask.AzureManagedBackend": "1.10.3",
+          "Microsoft.DurableTask.AzureManagedBackend": "1.10.4",
           "Microsoft.DurableTask.Extensions.AzureBlobPayloads": "1.25.0",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
+          "System.Text.Encodings.Web": "8.0.0",
           "System.Text.Json": "8.0.6",
           "System.Threading.Channels": "8.0.0"
         },
         "runtime": {
           "lib/net8.0/Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged.dll": {
             "assemblyVersion": "1.10.0.0",
-            "fileVersion": "1.10.3.24730"
+            "fileVersion": "1.10.4.14908"
           }
         }
       },
@@ -1683,7 +1684,7 @@
           }
         }
       },
-      "Microsoft.DurableTask.AzureManagedBackend/1.10.3": {
+      "Microsoft.DurableTask.AzureManagedBackend/1.10.4": {
         "dependencies": {
           "Azure.Core": "1.50.0",
           "Azure.Identity": "1.17.1",
@@ -1691,9 +1692,9 @@
           "Grpc.Net.Client": "2.80.0",
           "Microsoft.Azure.DurableTask.Core": "3.9.0",
           "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
-          "Microsoft.DurableTask.AzureManagedBackend.Protobuf": "1.10.3",
+          "Microsoft.DurableTask.AzureManagedBackend.Protobuf": "1.10.4",
           "Microsoft.DurableTask.Extensions.AzureBlobPayloads": "1.25.0",
-          "Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged": "1.10.3",
+          "Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged": "1.10.4",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
           "System.Text.Json": "8.0.6",
           "System.Threading.Channels": "8.0.0"
@@ -1701,11 +1702,11 @@
         "runtime": {
           "lib/net8.0/Microsoft.DurableTask.AzureManagedBackend.dll": {
             "assemblyVersion": "1.10.0.0",
-            "fileVersion": "1.10.3.24730"
+            "fileVersion": "1.10.4.14908"
           }
         }
       },
-      "Microsoft.DurableTask.AzureManagedBackend.Protobuf/1.10.3": {
+      "Microsoft.DurableTask.AzureManagedBackend.Protobuf/1.10.4": {
         "dependencies": {
           "Google.Protobuf": "3.34.1",
           "Grpc.Net.Client": "2.80.0"
@@ -1713,7 +1714,7 @@
         "runtime": {
           "lib/net8.0/Microsoft.DurableTask.AzureManagedBackend.Protobuf.dll": {
             "assemblyVersion": "1.10.0.0",
-            "fileVersion": "1.10.3.24730"
+            "fileVersion": "1.10.4.14908"
           }
         }
       },
@@ -1762,7 +1763,7 @@
           }
         }
       },
-      "Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged/1.10.3": {
+      "Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged/1.10.4": {
         "dependencies": {
           "Azure.Core": "1.50.0",
           "Azure.Identity": "1.17.1",
@@ -1770,7 +1771,7 @@
           "Grpc.Net.Client": "2.80.0",
           "Microsoft.Azure.DurableTask.Core": "3.9.0",
           "Microsoft.Bcl.AsyncInterfaces": "10.0.9",
-          "Microsoft.DurableTask.AzureManagedBackend.Protobuf": "1.10.3",
+          "Microsoft.DurableTask.AzureManagedBackend.Protobuf": "1.10.4",
           "Microsoft.DurableTask.Extensions.AzureBlobPayloads": "1.25.0",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
           "System.Text.Json": "8.0.6",
@@ -1779,7 +1780,7 @@
         "runtime": {
           "lib/net8.0/Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged.dll": {
             "assemblyVersion": "1.10.0.0",
-            "fileVersion": "1.10.3.24730"
+            "fileVersion": "1.10.4.14908"
           }
         }
       },
@@ -4374,19 +4375,19 @@
       "path": "microsoft.azure.durabletask.core/3.9.0",
       "hashPath": "microsoft.azure.durabletask.core.3.9.0.nupkg.sha512"
     },
-    "Microsoft.Azure.DurableTask.Netherite/3.1.1": {
+    "Microsoft.Azure.DurableTask.Netherite/3.1.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-QnPv/6R+dpZiOuqCS9yBVwpZ0gTrog4e0+X5Ama8ALu/8Lb5EF5bLj2V9nAN0Ug+EAoGZAAHsbpizvgiJ0uvlQ==",
-      "path": "microsoft.azure.durabletask.netherite/3.1.1",
-      "hashPath": "microsoft.azure.durabletask.netherite.3.1.1.nupkg.sha512"
+      "sha512": "sha512-lCu0OSeHx/yO2/Llr9CnrDM7cnQofqsEiU/lZz0xic/2hxbDwHEg43bfxWLuRF5w5pyRqRhiw3aF0wu5hFXFOw==",
+      "path": "microsoft.azure.durabletask.netherite/3.1.2",
+      "hashPath": "microsoft.azure.durabletask.netherite.3.1.2.nupkg.sha512"
     },
-    "Microsoft.Azure.DurableTask.Netherite.AzureFunctions/3.1.1": {
+    "Microsoft.Azure.DurableTask.Netherite.AzureFunctions/3.1.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-rgBJbKKU9QoM8faFCR51N+m+smE8eiTQgMBgpeqi3weoyKzQI/hG22JYHkbldJS65HzfZNZ76sBkI1jar8QbYA==",
-      "path": "microsoft.azure.durabletask.netherite.azurefunctions/3.1.1",
-      "hashPath": "microsoft.azure.durabletask.netherite.azurefunctions.3.1.1.nupkg.sha512"
+      "sha512": "sha512-s+WMwRpT2iDpmxahcIx9uZEAlqeUBhSmdYQ8/XChypLXyya7WdIAsHjALcnS8Zb3na1UG0e6VqPuui82xKahtg==",
+      "path": "microsoft.azure.durabletask.netherite.azurefunctions/3.1.2",
+      "hashPath": "microsoft.azure.durabletask.netherite.azurefunctions.3.1.2.nupkg.sha512"
     },
     "Microsoft.Azure.Functions.Analyzers/1.0.0": {
       "type": "package",
@@ -4395,12 +4396,12 @@
       "path": "microsoft.azure.functions.analyzers/1.0.0",
       "hashPath": "microsoft.azure.functions.analyzers.1.0.0.nupkg.sha512"
     },
-    "Microsoft.Azure.Functions.Extensions.Connector/0.4.1-alpha": {
+    "Microsoft.Azure.Functions.Extensions.Connector/1.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-/egg3wr4OziexyGiZB7UdhVGslYRT4ryPVlMfOQdkyxSYvk3cR/sPhQMaIgf2CXZ5oBFeYmqiYpqZQnx2JCjHA==",
-      "path": "microsoft.azure.functions.extensions.connector/0.4.1-alpha",
-      "hashPath": "microsoft.azure.functions.extensions.connector.0.4.1-alpha.nupkg.sha512"
+      "sha512": "sha512-eHIJ1bLaC+puwWcsJkk7StqLBr4IwR+dzO1iE/fN5lTcU9v/43F6kSmLk+A+CqRL+ZMuKIow3IkWm4tpZhAqQg==",
+      "path": "microsoft.azure.functions.extensions.connector/1.0.0",
+      "hashPath": "microsoft.azure.functions.extensions.connector.1.0.0.nupkg.sha512"
     },
     "Microsoft.Azure.Functions.Extensions.Dapr.Core/1.0.1": {
       "type": "package",
@@ -4500,12 +4501,12 @@
       "path": "microsoft.azure.webjobs.extensions.durabletask.analyzers/0.5.0",
       "hashPath": "microsoft.azure.webjobs.extensions.durabletask.analyzers.0.5.0.nupkg.sha512"
     },
-    "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged/1.10.3": {
+    "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged/1.10.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-S86SyTFzjobJrzh5pn1M9RD47ZTBv/zZQFBrmL5pIPDTU0BdHmVaZOAd+Rm99GJvsqTjyGVcetQnNnGAugJk5A==",
-      "path": "microsoft.azure.webjobs.extensions.durabletask.azuremanaged/1.10.3",
-      "hashPath": "microsoft.azure.webjobs.extensions.durabletask.azuremanaged.1.10.3.nupkg.sha512"
+      "sha512": "sha512-FNqhZjqNpZfEdkvNil/63DlCNFOXeM4q9vPdvfhA4SWXklyzRXCl9Uzs/Mz1BSqXjM6CgsQsDwgpaMCbb54dXg==",
+      "path": "microsoft.azure.webjobs.extensions.durabletask.azuremanaged/1.10.4",
+      "hashPath": "microsoft.azure.webjobs.extensions.durabletask.azuremanaged.1.10.4.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.EventGrid/3.5.0": {
       "type": "package",
@@ -4731,19 +4732,19 @@
       "path": "microsoft.durabletask.abstractions/1.25.0",
       "hashPath": "microsoft.durabletask.abstractions.1.25.0.nupkg.sha512"
     },
-    "Microsoft.DurableTask.AzureManagedBackend/1.10.3": {
+    "Microsoft.DurableTask.AzureManagedBackend/1.10.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-wOQs5PcZ8DfrqHNJwEASUGpSyGTHsRYmOXgtgmcAQ4d+Vjw8Lntm+Hjbu9/8QGrh5Y4TPXJW3VUF2E7OcMuGUQ==",
-      "path": "microsoft.durabletask.azuremanagedbackend/1.10.3",
-      "hashPath": "microsoft.durabletask.azuremanagedbackend.1.10.3.nupkg.sha512"
+      "sha512": "sha512-fiYh3NQfovVwQcwm1/6SZ7pslg/lOJExyZCy6kUpgrd+Gtqfy/vTdcg78qAr37aMQnDDoJd4IJiBPDM6WUn+MA==",
+      "path": "microsoft.durabletask.azuremanagedbackend/1.10.4",
+      "hashPath": "microsoft.durabletask.azuremanagedbackend.1.10.4.nupkg.sha512"
     },
-    "Microsoft.DurableTask.AzureManagedBackend.Protobuf/1.10.3": {
+    "Microsoft.DurableTask.AzureManagedBackend.Protobuf/1.10.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-UmjdNnrYXvWhkw443Rv2pW2jHLg7JLf7qdbkfsaR46LhWKAMDQzpeDh2lFpXJBSaAqBAlxlEEGVtTghk3B459Q==",
-      "path": "microsoft.durabletask.azuremanagedbackend.protobuf/1.10.3",
-      "hashPath": "microsoft.durabletask.azuremanagedbackend.protobuf.1.10.3.nupkg.sha512"
+      "sha512": "sha512-Lq+wfAmZhAynGSsZ3WDNYYcOouIvc6tLn10G2B6vTaj8S1OMiwgCk9JlIazvajk3VAinnw/vYpSknI08WZTyGg==",
+      "path": "microsoft.durabletask.azuremanagedbackend.protobuf/1.10.4",
+      "hashPath": "microsoft.durabletask.azuremanagedbackend.protobuf.1.10.4.nupkg.sha512"
     },
     "Microsoft.DurableTask.Client/1.25.0": {
       "type": "package",
@@ -4766,12 +4767,12 @@
       "path": "microsoft.durabletask.extensions.azureblobpayloads/1.25.0",
       "hashPath": "microsoft.durabletask.extensions.azureblobpayloads.1.25.0.nupkg.sha512"
     },
-    "Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged/1.10.3": {
+    "Microsoft.DurableTask.Extensions.AzureBlobPayloads.AzureManaged/1.10.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-vVd5+DZ7YY4oONoE1gV6RETlFNkqjpdrViUNrQWj1j1RaoRRmiM4CBmQV1uz17UTYl9+ZGWPk575qTDVHqn9xw==",
-      "path": "microsoft.durabletask.extensions.azureblobpayloads.azuremanaged/1.10.3",
-      "hashPath": "microsoft.durabletask.extensions.azureblobpayloads.azuremanaged.1.10.3.nupkg.sha512"
+      "sha512": "sha512-TVY5sRaDBN5FTz8hjXezkpNjvFwvM2xeEnroD+mdHPZxPj2hJ+8gbfZzyCodAvyujuVBqCi7RZd+GCdiUUeo1g==",
+      "path": "microsoft.durabletask.extensions.azureblobpayloads.azuremanaged/1.10.4",
+      "hashPath": "microsoft.durabletask.extensions.azureblobpayloads.azuremanaged.1.10.4.nupkg.sha512"
     },
     "Microsoft.DurableTask.Grpc/1.25.0": {
       "type": "package",

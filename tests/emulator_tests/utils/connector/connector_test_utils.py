@@ -87,115 +87,79 @@ class ConnectorEmulator:
                 tempfile.TemporaryDirectory(prefix='connector-emulator-')))
             thumbprint = _create_certificates(self.directory)
             self.control_token = str(uuid.uuid4())
-            port = testutils._find_open_port()
-            self.url = f'http://127.0.0.1:{port}'
             self.session = self._resources.enter_context(requests.Session())
             self.session.trust_env = False
             self.session.headers[CONTROL_HEADER] = self.control_token
-            self.environment = {
-                'ConnectorEmulator__pollingEndpoint':
-                    'https://localhost/api/connectorGateways/emulator',
-                'ConnectorEmulator__credential': 'managedidentity',
-                'CONNECTOR_EMULATOR_URL': self.url,
-                'CONNECTOR_EMULATOR_CONTROL_TOKEN': self.control_token,
-                'IDENTITY_ENDPOINT': self.url + '/identity',
-                'IDENTITY_HEADER': self.control_token,
-                'SSL_CERT_FILE': str(self.directory / 'ca.pem'),
-                'AzureFunctionsJobHost__extensions__connector__maxPollingInterval':
-                    '00:00:01',
-                'NO_PROXY': ','.join(filter(None, [
-                    os.environ.get('NO_PROXY'), '127.0.0.1', 'localhost'
-                ])),
-            }
             script = pathlib.Path(__file__).with_name('emulator.py')
-            if platform.system() == 'Windows':
+            system = platform.system()
+            if system not in ('Windows', 'Linux'):
+                raise RuntimeError('Connector Poll emulator supports Windows and Linux.')
+            if system == 'Windows':
                 if os.environ.get('CONNECTOR_EMULATOR_TRUST_LOCAL_CERTIFICATE') != '1':
                     raise RuntimeError(
                         'Set CONNECTOR_EMULATOR_TRUST_LOCAL_CERTIFICATE=1 to allow '
                         'temporary current-user certificate trust for this test run.')
-                self._update_windows_trust(
-                    '-addstore', str(self.directory / 'ca.cer'))
-                self._resources.callback(
-                    self._update_windows_trust, '-delstore', thumbprint)
-                log = self._resources.enter_context(
-                    (self.directory / 'emulator.log').open('w+'))
-                process = subprocess.Popen(
-                    [sys.executable, str(script),
-                     '--cert', str(self.directory / 'cert.pem'),
-                     '--key', str(self.directory / 'key.pem'),
-                     '--control-port', str(port)],
-                    env={**os.environ,
-                         'CONNECTOR_EMULATOR_CONTROL_TOKEN': self.control_token},
-                    stdout=log, stderr=subprocess.STDOUT)
-                self._resources.callback(
-                    self._archive_log, self.directory / 'emulator.log')
-                self._resources.callback(self._stop_process, process)
-            elif platform.system() == 'Linux':
-                config_path = self.directory / 'compose.json'
-                config_path.write_text(json.dumps({
-                    'services': {
-                        'connector': {
-                            'image': 'mcr.microsoft.com/azure-functions/python:4-python3.12',
-                            'entrypoint': ['python'],
-                            'ports': [
-                                '127.0.0.1:443:443',
-                                f'127.0.0.1:{port}:8080',
-                            ],
-                            'volumes': [
-                                {
-                                    'type': 'bind', 'source': str(script.parent),
-                                    'target': '/emulator', 'read_only': True,
-                                },
-                                {
-                                    'type': 'bind', 'source': str(self.directory),
-                                    'target': '/certs', 'read_only': True,
-                                },
-                            ],
-                            'environment': {
-                                'CONNECTOR_EMULATOR_CONTROL_TOKEN': self.control_token,
-                            },
-                            'command': [
-                                '/emulator/emulator.py',
-                                '--cert', '/certs/cert.pem',
-                                '--key', '/certs/key.pem',
-                                '--control-port', '8080', '--bind', '0.0.0.0',
-                            ],
-                        },
-                    },
-                }), encoding='utf-8')
-                command = [
-                    'docker', 'compose',
-                    '--project-name', f'connector-emulator-{uuid.uuid4().hex}',
-                    '--file', str(config_path),
-                ]
-                log_path = self.directory / 'emulator.log'
-                log_path.touch()
-                self._resources.callback(
-                    self._archive_log, log_path)
-                self._resources.callback(
-                    self._stop_compose_project, command, log_path)
-                result = subprocess.run(
-                    command + ['up', '--detach'],
-                    capture_output=True, text=True)
-                if result.returncode:
-                    raise RuntimeError(
-                        'Connector emulator container failed to start:\n'
-                        + result.stdout + result.stderr)
-            else:
-                raise RuntimeError('Connector Poll emulator supports Windows and Linux.')
+            ready_file = self.directory / 'ready.json'
+            log_path = self.directory / 'emulator.log'
+            log = self._resources.enter_context(log_path.open('w+'))
+            process = subprocess.Popen(
+                [sys.executable, '-u', str(script),
+                 '--cert', str(self.directory / 'cert.pem'),
+                 '--key', str(self.directory / 'key.pem'),
+                 '--ready-file', str(ready_file)],
+                env={**os.environ,
+                     'CONNECTOR_EMULATOR_CONTROL_TOKEN': self.control_token},
+                stdout=log, stderr=subprocess.STDOUT)
+            self._resources.callback(self._archive_log, log_path)
+            self._resources.callback(self._stop_process, process)
             deadline = time.monotonic() + 30
             while time.monotonic() < deadline:
-                if platform.system() == 'Windows' and process.poll() is not None:
+                if process.poll() is not None:
                     log.seek(0)
                     raise RuntimeError(
                         f'Connector Poll emulator exited during startup:\n{log.read()}')
+                if not ready_file.exists():
+                    time.sleep(0.1)
+                    continue
+                ports = json.loads(ready_file.read_text(encoding='utf-8'))
+                runtime_port = ports['runtime_port']
+                control_port = ports['control_port']
+                if not (1024 < runtime_port <= 65535
+                        and 1024 < control_port <= 65535
+                        and runtime_port != control_port):
+                    raise RuntimeError('Emulator did not bind distinct high ports.')
+                self.url = f'http://127.0.0.1:{control_port}'
+                self.runtime_url = f'https://localhost:{runtime_port}'
                 try:
                     response = self.session.get(self.url + '/health', timeout=2)
                     response.raise_for_status()
-                    return self
                 except (requests.ConnectionError, requests.Timeout):
                     time.sleep(0.1)
-            raise TimeoutError('Connector Poll emulator did not start on localhost:443.')
+                    continue
+                self.environment = {
+                    'ConnectorEmulator__pollingEndpoint':
+                        self.runtime_url + '/api/connectorGateways/emulator',
+                    'ConnectorEmulator__credential': 'managedidentity',
+                    'ConnectorStableEmulator__pollingEndpoint': self.runtime_url,
+                    'ConnectorStableEmulator__credential': 'managedidentity',
+                    'CONNECTOR_EMULATOR_URL': self.url,
+                    'CONNECTOR_EMULATOR_CONTROL_TOKEN': self.control_token,
+                    'IDENTITY_ENDPOINT': self.url + '/identity',
+                    'IDENTITY_HEADER': self.control_token,
+                    'SSL_CERT_FILE': str(self.directory / 'ca.pem'),
+                    'AzureFunctionsJobHost__extensions__connector__maxPollingInterval':
+                        '00:00:01',
+                    'NO_PROXY': ','.join(filter(None, [
+                        os.environ.get('NO_PROXY'), '127.0.0.1', 'localhost'
+                    ])),
+                }
+                if system == 'Windows':
+                    self._update_windows_trust(
+                        '-addstore', str(self.directory / 'ca.cer'))
+                    self._resources.callback(
+                        self._update_windows_trust, '-delstore', thumbprint)
+                return self
+            raise TimeoutError('Connector Poll emulator did not start within 30 seconds.')
         except BaseException as error:
             self._close_resources(error)
             raise
@@ -235,27 +199,6 @@ class ConnectorEmulator:
         except subprocess.TimeoutExpired:
             process.kill()
             process.wait(timeout=10)
-
-    @staticmethod
-    def _stop_compose_project(command, log_path):
-        errors = []
-        try:
-            result = subprocess.run(
-                command + ['logs', '--no-color'],
-                capture_output=True, text=True)
-            log_path.write_text(result.stdout + result.stderr, encoding='utf-8')
-            if result.returncode:
-                errors.append('Cannot collect emulator logs:\n'
-                              + result.stdout + result.stderr)
-        finally:
-            result = subprocess.run(
-                command + ['down', '--timeout', '5'],
-                capture_output=True, text=True)
-            if result.returncode:
-                errors.append('Cannot stop the emulator Compose project:\n'
-                              + result.stdout + result.stderr)
-        if errors:
-            raise RuntimeError('\n'.join(errors))
 
     @staticmethod
     def _archive_log(path):

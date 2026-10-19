@@ -8,7 +8,7 @@ namespace Build
 {
     public static class Settings
     {
-        public const string UpstreamPublicNuGetFeedUrl = "https://pkgs.dev.azure.com/azfunc/public/_packaging/upstream-public/nuget/v3/index.json";
+        public const string UpstreamPublicNuGetFeedUrl = "https://pkgs.dev.azure.com/azfunc/public/_packaging/azure-functions-extension-bundles-feed/nuget/v3/index.json";
 
         public static string basePath = path;
 

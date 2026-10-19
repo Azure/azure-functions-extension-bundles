@@ -5,6 +5,7 @@
 import argparse
 import json
 import os
+import pathlib
 import ssl
 import threading
 import time
@@ -16,6 +17,7 @@ from urllib.parse import parse_qs, urlsplit
 ACCESS_TOKEN = 'connector-emulator-access-token'
 CONTROL_HEADER = 'x-connector-emulator'
 POLL_PATH = '/api/connectorGateways/emulator/triggerConfigs/'
+STABLE_POLL_PATH = '/api/triggerConfigs/'
 
 
 class EmulatorServer(ThreadingHTTPServer):
@@ -115,10 +117,13 @@ class Handler(BaseHTTPRequestHandler):
 
     def runtime_route(self):
         path = urlsplit(self.path).path
-        if path.startswith(POLL_PATH):
-            segments = path[len(POLL_PATH):].split('/')
-            if len(segments) == 2 and segments[0] in ('poll', 'concurrency'):
-                return segments
+        for prefix, configurations in (
+                (POLL_PATH, ('poll', 'concurrency')),
+                (STABLE_POLL_PATH, ('stable',))):
+            if path.startswith(prefix):
+                segments = path[len(prefix):].split('/')
+                if len(segments) == 2 and segments[0] in configurations:
+                    return segments
         return None, None
 
     def do_GET(self):
@@ -383,26 +388,33 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--cert', required=True)
     parser.add_argument('--key', required=True)
-    parser.add_argument('--control-port', required=True, type=int)
-    parser.add_argument('--bind', default='127.0.0.1')
+    parser.add_argument('--ready-file', required=True, type=pathlib.Path)
     args = parser.parse_args()
     state = State()
-    runtime = EmulatorServer((args.bind, 443), Handler)
-    control = EmulatorServer((args.bind, args.control_port), Handler)
-    for server, is_runtime in ((runtime, True), (control, False)):
-        server.state = state
-        server.runtime = is_runtime
-        server.control_token = os.environ['CONNECTOR_EMULATOR_CONTROL_TOKEN']
-    tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    tls.load_cert_chain(args.cert, args.key)
-    runtime.tls_context = tls
-    threading.Thread(target=runtime.serve_forever, daemon=True).start()
-    try:
-        control.serve_forever()
-    finally:
-        runtime.shutdown()
-        runtime.server_close()
-        control.server_close()
+    with (
+        EmulatorServer(('127.0.0.1', 0), Handler) as runtime,
+        EmulatorServer(('127.0.0.1', 0), Handler) as control,
+    ):
+        for server, is_runtime in ((runtime, True), (control, False)):
+            server.state = state
+            server.runtime = is_runtime
+            server.control_token = os.environ['CONNECTOR_EMULATOR_CONTROL_TOKEN']
+        tls = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        tls.load_cert_chain(args.cert, args.key)
+        runtime.tls_context = tls
+        thread = threading.Thread(target=runtime.serve_forever, daemon=True)
+        thread.start()
+        try:
+            temporary = args.ready_file.with_suffix('.tmp')
+            temporary.write_text(json.dumps({
+                'runtime_port': runtime.server_port,
+                'control_port': control.server_port,
+            }), encoding='utf-8')
+            temporary.replace(args.ready_file)
+            control.serve_forever()
+        finally:
+            runtime.shutdown()
+            thread.join(timeout=5)
 
 
 if __name__ == '__main__':

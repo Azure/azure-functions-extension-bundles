@@ -286,7 +286,7 @@
   },
   {
     "id": "Microsoft.Azure.Functions.Extensions.Connector",
-    "version": "0.4.1-alpha",
+    "majorVersion": "1",
     "name": "Connector",
     "bindings": [
       "connectorTrigger"

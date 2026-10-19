@@ -55,6 +55,27 @@ async def connector_trigger_poll(payload: str) -> str:
     return await asyncio.to_thread(_process_poll_event, payload)
 
 
+@app.function_name(name='connector_trigger_poll_stable')
+@app.generic_trigger(
+    arg_name='payload', type='connectorTrigger', deliveryMode='Poll',
+    connection='ConnectorStableEmulator', triggerConfigName='stable',
+    cardinality=func.Cardinality.ONE, maxBatchSize=1, maxConcurrentCalls=1)
+@app.blob_output(
+    arg_name='$return', path='bundle-tests/test-connector-poll-stable.txt',
+    connection='AzureWebJobsStorage')
+async def connector_trigger_poll_stable(payload: str) -> str:
+    return await asyncio.to_thread(_process_poll_event, payload)
+
+
+@app.function_name(name='get_connector_poll_stable')
+@app.route(route='get_connector_poll_stable')
+@app.blob_input(
+    arg_name='file', path='bundle-tests/test-connector-poll-stable.txt',
+    connection='AzureWebJobsStorage')
+def get_connector_poll_stable(req: func.HttpRequest, file: func.InputStream) -> str:
+    return file.read().decode('utf-8')
+
+
 @app.function_name(name='connector_trigger_poll_concurrency')
 @app.generic_trigger(
     arg_name='payload', type='connectorTrigger', deliveryMode='Poll',
