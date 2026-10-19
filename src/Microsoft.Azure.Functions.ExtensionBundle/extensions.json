@@ -250,7 +250,7 @@
   },
   {
     "id": "MessagePack",
-    "version": "2.5.301",
+    "version": "2.5.307",
     "name": "MessagePack",
     "bindings": []
   },
