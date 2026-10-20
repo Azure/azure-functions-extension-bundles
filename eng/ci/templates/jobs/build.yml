@@ -47,7 +47,7 @@ jobs:
       ${{ if eq(parameters.official, false) }}:
         arguments: '--no-restore -- skip:DownloadTemplates,GenerateVulnerabilityReport,PackageBundle,PackagePortableBundle,PackageWindowsBundle,CreateRUPackage,CreateCDNStoragePackage,CreateCDNStoragePackageWindows,CreateCDNStoragePackageLinux,PackageLinuxBundle'
       ${{ else }}:
-        arguments: '--no-restore'
+        arguments: '--no-restore -- skip:GenerateVulnerabilityReport'
 
   - ${{ if eq(parameters.official, true) }}:
     - pwsh: |
