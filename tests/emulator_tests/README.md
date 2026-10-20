@@ -293,6 +293,18 @@ python -m pytest tests/emulator_tests -v -s
 python -m pytest tests/emulator_tests --cov=utils --cov-report=html
 ```
 
+## Connector Poll tests
+
+Poll tests require Azurite but no Azure resources or credentials. The fixture
+starts local HTTPS and identity endpoints on high ports and cleans them up afterward.
+Linux uses process-scoped TLS trust; Windows requires explicit permission to
+temporarily trust the generated certificate (and may display a confirmation prompt):
+
+```powershell
+$env:CONNECTOR_EMULATOR_TRUST_LOCAL_CERTIFICATE = "1"
+python -m pytest tests/emulator_tests/test_connector_poll_functions.py -v
+```
+
 ## Quick Setup Script
 
 For convenience, here's a PowerShell script that sets up everything:
