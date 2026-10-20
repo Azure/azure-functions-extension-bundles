@@ -250,7 +250,7 @@
   },
   {
     "id": "MessagePack",
-    "version": "2.5.301",
+    "version": "2.5.307",
     "name": "MessagePack",
     "bindings": []
   },
@@ -282,6 +282,14 @@
       "mcpToolProperty",
       "mcpResourceTrigger",
       "mcpPromptTrigger"
+    ]
+  },
+  {
+    "id": "Microsoft.Azure.Functions.Extensions.Connector",
+    "majorVersion": "1",
+    "name": "Connector",
+    "bindings": [
+      "connectorTrigger"
     ]
   }
 ]
