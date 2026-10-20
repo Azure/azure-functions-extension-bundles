@@ -22,8 +22,9 @@ def connector_trigger_default(payload: str) -> str:
 @app.blob_input(
     arg_name='file', path='bundle-tests/test-connector-default.txt',
     connection='AzureWebJobsStorage')
-def get_connector_default(req: func.HttpRequest, file: func.InputStream) -> str:
-    return file.read().decode('utf-8')
+def get_connector_default(
+        req: func.HttpRequest, file: func.InputStream) -> func.HttpResponse:
+    return func.HttpResponse(body=file.read(), mimetype='application/json')
 
 
 @app.function_name(name='connector_trigger_explicit')
@@ -41,5 +42,6 @@ def connector_trigger_explicit(payload: str) -> str:
 @app.blob_input(
     arg_name='file', path='bundle-tests/test-connector-explicit.txt',
     connection='AzureWebJobsStorage')
-def get_connector_explicit(req: func.HttpRequest, file: func.InputStream) -> str:
-    return file.read().decode('utf-8')
+def get_connector_explicit(
+        req: func.HttpRequest, file: func.InputStream) -> func.HttpResponse:
+    return func.HttpResponse(body=file.read(), mimetype='application/json')

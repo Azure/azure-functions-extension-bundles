@@ -3,6 +3,7 @@
 """Protocol and lifecycle checks for the Connector test infrastructure."""
 
 import errno
+import io
 import json
 import socket
 import subprocess
@@ -26,6 +27,28 @@ from tests.emulator_tests.utils.connector.emulator import (
     State,
 )
 from tests.utils import testutils
+
+
+@pytest.mark.parametrize('function_name', [
+    'get_connector_default', 'get_connector_explicit'
+])
+def test_webhook_readback_preserves_callback_envelope(function_name):
+    import azure.functions as func
+    from tests.emulator_tests.connector_functions import function_app
+
+    payload = {
+        'id': 'synthetic-correlation-id',
+        'metadata': {'source': 'office365'},
+        'body': {'value': [{'id': 'synthetic-message-id'}]},
+    }
+    function = getattr(function_app, function_name).build().get_user_function()
+    response = function(
+        func.HttpRequest(method='GET', url='http://localhost/api/readback', body=b''),
+        io.BytesIO(json.dumps(payload).encode('utf-8')))
+    assert isinstance(response, func.HttpResponse)
+    assert response.status_code == 200
+    assert response.mimetype == 'application/json'
+    assert json.loads(response.get_body()) == payload
 
 
 @pytest.fixture

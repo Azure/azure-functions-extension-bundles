@@ -49,7 +49,7 @@ ExtensionBundle.v4.Templates.1.0.5130.zip
 
 #### NuGet feed configuration
 
-The repository restores packages through the root [NuGet.config](NuGet.config), which uses the `azure-functions-extension-bundles-feed` Azure Artifacts feed. To test unpublished extension packages, use an Azure Artifacts feed and update both the root configuration and the metadata source in [Settings.cs](build/Settings.cs) for the local test.
+The repository restores packages through the root [NuGet.config](NuGet.config), which uses the Azure Functions CFS feed. To test unpublished extension packages, use an Azure Artifacts feed and update both the root configuration and the metadata source in [Settings.cs](build/Settings.cs) for the local test.
 
 ### Building on Windows
 
