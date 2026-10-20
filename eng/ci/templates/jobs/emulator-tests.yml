@@ -119,6 +119,8 @@ jobs:
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
 
+  - template: /eng/ci/templates/install-dotnet.yml@self
+
   - task: DotNetCoreCLI@2
     displayName: 'Restore build tooling'
     inputs:
@@ -261,6 +263,10 @@ jobs:
         artifact: emulator-test-results-$(HOST_INDEX)-$(TEST_GROUP)
 
   steps:
+  - template: /eng/ci/templates/install-dotnet.yml@self
+    parameters:
+      condition: and(succeeded(), eq(variables['ADDITIONAL_EMULATORS'], 'signalr'))
+
   # Download prepared artifacts
   - task: DownloadPipelineArtifact@2
     displayName: 'Download core tools artifacts'

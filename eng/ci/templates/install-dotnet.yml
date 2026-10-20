@@ -1,0 +1,13 @@
+parameters:
+  - name: condition
+    type: string
+    default: succeeded()
+
+steps:
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK from global.json'
+    condition: ${{ parameters.condition }}
+    inputs:
+      packageType: 'sdk'
+      useGlobalJson: true
+      workingDirectory: '$(Build.Repository.LocalPath)'

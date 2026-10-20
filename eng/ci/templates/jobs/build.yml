@@ -19,6 +19,8 @@ jobs:
   - task: NuGetAuthenticate@1
     displayName: 'NuGet Authenticate'
 
+  - template: /eng/ci/templates/install-dotnet.yml@self
+
   - task: DotNetCoreCLI@2
     displayName: 'Restore build tooling'
     inputs:
