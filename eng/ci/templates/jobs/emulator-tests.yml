@@ -529,17 +529,6 @@ jobs:
           RabbitMQHost: 'localhost'
           RabbitMQPort: '5673'
 
-      # Copy webhost config for debugging
-      - script: |
-          if [ -f tests/webhost_config.txt ]; then
-            cp tests/webhost_config.txt $(Build.ArtifactStagingDirectory)/
-            echo "WebHost config copied for artifact upload"
-          else
-            echo "Warning: webhost_config.txt not found"
-          fi
-        displayName: 'Copy WebHost Config'
-        condition: always()
-
       # Publish test results
       - task: PublishTestResults@2
         inputs:
