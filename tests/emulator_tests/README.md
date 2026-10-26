@@ -294,6 +294,74 @@ python -m pytest tests/emulator_tests -v -s
 python -m pytest tests/emulator_tests --cov=utils --cov-report=html
 ```
 
+## Connector Poll emulator
+
+Connector bundle coverage is limited to POST callback delivery in default and
+explicit Webhook modes, invalid-request rejection, and the Poll delivery lifecycle.
+One representative callback covers nested objects, a collection, Unicode, and a
+JSON charset parameter without separate application-transformation tests.
+PUT combinations, empty-body behavior, and exact payload-size implementation
+boundaries are left to extension-level tests.
+
+`test_connector_poll_functions.py` runs the bundled Connector extension against
+a local HTTPS Poll protocol emulator and a local managed-identity token endpoint.
+It requires the existing Azurite setup, but no Azure resources, sign-in, or real
+access tokens. Python tests use single-event delivery, not batched cardinality.
+
+The fixture generates short-lived certificates and starts the emulator with the
+test runner's Python interpreter on Linux and Windows. Both its HTTPS runtime
+and HTTP identity/control server bind OS-assigned high ports; the child reports
+the bound ports through an atomic readiness file. No Connector emulator Docker
+image, administrator privileges, or fixed port 443 is needed.
+
+On Linux, certificate trust is scoped to the Functions host through
+`SSL_CERT_FILE`; system certificate stores are unchanged.
+On Windows, execution requires explicit permission to
+temporarily add its generated CA to the current-user root store:
+
+```powershell
+$env:CONNECTOR_EMULATOR_TRUST_LOCAL_CERTIFICATE = "1"
+python -m pytest tests/emulator_tests/test_connector_poll_functions.py -v
+```
+
+Windows may also display a certificate confirmation prompt. Cancelling it fails
+Poll test setup; the fixture does not bypass that decision or skip the tests.
+
+Fixture teardown stops and reaps the owned emulator process, archives its log,
+and cleans up generated certificates. No shell file-deletion commands are used.
+These tests validate local Poll delivery
+and acknowledgement behavior, not Azure identity authorization or cloud scaling.
+
+The delivery/acknowledgement case exercises both connection forms:
+`https://localhost:<port>` for stable DNS and
+`https://localhost:<port>/api/connectorGateways/emulator` for legacy routing.
+Separate functions use those connections, so the real extension must construct
+the correct Receive and Acknowledge URLs. The emulator rejects a Trigger Config
+on the wrong routing prefix instead of accepting either path indiscriminately.
+
+Stable-DNS and non-default HTTPS ports require Connector `1.0.0` or later.
+The bundle manifest selects Connector major version 1. Azurite is still needed
+for Blob bindings; only the Connector emulator's Docker dependency is removed.
+
+Delivery IDs are independent of payload correlation IDs. Concurrency tests use
+four queued messages and controlled function-body and acknowledgement delays to
+check both remaining receive capacity and the complete processing lifetime.
+Recovery tests explicitly expire the current delivery lock after observing the
+expected failure, rather than relying on short lease timers. Received-lock history
+is retained for assertions. This is not a claim about cloud lease timings.
+
+Infrastructure regression checks do not require Core Tools, Docker, or certificate
+store access:
+
+```powershell
+python -m pytest tests/emulator_tests/test_connector_emulator.py -v
+```
+
+The shared harness selects HTTP ports from 15000-24999, below the default
+Linux and Windows ephemeral ranges used by the host's independently allocated
+gRPC endpoint. Occupied candidates are skipped. This avoids the HTTP/gRPC
+self-collision observed when both allocations used the ephemeral range.
+
 ## Quick Setup Script
 
 For convenience, here's a PowerShell script that sets up everything:
