@@ -256,7 +256,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.MySql",
-    "version": "1.0.130",
+    "version": "1.0.131",
     "name": "MySqlBinding",
     "bindings": [
       "MySql",
