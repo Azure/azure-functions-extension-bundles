@@ -147,7 +147,7 @@ jobs:
       fi
     displayName: 'Verify Build Artifacts'
 
-# Job 3: Generate dynamic matrix for all Core Tools versions × Test Groups
+# Job 3: Generate dynamic matrix for Core Tools versions, test groups and dependency modes
 - job: GenerateTestMatrix
   displayName: Generate Test Matrix
   dependsOn: PrepareCoreTools
@@ -201,19 +201,21 @@ jobs:
           }
         }
         
-        # Generate matrix: version index X test group (e.g., 1_CosmosDB, 1_MySQL, 2_CosmosDB, 2_MySQL)
+        $dependencyModes = @('Default', 'Isolated')
         $matrix = @{}
         for ($versionIndex = 1; $versionIndex -le $hostTagsCount; $versionIndex++) {
           foreach ($group in $testGroups) {
-            # Create job key like "1_CosmosDB", "2_MySQL", etc.
-            $key = "${versionIndex}_$($group.Name)"
-            $matrix[$key] = @{
-              HOST_INDEX = $versionIndex
-              TEST_GROUP = $group.Group
-              TEST_FILES = $group.Files
-              ADDITIONAL_EMULATORS = $group.Emulators
-              DISPLAY_NAME = "${versionIndex}-$($group.Display)"
-              STOP_EVENTHUB = $group.StopEventHub
+            foreach ($dependencyMode in $dependencyModes) {
+              $key = "${versionIndex}_$($group.Name)_$dependencyMode"
+              $matrix[$key] = @{
+                HOST_INDEX = $versionIndex
+                TEST_GROUP = $group.Group
+                TEST_FILES = $group.Files
+                ADDITIONAL_EMULATORS = $group.Emulators
+                DISPLAY_NAME = "${versionIndex}-$($group.Display)-$dependencyMode"
+                STOP_EVENTHUB = $group.StopEventHub
+                DEPENDENCY_MODE = $dependencyMode
+              }
             }
           }
         }
@@ -258,7 +260,7 @@ jobs:
       - output: pipelineArtifact
         displayName: Publish emulator test artifacts for $(DISPLAY_NAME)
         path: $(Build.ArtifactStagingDirectory)
-        artifact: emulator-test-results-$(HOST_INDEX)-$(TEST_GROUP)
+        artifact: emulator-test-results-$(HOST_INDEX)-$(TEST_GROUP)-$(DEPENDENCY_MODE)
 
   steps:
   # Download prepared artifacts
@@ -514,6 +516,11 @@ jobs:
       
       # Run tests
       export PYAZURE_WEBHOST_DEBUG=1
+      unset PYTHON_ISOLATE_WORKER_DEPENDENCIES
+      if [ "$(DEPENDENCY_MODE)" = "Isolated" ]; then
+        export PYTHON_ISOLATE_WORKER_DEPENDENCIES=1
+      fi
+      echo "Python dependency mode: $(DEPENDENCY_MODE)"
       export FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI="http://localhost:8000"
       export MySqlConnectionString="Server=localhost;UserID=root;Password=password;Database=testdb;Port=3307"
       export SqlConnectionString="Server=localhost,1433;Database=testdb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
@@ -527,7 +534,7 @@ jobs:
       echo "Running pytest with paths: $TEST_PATHS"
       
       # Run tests - only one version per job now, so no loop needed
-      python -m pytest $TEST_PATHS -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results-$(HOST_INDEX)-$(TEST_GROUP).xml
+      python -m pytest tests/test_worker_dependencies.py $TEST_PATHS -v --tb=short --junitxml=$(Build.ArtifactStagingDirectory)/test-results-$(HOST_INDEX)-$(TEST_GROUP)-$(DEPENDENCY_MODE).xml
     displayName: 'Run $(DISPLAY_NAME)'
     condition: and(succeeded(), eq(variables.MOCK_SITE_READY, 'true'))
     env:
@@ -551,7 +558,7 @@ jobs:
   # Publish test results
   - task: PublishTestResults@2
     inputs:
-      testResultsFiles: '$(Build.ArtifactStagingDirectory)/test-results-$(HOST_INDEX)-$(TEST_GROUP).xml'
+      testResultsFiles: '$(Build.ArtifactStagingDirectory)/test-results-$(HOST_INDEX)-$(TEST_GROUP)-$(DEPENDENCY_MODE).xml'
       testRunTitle: '$(DISPLAY_NAME)'
       failTaskOnFailedTests: true
     condition: always()

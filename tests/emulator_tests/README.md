@@ -56,8 +56,30 @@ The CI pipeline tests extension bundles against **multiple versions** of Azure F
 **How It Works:**
 
 1. **PrepareCoreTools Job**: Builds N versions of Core Tools (based on latest host tags)
-2. **GenerateTestMatrix Job**: Creates a dynamic test matrix (Core Tools versions × Test Groups)
+2. **GenerateTestMatrix Job**: Creates a dynamic test matrix (Core Tools versions × Test Groups × Dependency Modes)
 3. **EmulatorTests Job**: Runs each combination in parallel
+
+Each Python 3.12 combination runs in two dependency modes:
+
+| Mode | `PYTHON_ISOLATE_WORKER_DEPENDENCIES` | Purpose |
+|---|---|---|
+| Default | Unset | Exercise the bundled worker's default dependency precedence |
+| Isolated | `1` | Exercise customer-installed dependencies taking precedence |
+
+CI explicitly unsets the setting in the Default lane, even if the agent has an inherited value.
+The host helper preserves explicit local overrides but does not supply a default.
+Both lanes keep `azure-functions` unpinned in `tests/requirements.txt`; matching the app's SDK
+to a worker beta would hide the dependency-precedence difference. Artifacts and test results
+include the dependency mode to keep the lanes separate.
+
+Use the worker startup logs to identify Python and worker versions. With worker extensions
+enabled, the `Python Worker Extension is enabled in azure.functions (...)` log also reports
+the SDK version and loaded module path. Inspect these in the function process rather than
+relying on `pip freeze` from the test runner. The worker's release manifest, not its current
+development branch, identifies the SDK bundled with that release.
+
+These Core Tools tests do not emulate production hosting details such as Linux Consumption
+specialization. Validate those separately with a deployed smoke test on the target plan.
 
 **Configuration Variables** (in pipeline YAML files):
 
@@ -89,6 +111,17 @@ $env:HOST_VERSION = "4.1046.100"  # Set specific version
 python -m invoke -c test_setup webhost
 python -m pytest tests/emulator_tests -v
 ```
+
+For the production-default dependency mode, remove any local override before running:
+
+```powershell
+Remove-Item Env:PYTHON_ISOLATE_WORKER_DEPENDENCIES -ErrorAction SilentlyContinue
+python -m pytest tests/emulator_tests -v
+```
+
+For the customer-isolation mode, set `$env:PYTHON_ISOLATE_WORKER_DEPENDENCIES = "1"`.
+Run the host-environment regression tests independently with
+`python -m unittest tests.test_worker_dependencies -v`.
 
 ### Validating CI Setup Locally
 
