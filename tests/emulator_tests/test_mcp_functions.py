@@ -6,6 +6,53 @@ import time
 from tests.utils import testutils
 import logging
 
+import pytest
+
+
+@pytest.mark.parametrize("argument_key", ["Arguments", "arguments"])
+@pytest.mark.parametrize("arguments, expected_name", [
+    ({"name": "Functions"}, "Functions"),
+    ({}, "world"),
+])
+def test_greeting_prompt_legacy_context(argument_key, arguments, expected_name):
+    from tests.emulator_tests.mcp_functions import function_app
+
+    function = function_app.greeting_prompt.build().get_user_function()
+    result = json.loads(function(json.dumps({argument_key: arguments})))
+
+    assert result == {
+        "messages": [{
+            "role": "user",
+            "content": {"type": "text", "text": f"Say hello to {expected_name}."},
+        }]
+    }
+
+
+@pytest.mark.parametrize("arguments, expected_name", [
+    ({"name": "Functions"}, "Functions"),
+    ({}, "world"),
+])
+def test_greeting_prompt_typed_context(arguments, expected_name):
+    import azure.functions as func
+    from tests.emulator_tests.mcp_functions import function_app
+
+    if not hasattr(func, "PromptInvocationContext"):
+        pytest.skip("This SDK predates typed MCP prompt contexts")
+
+    context = func.PromptInvocationContext({
+        "name": "greeting_prompt",
+        "arguments": arguments,
+    })
+    function = function_app.greeting_prompt.build().get_user_function()
+    result = json.loads(function(context))
+
+    assert result == {
+        "messages": [{
+            "role": "user",
+            "content": {"type": "text", "text": f"Say hello to {expected_name}."},
+        }]
+    }
+
 
 class TestMcpFunctions(testutils.WebHostTestCase):
 
