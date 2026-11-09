@@ -323,11 +323,7 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         "RabbitMQConnectionString": os.environ.get('RabbitMQConnectionString', DEFAULT_RABBITMQ_CONNECTION_STRING),
         "WEBSITE_SITE_NAME": MYSQL_WEBSITE_SITE_NAME,
         "PYTHON_ENABLE_WORKER_EXTENSIONS": '1'
-    }
-    if 'PYTHON_ISOLATE_WORKER_DEPENDENCIES' in os.environ:
-        extra_env['PYTHON_ISOLATE_WORKER_DEPENDENCIES'] = os.environ['PYTHON_ISOLATE_WORKER_DEPENDENCIES']
-
-    # Add connection strings from config
+    }  # Add connection strings from config
     if testconfig and 'azure' in testconfig:
         for key in ['storage_key', 'cosmosdb_key', 'eventhub_key', 
                    'servicebus_key', 'sql_key', 'eventgrid_topic_uri', 
