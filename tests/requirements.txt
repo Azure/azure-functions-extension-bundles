@@ -3,7 +3,7 @@ invoke
 mysql-connector-python
 pyodbc
 requests==2.*
-azure-functions>=1.27.0b1,<2
+azure-functions
 
 # Azure SDK packages for emulator tests
 azure-cosmos
