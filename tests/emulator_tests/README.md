@@ -59,9 +59,7 @@ The CI pipeline tests extension bundles against **multiple versions** of Azure F
 2. **GenerateTestMatrix Job**: Creates a dynamic test matrix (Core Tools versions × Test Groups)
 3. **EmulatorTests Job**: Runs each combination in parallel
 
-Keep `azure-functions` unpinned and leave `PYTHON_ISOLATE_WORKER_DEPENDENCIES` unset
-to exercise the Python 3.12 worker's default dependency precedence. The host helper
-inherits explicit environment overrides but does not enable isolation by default.
+Keep `azure-functions` unpinned and leave `PYTHON_ISOLATE_WORKER_DEPENDENCIES` unset to exercise the Python 3.12 worker's default dependency precedence. The host helper inherits explicit environment overrides but does not enable isolation by default.
 
 **Configuration Variables** (in pipeline YAML files):
 
