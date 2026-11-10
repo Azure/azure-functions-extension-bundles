@@ -63,8 +63,12 @@ def greeting_prompt(context) -> str:
     Returns:
         str: A JSON-serialized prompt result with the greeting message.
     """
-    ctx = json.loads(context)
-    args = ctx.get("Arguments") or ctx.get("arguments") or {}
+    prompt_context_type = getattr(func, "PromptInvocationContext", None)
+    if prompt_context_type is not None and isinstance(context, prompt_context_type):
+        args = context.arguments
+    else:
+        ctx = json.loads(context)
+        args = ctx.get("Arguments") or ctx.get("arguments") or {}
     name = args.get("name", "world")
     return json.dumps({
         "messages": [

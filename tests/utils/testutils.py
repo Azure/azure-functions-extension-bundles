@@ -36,7 +36,6 @@ DEFAULT_FUNCTIONS_EXTENSIONBUNDLE_SOURCE_URI = 'http://localhost:3000'
 # This definition is safe by design, but it might trigger the CI security checks. If that happens, let’s change it so it’s created and applied dynamically.
 DEFAULT_MYSQL_CONNECTION_STRING = "Server=localhost;UserID=root;Password=password;Database=testdb;Port=3307"
 MYSQL_WEBSITE_SITE_NAME = "SampleMysqlPythonApp"
-DEFAULT_PYTHON_ISOLATE_WORKER_DEPENDENCIES = '1'
 # SignalR emulator default connection string (used when AzureSignalRConnectionString is not set)
 # The emulator runs on port 8888 by default with a placeholder access key
 DEFAULT_SIGNALR_CONNECTION_STRING = "Endpoint=http://localhost;Port=8888;AccessKey=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789ABCDEFGH;Version=1.0;"
@@ -322,7 +321,6 @@ def popen_webhost(*, stdout, stderr, script_root, port=None):
         "MySqlConnectionString": os.environ.get('MySqlConnectionString', DEFAULT_MYSQL_CONNECTION_STRING),
         "AzureSignalRConnectionString": os.environ.get('AzureSignalRConnectionString', DEFAULT_SIGNALR_CONNECTION_STRING),
         "RabbitMQConnectionString": os.environ.get('RabbitMQConnectionString', DEFAULT_RABBITMQ_CONNECTION_STRING),
-        "PYTHON_ISOLATE_WORKER_DEPENDENCIES": os.environ.get('PYTHON_ISOLATE_WORKER_DEPENDENCIES', DEFAULT_PYTHON_ISOLATE_WORKER_DEPENDENCIES),
         "WEBSITE_SITE_NAME": MYSQL_WEBSITE_SITE_NAME,
         "PYTHON_ENABLE_WORKER_EXTENSIONS": '1'
     }  # Add connection strings from config
