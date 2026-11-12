@@ -14,8 +14,6 @@ Extension bundles provide a way for non-.NET function apps to reference and use 
 
 For more details, see [Supported Extension Bundles](https://learn.microsoft.com/azure/azure-functions/extension-bundles#supported-extension-bundles).
 
-Bundles built from this source do not include Dapr triggers or bindings. Apps using them must migrate or use a bundle that still includes Dapr; see the [Dapr extension retirement guidance](https://learn.microsoft.com/azure/azure-functions/functions-bindings-dapr).
-
 ## Build status
 
 |Branch|Status|
