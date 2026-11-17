@@ -217,6 +217,12 @@
     "bindings": []
   },
   {
+    "id": "Microsoft.AspNetCore.WebUtilities",
+    "version": "2.3.14",
+    "name": "MicrosoftAspNetCoreWebUtilities",
+    "bindings": []
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
     "majorVersion": "1",
     "name": "Dapr",
