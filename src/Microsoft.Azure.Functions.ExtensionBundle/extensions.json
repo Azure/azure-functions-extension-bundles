@@ -223,6 +223,18 @@
     "bindings": []
   },
   {
+    "id": "Microsoft.Azure.SignalR.Protocols",
+    "version": "1.34.0",
+    "name": "MicrosoftAzureSignalRProtocols",
+    "bindings": []
+  },
+  {
+    "id": "Microsoft.Azure.SignalR.Serverless.Protocols",
+    "version": "1.11.1",
+    "name": "MicrosoftAzureSignalRServerlessProtocols",
+    "bindings": []
+  },
+  {
     "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
     "majorVersion": "1",
     "name": "Dapr",
