@@ -16,7 +16,6 @@
           "Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents": "1.1.0",
           "Microsoft.Azure.WebJobs.Extensions.AzureCosmosDb.Mongo": "1.2.5-preview",
           "Microsoft.Azure.WebJobs.Extensions.CosmosDB": "4.16.1",
-          "Microsoft.Azure.WebJobs.Extensions.Dapr": "0.17.0-preview01",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask": "3.15.0",
           "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged": "1.10.0",
           "Microsoft.Azure.WebJobs.Extensions.EventGrid": "3.5.0",
@@ -1039,17 +1038,6 @@
           }
         }
       },
-      "Microsoft.Azure.Functions.Extensions.Dapr.Core/0.17.0-preview01": {
-        "dependencies": {
-          "System.Text.Json": "8.0.6"
-        },
-        "runtime": {
-          "lib/netstandard2.0/Microsoft.Azure.Functions.Extensions.Dapr.Core.dll": {
-            "assemblyVersion": "99.99.99.0",
-            "fileVersion": "99.99.99.0"
-          }
-        }
-      },
       "Microsoft.Azure.Functions.Extensions.Mcp/1.6.0": {
         "dependencies": {
           "Azure.Storage.Queues": "12.24.0",
@@ -1295,24 +1283,6 @@
           "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.CosmosDB.dll": {
             "assemblyVersion": "4.16.1.0",
             "fileVersion": "4.16.1.26276"
-          }
-        }
-      },
-      "Microsoft.Azure.WebJobs.Extensions.Dapr/0.17.0-preview01": {
-        "dependencies": {
-          "CloudNative.CloudEvents": "2.6.0",
-          "CloudNative.CloudEvents.SystemTextJson": "2.6.0",
-          "Microsoft.AspNet.WebApi.Client": "5.2.9",
-          "Microsoft.AspNetCore.Routing": "2.3.0",
-          "Microsoft.AspNetCore.Server.Kestrel": "2.2.0",
-          "Microsoft.Azure.Functions.Extensions.Dapr.Core": "0.17.0-preview01",
-          "Microsoft.Azure.WebJobs": "3.0.45",
-          "Microsoft.Extensions.Http": "8.0.0"
-        },
-        "runtime": {
-          "lib/netstandard2.0/Microsoft.Azure.WebJobs.Extensions.Dapr.dll": {
-            "assemblyVersion": "99.99.99.0",
-            "fileVersion": "99.99.99.0"
           }
         }
       },
@@ -4721,13 +4691,6 @@
       "path": "microsoft.azure.functions.extensions.connector/1.0.0",
       "hashPath": "microsoft.azure.functions.extensions.connector.1.0.0.nupkg.sha512"
     },
-    "Microsoft.Azure.Functions.Extensions.Dapr.Core/0.17.0-preview01": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-vt1HoPWXtzcw5iMeXXA5fw41H9Hbn72xwIccuSF9nBrRC5iHur30p/RTioNCKNEVxnQpGhQrKBcfQl0/oyJMpA==",
-      "path": "microsoft.azure.functions.extensions.dapr.core/0.17.0-preview01",
-      "hashPath": "microsoft.azure.functions.extensions.dapr.core.0.17.0-preview01.nupkg.sha512"
-    },
     "Microsoft.Azure.Functions.Extensions.Mcp/1.6.0": {
       "type": "package",
       "serviceable": true,
@@ -4839,13 +4802,6 @@
       "sha512": "sha512-KFh0HvMTqESPmCmZ7AilxIegw47WgXi8wnVXAwFmfhFCWynUZ9i3q72+Ije9XS6oL4gM/8zr16wOQzCroZ07/A==",
       "path": "microsoft.azure.webjobs.extensions.cosmosdb/4.16.1",
       "hashPath": "microsoft.azure.webjobs.extensions.cosmosdb.4.16.1.nupkg.sha512"
-    },
-    "Microsoft.Azure.WebJobs.Extensions.Dapr/0.17.0-preview01": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-4dAa3EXT+wIqsNiHP77H4TO3fB0X2clA8dcmI7cSKHDfSuarZKY/AS2GOJWWVAm/0DEjevfxTelxXFPVAowX4Q==",
-      "path": "microsoft.azure.webjobs.extensions.dapr/0.17.0-preview01",
-      "hashPath": "microsoft.azure.webjobs.extensions.dapr.0.17.0-preview01.nupkg.sha512"
     },
     "Microsoft.Azure.WebJobs.Extensions.DurableTask/3.15.0": {
       "type": "package",

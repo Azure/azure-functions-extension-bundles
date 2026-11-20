@@ -204,19 +204,22 @@
     ]
   },
   {
-    "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
-    "majorVersion": "0",
-    "name": "Dapr",
-    "bindings": [
-      "daprBinding",
-      "daprBindingTrigger",
-      "daprInvoke",
-      "daprPublish",
-      "daprSecret",
-      "daprServiceInvocationTrigger",
-      "daprState",
-      "daprTopicTrigger"
-    ]
+    "id": "Microsoft.AspNetCore.WebUtilities",
+    "version": "2.3.14",
+    "name": "MicrosoftAspNetCoreWebUtilities",
+    "bindings": []
+  },
+  {
+    "id": "Microsoft.Azure.SignalR.Protocols",
+    "version": "1.34.0",
+    "name": "MicrosoftAzureSignalRProtocols",
+    "bindings": []
+  },
+  {
+    "id": "Microsoft.Azure.SignalR.Serverless.Protocols",
+    "version": "1.11.1",
+    "name": "MicrosoftAzureSignalRServerlessProtocols",
+    "bindings": []
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.OpenAI",
