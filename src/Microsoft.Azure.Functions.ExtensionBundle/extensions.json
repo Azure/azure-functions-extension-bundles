@@ -21,7 +21,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Tables",
-    "majorVersion": "1",
+    "version": "1.4.0",
     "name": "AzureTables",
     "bindings": [
       "table"
@@ -56,7 +56,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.SendGrid",
-    "majorVersion": "3",
+    "version": "3.1.1",
     "name": "SendGrid",
     "bindings": [
       "sendgrid"
@@ -64,7 +64,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask",
-    "majorVersion": "3",
+    "version": "3.19.0",
     "name": "DurableTask",
     "bindings": [
       "activitytrigger",
@@ -76,7 +76,7 @@
   },
   {
     "id": "Microsoft.DurableTask.SqlServer.AzureFunctions",
-    "majorVersion": "1",
+    "version": "1.8.1",
     "name": "SqlDurabilityProvider",
     "bindings": [
       "activitytrigger",
@@ -88,7 +88,7 @@
   },
   {
     "id": "Microsoft.Azure.DurableTask.Netherite.AzureFunctions",
-    "majorVersion": "3",
+    "version": "3.1.2",
     "name": "NetheriteProvider",
     "bindings": [
       "activitytrigger",
@@ -100,7 +100,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.DurableTask.AzureManaged",
-    "majorVersion": "1",
+    "version": "1.12.0",
     "name": "AzureManagedProvider",
     "bindings": [
       "activitytrigger",
@@ -112,7 +112,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.EventGrid",
-    "majorVersion": "3",
+    "version": "3.5.0",
     "name": "EventGrid",
     "bindings": [
       "eventgridtrigger",
@@ -121,7 +121,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.CosmosDB",
-    "majorVersion": "4",
+    "version": "4.16.1",
     "name": "CosmosDB",
     "bindings": [
       "cosmosdbtrigger",
@@ -130,7 +130,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Twilio",
-    "majorVersion": "3",
+    "version": "3.0.2",
     "name": "Twilio",
     "bindings": [
       "twiliosms"
@@ -150,7 +150,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.RabbitMQ",
-    "majorVersion": "2",
+    "version": "2.1.0",
     "name": "RabbitMQ",
     "bindings": [
       "rabbitmqtrigger",
@@ -168,7 +168,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Sql",
-    "majorVersion": "3",
+    "version": "3.1.549",
     "name": "SqlBinding",
     "bindings": [
       "Sql",
@@ -177,7 +177,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.WebPubSub",
-    "majorVersion": "1",
+    "version": "1.10.2",
     "name": "WebPubSub",
     "bindings": [
       "webpubsub",
@@ -223,12 +223,6 @@
     "bindings": []
   },
   {
-    "id": "Microsoft.Azure.SignalR.Protocols",
-    "version": "1.34.0",
-    "name": "MicrosoftAzureSignalRProtocols",
-    "bindings": []
-  },
-  {
     "id": "Microsoft.Azure.SignalR.Serverless.Protocols",
     "version": "1.11.1",
     "name": "MicrosoftAzureSignalRServerlessProtocols",
@@ -236,7 +230,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
-    "majorVersion": "1",
+    "version": "1.0.1",
     "name": "Dapr",
     "bindings": [
       "daprBinding",
@@ -251,7 +245,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Redis",
-    "majorVersion": "1",
+    "version": "1.0.0",
     "name": "Redis",
     "bindings": [
       "redisPubSubTrigger",
@@ -274,7 +268,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.MySql",
-    "majorVersion": "1",
+    "version": "1.0.133",
     "name": "MySqlBinding",
     "bindings": [
       "MySql",
@@ -283,7 +277,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Fabric",
-    "majorVersion": "1",
+    "version": "1.0.130",
     "name": "Startup",
     "bindings": [
       "FabricItem",
@@ -293,7 +287,7 @@
   },
   {
     "id": "Microsoft.Azure.Functions.Extensions.Mcp",
-    "majorVersion": "1",
+    "version": "1.6.0",
     "name": "Mcp",
     "bindings": [
       "mcpToolTrigger",
@@ -304,7 +298,7 @@
   },
   {
     "id": "Microsoft.Azure.Functions.Extensions.Connector",
-    "majorVersion": "1",
+    "version": "1.0.0",
     "name": "Connector",
     "bindings": [
       "connectorTrigger"
