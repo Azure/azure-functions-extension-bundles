@@ -217,12 +217,6 @@
     "bindings": []
   },
   {
-    "id": "Microsoft.Azure.SignalR.Protocols",
-    "version": "1.34.0",
-    "name": "MicrosoftAzureSignalRProtocols",
-    "bindings": []
-  },
-  {
     "id": "Microsoft.Azure.SignalR.Serverless.Protocols",
     "version": "1.11.1",
     "name": "MicrosoftAzureSignalRServerlessProtocols",
