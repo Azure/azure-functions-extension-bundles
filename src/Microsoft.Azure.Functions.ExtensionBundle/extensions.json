@@ -211,12 +211,6 @@
     "bindings": []
   },
   {
-    "id": "Microsoft.AspNetCore.Server.Kestrel.Core",
-    "version": "2.3.6",
-    "name": "MicrosoftAspNetCoreServerKestrelCore",
-    "bindings": []
-  },
-  {
     "id": "Microsoft.AspNetCore.WebUtilities",
     "version": "2.3.14",
     "name": "MicrosoftAspNetCoreWebUtilities",
@@ -233,21 +227,6 @@
     "version": "1.11.1",
     "name": "MicrosoftAzureSignalRServerlessProtocols",
     "bindings": []
-  },
-  {
-    "id": "Microsoft.Azure.WebJobs.Extensions.Dapr",
-    "majorVersion": "1",
-    "name": "Dapr",
-    "bindings": [
-      "daprBinding",
-      "daprBindingTrigger",
-      "daprInvoke",
-      "daprPublish",
-      "daprSecret",
-      "daprServiceInvocationTrigger",
-      "daprState",
-      "daprTopicTrigger"
-    ]
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.Redis",
