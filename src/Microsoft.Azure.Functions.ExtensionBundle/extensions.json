@@ -255,6 +255,12 @@
     "bindings": []
   },
   {
+    "id": "Microsoft.Azure.SignalR.Serverless.Protocols",
+    "version": "1.11.1",
+    "name": "MicrosoftAzureSignalRServerlessProtocols",
+    "bindings": []
+  },
+  {
     "id": "MessagePack",
     "version": "2.5.307",
     "name": "MessagePack",
@@ -262,7 +268,7 @@
   },
   {
     "id": "Microsoft.Azure.WebJobs.Extensions.MySql",
-    "version": "1.0.131",
+    "version": "1.0.133",
     "name": "MySqlBinding",
     "bindings": [
       "MySql",
